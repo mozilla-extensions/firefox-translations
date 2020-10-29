@@ -1,2 +1,2 @@
-# Extension
-NMT extension for Firefox
+# Bergamot Browser Extension
+
