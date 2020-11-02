@@ -20,7 +20,7 @@
     border-radius: 4px;
     border: 1px solid var(--color-neutral-5);
     box-shadow: 0 8px 20px rgba(var(--color-black-rgb), 0.1);
-    overflow: hidden;
+    // overflow: hidden;
     scroll-behavior: smooth;
 
     &::-webkit-scrollbar {
@@ -50,6 +50,7 @@
     &__footer {
         position: absolute;
         width: 100%;
+        box-sizing: border-box;
         bottom: 0px;
         display: flex;
         justify-content: space-between;
