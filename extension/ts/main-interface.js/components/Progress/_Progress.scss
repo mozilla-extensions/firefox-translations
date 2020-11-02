@@ -15,7 +15,7 @@
     &.bar &__inner {
         width: 40px;
         height: 100%;
-        background: $color-teal-6;
+        background: var(--color-teal-6);
         display: inline-block;
         position: absolute;
         border-radius: 4px;
@@ -28,7 +28,7 @@
     }
 
     &.finished &__inner {
-        background-color: $color-green-6;
+        background-color: var(--color-green-6);
     }
 
     &.paused &__inner {
@@ -50,6 +50,6 @@
     }
 
     &.finished &__icon {
-        color: $color-green-6;
+        color: var(--color-green-6);
     }
 }

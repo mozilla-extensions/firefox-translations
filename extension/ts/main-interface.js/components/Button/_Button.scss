@@ -8,19 +8,19 @@
   align-items: center;
   border: 1px solid transparent;
   border-radius: 2px;
-  background: $color-teal-6;
-  color: $color-white;
+  background: var(--color-teal-6);
+  color: var(--color-white);
   transition: all 0.2s;
   width: fit-content;
   height: fit-content;
   
   &:hover {
-    background: $color-teal-5;
+    background: var(--color-teal-5);
   }
 
   &:active {
-    background: $color-teal-7;
-    box-shadow: 0 0 0 2px $color-teal-3;
+    background: var(--color-teal-7);
+    box-shadow: 0 0 0 2px var(--color-teal-3);
     animation-fill-mode: both;
   }
 
@@ -40,8 +40,8 @@
 
   &.outlined {
     background: transparent;
-    border: 1px solid $color-teal-6;
-    color: $color-teal-6;
+    border: 1px solid var(--color-teal-6);
+    color: var(--color-teal-6);
   }
   
 

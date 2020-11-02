@@ -3,7 +3,7 @@
 
     & .Text {
         flex: 1;
-        border: 1px solid $color-neutral-5;
+        border: 1px solid var(--color-neutral-5);
         margin-left: 120px;
         padding: 40px 40px;
         border-radius: 2px;
@@ -13,13 +13,13 @@
 .BergamotApp {
     width: 320px;
     height: 600px;
-    // background-color: $color-neutral-3;
+    // background-color: var(--color-neutral-3);
     position: relative;
-    color: $color-neutral-11;
+    color: var(--color-neutral-11);
     font-size: 14px;
     border-radius: 4px;
-    border: 1px solid $color-neutral-5;
-    box-shadow: 0 8px 20px rgba($color-neutral-13, 0.1);
+    border: 1px solid var(--color-neutral-5);
+    box-shadow: 0 8px 20px rgba(var(--color-black-rgb), 0.1);
     overflow: hidden;
     scroll-behavior: smooth;
 
@@ -30,20 +30,20 @@
     & input {
         border: none;
         outline: none;
-        background-color: $color-neutral-2;
-        border-bottom: 1px solid $color-neutral-5;
+        background-color: var(--color-neutral-2);
+        border-bottom: 1px solid var(--color-neutral-5);
 
         &:hover,
         &:focus {
             border: none;
-            border-bottom: 1px solid $color-neutral-5;
+            border-bottom: 1px solid var(--color-neutral-5);
             box-shadow: none;
         }
     }
 
     &__languageSwitcher {
         position: relative;
-        background: $color-neutral-2;
+        background: var(--color-neutral-2);
         padding: 16px;
     }
 
@@ -54,7 +54,7 @@
         display: flex;
         justify-content: space-between;
         padding: 12px 16px;
-        color: $color-neutral-7;
+        color: var(--color-neutral-7);
 
         a {
             text-decoration: none;
@@ -68,7 +68,7 @@
             width: 90%;
             height: 1px;
             position: absolute;
-            background: $color-neutral-5;
+            background: var(--color-neutral-5);
         }
     }
 }

@@ -25,7 +25,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: $color-white;
+        color: var(--color-white);
         cursor: pointer;
         
         & svg{
@@ -36,8 +36,8 @@
     }
 
     & input:checked ~ .Checkbox__checkmark {
-        background: $color-teal-6;
-        border: 1px solid $color-teal-6;
+        background: var(--color-teal-6);
+        border: 1px solid var(--color-teal-6);
         background-size: 100% 100%;
 
         & svg {

@@ -11,7 +11,7 @@
     outline: none;
 
     &:hover {
-        box-shadow: 0 0 0 2px $color-neutral-3;
+        box-shadow: 0 0 0 2px var(--color-neutral-3);
     }
     
     &__slider {
@@ -48,18 +48,18 @@
     }
 
     &.checked {
-        background: $color-teal-6;
+        background: var(--color-teal-6);
 
         & .Switch__slider {
         }
 
         &:hover {
-            box-shadow: 0 0 0 2px $color-teal-3;
+            box-shadow: 0 0 0 2px var(--color-teal-3);
         }
     }
 
     &.checked &__icon {
-        color: $color-teal-6;
+        color: var(--color-teal-6);
     }
 
     &.checked &__slider {
@@ -72,6 +72,6 @@
     }
 
     &:hover &__slider{
-        box-shadow: 0 4px 6px 0 rgba($color-black, .1);
+        box-shadow: 0 4px 6px 0 rgba(var(--color-black-rgb), .1);
     }
 }

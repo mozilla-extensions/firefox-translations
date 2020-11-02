@@ -1,14 +1,14 @@
 .List {
-    border: 1px solid $color-neutral-6;
+    border: 1px solid var(--color-neutral-6);
     border-radius: 2px;
     overflow: hidden;
     width: 100%;
     height: fit-content;
-    color: $color-neutral-9;
+    color: var(--color-neutral-9);
 
     & a, a:visited, a:active, a:link {
         text-decoration: none;
-        color: $color-neutral-9;
+        color: var(--color-neutral-9);
     }
 
     &.borderless {
@@ -17,14 +17,14 @@
 
     &__header {
         padding: 12px 12px;
-        background: $color-neutral-5;
+        background: var(--color-neutral-5);
         position: relative;
 
         &::after {
             content: "";
             position: absolute;
             height: 1px;
-            background: $color-neutral-6;
+            background: var(--color-neutral-6);
             bottom: 0;
             width: 100%;
             left: 0;
@@ -37,20 +37,21 @@
         display: flex;
         align-items: center;
         width: 100%;
+        box-sizing: border-box;
         transition: all .2s;
 
         &::after {
             content: "";
             position: absolute;
             height: 1px;
-            // background: $color-neutral-;
+            // background: var(--color-neutral-);
             bottom: 0;
-            width: 100%;
+            // width: 100%;
             left: 0;
         }
 
         &:hover {
-            background: $color-neutral-2;
+            background: var(--color-neutral-2);
         }
 
         &__icon {
@@ -58,7 +59,7 @@
             justify-content: center;
             align-items: center;
             margin-right: 8px;
-            color: $color-neutral-9;
+            color: var(--color-neutral-9);
         }
 
         &__action {

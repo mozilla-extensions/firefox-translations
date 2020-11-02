@@ -1,8 +1,8 @@
 .Alert {
     width: 100%;
     position: relative;
-    background: $color-teal-1;
-    color: $color-teal-6;
+    background: var(--color-teal-1);
+    color: var(--color-teal-6);
     font-size: 14px;
     padding: 5px 8px;
     display: flex;
@@ -40,36 +40,36 @@
         width: 2px;
         height: 100%;
         position: absolute;
-        background: $color-teal-6;
+        background: var(--color-teal-6);
         left: 0;
         top: 0;
         transition: all .5s ease;
     }
 
     &.error {
-        background: $color-red-1;
-        color: $color-red-6;
+        background: var(--color-red-1);
+        color: var(--color-red-6);
 
         &::before {
-            background: $color-red-6;
+            background: var(--color-red-6);
         }
     }
 
     &.success {
-        background: $color-green-1;
-        color: $color-green-6; 
+        background: var(--color-green-1);
+        color: var(--color-green-6);
 
         &::before {
-            background: $color-green-6;
+            background: var(--color-green-6);
         }
     }
 
     &.warning {
-        background: $color-orange-1;
-        color: $color-orange-6;
+        background: var(--color-orange-1);
+        color: var(--color-orange-6);
 
         &::before {
-            background: $color-orange-6;
+            background: var(--color-orange-6);
         }
     }
 }

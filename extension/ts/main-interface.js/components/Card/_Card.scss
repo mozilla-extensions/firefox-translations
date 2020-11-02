@@ -10,7 +10,7 @@
     }
     
     &:hover {
-        box-shadow: 0 4px 10px rgba($color-black, .1);
+        box-shadow: 0 4px 10px rgba(var(--color-black-rgb), .1);
         transform: translateY(-2px);
     }
 

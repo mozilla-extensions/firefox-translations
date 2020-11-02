@@ -4,13 +4,13 @@
     padding: 16px;
     // margin: 8px;
     font-size: 24px;
-    color: $color-neutral-5;
-    background-color: $color-white;
+    color: var(--color-neutral-5);
+    background-color: var(--color-white);
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba($color-black, 0.05);
+    box-shadow: 0 4px 10px rgba(var(--color-black-rgb), 0.05);
 
     &__languageType {
-        color: $color-neutral-5;
+        color: var(--color-neutral-5);
         font-size: 12px;
         display: inline-block;
         margin-bottom: 2px;
@@ -64,7 +64,7 @@
         transition: all 0.2s;
 
         &:hover {
-            background-color: $color-neutral-4;
+            background-color: var(--color-neutral-4);
         }
 
         & svg {
@@ -74,17 +74,17 @@
 
     &.source {
         .LanguageSwitcher__sourceLanguage {
-            color: $color-teal-6;
+            color: var(--color-teal-6);
         }
     }
 
     &.target {
         .LanguageSwitcher__targetLanguage {
-            color: $color-teal-6;
+            color: var(--color-teal-6);
         }
 
         .LanguageSwitcher__select {
-            color: $color-neutral-7;
+            color: var(--color-neutral-7);
         }
     }
 }
