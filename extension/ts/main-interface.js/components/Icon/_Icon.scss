@@ -1,0 +1,15 @@
+.Icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    justify-self: center;
+    width: 16px;
+    height: 16px;
+    padding: 2px;
+    border-radius: 2px;
+
+    &:hover {
+        background: $color-neutral-5;
+    }
+}

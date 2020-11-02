@@ -1,0 +1,132 @@
+.TextField {
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    width: 100%;
+
+    &.allowClear {
+        color: lightgray;
+        position: relative;
+
+        &:hover {
+            color: darkgray;
+        }
+    }
+
+    &__clearIcon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: -24px;
+    }
+
+    & textarea {
+        width: 100%;
+        height: 100%;
+        display: block;
+        margin: 0;
+    }
+
+    &.itemOver {
+        &::after {
+            content: "Drop file here to upload.";
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border: 1px dashed $color-teal-6;
+            color: $color-teal-6;
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            border-radius: 2px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        & textarea {
+            border: 1px solid $color-teal-6;
+        }
+    }
+
+    &__prefixIcon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        left: 8px;
+        padding: 1px;
+    }
+
+    &__suffixIcon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-self: center;
+        right: 8px;
+        padding: 1px;
+    }
+
+    &.withPrefixIcon input {
+        padding: 8px 8px 8px 32px;
+    }
+
+    &.withSuffixIcon input {
+        padding: 8px 32px 8px 8px;
+    }
+
+    & input,
+    & textarea {
+        transition: all 0.2s;
+        border: 1px solid lightgray;
+        border-radius: 2px;
+        padding: 8px;
+        width: 100%;
+
+        &:hover,
+        &:focus {
+            box-shadow: 0 0 0 2px $color-teal-3;
+            border: 1px solid $color-teal-6;
+        }
+    }
+
+    &.processing input, &.processing textarea {
+        border: 1px solid $color-teal-6;
+        animation: shadowSpread 2s ease;
+        animation-iteration-count: infinite;
+    }
+
+    & input + &__maxLength {
+        font-size: 12px;
+        line-height: 12px;
+        color: lightgray;
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    & textarea + &__maxLength {
+        font-size: 12px;
+        line-height: 12px;
+        color: lightgray;
+        right: 0px;
+        bottom: -16px;
+        position: absolute;
+        // transform: translateY(-50%);
+    }
+
+    &.maxLengthSet input {
+        padding-right: 48px;
+    }
+}

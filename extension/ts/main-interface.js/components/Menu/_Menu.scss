@@ -1,0 +1,28 @@
+.Menu {
+    width: fit-content;
+    min-width: 160px;
+    box-shadow: 0 4px 10px rgba($color-black, .1);
+    border-radius: 4px;
+    border: 1px solid $color-neutral-3;
+    overflow: hidden;
+    padding: 4px 0;
+    position: absolute;
+    z-index: 999;
+    font-size: 14px;
+    color: $color-neutral-9;
+    background: $color-white;
+
+    &__Item {
+        padding: 8px 12px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: $color-white;
+
+        &:hover{
+            background-color: $color-neutral-3;
+            cursor: pointer;
+        }
+    }
+}

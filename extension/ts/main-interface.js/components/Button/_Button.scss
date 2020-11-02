@@ -1,0 +1,72 @@
+.Button {
+  padding: 5px 6px;
+  font-size: 14px;
+  line-height: 1;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: $color-teal-6;
+  color: $color-white;
+  transition: all 0.2s;
+  width: fit-content;
+  height: fit-content;
+  
+  &:hover {
+    background: $color-teal-5;
+  }
+
+  &:active {
+    background: $color-teal-7;
+    box-shadow: 0 0 0 2px $color-teal-3;
+    animation-fill-mode: both;
+  }
+
+  &__prefixIcon {
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__suffixIcon {
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.outlined {
+    background: transparent;
+    border: 1px solid $color-teal-6;
+    color: $color-teal-6;
+  }
+  
+
+  &.secondary {
+    background: gray;
+
+    &:active {
+      box-shadow: 0 0 0 2px darkgray;
+    }
+  }
+
+  &:disabled {
+    background-color: lightgray;
+    color: gray;
+    border: 1px solid lightgray;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &.block {
+    width: 100%;
+  }
+
+  &.block &__suffixIcon {
+    position: absolute;
+    right: 6px;
+  }
+}
