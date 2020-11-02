@@ -4,13 +4,13 @@
   line-height: 30px;
   font-size: 12px;
   text-align: center;
-  transition: all .1s;
+  transition: all 0.1s;
   cursor: pointer;
 
   &:hover {
-    border-radius: .1rem;
+    border-radius: 0.1rem;
     transform: scale(1.1);
-    box-shadow: 1px 1px 20px rgba(black, .1);
+    box-shadow: 1px 1px 20px rgba(black, 0.1);
   }
 }
 
@@ -46,8 +46,6 @@
   opacity: 0;
   transition: all 3000ms;
 }
-
-
 
 @import "./scss/_variables.scss";
 @import "./scss/_base.scss";

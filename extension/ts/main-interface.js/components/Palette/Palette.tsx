@@ -4,48 +4,49 @@ import { generate } from "@ant-design/colors";
 const baseColors = [
   {
     name: "Rose Red / Error, Danger",
-    hex: "FF033E"
+    hex: "FF033E",
   },
   {
     name: "Gold",
-    hex: "FFD700"
+    hex: "FFD700",
   },
   {
     name: "Violet",
-    hex: "8F00FF"
+    hex: "8F00FF",
   },
   {
     name: "Emerald Green / Success",
-    hex: "50C878"
+    hex: "50C878",
   },
   {
     name: "Bright Orange / Warning",
-    hex: "FFA500"
+    hex: "FFA500",
   },
   {
     name: "Teal",
-    hex: "30D5C8"
+    hex: "30D5C8",
   },
   {
     name: "Royal Blue / Information",
-    hex: "4169E1"
-  }
+    hex: "4169E1",
+  },
 ];
 
-const generatedColors = baseColors.map((hue) => {
+const generatedColors = baseColors.map(hue => {
   return {
     name: hue.name,
-    colors: generate(hue.hex)
+    colors: generate(hue.hex),
   };
 });
 
-const swatches = generatedColors.map((list) => (
-  <div key={generatedColors.indexOf(list)}
+const swatches = generatedColors.map(list => (
+  <div
+    key={generatedColors.indexOf(list)}
     style={{
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      marginLeft: 20
+      marginLeft: 20,
     }}
   >
     <div key={Math.random()}>
@@ -58,14 +59,14 @@ const swatches = generatedColors.map((list) => (
             height: "30px",
             background: color,
             lineHeight: "30px",
-            fontSize: "12px"
+            fontSize: "12px",
           }}
         >
           <span>
             {color +
               " - " +
               (i + 1) +
-              ((i) => {
+              (i => {
                 switch (i) {
                   case 6:
                     return " / base";
@@ -89,18 +90,14 @@ const swatches = generatedColors.map((list) => (
   </div>
 ));
 
-
 const Palette = () => {
-
-
   return (
     <div className="Palette">
       <div className="swatches" style={{ display: "flex" }}>
         {swatches}
       </div>
     </div>
-  )
-}
-
+  );
+};
 
 export default Palette;

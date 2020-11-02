@@ -18,17 +18,16 @@ const App = () => {
         <Transition />
       </Route>
     </Switch>
-  )
-
+  );
 
   return (
-  <div className={"App"}>
+    <div className={"App"}>
       <Link to={"/components"}>Components</Link>
       <Link to={"/demo"}>Demo</Link>
       <Link to={"/transition"}>Transition</Link>
-      { routes }
+      {routes}
     </div>
-  )
-}
+  );
+};
 
 export default App;

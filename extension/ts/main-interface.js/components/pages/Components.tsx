@@ -5,7 +5,23 @@ import Switch from "../Switch/Switch";
 import TextField from "../TextField/TextField";
 import Alert from "../Alert/Alert";
 import Checkbox from "../Checkbox/Checkbox";
-import { BsPerson, BsPlus, BsGear, BsFillInfoCircleFill, BsXCircleFill, BsQuestionCircleFill, BsFlagFill, BsClock, BsArrowRepeat, BsLockFill, BsApp, BsChevronRight, BsLightningFill, BsVolumeUpFill, BsPower } from "react-icons/bs"
+import {
+  BsPerson,
+  BsPlus,
+  BsGear,
+  BsFillInfoCircleFill,
+  BsXCircleFill,
+  BsQuestionCircleFill,
+  BsFlagFill,
+  BsClock,
+  BsArrowRepeat,
+  BsLockFill,
+  BsApp,
+  BsChevronRight,
+  BsLightningFill,
+  BsVolumeUpFill,
+  BsPower,
+} from "react-icons/bs";
 import Radio from "../Radio/Radio";
 import Card from "../Card/Card";
 import Progress from "../Progress/Progress";
@@ -18,38 +34,37 @@ export const data = [
   {
     text: "Translate own text",
     icon: <BsLockFill />,
-    action: <BsChevronRight />
+    action: <BsChevronRight />,
   },
   {
     text: "Module Management",
     icon: <BsApp />,
-    action: <BsChevronRight />
+    action: <BsChevronRight />,
   },
   {
     text: "Options",
     icon: <BsGear />,
-    action: <BsChevronRight />
+    action: <BsChevronRight />,
   },
   {
     text: "Always translate German",
     icon: <BsLightningFill />,
-    action: <Switch />
+    action: <Switch />,
   },
   {
     text: "Show quality estimation",
     icon: <BsLightningFill />,
-    action: <Switch />
-  }
+    action: <Switch />,
+  },
 ];
 
 export default function Components() {
-
   const [progressValue, setProgressValue] = React.useState(2);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
       if (progressValue < 100) {
-        setProgressValue(v => v + 1)
+        setProgressValue(v => v + 1);
       } else setProgressValue(v => 0);
     }, 10);
 
@@ -57,11 +72,16 @@ export default function Components() {
   }, [progressValue]);
 
   return (
-    <div className={"App"} >
+    <div className={"App"}>
       <h1>Design Assets</h1>
-      <a href={"https://github.com/randomgoose/bergamot-ui"}>Github Repository</a>
+      <a href={"https://github.com/randomgoose/bergamot-ui"}>
+        Github Repository
+      </a>
       <h3>Button</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Different types of buttons"}>
           <div>primary button</div>
           <Button type={"primary"} label={"Translate"} />
@@ -73,9 +93,17 @@ export default function Components() {
 
         <Card title={"Buttons with icons"}>
           <div>prefixIcon.</div>
-          <Button prefixIcon={<BsArrowRepeat />} type={"primary"} label={"Translate"} />
+          <Button
+            prefixIcon={<BsArrowRepeat />}
+            type={"primary"}
+            label={"Translate"}
+          />
           <div>suffixIcon</div>
-          <Button suffixIcon={<BsArrowRepeat />} type={"secondary"} label={"Translate"} />
+          <Button
+            suffixIcon={<BsArrowRepeat />}
+            type={"secondary"}
+            label={"Translate"}
+          />
           <div>outlined button / tertiary button</div>
         </Card>
 
@@ -92,7 +120,10 @@ export default function Components() {
 
       <h3>Switch</h3>
 
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Basic"}>
           <Switch />
         </Card>
@@ -108,7 +139,10 @@ export default function Components() {
 
       <h3>TextField</h3>
 
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Basic"}>
           <TextField />
         </Card>
@@ -138,27 +172,51 @@ export default function Components() {
         </Card>
 
         <Card title={"Drag and drop a file."}>
-          <TextField textArea placeholder={"Drag and drop a file here."} allowDrop />
+          <TextField
+            textArea
+            placeholder={"Drag and drop a file here."}
+            allowDrop
+          />
         </Card>
-
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-start" }}>
-
-
-      </div>
+      <div style={{ display: "flex", alignItems: "flex-start" }}></div>
       <h3>Alert</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Alert"}>
-          <Alert closable prefixIcon={<BsFillInfoCircleFill />} info={"New NMT model installed."} />
-          <Alert closable prefixIcon={<BsXCircleFill />} info={"A fatal error."} status={"error"} />
-          <Alert closable prefixIcon={<BsFlagFill />} info={"The task has been done."} status={"success"} />
-          <Alert closable prefixIcon={<BsQuestionCircleFill />} info={"There's not enought disk space."} status={"warning"} />
+          <Alert
+            closable
+            prefixIcon={<BsFillInfoCircleFill />}
+            info={"New NMT model installed."}
+          />
+          <Alert
+            closable
+            prefixIcon={<BsXCircleFill />}
+            info={"A fatal error."}
+            status={"error"}
+          />
+          <Alert
+            closable
+            prefixIcon={<BsFlagFill />}
+            info={"The task has been done."}
+            status={"success"}
+          />
+          <Alert
+            closable
+            prefixIcon={<BsQuestionCircleFill />}
+            info={"There's not enought disk space."}
+            status={"warning"}
+          />
         </Card>
-
       </div>
       <h3>Checkbox</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Checkbox"}>
           <Checkbox id={"checkbox1"} label={"English"} />
           <Checkbox id={"checkbox2"} label={"Finnish"} />
@@ -167,7 +225,10 @@ export default function Components() {
       </div>
 
       <h3>Radio</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Radio"}>
           <Radio id={"radio1"} />
           <Radio id={"radio2"} />
@@ -176,35 +237,60 @@ export default function Components() {
       </div>
 
       <h3>Card</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
-        <Card actions={[
-          <Button label={"Done"} />
-        ]} title={"ambience"} style={{ width: "50%", alignSelf: "center" }}>
-          <span><strong>noun</strong> [S]</span>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
+        <Card
+          actions={[<Button label={"Done"} />]}
+          title={"ambience"}
+          style={{ width: "50%", alignSelf: "center" }}
+        >
+          <span>
+            <strong>noun</strong> [S]
+          </span>
           <br />
-          <span style={{ display: "flex", alignItems: "center" }}><strong>UK</strong><BsVolumeUpFill style={{ marginLeft: 4 }} /></span>
-        the character of a place or the quality it seems to have:
-        <ul>
-            <li>Despite being a busy city, Dublin has the ambience of a country town.</li>
+          <span style={{ display: "flex", alignItems: "center" }}>
+            <strong>UK</strong>
+            <BsVolumeUpFill style={{ marginLeft: 4 }} />
+          </span>
+          the character of a place or the quality it seems to have:
+          <ul>
+            <li>
+              Despite being a busy city, Dublin has the ambience of a country
+              town.
+            </li>
           </ul>
-
         </Card>
 
-        <Card actions={[
-          <Button label={"Done"} />
-        ]} title={"ambience"} style={{ width: "50%", alignSelf: "center" }} borderless>
-          <span><strong>noun</strong> [S]</span>
+        <Card
+          actions={[<Button label={"Done"} />]}
+          title={"ambience"}
+          style={{ width: "50%", alignSelf: "center" }}
+          borderless
+        >
+          <span>
+            <strong>noun</strong> [S]
+          </span>
           <br />
-          <span style={{ display: "flex", alignItems: "center" }}><strong>UK</strong><BsVolumeUpFill style={{ marginLeft: 4 }} /></span>
-        the character of a place or the quality it seems to have:
-        <ul>
-            <li>Despite being a busy city, Dublin has the ambience of a country town.</li>
+          <span style={{ display: "flex", alignItems: "center" }}>
+            <strong>UK</strong>
+            <BsVolumeUpFill style={{ marginLeft: 4 }} />
+          </span>
+          the character of a place or the quality it seems to have:
+          <ul>
+            <li>
+              Despite being a busy city, Dublin has the ambience of a country
+              town.
+            </li>
           </ul>
-
         </Card>
       </div>
       <h3>Progress</h3>
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"Progress bar"}>
           <ControlledProgress value={50} />
         </Card>
@@ -212,9 +298,13 @@ export default function Components() {
           <Progress value={progressValue} label />
         </Card>
         <Card title={"Different statuses of progress bars"}>
-          <Progress value={62} status={"finished"} label style={{ marginBottom: 20 }} />
+          <Progress
+            value={62}
+            status={"finished"}
+            label
+            style={{ marginBottom: 20 }}
+          />
           <Progress value={62} status={"paused"} label />
-
         </Card>
 
         <Card title={"Trigger an action when finished."}>
@@ -223,11 +313,12 @@ export default function Components() {
         </Card>
       </div>
 
-      <div className={"Row"} style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        className={"Row"}
+        style={{ display: "flex", flexDirection: "column" }}
+      >
         <Card title={"List"}>
-          <List header={"Features"} data={
-            data
-          } />
+          <List header={"Features"} data={data} />
         </Card>
       </div>
 
@@ -239,11 +330,11 @@ export default function Components() {
       <h3>Menu</h3>
       <Card title={"Menu"} style={{ width: "100%" }}>
         <Menu>
-          <Button label={"Button"}/>
+          <Button label={"Button"} />
         </Menu>
       </Card>
 
       <Table defaultData={{ name: "Lee" }} />
-    </div >
+    </div>
   );
 }

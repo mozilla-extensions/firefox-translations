@@ -1,17 +1,19 @@
 // @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 html {
-    box-sizing: border-box;
-  }
-
-*, *:before, *:after {
-    // font-family: 'Open Sans', sans-serif;
-    font-family: 'Inter', sans-serif;
-    box-sizing: inherit;
+  box-sizing: border-box;
 }
 
-.Row > *{
+*,
+*:before,
+*:after {
+  // font-family: 'Open Sans', sans-serif;
+  font-family: "Inter", sans-serif;
+  box-sizing: inherit;
+}
+
+.Row > * {
   margin: 10px 0;
 }
 

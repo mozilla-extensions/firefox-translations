@@ -1,70 +1,73 @@
 .List {
-    border: 1px solid var(--color-neutral-6);
-    border-radius: 2px;
-    overflow: hidden;
-    width: 100%;
-    height: fit-content;
+  border: 1px solid var(--color-neutral-6);
+  border-radius: 2px;
+  overflow: hidden;
+  width: 100%;
+  height: fit-content;
+  color: var(--color-neutral-9);
+
+  & a,
+  a:visited,
+  a:active,
+  a:link {
+    text-decoration: none;
     color: var(--color-neutral-9);
+  }
 
-    & a, a:visited, a:active, a:link {
-        text-decoration: none;
-        color: var(--color-neutral-9);
+  &.borderless {
+    border: none;
+  }
+
+  &__header {
+    padding: 12px 12px;
+    background: var(--color-neutral-5);
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      height: 1px;
+      background: var(--color-neutral-6);
+      bottom: 0;
+      width: 100%;
+      left: 0;
+    }
+  }
+
+  &Item {
+    padding: 16px 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s;
+
+    &::after {
+      content: "";
+      position: absolute;
+      height: 1px;
+      // background: var(--color-neutral-);
+      bottom: 0;
+      // width: 100%;
+      left: 0;
     }
 
-    &.borderless {
-        border: none;
+    &:hover {
+      background: var(--color-neutral-2);
     }
 
-    &__header {
-        padding: 12px 12px;
-        background: var(--color-neutral-5);
-        position: relative;
-
-        &::after {
-            content: "";
-            position: absolute;
-            height: 1px;
-            background: var(--color-neutral-6);
-            bottom: 0;
-            width: 100%;
-            left: 0;
-        }
+    &__icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 8px;
+      color: var(--color-neutral-9);
     }
 
-    &Item {
-        padding: 16px 16px;
-        position: relative;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        box-sizing: border-box;
-        transition: all .2s;
-
-        &::after {
-            content: "";
-            position: absolute;
-            height: 1px;
-            // background: var(--color-neutral-);
-            bottom: 0;
-            // width: 100%;
-            left: 0;
-        }
-
-        &:hover {
-            background: var(--color-neutral-2);
-        }
-
-        &__icon {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 8px;
-            color: var(--color-neutral-9);
-        }
-
-        &__action {
-            position: absolute;
-            right: 8px;
-        }
+    &__action {
+      position: absolute;
+      right: 8px;
     }
+  }
 }

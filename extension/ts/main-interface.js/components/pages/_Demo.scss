@@ -1,136 +1,136 @@
 .Demo {
-    display: flex;
+  display: flex;
 
-    & .Text {
-        flex: 1;
-        border: 1px solid var(--color-neutral-5);
-        margin-left: 120px;
-        padding: 40px 40px;
-        border-radius: 2px;
-    }
+  & .Text {
+    flex: 1;
+    border: 1px solid var(--color-neutral-5);
+    margin-left: 120px;
+    padding: 40px 40px;
+    border-radius: 2px;
+  }
 }
 
 .BergamotApp {
-    width: 320px;
-    height: 600px;
-    // background-color: var(--color-neutral-3);
+  width: 320px;
+  height: 600px;
+  // background-color: var(--color-neutral-3);
+  position: relative;
+  color: var(--color-neutral-11);
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--color-neutral-5);
+  box-shadow: 0 8px 20px rgba(var(--color-black-rgb), 0.1);
+  // overflow: hidden;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  & input {
+    border: none;
+    outline: none;
+    background-color: var(--color-neutral-2);
+    border-bottom: 1px solid var(--color-neutral-5);
+
+    &:hover,
+    &:focus {
+      border: none;
+      border-bottom: 1px solid var(--color-neutral-5);
+      box-shadow: none;
+    }
+  }
+
+  &__languageSwitcher {
     position: relative;
-    color: var(--color-neutral-11);
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid var(--color-neutral-5);
-    box-shadow: 0 8px 20px rgba(var(--color-black-rgb), 0.1);
-    // overflow: hidden;
-    scroll-behavior: smooth;
+    background: var(--color-neutral-2);
+    padding: 16px;
+  }
 
-    &::-webkit-scrollbar {
-        display: none;
-      }
+  &__footer {
+    position: absolute;
+    width: 100%;
+    box-sizing: border-box;
+    bottom: 0px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    color: var(--color-neutral-7);
 
-    & input {
-        border: none;
-        outline: none;
-        background-color: var(--color-neutral-2);
-        border-bottom: 1px solid var(--color-neutral-5);
-
-        &:hover,
-        &:focus {
-            border: none;
-            border-bottom: 1px solid var(--color-neutral-5);
-            box-shadow: none;
-        }
+    a {
+      text-decoration: none;
     }
 
-    &__languageSwitcher {
-        position: relative;
-        background: var(--color-neutral-2);
-        padding: 16px;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      justify-self: center;
+      width: 90%;
+      height: 1px;
+      position: absolute;
+      background: var(--color-neutral-5);
     }
-
-    &__footer {
-        position: absolute;
-        width: 100%;
-        box-sizing: border-box;
-        bottom: 0px;
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 16px;
-        color: var(--color-neutral-7);
-
-        a {
-            text-decoration: none;
-        }
-
-        &::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            justify-self: center;
-            width: 90%;
-            height: 1px;
-            position: absolute;
-            background: var(--color-neutral-5);
-        }
-    }
+  }
 }
 
 .item-enter {
-    opacity: 0;
-    transform: translateX(-100px);
+  opacity: 0;
+  transform: translateX(-100px);
 }
 .item-enter-active {
-    opacity: 1;
-    transition: all 500ms ease-in;
-    transform: translateX(0px);
+  opacity: 1;
+  transition: all 500ms ease-in;
+  transform: translateX(0px);
 }
 .item-exit {
-    opacity: 1;
+  opacity: 1;
 }
 .item-exit-active {
-    opacity: 0;
-    transition: all 500ms ease-in;
+  opacity: 0;
+  transition: all 500ms ease-in;
 }
 
 .Home {
-    height: 100%;
-    width: 100%;
-    display: inline-block;
+  height: 100%;
+  width: 100%;
+  display: inline-block;
 }
 
 .Translate {
+  height: 100%;
+  min-width: 320px;
+  display: inline-block;
+  flex-direction: column;
+  position: relative;
+
+  &__body {
     height: 100%;
-    min-width: 320px;
-    display: inline-block;
-    flex-direction: column;
-    position: relative;
+    padding: 16px;
+  }
 
-    &__body {
-        height: 100%;
-        padding: 16px;
+  &__title {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  &__originText {
+    margin-bottom: 16px;
+    height: 50%;
+
+    & textarea {
+      height: 50%;
+      resize: none;
     }
+  }
 
-    &__title {
-        margin-bottom: 8px;
-        font-size: 16px;
-        font-weight: bold;
+  &__targetText {
+    height: 50%;
+
+    & textarea {
+      height: 50%;
+      resize: none;
     }
-
-    &__originText {
-        margin-bottom: 16px;
-        height: 50%;
-
-        & textarea {
-            height: 50%;
-            resize: none;
-        }
-    }
-
-    &__targetText {
-        height: 50%;
-
-        & textarea {
-            height: 50%;
-            resize: none;
-        }
-    }
+  }
 }
