@@ -49,23 +49,23 @@
 
 
 
-@import "./scss/variables";
-@import "./scss/base";
-@import "./scss/animation";
+@import "./scss/_variables.scss";
+@import "./scss/_base.scss";
+@import "./scss/_animation.scss";
 
-@import "./components/Button/Button";
-@import "./components/Switch/Switch";
-@import "./components/TextField/TextField";
-@import "./components/Alert/Alert";
-@import "./components/Checkbox/Checkbox";
-@import "./components/Radio/Radio";
-@import "./components/Card/Card";
-@import "./components/Progress/Progress";
-@import "./components/List/List";
-@import "./components/pages/Demo";
-@import "./components/LanguageSwitcher/LanguageSwitcher";
-@import "./components/Header/Header";
-@import "./components/Icon/Icon";
-@import "./components/QualityEstimationContainer/QualityEstimationContainer";
-@import "./components/InputBox/InputBox";
-@import "./components/Menu/Menu";
+@import "./components/Button/_Button.scss";
+@import "./components/Switch/_Switch.scss";
+@import "./components/TextField/_TextField.scss";
+@import "./components/Alert/_Alert.scss";
+@import "./components/Checkbox/_Checkbox.scss";
+@import "./components/Radio/_Radio.scss";
+@import "./components/Card/_Card.scss";
+@import "./components/Progress/_Progress.scss";
+@import "./components/List/List.scss";
+@import "./components/pages/_Demo.scss";
+@import "./components/LanguageSwitcher/_LanguageSwitcher.scss";
+@import "./components/Header/_Header.scss";
+@import "./components/Icon/_Icon.scss";
+@import "./components/QualityEstimationContainer/_QualityEstimationContainer.scss";
+@import "./components/InputBox/_InputBox.scss";
+@import "./components/Menu/_Menu.scss";
