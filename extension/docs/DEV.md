@@ -66,6 +66,16 @@ For Chrome:
 yarn watch:chrome
 ```
 
+Note: At this stage of development of the Bergamot translation engine, a REST API server needs to be launched from the command line on the same system that the extension runs on:
+
+```
+git clone https://github.com/browsermt/macos-server.git
+cd macos-server
+./server/rest-server -c inboundModel/config.yml -p 8787 --log-level debug -w 5000
+```
+
+The binary is currently only available for Mac OSX. For any other system, compile from source: [https://github.com/browsermt/mts](https://github.com/browsermt/mts).
+
 ## Opening up specific extension pages
 
 From the background context:
