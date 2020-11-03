@@ -1,29 +1,24 @@
+import { BergamotApiClient } from "../../shared-resources/BergamotApiClient";
+
 export class Translator {
   originLanguage: string;
   targetLanguage: string;
+  bergamotApiClient: BergamotApiClient;
   delay: number;
 
   constructor(originLanague: string, targetLanguage: string) {
     this.originLanguage = "English";
     this.targetLanguage = "German";
+    this.bergamotApiClient = new BergamotApiClient();
     this.delay = 3000;
   }
 
-  translate(text: string) {
-    const promise = new Promise<string>((resolve, reject) => {
-      setTimeout(
-        () =>
-          resolve(
-            text
-              .split("")
-              .reverse()
-              .join(""),
-          ),
-        this.delay,
-      );
-    });
-
-    return promise;
+  async translate(text: string) {
+    const translationResults = await this.bergamotApiClient.sendTranslationRequest(
+      [text],
+    );
+    console.log({ translationResults });
+    return translationResults[0];
   }
 
   setDelay(milliseconds: number) {
