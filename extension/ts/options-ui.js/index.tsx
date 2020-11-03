@@ -4,7 +4,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import { ErrorBoundary } from "../shared-resources/ErrorBoundary";
-import { ExtensionPreferencesForm } from "./ExtensionPreferencesForm";
+import { OptionsUi } from "./OptionsUi";
 import { DisplayError } from "./DisplayError";
 
 const init = async () => {
@@ -12,7 +12,7 @@ const init = async () => {
   ReactDOM.render(
     <div className="text-lg leading-snug px-5 py-4 mx-0">
       <ErrorBoundary displayErrorComponent={DisplayError}>
-        <ExtensionPreferencesForm />
+        <OptionsUi />
       </ErrorBoundary>
     </div>,
     document.getElementById("app"),

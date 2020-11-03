@@ -40,7 +40,7 @@ export const toggleErrorReportingBasedAsPerExtensionPreferences = (
     Sentry.configureScope(function(scope) {
       scope.setTag("extension.version", extensionPreferences.extensionVersion);
       scope.setUser({
-        id: extensionPreferences.extensionInstallationErrorReportingUuid,
+        id: extensionPreferences.extensionInstallationErrorReportingId,
       });
     });
     console.info("Enabled error reporting");

@@ -9,7 +9,7 @@ const options = {
   ],
 };
 
-if (process.env.NODE_ENV === "development") {
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   options.map = { inline: true };
 } else {
   options.plugins.push(
