@@ -18,7 +18,7 @@ import {
 import Switch from "../Switch/Switch";
 import List from "../List/List";
 import TextField from "../TextField/TextField";
-import logo from "../../images/logo.png";
+import logo from "../../../../src/icons/extension-icon.38x38.png";
 import Header from "../Header/Header";
 import {
   Route,
