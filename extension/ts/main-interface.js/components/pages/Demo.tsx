@@ -70,7 +70,7 @@ const Home = () => {
   const items = data.map(i => {
     if (i.route)
       return (
-        <Link to={`demo/${i.route}`}>
+        <Link to={`${i.route}`}>
           <List.Item
             key={Math.random()}
             text={i.text}
@@ -91,8 +91,8 @@ const Home = () => {
   });
 
   return (
-    <div className={"Home"}>
-      <div>
+    <div className={"Home w-full"}>
+      <div className="flex flex-col">
         <div className={"BergamotApp__header"}>
           <TextField
             allowClear
@@ -107,7 +107,7 @@ const Home = () => {
         <List style={{ cursor: "pointer" }} borderless>
           {items}
         </List>
-        <div className={"BergamotApp__footer"}>
+        <div className={"BergamotApp__footer mt-4"}>
           <span>About</span>
           <span>Feedback</span>
         </div>
@@ -136,7 +136,7 @@ const Translate = () => {
   };
 
   return (
-    <div className={"Translate"}>
+    <div className={"Translate w-full"}>
       <Header allowBack extra={<BsGear />} />
       <div className={"Translate__body"}>
         <div className={"Translate__originText"}>
@@ -164,10 +164,10 @@ const Demo = () => {
   const Routes = withRouter(({ location }) => {
     return (
       <ReactSwitch location={location}>
-        <Route exact path={"/demo"}>
+        <Route exact path={"/"}>
           <Home />
         </Route>
-        <Route exact path={`/demo/translate`}>
+        <Route exact path={`/translate`}>
           <Translate />
         </Route>
       </ReactSwitch>
@@ -187,48 +187,15 @@ const Demo = () => {
   // }
 
   return (
-    <div className={"Demo"}>
-      <div className={"BergamotApp"}>
-        {/* <TransitionGroup> */}
-        {/* { currentPage } */}
-        {/* { routes } */}
-        <Routes />
-        {/* <CSSTransition timeout={500} in={page === "Home"} classNames={"item"} unmountOnExit><Home setPage={setPage} /></CSSTransition> */}
-        {/* <CSSTransition timeout={500} in={page === "Translate"} classNames={"item"} onEnter={() => console.log("yes")} unmountOnExit><Translate /></CSSTransition> */}
-        {/* </TransitionGroup> */}
-        {/* <Landing /> */}
-      </div>
-      <div className={"Text"}>
-        <p>
-          The most profound technologies are those that disappear. They weave
-          themselves into the fabric of everyday life until they are
-          indistinguishable from it.
-        </p>
-        <p>
-          Consider writing, perhaps the first information technology: The
-          ability to capture a symbolic representation of spoken language for
-          long-term storage freed information from the limits of individual
-          memory. Today this technology is ubiquitous in industrialized
-          countries. Not only do books, magazines and newspapers convey written
-          information, but so do street signs, billboards, shop signs and even
-          graffiti. Candy wrappers are covered in writing. The constant
-          background presence of these products of "literacy technology" does
-          not require active attention, but the information to be conveyed is
-          ready for use at a glance. It is difficult to imagine modern life
-          otherwise.
-        </p>
-        <p>
-          Silicon-based information technology, in contrast, is far from having
-          become part of the environment. More than 50 million personal
-          computers have been sold, and nonetheless the computer remains largely
-          in a world of its own. It is approachable only through complex jargon
-          that has nothing to do with the tasks for which which people actually
-          use computers. The state of the art is perhaps analogous to the period
-          when scribes had to know as much about making ink or baking clay as
-          they did about writing.
-        </p>
-      </div>
-      <InputBox />
+    <div className={"BergamotApp"}>
+      {/* <TransitionGroup> */}
+      {/* { currentPage } */}
+      {/* { routes } */}
+      <Routes />
+      {/* <CSSTransition timeout={500} in={page === "Home"} classNames={"item"} unmountOnExit><Home setPage={setPage} /></CSSTransition> */}
+      {/* <CSSTransition timeout={500} in={page === "Translate"} classNames={"item"} onEnter={() => console.log("yes")} unmountOnExit><Translate /></CSSTransition> */}
+      {/* </TransitionGroup> */}
+      {/* <Landing /> */}
     </div>
   );
 };

@@ -11,16 +11,13 @@
 }
 
 .BergamotApp {
-  width: 320px;
-  height: 600px;
-  // background-color: var(--color-neutral-3);
+  width: 100%;
+  background-color: var(--color-neutral-2);
   position: relative;
   color: var(--color-neutral-11);
   font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid var(--color-neutral-5);
+  border-radius: 0;
   box-shadow: 0 8px 20px rgba(var(--color-black-rgb), 0.1);
-  // overflow: hidden;
   scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
@@ -48,28 +45,16 @@
   }
 
   &__footer {
-    position: absolute;
     width: 100%;
     box-sizing: border-box;
-    bottom: 0px;
     display: flex;
     justify-content: space-between;
     padding: 12px 16px;
     color: var(--color-neutral-7);
+    border-top: 1px solid var(--color-neutral-5);
 
     a {
       text-decoration: none;
-    }
-
-    &::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      justify-self: center;
-      width: 90%;
-      height: 1px;
-      position: absolute;
-      background: var(--color-neutral-5);
     }
   }
 }
@@ -93,13 +78,11 @@
 
 .Home {
   height: 100%;
-  width: 100%;
   display: inline-block;
 }
 
 .Translate {
   height: 100%;
-  min-width: 320px;
   display: inline-block;
   flex-direction: column;
   position: relative;
