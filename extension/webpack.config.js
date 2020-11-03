@@ -47,6 +47,8 @@ if (
 module.exports = {
   entry: {
     background: "./ts/background.js/index.ts",
+    "document-translation-content-script":
+      "./ts/document-translation-content-script.js/index.ts",
     "get-started": "./ts/get-started.js/index.tsx",
     "main-interface": "./ts/main-interface.js/index.tsx",
     "options-ui": "./ts/options-ui.js/index.tsx",
