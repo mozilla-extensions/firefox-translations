@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "Bergamot Translate",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Neural Machine Translation for the browser.",
+    "description": "Description of the extension."
+  },
+  "pageActionButtonTitle": {
+    "message": "Translate",
+    "description": "The page action button title."
+  }
+}

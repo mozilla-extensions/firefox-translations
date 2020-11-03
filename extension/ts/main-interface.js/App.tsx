@@ -5,7 +5,7 @@ import Transition from "./components/pages/Transition";
 import "./styles.scss";
 import { Link, Switch, Route } from "react-router-dom";
 
-const App = () => {
+export const App = () => {
   return (
     <Switch>
       <Route exact path="/components">
@@ -20,5 +20,3 @@ const App = () => {
     </Switch>
   );
 };
-
-export default App;

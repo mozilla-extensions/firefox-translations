@@ -1,0 +1,25 @@
+{
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "bugfixes": true,
+        "shippedProposals": true,
+        "corejs": 3,
+        "useBuiltIns": "entry"
+      }
+    ]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        [
+          "istanbul",
+          {
+            "exclude": ["test/**/*.js"]
+          }
+        ]
+      ]
+    }
+  }
+}

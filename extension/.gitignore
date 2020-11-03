@@ -1,0 +1,10 @@
+dist/
+build/
+test/build/
+test/results/coverage/
+stats.json
+yarn-error.log
+*.map
+node_modules/
+.env*
+!.env.example

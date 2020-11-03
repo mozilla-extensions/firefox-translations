@@ -1,0 +1,13 @@
+.checkbox {
+  background-color: var(--grey-10-a10);
+  border: 1px solid var(--grey-90-a30);
+}
+
+.checkbox:hover {
+  border: 1px solid var(--blue-50);
+  background-color: var(--grey-10-a20);
+}
+
+.checkbox:active {
+  background-color: var(--grey-10-a40);
+}

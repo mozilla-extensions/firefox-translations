@@ -1,0 +1,15 @@
+# do not lint/format generated artifacts
+dist/
+build/
+test/build/
+test/results/coverage/
+stats.json
+yarn-error.log
+*.map
+package-lock.json
+# makes sure that eslintrc.js gets linted/formatted
+!.eslintrc.js
+# don't lint/format package.json since npm install formats it differently by default
+package.json
+# don't lint node_modules
+node_modules/

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./debug/ts-compiled-to-js-by-tsc",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "lib": ["es2017", "dom"],
+    "esModuleInterop": true,
+    "allowJs": true
+  },
+  "include": ["ts/**/*.ts", "ts/**/*.tsx"]
+}
