@@ -60,7 +60,9 @@
     "eslint-plugin-no-unsanitized": "^3.0.2",
     "eslint-plugin-typescript": "^0.12.0",
     "fixpack": "^2.3.1",
+    "husky": "^4.3.0",
     "jshint": "^2.9.5",
+    "lint-staged": "^10.5.1",
     "minimist": "^1.2.0",
     "mocha": "^5.2.0",
     "nock": "^13.0.1",
@@ -92,6 +94,12 @@
     "yarn": ">=1.21.1",
     "node": ">=10.18.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "post-commit": "git update-index --again"
+    }
+  },
   "keywords": [
     "bergamot",
     "mozilla",
@@ -99,6 +107,27 @@
     "translation"
   ],
   "license": "MPL-2.0",
+  "lint-staged": {
+    "*.{jsm,js,json}": [
+      "eslint --ext jsm,js,json",
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "git add"
+    ],
+    "*.{ts,tsx}": [
+      "tslint -t stylish",
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "git add"
+    ],
+    "*.{md}": [
+      "doctoc --title '**Contents**'",
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "git add"
+    ],
+    "*.{css,scss,json}": [
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "git add"
+    ]
+  },
   "private": true,
   "scripts": {
     "build:development": "webpack && web-ext build",
