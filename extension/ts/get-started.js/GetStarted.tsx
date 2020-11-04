@@ -110,15 +110,23 @@ export class GetStarted extends Component<GetStartedProps, GetStartedState> {
                       Bergamot Translate and your data
                     </div>
                     <div className="mb-2">
+                      The text that you choose to translate will not be sent to
+                      a server - the translation is performed locally in your
+                      browser.
+                    </div>
+                    <div className="mb-2">
                       By default, this add-on does not submit any information to
                       Mozilla, with the following exception:
                       <ul className="list-disc">
                         <li className="ml-4 my-4">
-                          When you choose to translate a document, the add-on
-                          will automatically download the required language
-                          files necessary to perform the translation.
+                          When you choose to translate a document into a
+                          language that you have not translated into before, the
+                          add-on will automatically download the required
+                          language files necessary to perform the translation.
                         </li>
                       </ul>
+                    </div>
+                    <div className="mb-2">
                       You can choose to share additional info with us which
                       helps us improve this add-on. To{" "}
                       {this.state.extensionPreferences.enableErrorReporting
