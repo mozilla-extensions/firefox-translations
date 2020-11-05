@@ -1,38 +1,7 @@
 # dom/base/nsDOMWindowUtils.cpp
 
-NS_IMETHODIMP
-nsDOMWindowUtils::GetTranslationNodes(nsINode* aRoot,
-                                      nsITranslationNodeList** aRetVal) {
-  NS_ENSURE_ARG_POINTER(aRetVal);
-  nsCOMPtr<nsIContent> root = do_QueryInterface(aRoot);
-  NS_ENSURE_STATE(root);
-  nsCOMPtr<Document> doc = GetDocument();
-  NS_ENSURE_STATE(doc);
-
-  if (root->OwnerDoc() != doc) {
-    return NS_ERROR_DOM_WRONG_DOCUMENT_ERR;
-  }
-
   nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
   RefPtr<nsTranslationNodeList> list = new nsTranslationNodeList;
-
-  uint32_t limit = 15000;
-
-  // We begin iteration with content->GetNextNode because we want to explictly
-  // skip the root tag from being a translation node.
-  nsIContent* content = root;
-  while ((limit > 0) && (content = content->GetNextNode(root))) {
-    if (!content->IsHTMLElement()) {
-      continue;
-    }
-
-    // Skip elements that usually contain non-translatable text content.
-    if (content->IsAnyOfHTMLElements(nsGkAtoms::script, nsGkAtoms::iframe,
-                                     nsGkAtoms::frameset, nsGkAtoms::frame,
-                                     nsGkAtoms::code, nsGkAtoms::noscript,
-                                     nsGkAtoms::style)) {
-      continue;
-    }
 
     // An element is a translation node if it contains
     // at least one text node that has meaningful data
@@ -62,11 +31,6 @@ nsDOMWindowUtils::GetTranslationNodes(nsINode* aRoot,
         break;
       }
     }
-  }
-
-  *aRetVal = list.forget().take();
-  return NS_OK;
-}
 
 # dom/base/Text.cpp
 
