@@ -22,7 +22,8 @@ async function generateManifest({ dotEnvPath }) {
     content_scripts: [],
     permissions: [
       "<all_urls>",
-      `${process.env.BERGAMOT_REST_API_URL}/*`,
+      `${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`,
+      `${process.env.BERGAMOT_REST_API_OUTBOUND_URL}/*`,
       "storage",
       "alarms",
     ],
