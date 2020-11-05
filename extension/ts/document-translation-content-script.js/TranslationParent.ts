@@ -1,3 +1,20 @@
+import { Translation } from "./Translation";
+import { TranslationTelemetry } from "./TranslationTelemetry";
+import {TRANSLATION_PREF_SHOWUI} from "./translation.constants";
+
+// Temporary mock
+class JSWindowActorParent {
+  public browsingContext;
+  sendAsyncMessage(ref) {}
+  async sendQuery(ref, data): Promise<any> {return "foo";}
+}
+
+// Temporary mock
+class Services {
+  static prefs: { getCharPref: (pref) => "foo", getBoolPref: (pref) => false};
+  static perms: {testExactPermissionFromPrincipal: (aPrincipal, permissionRef) => "foo", DENY_ACTION: "foo"};
+}
+
 /* Translation objects keep the information related to translation for
  * a specific browser.  The properties exposed to the infobar are:
  * - detectedLanguage, code of the language detected on the web page.
@@ -11,7 +28,20 @@
  * - originalShown, boolean indicating if the original or translated
  *   version of the page is shown.
  */
-class TranslationParent extends JSWindowActorParent {
+export class TranslationParent extends JSWindowActorParent {
+
+  private translationTelemetry;
+  private _state;
+  private detectedLanguage;
+  private translatedFrom;
+  private translatedTo;
+  private originalShown;
+
+  constructor() {
+    super();
+    this.translationTelemetry = new TranslationTelemetry();
+  }
+
   actorCreated() {
     this._state = 0;
     this.originalShown = true;
@@ -40,13 +70,13 @@ class TranslationParent extends JSWindowActorParent {
         !Translation.supportedTargetLanguages.includes(aData.detectedLanguage)
       ) {
         // Detected language is not part of the supported languages.
-        TranslationTelemetry.recordMissedTranslationOpportunity(
+        this.translationTelemetry.recordMissedTranslationOpportunity(
           aData.detectedLanguage
         );
         return;
       }
 
-      TranslationTelemetry.recordTranslationOpportunity(aData.detectedLanguage);
+      this.translationTelemetry.recordTranslationOpportunity(aData.detectedLanguage);
     }
 
     if (!Services.prefs.getBoolPref(TRANSLATION_PREF_SHOWUI)) {
@@ -82,14 +112,14 @@ class TranslationParent extends JSWindowActorParent {
 
     if (this.state == Translation.STATE_OFFER) {
       if (this.detectedLanguage != aFrom) {
-        TranslationTelemetry.recordDetectedLanguageChange(true);
+        this.translationTelemetry.recordDetectedLanguageChange(true);
       }
     } else {
       if (this.translatedFrom != aFrom) {
-        TranslationTelemetry.recordDetectedLanguageChange(false);
+        this.translationTelemetry.recordDetectedLanguageChange(false);
       }
       if (this.translatedTo != aTo) {
-        TranslationTelemetry.recordTargetLanguageChange();
+        this.translationTelemetry.recordTargetLanguageChange();
       }
     }
 
@@ -173,7 +203,7 @@ class TranslationParent extends JSWindowActorParent {
     this.originalShown = true;
     this.showURLBarIcon();
     this.sendAsyncMessage("Translation:ShowOriginal");
-    TranslationTelemetry.recordShowOriginalContent();
+    this.translationTelemetry.recordShowOriginalContent();
   }
 
   showTranslatedContent() {
@@ -213,7 +243,7 @@ class TranslationParent extends JSWindowActorParent {
       "browser.translation.neverForLanguages"
     );
     if (neverForLangs.split(",").includes(this.detectedLanguage)) {
-      TranslationTelemetry.recordAutoRejectedTranslationOffer();
+      this.translationTelemetry.recordAutoRejectedTranslationOffer();
       return false;
     }
 
@@ -223,7 +253,7 @@ class TranslationParent extends JSWindowActorParent {
       perms.testExactPermissionFromPrincipal(aPrincipal, "translate") ==
       perms.DENY_ACTION
     ) {
-      TranslationTelemetry.recordAutoRejectedTranslationOffer();
+      this.translationTelemetry.recordAutoRejectedTranslationOffer();
       return false;
     }
 
@@ -237,7 +267,7 @@ class TranslationParent extends JSWindowActorParent {
       this.showURLBarIcon();
 
       // Record the number of characters translated.
-      TranslationTelemetry.recordTranslation(
+      this.translationTelemetry.recordTranslation(
         result.from,
         result.to,
         result.characterCount
@@ -256,7 +286,7 @@ class TranslationParent extends JSWindowActorParent {
 
   infobarClosed() {
     if (this.state == Translation.STATE_OFFER) {
-      TranslationTelemetry.recordDeniedTranslationOffer();
+      this.translationTelemetry.recordDeniedTranslationOffer();
     }
   }
 }

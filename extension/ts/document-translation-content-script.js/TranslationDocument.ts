@@ -4,14 +4,6 @@
 
 "use strict";
 
-/*
-const { Async } = ChromeUtils.import("resource://services-common/async.js");
-const { XPCOMUtils } = ChromeUtils.import(
-  "resource://gre/modules/XPCOMUtils.jsm"
-);
-XPCOMUtils.defineLazyGlobalGetters(this, ["DOMParser"]);
-*/
-
 import {getTranslationNodes} from "./getTranslationNodes";
 
 /**
@@ -23,17 +15,19 @@ import {getTranslationNodes} from "./getTranslationNodes";
  *
  * @param document  The document to be translated
  */
-export const TranslationDocument = function(document) {
-  this.itemsMap = new Map();
-  this.roots = [];
-  this._init(document);
-};
+export class TranslationDocument {
+  private translatedFrom = "";
+  private translatedTo = "";
+  private translationError = false;
+  private originalShown = true;
+  private itemsMap;
+  private roots;
 
-TranslationDocument.prototype = {
-  translatedFrom: "",
-  translatedTo: "",
-  translationError: false,
-  originalShown: true,
+  constructor(document) {
+    this.itemsMap = new Map();
+    this.roots = [];
+    this._init(document);
+  }
 
   /**
    * Initializes the object and populates
@@ -47,9 +41,8 @@ TranslationDocument.prototype = {
     // a translation node is a node from the document which
     // contains useful content for translation, and therefore
     // must be included in the translation process.
-    const translationNodes = getTranslationNodes(document.body);
-    console.log({ translationNodes });
-    // let nodeList = winUtils.getTranslationNodes(document.body);
+    let nodeList = getTranslationNodes(document.body);
+    console.log({ nodeList });
 
     let length = nodeList.length;
 
@@ -79,7 +72,7 @@ TranslationDocument.prototype = {
         root.isSimpleRoot = true;
       }
     }
-  },
+  }
 
   /**
    * Creates a TranslationItem object, which should be called
@@ -110,7 +103,7 @@ TranslationDocument.prototype = {
 
     this.itemsMap.set(node, item);
     return item;
-  },
+  }
 
   /**
    * Generate the text string that represents a TranslationItem object.
@@ -178,7 +171,7 @@ TranslationDocument.prototype = {
     }
 
     return generateTranslationHtmlForItem(item, str);
-  },
+  }
 
   /**
    * Changes the document to display its translated
@@ -187,7 +180,7 @@ TranslationDocument.prototype = {
   showTranslation() {
     this.originalShown = false;
     this._swapDocumentContent("translation");
-  },
+  }
 
   /**
    * Changes the document to display its original
@@ -196,7 +189,7 @@ TranslationDocument.prototype = {
   showOriginal() {
     this.originalShown = true;
     this._swapDocumentContent("original");
-  },
+  }
 
   /**
    * Swap the document with the resulting translation,
@@ -207,6 +200,7 @@ TranslationDocument.prototype = {
    */
   _swapDocumentContent(target) {
     (async () => {
+      /* TODO: Reimplement
       // Let the event loop breath on every 100 nodes
       // that are replaced.
       const YIELD_INTERVAL = 100;
@@ -215,9 +209,10 @@ TranslationDocument.prototype = {
         root => root.swapText(target),
         YIELD_INTERVAL
       );
+       */
     })();
-  },
-};
+  }
+}
 
 /**
  * Generate the outer HTML representation for a given item.

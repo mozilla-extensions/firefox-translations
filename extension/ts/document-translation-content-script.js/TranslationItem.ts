@@ -35,16 +35,21 @@
  *    translation: ["da Mozilla"]
  *  }
  */
-function TranslationItem(node, id, isRoot) {
-  this.nodeRef = node;
-  this.id = id;
-  this.isRoot = isRoot;
-  this.children = [];
-}
+class TranslationItem {
 
-TranslationItem.prototype = {
-  isRoot: false,
-  isSimpleRoot: false,
+  private isRoot = false;
+  private isSimpleRoot = false;
+  public nodeRef;
+  private id;
+  private children;
+  private translation;
+
+  constructor(node, id, isRoot) {
+    this.nodeRef = node;
+    this.id = id;
+    this.isRoot = isRoot;
+    this.children = [];
+  }
 
   toString() {
     let rootType = "";
@@ -62,7 +67,7 @@ TranslationItem.prototype = {
       rootType +
       "]"
     );
-  },
+  }
 
   /**
    * This function will parse the result of the translation of one translation
@@ -91,7 +96,7 @@ TranslationItem.prototype = {
 
     let doc = domParser.parseFromString(result, "text/html");
     parseResultNode(this, doc.body.firstChild);
-  },
+  }
 
   /**
    * This function finds a child TranslationItem
@@ -107,7 +112,7 @@ TranslationItem.prototype = {
       }
     }
     return null;
-  },
+  }
 
   /**
    * Swap the text of this TranslationItem between
@@ -118,8 +123,8 @@ TranslationItem.prototype = {
    */
   swapText(target) {
     swapTextForItem(this, target);
-  },
-};
+  }
+}
 
 /**
  * This object represents a placeholder item for translation. It's similar to

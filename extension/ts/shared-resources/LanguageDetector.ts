@@ -4,12 +4,6 @@
 
 "use strict";
 
-var EXPORTED_SYMBOLS = ["LanguageDetector"];
-
-const { clearTimeout, setTimeout } = ChromeUtils.import(
-  "resource://gre/modules/Timer.jsm"
-);
-
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
 // string in order to prevent unnecessary resident memory growth.
@@ -22,12 +16,12 @@ const { clearTimeout, setTimeout } = ChromeUtils.import(
 //
 // 1.5MB. This is the approximate string length that forces heap growth
 // for a 2MB heap.
-var LARGE_STRING = 1.5 * 1024 * 1024;
-var IDLE_TIMEOUT = 10 * 1000;
+const LARGE_STRING = 1.5 * 1024 * 1024;
+const IDLE_TIMEOUT = 10 * 1000;
 
 const WORKER_URL = "resource:///modules/translation/cld-worker.js";
 
-var workerManager = {
+const workerManager = {
   detectionQueue: [],
 
   detectLanguage(aParams) {
@@ -103,7 +97,7 @@ var workerManager = {
   },
 };
 
-var LanguageDetector = {
+export const LanguageDetector = {
   /**
    * Detect the language of a given string.
    *

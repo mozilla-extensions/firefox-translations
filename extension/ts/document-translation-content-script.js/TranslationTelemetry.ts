@@ -4,7 +4,18 @@
  *
  * NOTE: Metrics are only recorded if the user enabled the telemetry option.
  */
-var TranslationTelemetry = {
+import {TRANSLATION_PREF_DETECT_LANG, TRANSLATION_PREF_SHOWUI} from "./translation.constants";
+
+// Temporary mock
+class Services {
+  static telemetry: { getHistogramById: (id) => "foo", getKeyedHistogramById: (id) => "foo"};
+  static prefs: { getBoolPref: (pref) => false};
+}
+
+export class TranslationTelemetry {
+
+  private HISTOGRAMS;
+
   init() {
     // Constructing histograms.
     const plain = id => Services.telemetry.getHistogramById(id);
@@ -27,7 +38,7 @@ var TranslationTelemetry = {
 
     // Capturing the values of flags at the startup.
     this.recordPreferences();
-  },
+  }
 
   /**
    * Record a translation opportunity in the health report.
@@ -36,7 +47,7 @@ var TranslationTelemetry = {
    */
   recordTranslationOpportunity(language) {
     return this._recordOpportunity(language, true);
-  },
+  }
 
   /**
    * Record a missed translation opportunity in the health report.
@@ -47,7 +58,7 @@ var TranslationTelemetry = {
    */
   recordMissedTranslationOpportunity(language) {
     return this._recordOpportunity(language, false);
-  },
+  }
 
   /**
    * Record an automatically rejected translation offer in the health
@@ -61,7 +72,7 @@ var TranslationTelemetry = {
    */
   recordAutoRejectedTranslationOffer() {
     this.HISTOGRAMS.AUTO_REJECTED().add();
-  },
+  }
 
   /**
    * Record a translation in the health report.
@@ -76,7 +87,7 @@ var TranslationTelemetry = {
     this.HISTOGRAMS.PAGES().add();
     this.HISTOGRAMS.PAGES_BY_LANG().add(langFrom + " -> " + langTo);
     this.HISTOGRAMS.CHARACTERS().add(numCharacters);
-  },
+  }
 
   /**
    * Record a change of the detected language in the health report. This should
@@ -92,7 +103,7 @@ var TranslationTelemetry = {
    */
   recordDetectedLanguageChange(beforeFirstTranslation) {
     this.HISTOGRAMS.DETECTION_CHANGES().add(beforeFirstTranslation);
-  },
+  }
 
   /**
    * Record a change of the target language in the health report. This should
@@ -101,21 +112,21 @@ var TranslationTelemetry = {
    */
   recordTargetLanguageChange() {
     this.HISTOGRAMS.TARGET_CHANGES().add();
-  },
+  }
 
   /**
    * Record a denied translation offer.
    */
   recordDeniedTranslationOffer() {
     this.HISTOGRAMS.DENIED().add();
-  },
+  }
 
   /**
    * Record a "Show Original" command use.
    */
   recordShowOriginalContent() {
     this.HISTOGRAMS.SHOW_ORIGINAL().add();
-  },
+  }
 
   /**
    * Record the state of translation preferences.
@@ -127,12 +138,12 @@ var TranslationTelemetry = {
     if (Services.prefs.getBoolPref(TRANSLATION_PREF_DETECT_LANG)) {
       this.HISTOGRAMS.DETECT_LANG().add(1);
     }
-  },
+  }
 
   _recordOpportunity(language, success) {
     this.HISTOGRAMS.OPPORTUNITIES().add(success);
     this.HISTOGRAMS.OPPORTUNITIES_BY_LANG().add(language, success);
-  },
-};
+  }
+}
 
 TranslationTelemetry.init();

@@ -4,6 +4,9 @@
 
 "use strict";
 
+import {MAX_REQUEST_CHUNKS, MAX_REQUEST_DATA, MAX_REQUESTS} from "./bergamot.constants";
+import {BergamotRequest} from "../shared-resources/BergamotRequest";
+
 /**
  * Outbound translator for a webpage using Bergamot's Translation API.
  * Currently, it translates the textual content of the forms of an
@@ -12,14 +15,23 @@
  * @param translationDocument  The TranslationDocument object that
  *                             represents the webpage.
  */
-function BergamotOutboundTranslator(translationDocument) {
-  this._translationDocument = translationDocument;
-  this._pendingRequests = 0;
-  this._partialSuccess = false;
-  this._translatedCharacterCount = 0;
-}
+export class BergamotOutboundTranslator {
 
-BergamotOutboundTranslator.prototype = {
+  private _translationDocument;
+  private _pendingRequests;
+  private _partialSuccess;
+  private _translatedCharacterCount;
+  private _formControlElements;
+  private sourceLanguage;
+  private targetLanguage;
+
+  constructor(translationDocument) {
+    this._translationDocument = translationDocument;
+    this._pendingRequests = 0;
+    this._partialSuccess = false;
+    this._translatedCharacterCount = 0;
+  }
+
   /**
    * Add listener for 'submit' events on all the forms of the document
    *
@@ -29,7 +41,7 @@ BergamotOutboundTranslator.prototype = {
     for (let form of ownerDocument.forms) {
       form.addEventListener('submit', this);
     }
-  },
+  }
 
   /**
    * Handler function to process 'submit' events on the forms of the document
@@ -44,7 +56,7 @@ BergamotOutboundTranslator.prototype = {
     // just an initial integration of outbound translation in browser.
     // Stop any further actions on the SubmitEvent object
     event.preventDefault();
-  },
+  }
 
   /**
    * Translates contents of document's form for which 'submit' event is received.
@@ -75,7 +87,7 @@ BergamotOutboundTranslator.prototype = {
       this._pendingRequests++;
 
       bergamotRequest
-        .fireRequest(URL_OUTBOUND)
+        .fireRequest(process.env.BERGAMOT_REST_API_OUTBOUND_URL)
         .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
 
       currentIndex = request.lastIndex;
@@ -83,7 +95,7 @@ BergamotOutboundTranslator.prototype = {
         break;
       }
     }
-  },
+  }
 
   /**
    * This function will generate data that is to be used for creating Nth
@@ -129,7 +141,7 @@ BergamotOutboundTranslator.prototype = {
       finished: true,
       lastIndex: 0,
     };
-  },
+  }
 
   /**
    * Return the value of document's form control element.
@@ -144,7 +156,7 @@ BergamotOutboundTranslator.prototype = {
         formControlElement.type.toUpperCase() == "TEXTAREA") {
       return formControlElement.value;
     }
-  },
+  }
 
   /**
    * Function called when a request sent to the server completed successfully.
@@ -159,7 +171,7 @@ BergamotOutboundTranslator.prototype = {
       this._translatedCharacterCount += bergamotRequest.characterCount;
     }
     this._checkIfFinished();
-  },
+  }
 
   /**
    * Function called when a request sent to the server has failed.
@@ -171,7 +183,7 @@ BergamotOutboundTranslator.prototype = {
    */
   _chunkFailed(aError) {
     this._checkIfFinished();
-  },
+  }
 
   /**
    * Function called when a request sent to the server has completed.
@@ -185,7 +197,7 @@ BergamotOutboundTranslator.prototype = {
         // ToDo: Return rejected Promise otherwise
       }
     }
-  },
+  }
 
   /**
    * This function parses the result returned by Bergamot's Http API for
@@ -234,7 +246,7 @@ BergamotOutboundTranslator.prototype = {
       }
     }
     return !error;
-  },
+  }
 
   /**
    * This function parses 'Paragraph' entity of the response for the
@@ -273,5 +285,5 @@ BergamotOutboundTranslator.prototype = {
       result += translation;
     }
     return result;
-  },
-};
+  }
+}

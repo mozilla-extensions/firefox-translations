@@ -4,8 +4,15 @@
 
 "use strict";
 
-var EXPORTED_SYMBOLS = ["BergamotTranslator"];
+import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
+import { BergamotRequest } from "../shared-resources/BergamotRequest";
+import {MAX_REQUEST_CHUNKS, MAX_REQUEST_DATA, MAX_REQUESTS} from "./bergamot.constants";
 
+// Temporary mock
+class PromiseUtils {
+  static defer() {
+  }
+}
 /**
  * Translates a webpage using Bergamot's Translation API.
  *
@@ -17,21 +24,31 @@ var EXPORTED_SYMBOLS = ["BergamotTranslator"];
  * @returns {Promise}          A promise that will resolve when the translation
  *                             task is finished.
  */
-var BergamotTranslator = function(
-  translationDocument,
-  sourceLanguage,
-  targetLanguage
-) {
-  this.translationDocument = translationDocument;
-  this.sourceLanguage = sourceLanguage;
-  this.targetLanguage = targetLanguage;
-  this._pendingRequests = 0;
-  this._partialSuccess = false;
-  this._translatedCharacterCount = 0;
-  this._initBergamotOutboundTranslator();
-};
+export class BergamotTranslator {
 
-this.BergamotTranslator.prototype = {
+  private translationDocument;
+  private sourceLanguage;
+  private targetLanguage;
+  private _pendingRequests;
+  private _partialSuccess;
+  private _translatedCharacterCount;
+  private _outboundTranslator;
+  private _onFinishedDeferred;
+
+  constructor(
+    translationDocument,
+    sourceLanguage,
+    targetLanguage
+  ) {
+    this.translationDocument = translationDocument;
+    this.sourceLanguage = sourceLanguage;
+    this.targetLanguage = targetLanguage;
+    this._pendingRequests = 0;
+    this._partialSuccess = false;
+    this._translatedCharacterCount = 0;
+    this._initBergamotOutboundTranslator();
+  }
+
   /**
    * Instantiate BergamotOutboundTranslator object and add listener for all "submit"
    * events on the document.
@@ -39,7 +56,7 @@ this.BergamotTranslator.prototype = {
   _initBergamotOutboundTranslator() {
     this._outboundTranslator = new BergamotOutboundTranslator(this.translationDocument);
     this._outboundTranslator.listenSubmitEvents();
-  },
+  }
 
   /**
    * Performs the translation, splitting the document into several chunks
@@ -55,12 +72,6 @@ this.BergamotTranslator.prototype = {
     // Let's split the document into various requests to be sent to
     // Bergamot's Translation API.
     for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
-      // Generating the text for each request can be expensive, so
-      // let's take the opportunity of the chunkification process to
-      // allow for the event loop to attend other pending events
-      // before we continue.
-      await new Promise(resolve => Services.tm.dispatchToMainThread(resolve));
-
       // Determine the data for the next request.
       let request = this._generateNextTranslationRequest(currentIndex);
 
@@ -73,7 +84,7 @@ this.BergamotTranslator.prototype = {
       );
       this._pendingRequests++;
       bergamotRequest
-        .fireRequest(URL_INBOUND)
+        .fireRequest(process.env.BERGAMOT_REST_API_INBOUND_URL)
         .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
 
       currentIndex = request.lastIndex;
@@ -83,7 +94,7 @@ this.BergamotTranslator.prototype = {
     }
 
     return this._onFinishedDeferred.promise;
-  },
+  }
 
   /**
    * Function called when a request sent to the server completed successfully.
@@ -93,7 +104,7 @@ this.BergamotTranslator.prototype = {
    *
    * @param   request   The BergamotRequest sent to the server.
    */
-  _chunkCompleted(bergamotRequest) {
+  _chunkCompleted(bergamotRequest: BergamotRequest) {
     if (this._parseChunkResult(bergamotRequest)) {
       this._partialSuccess = true;
       // Count the number of characters successfully translated.
@@ -101,7 +112,7 @@ this.BergamotTranslator.prototype = {
     }
 
     this._checkIfFinished();
-  },
+  }
 
   /**
    * Function called when a request sent to the server has failed.
@@ -115,7 +126,7 @@ this.BergamotTranslator.prototype = {
    */
   _chunkFailed(aError) {
     this._checkIfFinished();
-  },
+  }
 
   /**
    * Function called when a request sent to the server has completed.
@@ -138,7 +149,7 @@ this.BergamotTranslator.prototype = {
         this._onFinishedDeferred.reject("failure");
       }
     }
-  },
+  }
 
   /**
    * This function parses the result returned by Bergamot's Http API for
@@ -147,7 +158,7 @@ this.BergamotTranslator.prototype = {
    * @param   request      The request sent to the server.
    * @returns boolean      True if parsing of this chunk was successful.
    */
-  _parseChunkResult(bergamotRequest) {
+  _parseChunkResult(bergamotRequest: BergamotRequest) {
     let results;
     try {
       let response = bergamotRequest.networkRequest.response;
@@ -191,7 +202,7 @@ this.BergamotTranslator.prototype = {
     }
 
     return !error;
-  },
+  }
 
   /**
    * This function parses 'Paragraph' entity of the response and returns
@@ -238,7 +249,7 @@ this.BergamotTranslator.prototype = {
     // Wrap the result with identifier "QE-ANNOTATED" to make it easy to switch
     // b/w "original" and "translation" in TranslationDocument.swapTextForItem() method
     return `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`
-  },
+  }
 
   /**
    * This function generates the Quality Estimation annotated HTML of a string
@@ -266,7 +277,7 @@ this.BergamotTranslator.prototype = {
       color = "red";
     }
     return (`<span style="color:${color}">${translation}</span>`);
-  },
+  }
 
   /**
    * This function will determine what is the data to be used for
@@ -313,5 +324,5 @@ this.BergamotTranslator.prototype = {
       finished: true,
       lastIndex: 0,
     };
-  },
-};
+  }
+}

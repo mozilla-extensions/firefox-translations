@@ -4,6 +4,12 @@
 
 "use strict";
 
+// Temporary mock
+class httpRequest {
+  constructor(url, options) {
+  }
+}
+
 /**
  * Represents a request (for 1 chunk) sent off to Bergamot's service.
  *
@@ -14,14 +20,21 @@
  * @param targetLanguage    The target language for the translation.
  *
  */
-function BergamotRequest(translationData, sourceLanguage, targetLanguage) {
-  this.translationData = translationData;
-  this.sourceLanguage = sourceLanguage;
-  this.targetLanguage = targetLanguage;
-  this.characterCount = 0;
-}
+export class BergamotRequest {
 
-BergamotRequest.prototype = {
+  public translationData;
+  private sourceLanguage;
+  private targetLanguage;
+  public characterCount;
+  public networkRequest;
+
+  constructor(translationData, sourceLanguage, targetLanguage) {
+    this.translationData = translationData;
+    this.sourceLanguage = sourceLanguage;
+    this.targetLanguage = targetLanguage;
+    this.characterCount = 0;
+  }
+
   /**
    * Initiates the request
    */
@@ -54,7 +67,7 @@ BergamotRequest.prototype = {
     }
 
     // Convert the post to a string
-    postData = JSON.stringify(postData);
+    const postDataString = JSON.stringify(postData);
 
     // Set up request options.
     return new Promise((resolve, reject) => {
@@ -65,12 +78,12 @@ BergamotRequest.prototype = {
         onError(e, responseText, xhr) {
           reject(xhr);
         },
-        postData,
+        postDataString,
         headers,
       };
 
       // Fire the request.
-      this.networkRequest = httpRequest(url, options);
+      this.networkRequest = new httpRequest(url, options);
     });
-  },
-};
+  }
+}

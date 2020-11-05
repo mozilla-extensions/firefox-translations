@@ -3,9 +3,31 @@ interface TranslationNode {
   isTranslationRoot: boolean;
 }
 
+interface NodeListInterface {
+  length: number;
+  item: (i) => TranslationNode;
+  isTranslationRootAtIndex: (i) => boolean;
+}
+
+class NodeList implements NodeListInterface {
+  private translationNodes: TranslationNode[];
+  constructor(translationNodes) {
+    this.translationNodes = translationNodes;
+  }
+  get length() {
+    return 0;
+  }
+  item(i) {
+    return this.translationNodes[i];
+  }
+  isTranslationRootAtIndex(i) {
+    return this.translationNodes[i].isTranslationRoot;
+  }
+}
+
 export const getTranslationNodes = (
   rootElement: Element,
-): TranslationNode[] => {
+): NodeList => {
   // nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
 
   const translationNodesHash: {
@@ -82,5 +104,5 @@ export const getTranslationNodes = (
     }
   }
 
-  return translationNodes;
+  return new NodeList(translationNodes);
 };

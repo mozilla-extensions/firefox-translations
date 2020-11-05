@@ -4,20 +4,51 @@
 
 "use strict";
 
-var EXPORTED_SYMBOLS = ["TranslationChild"];
-
-const { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-ChromeUtils.defineModuleGetter(
-  this,
-  "LanguageDetector",
-  "resource:///modules/translation/LanguageDetector.jsm"
-);
+import { TranslationDocument } from "./TranslationDocument";
+import { BergamotTranslator } from "./BergamotTranslator";
 
 const STATE_OFFER = 0;
 const STATE_TRANSLATED = 2;
 const STATE_ERROR = 3;
 
-class TranslationChild extends JSWindowActorChild {
+// Temporary mock
+class JSWindowActorChild {
+  public contentWindow;
+  public document;
+  sendAsyncMessage(ref, data) {}
+}
+
+// Temporary mock
+class DocumentEncoder {
+  public SkipInvisibleContent;
+  init(document, mimeType, skipInvisibleContent) {
+  }
+  encodeToStringWithMaxLength(length): string {
+    return "foo"
+  }
+}
+
+// Temporary mock
+class Cu {
+  static createDocumentEncoder(mimeType) {
+    return new DocumentEncoder();
+  }
+}
+
+// Temporary mock
+class Services {
+  static prefs: { getCharPref: (pref) => "foo"};
+}
+
+interface Data {
+  state?: any;
+  translatedFrom?: any;
+  translatedTo?: any;
+  originalShown?: any;
+  detectedLanguage?: any;
+}
+
+export class TranslationChild extends JSWindowActorChild {
   handleEvent(aEvent) {
     switch (aEvent.type) {
       case "pageshow":
@@ -27,7 +58,7 @@ class TranslationChild extends JSWindowActorChild {
           return;
         }
 
-        let data = {};
+        let data: Data = {};
         let trDoc = content.translationDocument;
         if (trDoc) {
           data.state = trDoc.translationError ? STATE_ERROR : STATE_TRANSLATED;
@@ -77,9 +108,11 @@ class TranslationChild extends JSWindowActorChild {
       }
 
       // The window might be gone by now.
+      /* TODO: Restore check
       if (Cu.isDeadWrapper(content)) {
         return;
       }
+      */
 
       content.detectedLanguage = result.language;
 
@@ -93,10 +126,6 @@ class TranslationChild extends JSWindowActorChild {
   }
 
   async doTranslation(aFrom, aTo) {
-    var { TranslationDocument } = ChromeUtils.import(
-      "resource:///modules/translation/TranslationDocument.jsm"
-    );
-
     // If a TranslationDocument already exists for this document, it should
     // be used instead of creating a new one so that we can use the original
     // content of the page for the new translation instead of the newly
@@ -106,11 +135,7 @@ class TranslationChild extends JSWindowActorChild {
       new TranslationDocument(this.document);
 
     let engine = Services.prefs.getCharPref("browser.translation.engine");
-    let importScope = ChromeUtils.import(
-      `resource:///modules/translation/${engine}Translator.jsm`,
-      {}
-    );
-    let translator = new importScope[engine + "Translator"](
+    let translator = new BergamotTranslator(
       translationDocument,
       aFrom,
       aTo
