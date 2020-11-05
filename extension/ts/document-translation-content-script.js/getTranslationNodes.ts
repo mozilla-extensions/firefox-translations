@@ -10,7 +10,7 @@ interface NodeListInterface {
 }
 
 class NodeList implements NodeListInterface {
-  private translationNodes: TranslationNode[];
+  private readonly translationNodes: TranslationNode[];
   constructor(translationNodes) {
     this.translationNodes = translationNodes;
   }
@@ -28,9 +28,6 @@ class NodeList implements NodeListInterface {
 export const getTranslationNodes = (rootElement: Element): NodeList => {
   // nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
 
-  const translationNodesHash: {
-    [k: number]: string;
-  } = {};
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
 

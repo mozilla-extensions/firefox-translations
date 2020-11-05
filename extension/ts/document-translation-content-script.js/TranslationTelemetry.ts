@@ -21,7 +21,7 @@ class Services {
 export class TranslationTelemetry {
   private HISTOGRAMS;
 
-  init() {
+  constructor() {
     // Constructing histograms.
     const plain = id => Services.telemetry.getHistogramById(id);
     const keyed = id => Services.telemetry.getKeyedHistogramById(id);
@@ -150,5 +150,3 @@ export class TranslationTelemetry {
     this.HISTOGRAMS.OPPORTUNITIES_BY_LANG().add(language, success);
   }
 }
-
-TranslationTelemetry.init();

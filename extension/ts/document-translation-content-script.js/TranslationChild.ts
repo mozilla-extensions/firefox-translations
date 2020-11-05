@@ -6,6 +6,7 @@
 
 import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
+import { LanguageDetector } from "../shared-resources/LanguageDetector";
 
 const STATE_OFFER = 0;
 const STATE_TRANSLATED = 2;
@@ -19,6 +20,7 @@ class JSWindowActorChild {
 }
 
 // Temporary mock
+// noinspection JSUnusedLocalSymbols
 class DocumentEncoder {
   public SkipInvisibleContent;
   init(document, mimeType, skipInvisibleContent) {}
@@ -48,6 +50,11 @@ interface Data {
 }
 
 export class TranslationChild extends JSWindowActorChild {
+  constructor(document) {
+    super();
+    this.document = document;
+  }
+
   handleEvent(aEvent) {
     switch (aEvent.type) {
       case "pageshow":
@@ -133,7 +140,6 @@ export class TranslationChild extends JSWindowActorChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    let engine = Services.prefs.getCharPref("browser.translation.engine");
     let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
     this.contentWindow.translationDocument = translationDocument;

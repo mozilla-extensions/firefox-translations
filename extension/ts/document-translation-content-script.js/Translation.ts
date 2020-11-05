@@ -21,6 +21,7 @@ export const Translation = {
 
   serviceUnavailable: false,
 
+  // TODO: Update to reflect "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
   supportedSourceLanguages: [
     "bg",
     "cs",
@@ -70,37 +71,5 @@ export const Translation = {
       )[0];
     }
     return this._defaultTargetLanguage;
-  },
-
-  openProviderAttribution() {
-    let attribution = this.supportedEngines[this.translationEngine];
-    // TODO Open link in new tab
-  },
-
-  /**
-   * The list of translation engines and their attributions.
-   */
-  supportedEngines: {
-    Google: "",
-    Bergamot: "https://browser.mt/",
-    Bing: "http://aka.ms/MicrosoftTranslatorAttribution",
-    Yandex: "http://translate.yandex.com/",
-  },
-
-  /**
-   * Fallback engine (currently Bergamot) if the preferences seem confusing.
-   */
-  get defaultEngine() {
-    return Object.keys(this.supportedEngines)[1];
-  },
-
-  /**
-   * Returns the name of the preferred translation engine.
-   */
-  get translationEngine() {
-    let engine = Services.prefs.getCharPref("browser.translation.engine");
-    return !Object.keys(this.supportedEngines).includes(engine)
-      ? this.defaultEngine
-      : engine;
   },
 };

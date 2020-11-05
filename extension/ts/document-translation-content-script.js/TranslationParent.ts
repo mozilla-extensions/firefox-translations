@@ -1,8 +1,12 @@
 import { Translation } from "./Translation";
 import { TranslationTelemetry } from "./TranslationTelemetry";
-import { TRANSLATION_PREF_SHOWUI } from "./translation.constants";
+import {
+  TRANSLATION_PREF_SHOWUI,
+  TRANSLATION_PREF_NEVER_FOR_LANGUAGES,
+} from "./translation.constants";
 
 // Temporary mock
+// noinspection JSUnusedLocalSymbols
 class JSWindowActorParent {
   public browsingContext;
   sendAsyncMessage(ref) {}
@@ -156,7 +160,7 @@ export class TranslationParent extends JSWindowActorParent {
       PopupNotifications.remove(notification);
     }
 
-    let callback = (aTopic, aNewBrowser) => {
+    let callback = aTopic => {
       if (aTopic == "swapping") {
         let infoBarVisible = this.notificationBox.getNotificationWithValue(
           "translation",
@@ -246,7 +250,7 @@ export class TranslationParent extends JSWindowActorParent {
 
     // Check if we should never show the infobar for this language.
     let neverForLangs = Services.prefs.getCharPref(
-      "browser.translation.neverForLanguages",
+      TRANSLATION_PREF_NEVER_FOR_LANGUAGES,
     );
     if (neverForLangs.split(",").includes(this.detectedLanguage)) {
       this.translationTelemetry.recordAutoRejectedTranslationOffer();

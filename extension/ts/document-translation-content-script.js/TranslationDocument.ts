@@ -5,6 +5,10 @@
 "use strict";
 
 import { getTranslationNodes } from "./getTranslationNodes";
+import {
+  TranslationItem,
+  TranslationItem_NodePlaceholder,
+} from "./TranslationItem";
 
 /**
  * This class represents a document that is being translated,
@@ -95,7 +99,7 @@ export class TranslationDocument {
    *
    * @returns           A TranslationItem object.
    */
-  _createItemForNode(node, id, isRoot) {
+  _createItemForNode(node, id, isRoot): TranslationItem {
     if (this.itemsMap.has(node)) {
       return this.itemsMap.get(node);
     }
@@ -130,7 +134,7 @@ export class TranslationDocument {
    *
    * @returns        A string representation of the TranslationItem.
    */
-  generateTextForItem(item) {
+  generateTextForItem(item: TranslationItem & { original: any }) {
     if (item.original) {
       return regenerateTextFromOriginalHelper(item);
     }
@@ -229,11 +233,11 @@ export class TranslationDocument {
  * Generate the outer HTML representation for a given item.
  *
  * @param   item       A TranslationItem object.
- * param    content    The inner content for this item.
+ * @param   content    The inner content for this item.
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-function generateTranslationHtmlForItem(item, content) {
+function generateTranslationHtmlForItem(item, content): string {
   let localName = item.isRoot ? "div" : "b";
   return (
     "<" + localName + " id=n" + item.id + ">" + content + "</" + localName + ">"

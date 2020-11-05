@@ -20,16 +20,16 @@ import { BergamotRequest } from "../shared-resources/BergamotRequest";
  *                             represents the webpage.
  */
 export class BergamotOutboundTranslator {
-  private _translationDocument;
+  private translationDocument;
+  private sourceLanguage;
+  private targetLanguage;
   private _pendingRequests;
   private _partialSuccess;
   private _translatedCharacterCount;
   private _formControlElements;
-  private sourceLanguage;
-  private targetLanguage;
 
   constructor(translationDocument) {
-    this._translationDocument = translationDocument;
+    this.translationDocument = translationDocument;
     this._pendingRequests = 0;
     this._partialSuccess = false;
     this._translatedCharacterCount = 0;
@@ -40,7 +40,7 @@ export class BergamotOutboundTranslator {
    *
    */
   listenSubmitEvents() {
-    let ownerDocument = this._translationDocument.getOwnerDocument();
+    let ownerDocument = this.translationDocument.getOwnerDocument();
     for (let form of ownerDocument.forms) {
       form.addEventListener("submit", this);
     }
@@ -101,6 +101,156 @@ export class BergamotOutboundTranslator {
   }
 
   /**
+   * Return the value of document's form control element.
+   *
+   * @param  formControlElement   An element respresenting Form Control
+   */
+  _getFormControlElementValue(formControlElement) {
+    // ToDo: Change this once outbound translation use case gets well defined.
+    // Values for only the <input> elements (of type "text") and <textarea>
+    // elements are returned right now
+    if (
+      formControlElement.type.toUpperCase() == "TEXT" ||
+      formControlElement.type.toUpperCase() == "TEXTAREA"
+    ) {
+      return formControlElement.value;
+    }
+  }
+
+  /**
+   * Function called when a request sent to the server completed successfully.
+   * This function handles calling the function to parse the result.
+   *
+   * @param   bergamotRequest   The BergamotRequest sent to the server.
+   */
+  _chunkCompleted(bergamotRequest: BergamotRequest) {
+    if (this._parseChunkResult(bergamotRequest)) {
+      this._partialSuccess = true;
+      // Count the number of characters successfully translated.
+      this._translatedCharacterCount += bergamotRequest.characterCount;
+    }
+
+    this._checkIfFinished();
+  }
+
+  /**
+   * Function called when a request sent to the server has failed.
+   * This function handles deciding if the error is transient or means the
+   * service is unavailable (zero balance on the key or request credentials are
+   * not in an active state).
+   *
+   * @param   aError   [optional] The XHR object of the request that failed.
+   */
+  _chunkFailed(aError) {
+    this._checkIfFinished();
+  }
+
+  /**
+   * Function called when a request sent to the server has completed.
+   */
+  _checkIfFinished() {
+    // Check if all pending requests have been translated.
+    if (--this._pendingRequests == 0) {
+      if (this._partialSuccess) {
+        // ToDo: Return resolved Promise if at least one chunk was successful
+      } else {
+        // ToDo: Return rejected Promise otherwise
+      }
+    }
+  }
+
+  /**
+   * This function parses the result returned by Bergamot's Http API for
+   * the translated text in target language.
+   *
+   * @param   bergamotRequest      The request sent to the server.
+   * @returns boolean      True if parsing of this chunk was successful.
+   */
+  _parseChunkResult(bergamotRequest: BergamotRequest) {
+    let results;
+    try {
+      let response = bergamotRequest.networkRequest.response;
+      results = JSON.parse(response);
+    } catch (e) {
+      return false;
+    }
+    let len = results.text.length;
+    if (len != bergamotRequest.translationData.length) {
+      // This should never happen, but if the service returns a different number
+      // of items (from the number of items submitted), we can't use this chunk
+      // because all items would be paired incorrectly.
+      return false;
+    }
+
+    let error = false;
+    for (let i = 0; i < len; i++) {
+      try {
+        // The 'text' field of results is a list of 'Paragraph'. Parse each
+        // 'Paragraph' entry for the translated text.
+        let translation = this._parseTranslatedTextFromParagraph(
+          results.text[i],
+        );
+        let formControlElement = bergamotRequest.translationData[i][0];
+        if (translation.includes("&")) {
+          // If translation contains HTML entities, we convert it to plain text.
+          // ToDo: Change this once outbound translation use case gets well defined.
+          // ToDo: Add message-system logging later
+          let doc = new DOMParser().parseFromString(translation, "text/html");
+          translation = doc.body.firstChild.nodeValue;
+        }
+
+        // ToDo: Change this once outbound translation use case gets well defined.
+        // This step is done in order to demonstrate through GUI that text entered
+        // by the user in the form has been translated in target language. This is
+        formControlElement.value = translation;
+      } catch (e) {
+        error = true;
+      }
+    }
+
+    return !error;
+  }
+
+  /**
+   * This function parses 'Paragraph' entity of the response for the
+   * the translated text and returns it. The API response format
+   * can be referred here: https://github.com/browsermt/mts
+   *
+   * @param   paragraph    paragraph entry in the response of server.
+   *
+   * @returns string       translated text in target language
+   */
+  _parseTranslatedTextFromParagraph(paragraph) {
+    // ToDo: Add message-system logging later in this method
+    // Each 'Paragraph' contains a list of 'Sentence translation' list.
+    // There should be only 1 such list.
+    let sentenceTranslationList = paragraph[0];
+
+    let result = "";
+
+    // 'Sentence translation' list contains 'Sentence translation' objects
+    // where each object contains all the information related to translation
+    // of each sentence in source language.
+    for (let index = 0; index < sentenceTranslationList.length; index++) {
+      let sentenceTranslation = sentenceTranslationList[index];
+      let nBestTranslations = sentenceTranslation.nBest;
+
+      // Depending on the request, there might be multiple 'best translations'.
+      // We are fetching the best one (present in 'translation' field).
+      let translation = nBestTranslations[0].translation;
+
+      // ToDo: Currently the rest server doesn't retain the leading/trailing
+      // whitespace information of sentences. It is a bug on rest server side.
+      // Once it is fixed there, we need to stop appending whitespaces.
+      if (index != 0) {
+        translation = " " + translation;
+      }
+      result += translation;
+    }
+    return result;
+  }
+
+  /**
    * This function will generate data that is to be used for creating Nth
    * translation request based on the input params.
    *
@@ -144,153 +294,5 @@ export class BergamotOutboundTranslator {
       finished: true,
       lastIndex: 0,
     };
-  }
-
-  /**
-   * Return the value of document's form control element.
-   *
-   * @param  formControlElement   An element respresenting Form Control
-   */
-  _getFormControlElementValue(formControlElement) {
-    // ToDo: Change this once outbound translation use case gets well defined.
-    // Values for only the <input> elements (of type "text") and <textarea>
-    // elements are returned right now
-    if (
-      formControlElement.type.toUpperCase() == "TEXT" ||
-      formControlElement.type.toUpperCase() == "TEXTAREA"
-    ) {
-      return formControlElement.value;
-    }
-  }
-
-  /**
-   * Function called when a request sent to the server completed successfully.
-   * This function handles calling the function to parse the result.
-   *
-   * @param   request   The BergamotRequest sent to the server.
-   */
-  _chunkCompleted(bergamotRequest) {
-    if (this._parseChunkResult(bergamotRequest)) {
-      this._partialSuccess = true;
-      // Count the number of characters successfully translated.
-      this._translatedCharacterCount += bergamotRequest.characterCount;
-    }
-    this._checkIfFinished();
-  }
-
-  /**
-   * Function called when a request sent to the server has failed.
-   * This function handles deciding if the error is transient or means the
-   * service is unavailable (zero balance on the key or request credentials are
-   * not in an active state).
-   *
-   * @param   aError   [optional] The XHR object of the request that failed.
-   */
-  _chunkFailed(aError) {
-    this._checkIfFinished();
-  }
-
-  /**
-   * Function called when a request sent to the server has completed.
-   */
-  _checkIfFinished() {
-    // Check if all pending requests have been translated.
-    if (--this._pendingRequests == 0) {
-      if (this._partialSuccess) {
-        // ToDo: Return resolved Promise if at least one chunk was successful
-      } else {
-        // ToDo: Return rejected Promise otherwise
-      }
-    }
-  }
-
-  /**
-   * This function parses the result returned by Bergamot's Http API for
-   * the translated text in target language.
-   *
-   * @param   request      The request sent to the server.
-   * @returns boolean      True if parsing of this chunk was successful.
-   */
-  _parseChunkResult(bergamotRequest) {
-    let results;
-    try {
-      let response = bergamotRequest.networkRequest.response;
-      results = JSON.parse(response);
-    } catch (e) {
-      return false;
-    }
-    let len = results.text.length;
-    if (len != bergamotRequest.translationData.length) {
-      // This should never happen, but if the service returns a different number
-      // of items (from the number of items submitted), we can't use this chunk
-      // because all items would be paired incorrectly.
-      return false;
-    }
-
-    let error = false;
-    for (let i = 0; i < len; i++) {
-      try {
-        // The 'text' field of results is a list of 'Paragraph'. Parse each
-        // 'Paragraph' entry for the translated text.
-        let translation = this._parseTranslatedTextFromParagraph(
-          results.text[i],
-        );
-        let formControlElement = bergamotRequest.translationData[i][0];
-        if (translation.includes("&")) {
-          // If translation contains HTML entities, we convert it to plain text.
-          // ToDo: Change this once outbound translation use case gets well defined.
-          // ToDo: Add message-system logging later
-          let doc = new DOMParser().parseFromString(translation, "text/html");
-          translation = doc.body.firstChild.nodeValue;
-        }
-
-        // ToDo: Change this once outbound translation use case gets well defined.
-        // This step is done in order to demonstrate through GUI that text entered
-        // by the user in the form has been translated in target language. This is
-        formControlElement.value = translation;
-      } catch (e) {
-        error = true;
-      }
-    }
-    return !error;
-  }
-
-  /**
-   * This function parses 'Paragraph' entity of the response for the
-   * the translated text and returns it. The API response format
-   * can be referred here: https://github.com/browsermt/mts
-   *
-   * @param   paragraph    paragraph entry in the response of server.
-   *
-   * @returns string       translated text in target language
-   */
-  _parseTranslatedTextFromParagraph(paragraph) {
-    // ToDo: Add message-system logging later in this method
-    // Each 'Paragraph' contains a list of 'Sentence translation' list.
-    // There should be only 1 such list.
-    let sentenceTranslationList = paragraph[0];
-
-    let result = "";
-
-    // 'Sentence translation' list contains 'Sentence translation' objects
-    // where each object contains all the information related to translation
-    // of each sentence in source language.
-    for (let index = 0; index < sentenceTranslationList.length; index++) {
-      let sentenceTranslation = sentenceTranslationList[index];
-      let nBestTranslations = sentenceTranslation.nBest;
-
-      // Depending on the request, there might be multiple 'best translations'.
-      // We are fetching the best one (present in 'translation' field).
-      let translation = nBestTranslations[0].translation;
-
-      // ToDo: Currently the rest server doesn't retain the leading/trailing
-      // whitespace information of sentences. It is a bug on rest server side.
-      // Once it is fixed there, we need to stop appending whitespaces.
-      if (index != 0) {
-        translation = " " + translation;
-      }
-      result += translation;
-    }
-    return result;
   }
 }

@@ -35,12 +35,12 @@
  *    translation: ["da Mozilla"]
  *  }
  */
-class TranslationItem {
-  private isRoot = false;
-  private isSimpleRoot = false;
+export class TranslationItem {
+  private readonly isRoot = false;
+  public isSimpleRoot = false;
   public nodeRef;
   private id;
-  private children;
+  private readonly children;
   private translation;
 
   constructor(node, id, isRoot) {
@@ -130,9 +130,9 @@ class TranslationItem {
  * the TranslationItem class, but it represents nodes that have no meaningful
  * content for translation. These nodes will be replaced by "<br>" in a
  * translation request. It's necessary to keep them to use it as a mark
- * for correct positioning and spliting of text nodes.
+ * for correct positioning and splitting of text nodes.
  */
-const TranslationItem_NodePlaceholder = {
+export const TranslationItem_NodePlaceholder = {
   toString() {
     return "[object TranslationItem_NodePlaceholder]";
   },

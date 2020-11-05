@@ -1,4 +1,5 @@
 import { BergamotApiClient } from "../shared-resources/BergamotApiClient";
+import { TranslationChild } from "./TranslationChild";
 
 const init = async () => {
   /*
@@ -14,6 +15,9 @@ const init = async () => {
   window.addEventListener("DOMContentLoaded", async () => {
     console.log("DOMContentLoaded");
 
+    const translationChild = new TranslationChild(document);
+    translationChild.checkForTranslation();
+
     const translationResults = await bergamotApiClient.sendTranslationRequest([
       "Hello world",
       "Foo bar",
@@ -22,4 +26,5 @@ const init = async () => {
     console.log({ translationResults });
   });
 };
+// noinspection JSIgnoredPromiseFromCall
 init();

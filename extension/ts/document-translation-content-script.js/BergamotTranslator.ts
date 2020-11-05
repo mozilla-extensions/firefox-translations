@@ -4,13 +4,13 @@
 
 "use strict";
 
-import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
-import { BergamotRequest } from "../shared-resources/BergamotRequest";
 import {
   MAX_REQUEST_CHUNKS,
   MAX_REQUEST_DATA,
   MAX_REQUESTS,
 } from "./bergamot.constants";
+import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
+import { BergamotRequest } from "../shared-resources/BergamotRequest";
 
 // Temporary mock
 class PromiseUtils {
@@ -28,9 +28,9 @@ class PromiseUtils {
  *                             task is finished.
  */
 export class BergamotTranslator {
-  private translationDocument;
-  private sourceLanguage;
-  private targetLanguage;
+  private readonly translationDocument;
+  private readonly sourceLanguage;
+  private readonly targetLanguage;
   private _pendingRequests;
   private _partialSuccess;
   private _translatedCharacterCount;
@@ -75,14 +75,14 @@ export class BergamotTranslator {
       // Determine the data for the next request.
       let request = this._generateNextTranslationRequest(currentIndex);
 
-      // Create a real request to the server, and put it on the
-      // pending requests list.
+      // Create a real request for the server and add it to the pending requests list.
       let bergamotRequest = new BergamotRequest(
         request.data,
         this.sourceLanguage,
         this.targetLanguage,
       );
       this._pendingRequests++;
+
       bergamotRequest
         .fireRequest(process.env.BERGAMOT_REST_API_INBOUND_URL)
         .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
@@ -102,7 +102,7 @@ export class BergamotTranslator {
    * function to resolve the promise returned by the public `translate()`
    * method when there's no pending request left.
    *
-   * @param   request   The BergamotRequest sent to the server.
+   * @param   bergamotRequest   The BergamotRequest sent to the server.
    */
   _chunkCompleted(bergamotRequest: BergamotRequest) {
     if (this._parseChunkResult(bergamotRequest)) {
@@ -155,7 +155,7 @@ export class BergamotTranslator {
    * This function parses the result returned by Bergamot's Http API for
    * the translated text in target language.
    *
-   * @param   request      The request sent to the server.
+   * @param   bergamotRequest      The request sent to the server.
    * @returns boolean      True if parsing of this chunk was successful.
    */
   _parseChunkResult(bergamotRequest: BergamotRequest) {
@@ -268,7 +268,7 @@ export class BergamotTranslator {
     // Color choices and thresholds below are chosen based on intuitiveness.
     // They will be changed according to the UI design of Translator once it
     // is fixed.
-    let color = "";
+    let color: string;
     if (score >= -0.2) {
       color = "green";
     } else if (score >= -0.5 && score < -0.2) {
