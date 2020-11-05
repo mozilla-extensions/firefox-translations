@@ -36,11 +36,6 @@ class Cu {
   }
 }
 
-// Temporary mock
-class Services {
-  static prefs: { getCharPref: (pref) => "foo" };
-}
-
 interface Data {
   state?: any;
   translatedFrom?: any;

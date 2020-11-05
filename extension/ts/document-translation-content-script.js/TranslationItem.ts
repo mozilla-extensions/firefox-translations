@@ -9,7 +9,7 @@
  * the structure of that node in its original state, and the other in its
  * translated state.
  *
- * The "original" array is generated in the generateTextForItem function,
+ * The "original" array is generated in the TranslationDocument.generateTextForItem function,
  * and the "translation" array is generated when the translation results
  * are parsed.
  *
