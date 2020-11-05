@@ -4,16 +4,21 @@
  *
  * NOTE: Metrics are only recorded if the user enabled the telemetry option.
  */
-import {TRANSLATION_PREF_DETECT_LANG, TRANSLATION_PREF_SHOWUI} from "./translation.constants";
+import {
+  TRANSLATION_PREF_DETECT_LANG,
+  TRANSLATION_PREF_SHOWUI,
+} from "./translation.constants";
 
 // Temporary mock
 class Services {
-  static telemetry: { getHistogramById: (id) => "foo", getKeyedHistogramById: (id) => "foo"};
-  static prefs: { getBoolPref: (pref) => false};
+  static telemetry: {
+    getHistogramById: (id) => "foo";
+    getKeyedHistogramById: (id) => "foo";
+  };
+  static prefs: { getBoolPref: (pref) => false };
 }
 
 export class TranslationTelemetry {
-
   private HISTOGRAMS;
 
   init() {

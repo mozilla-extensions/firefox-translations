@@ -25,9 +25,7 @@ class NodeList implements NodeListInterface {
   }
 }
 
-export const getTranslationNodes = (
-  rootElement: Element,
-): NodeList => {
+export const getTranslationNodes = (rootElement: Element): NodeList => {
   // nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
 
   const translationNodesHash: {

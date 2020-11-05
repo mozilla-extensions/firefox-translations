@@ -36,7 +36,6 @@
  *  }
  */
 class TranslationItem {
-
   private isRoot = false;
   private isSimpleRoot = false;
   public nodeRef;
@@ -162,7 +161,7 @@ function parseResultNode(item, node) {
       item.translation.push(TranslationItem_NodePlaceholder);
       /*
        */
-    } else if (child.id == "QE-ANNOTATED"){
+    } else if (child.id == "QE-ANNOTATED") {
       // A workaround to show translated text with Quality Estimate annotations
       // inplace (i.e. in the same webpage replacing the original text) and
       // enabling seemless switch between showing original and translated text
@@ -318,7 +317,7 @@ function swapTextForItem(item, target) {
       curNode &&
       curNode.nodeType == curNode.TEXT_NODE &&
       curNode.nodeValue.trim() == ""
-      ) {
+    ) {
       curNode = curNode.nextSibling;
     }
 
@@ -369,7 +368,7 @@ function swapTextForItem(item, target) {
           curNode &&
           (curNode.nodeType != curNode.TEXT_NODE ||
             curNode.nodeValue.trim() == "")
-          ) {
+        ) {
           curNode = curNode.nextSibling;
         }
       } else {
@@ -387,7 +386,7 @@ function swapTextForItem(item, target) {
           // so the best bet is to create the text node with " " which
           // will add one space at the beginning and one at the end.
           curNode = domNode.appendChild(
-            domNode.ownerDocument.createTextNode(" ")
+            domNode.ownerDocument.createTextNode(" "),
           );
         }
 
@@ -422,8 +421,7 @@ function swapTextForItem(item, target) {
             }
           }
           curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
-        }
-        else {
+        } else {
           let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
           // Replace the text node with the qe-annotated node to maintain the
           // right order in original DOM tree of the document.
@@ -432,7 +430,6 @@ function swapTextForItem(item, target) {
         }
         /*
          */
-
       }
     }
 
@@ -453,7 +450,7 @@ function getNextSiblingSkippingEmptyTextNodes(startSibling) {
     item &&
     item.nodeType == item.TEXT_NODE &&
     item.nodeValue.trim() == ""
-    ) {
+  ) {
     item = item.nextSibling;
   }
   return item;

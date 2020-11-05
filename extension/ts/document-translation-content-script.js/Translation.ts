@@ -7,7 +7,7 @@
 // Temporary mock
 class Services {
   static locale: { appLocaleAsBCP47: "foo" };
-  static prefs: { getCharPref: (pref) => "foo"};
+  static prefs: { getCharPref: (pref) => "foo" };
 }
 
 export const Translation = {
@@ -66,7 +66,7 @@ export const Translation = {
   get defaultTargetLanguage() {
     if (!this._defaultTargetLanguage) {
       this._defaultTargetLanguage = Services.locale.appLocaleAsBCP47.split(
-        "-"
+        "-",
       )[0];
     }
     return this._defaultTargetLanguage;

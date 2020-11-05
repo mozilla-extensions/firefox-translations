@@ -4,7 +4,7 @@
 
 "use strict";
 
-import {getTranslationNodes} from "./getTranslationNodes";
+import { getTranslationNodes } from "./getTranslationNodes";
 
 /**
  * This class represents a document that is being translated,
@@ -36,7 +36,6 @@ export class TranslationDocument {
    * @param document  The document to be translated
    */
   _init(document) {
-
     // Get all the translation nodes in the document's body:
     // a translation node is a node from the document which
     // contains useful content for translation, and therefore
@@ -268,4 +267,3 @@ function regenerateTextFromOriginalHelper(item) {
 
   return generateTranslationHtmlForItem(item, str);
 }
-

@@ -1,18 +1,23 @@
 import { Translation } from "./Translation";
 import { TranslationTelemetry } from "./TranslationTelemetry";
-import {TRANSLATION_PREF_SHOWUI} from "./translation.constants";
+import { TRANSLATION_PREF_SHOWUI } from "./translation.constants";
 
 // Temporary mock
 class JSWindowActorParent {
   public browsingContext;
   sendAsyncMessage(ref) {}
-  async sendQuery(ref, data): Promise<any> {return "foo";}
+  async sendQuery(ref, data): Promise<any> {
+    return "foo";
+  }
 }
 
 // Temporary mock
 class Services {
-  static prefs: { getCharPref: (pref) => "foo", getBoolPref: (pref) => false};
-  static perms: {testExactPermissionFromPrincipal: (aPrincipal, permissionRef) => "foo", DENY_ACTION: "foo"};
+  static prefs: { getCharPref: (pref) => "foo"; getBoolPref: (pref) => false };
+  static perms: {
+    testExactPermissionFromPrincipal: (aPrincipal, permissionRef) => "foo";
+    DENY_ACTION: "foo";
+  };
 }
 
 /* Translation objects keep the information related to translation for
@@ -29,7 +34,6 @@ class Services {
  *   version of the page is shown.
  */
 export class TranslationParent extends JSWindowActorParent {
-
   private translationTelemetry;
   private _state;
   private detectedLanguage;
@@ -71,12 +75,14 @@ export class TranslationParent extends JSWindowActorParent {
       ) {
         // Detected language is not part of the supported languages.
         this.translationTelemetry.recordMissedTranslationOpportunity(
-          aData.detectedLanguage
+          aData.detectedLanguage,
         );
         return;
       }
 
-      this.translationTelemetry.recordTranslationOpportunity(aData.detectedLanguage);
+      this.translationTelemetry.recordTranslationOpportunity(
+        aData.detectedLanguage,
+      );
     }
 
     if (!Services.prefs.getBoolPref(TRANSLATION_PREF_SHOWUI)) {
@@ -134,7 +140,7 @@ export class TranslationParent extends JSWindowActorParent {
       result => {
         this.translationFinished(result);
       },
-      () => {}
+      () => {},
     );
   }
 
@@ -144,7 +150,7 @@ export class TranslationParent extends JSWindowActorParent {
     let removeId = this.originalShown ? "translated" : "translate";
     let notification = PopupNotifications.getNotification(
       removeId,
-      this.browser
+      this.browser,
     );
     if (notification) {
       PopupNotifications.remove(notification);
@@ -153,7 +159,7 @@ export class TranslationParent extends JSWindowActorParent {
     let callback = (aTopic, aNewBrowser) => {
       if (aTopic == "swapping") {
         let infoBarVisible = this.notificationBox.getNotificationWithValue(
-          "translation"
+          "translation",
         );
         if (infoBarVisible) {
           this.showTranslationInfoBar();
@@ -165,7 +171,7 @@ export class TranslationParent extends JSWindowActorParent {
         return false;
       }
       let translationNotification = this.notificationBox.getNotificationWithValue(
-        "translation"
+        "translation",
       );
       if (translationNotification) {
         translationNotification.close();
@@ -183,7 +189,7 @@ export class TranslationParent extends JSWindowActorParent {
       addId + "-notification-icon",
       null,
       null,
-      { dismissed: true, eventCallback: callback }
+      { dismissed: true, eventCallback: callback },
     );
   }
 
@@ -225,7 +231,7 @@ export class TranslationParent extends JSWindowActorParent {
       notificationBox.PRIORITY_INFO_HIGH,
       null,
       null,
-      "translation-notification"
+      "translation-notification",
     );
     notif.init(this);
     return notif;
@@ -240,7 +246,7 @@ export class TranslationParent extends JSWindowActorParent {
 
     // Check if we should never show the infobar for this language.
     let neverForLangs = Services.prefs.getCharPref(
-      "browser.translation.neverForLanguages"
+      "browser.translation.neverForLanguages",
     );
     if (neverForLangs.split(",").includes(this.detectedLanguage)) {
       this.translationTelemetry.recordAutoRejectedTranslationOffer();
@@ -270,7 +276,7 @@ export class TranslationParent extends JSWindowActorParent {
       this.translationTelemetry.recordTranslation(
         result.from,
         result.to,
-        result.characterCount
+        result.characterCount,
       );
     } else if (result.unavailable) {
       Translation.serviceUnavailable = true;
@@ -290,4 +296,3 @@ export class TranslationParent extends JSWindowActorParent {
     }
   }
 }
-

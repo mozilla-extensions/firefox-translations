@@ -6,8 +6,7 @@
 
 // Temporary mock
 class httpRequest {
-  constructor(url, options) {
-  }
+  constructor(url, options) {}
 }
 
 /**
@@ -21,7 +20,6 @@ class httpRequest {
  *
  */
 export class BergamotRequest {
-
   public translationData;
   private sourceLanguage;
   private targetLanguage;
@@ -40,14 +38,12 @@ export class BergamotRequest {
    */
   fireRequest(url) {
     // Prepare the headers
-    let headers = [
-      ["Content-Type", "application/json"],
-    ]
+    let headers = [["Content-Type", "application/json"]];
 
     // Prepare the post data
     let postData = {
-      "text"  : [],
-      "options" : {"returnSentenceScore" : true}
+      text: [],
+      options: { returnSentenceScore: true },
     };
 
     // Prepare the content of the post
@@ -61,7 +57,7 @@ export class BergamotRequest {
       // replace them as it doesn't know how to insert them in to
       // the translated result. So as a hack we just remove the
       // tags and hope the formatting is not too bad.
-      text = text.replace(/<[^>]*>?/gm, ' ');
+      text = text.replace(/<[^>]*>?/gm, " ");
       postData["text"].push(text);
       this.characterCount += text.length;
     }

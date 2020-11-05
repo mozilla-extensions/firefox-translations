@@ -6,12 +6,15 @@
 
 import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
 import { BergamotRequest } from "../shared-resources/BergamotRequest";
-import {MAX_REQUEST_CHUNKS, MAX_REQUEST_DATA, MAX_REQUESTS} from "./bergamot.constants";
+import {
+  MAX_REQUEST_CHUNKS,
+  MAX_REQUEST_DATA,
+  MAX_REQUESTS,
+} from "./bergamot.constants";
 
 // Temporary mock
 class PromiseUtils {
-  static defer() {
-  }
+  static defer() {}
 }
 /**
  * Translates a webpage using Bergamot's Translation API.
@@ -25,7 +28,6 @@ class PromiseUtils {
  *                             task is finished.
  */
 export class BergamotTranslator {
-
   private translationDocument;
   private sourceLanguage;
   private targetLanguage;
@@ -35,11 +37,7 @@ export class BergamotTranslator {
   private _outboundTranslator;
   private _onFinishedDeferred;
 
-  constructor(
-    translationDocument,
-    sourceLanguage,
-    targetLanguage
-  ) {
+  constructor(translationDocument, sourceLanguage, targetLanguage) {
     this.translationDocument = translationDocument;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
@@ -54,7 +52,9 @@ export class BergamotTranslator {
    * events on the document.
    */
   _initBergamotOutboundTranslator() {
-    this._outboundTranslator = new BergamotOutboundTranslator(this.translationDocument);
+    this._outboundTranslator = new BergamotOutboundTranslator(
+      this.translationDocument,
+    );
     this._outboundTranslator.listenSubmitEvents();
   }
 
@@ -80,7 +80,7 @@ export class BergamotTranslator {
       let bergamotRequest = new BergamotRequest(
         request.data,
         this.sourceLanguage,
-        this.targetLanguage
+        this.targetLanguage,
       );
       this._pendingRequests++;
       bergamotRequest
@@ -179,7 +179,9 @@ export class BergamotTranslator {
       try {
         // The 'text' field of results is a list of 'Paragraph'. Parse each
         // 'Paragraph' entry and generate QE annotated HTML of the translated text
-        let translation = this._generateQEAnnotatedHTMLFromParagraph(results.text[i]);
+        let translation = this._generateQEAnnotatedHTMLFromParagraph(
+          results.text[i],
+        );
         let root = bergamotRequest.translationData[i][0];
         if (root.isSimpleRoot && translation.includes("&")) {
           // If translation contains HTML entities, we need to convert them.
@@ -243,12 +245,15 @@ export class BergamotTranslator {
       }
 
       // Generate QE Annotated HTML for each sentence and append it to the result
-      qeAnnotatedParagraphHTML += this._generateQEAnnotatedHTML(translation, sentenceScore);
+      qeAnnotatedParagraphHTML += this._generateQEAnnotatedHTML(
+        translation,
+        sentenceScore,
+      );
     }
 
     // Wrap the result with identifier "QE-ANNOTATED" to make it easy to switch
     // b/w "original" and "translation" in TranslationDocument.swapTextForItem() method
-    return `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`
+    return `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`;
   }
 
   /**
@@ -264,19 +269,16 @@ export class BergamotTranslator {
     // They will be changed according to the UI design of Translator once it
     // is fixed.
     let color = "";
-    if (score >= -0.20) {
+    if (score >= -0.2) {
       color = "green";
-    }
-    else if (score >= -0.50 && score < -0.20) {
+    } else if (score >= -0.5 && score < -0.2) {
       color = "black";
-    }
-    else if (score >= -0.80 && score < -0.50) {
+    } else if (score >= -0.8 && score < -0.5) {
       color = "mediumvioletred";
-    }
-    else {
+    } else {
       color = "red";
     }
-    return (`<span style="color:${color}">${translation}</span>`);
+    return `<span style="color:${color}">${translation}</span>`;
   }
 
   /**

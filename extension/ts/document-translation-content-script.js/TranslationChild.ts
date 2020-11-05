@@ -21,10 +21,9 @@ class JSWindowActorChild {
 // Temporary mock
 class DocumentEncoder {
   public SkipInvisibleContent;
-  init(document, mimeType, skipInvisibleContent) {
-  }
+  init(document, mimeType, skipInvisibleContent) {}
   encodeToStringWithMaxLength(length): string {
-    return "foo"
+    return "foo";
   }
 }
 
@@ -37,7 +36,7 @@ class Cu {
 
 // Temporary mock
 class Services {
-  static prefs: { getCharPref: (pref) => "foo"};
+  static prefs: { getCharPref: (pref) => "foo" };
 }
 
 interface Data {
@@ -135,11 +134,7 @@ export class TranslationChild extends JSWindowActorChild {
       new TranslationDocument(this.document);
 
     let engine = Services.prefs.getCharPref("browser.translation.engine");
-    let translator = new BergamotTranslator(
-      translationDocument,
-      aFrom,
-      aTo
-    );
+    let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
     this.contentWindow.translationDocument = translationDocument;
     translationDocument.translatedFrom = aFrom;

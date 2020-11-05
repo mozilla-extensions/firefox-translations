@@ -75,6 +75,7 @@ cd macos-server
 ```
 
 In another terminal:
+
 ```
 ./server/rest-server -c outboundModel/config.yml -p 8788 --log-level debug -w 5000
 ```

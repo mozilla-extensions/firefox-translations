@@ -4,8 +4,12 @@
 
 "use strict";
 
-import {MAX_REQUEST_CHUNKS, MAX_REQUEST_DATA, MAX_REQUESTS} from "./bergamot.constants";
-import {BergamotRequest} from "../shared-resources/BergamotRequest";
+import {
+  MAX_REQUEST_CHUNKS,
+  MAX_REQUEST_DATA,
+  MAX_REQUESTS,
+} from "./bergamot.constants";
+import { BergamotRequest } from "../shared-resources/BergamotRequest";
 
 /**
  * Outbound translator for a webpage using Bergamot's Translation API.
@@ -16,7 +20,6 @@ import {BergamotRequest} from "../shared-resources/BergamotRequest";
  *                             represents the webpage.
  */
 export class BergamotOutboundTranslator {
-
   private _translationDocument;
   private _pendingRequests;
   private _partialSuccess;
@@ -39,7 +42,7 @@ export class BergamotOutboundTranslator {
   listenSubmitEvents() {
     let ownerDocument = this._translationDocument.getOwnerDocument();
     for (let form of ownerDocument.forms) {
-      form.addEventListener('submit', this);
+      form.addEventListener("submit", this);
     }
   }
 
@@ -152,8 +155,10 @@ export class BergamotOutboundTranslator {
     // ToDo: Change this once outbound translation use case gets well defined.
     // Values for only the <input> elements (of type "text") and <textarea>
     // elements are returned right now
-    if (formControlElement.type.toUpperCase() == "TEXT" ||
-        formControlElement.type.toUpperCase() == "TEXTAREA") {
+    if (
+      formControlElement.type.toUpperCase() == "TEXT" ||
+      formControlElement.type.toUpperCase() == "TEXTAREA"
+    ) {
       return formControlElement.value;
     }
   }
@@ -227,7 +232,9 @@ export class BergamotOutboundTranslator {
       try {
         // The 'text' field of results is a list of 'Paragraph'. Parse each
         // 'Paragraph' entry for the translated text.
-        let translation = this._parseTranslatedTextFromParagraph(results.text[i]);
+        let translation = this._parseTranslatedTextFromParagraph(
+          results.text[i],
+        );
         let formControlElement = bergamotRequest.translationData[i][0];
         if (translation.includes("&")) {
           // If translation contains HTML entities, we convert it to plain text.
