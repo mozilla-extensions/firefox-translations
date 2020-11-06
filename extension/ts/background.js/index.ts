@@ -131,15 +131,6 @@ class ExtensionGlue {
       });
     };
     crossBrowser.runtime.onConnect.addListener(this.mainInterfacePortListener);
-
-    // Register the content script necessary for document translation
-    await crossBrowser.contentScripts.register({
-      js: [{ file: "/document-translation-content-script.js" }],
-      matches: ["<all_urls>"],
-      allFrames: false,
-      runAt: "document_start",
-      matchAboutBlank: false,
-    });
   }
 
   async cleanup() {

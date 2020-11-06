@@ -3369,14 +3369,6 @@ contains-path@^0.1.0:
   resolved "https://registry.yarnpkg.com/contains-path/-/contains-path-0.1.0.tgz#fe8cf184ff6670b6baef01a9d4861a5cbec4120a"
   integrity sha1-/ozxhP9mcLa67wGp1IYaXL7EEgo=
 
-content-scripts-register-polyfill@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/content-scripts-register-polyfill/-/content-scripts-register-polyfill-1.0.5.tgz#8b68b6cf156357df54ac4a2789acbe76847ab946"
-  integrity sha512-SNpw8Qn3DeIRGLIVgeOdDrWftlwKMcIqaKTrZ67MEtBnt/rC1MG8GAWINxrrizOymSBDszk8K2CJ2AJPNILCcg==
-  dependencies:
-    "@types/firefox-webext-browser" "^78.0.1"
-    webext-patterns "^0.9.0"
-
 convert-source-map@^1.5.1, convert-source-map@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/convert-source-map/-/convert-source-map-1.7.0.tgz#17a2cb882d7f77d3490585e2ce6c524424a3a442"

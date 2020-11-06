@@ -15,11 +15,20 @@ async function generateManifest({ dotEnvPath }) {
     }`,
     description: "__MSG_extensionDescription__",
     version: `${packageJson.version}`,
+    incognito: "spanning", // Share context between private and non-private windows
     default_locale: "en_US",
     background: {
       scripts: ["background.js"],
     },
-    content_scripts: [],
+    content_scripts: [
+      {
+        js: ["document-translation-content-script.js"],
+        matches: ["<all_urls>"],
+        all_frames: false,
+        run_at: "document_idle",
+        match_about_blank: false,
+      },
+    ],
     permissions: [
       "<all_urls>",
       `${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`,
