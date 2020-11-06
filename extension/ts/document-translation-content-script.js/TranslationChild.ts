@@ -31,10 +31,12 @@ interface DocumentState {
 }
 
 export class TranslationChild extends JSWindowActorChild {
+  private languageDetector: ContentScriptLanguageDetectorProxy;
   constructor(document, contentWindow) {
     super();
     this.document = document;
     this.contentWindow = contentWindow;
+    this.languageDetector = new ContentScriptLanguageDetectorProxy();
   }
 
   handleEvent(aEvent) {
@@ -120,7 +122,7 @@ export class TranslationChild extends JSWindowActorChild {
       return;
     }
 
-    ContentScriptLanguageDetectorProxy.detectLanguage(string).then(result => {
+    this.languageDetector.detectLanguage(string).then(result => {
       console.debug("Language detection results are in", { string, result });
 
       // Bail if we're not confident.

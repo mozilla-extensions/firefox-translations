@@ -6,6 +6,7 @@ import { Store } from "./Store";
 import { localStorageWrapper } from "./lib/localStorageWrapper";
 import { getCurrentTab } from "./lib/getCurrentTab";
 import Port = Runtime.Port;
+import { LanguageDetector } from "./LanguageDetector";
 const store = new Store(localStorageWrapper);
 
 /**
@@ -16,6 +17,7 @@ class ExtensionGlue {
   private getStartedPortListener;
   private extensionPreferencesPortListener: (port: Port) => void;
   private mainInterfacePortListener: (port: Port) => void;
+  private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
 
   constructor() {}
 
@@ -131,6 +133,32 @@ class ExtensionGlue {
       });
     };
     crossBrowser.runtime.onConnect.addListener(this.mainInterfacePortListener);
+
+    // Set up a connection / listener for the content-script-language-detector-proxy
+    let portFromContentScriptLanguageDetectorProxy;
+    this.contentScriptLanguageDetectorProxyPortListener = p => {
+      if (p.name !== "port-from-content-script-language-detector-proxy") {
+        return;
+      }
+      portFromContentScriptLanguageDetectorProxy = p;
+      portFromContentScriptLanguageDetectorProxy.onMessage.addListener(
+        async function(m: { str: string; requestId: string }) {
+          // console.log("Message from content-script-language-detector-proxy:", { m });
+          const { str, requestId } = m;
+          const results = await LanguageDetector.detectLanguage({ text: str });
+          console.log({ results });
+          portFromContentScriptLanguageDetectorProxy.postMessage({
+            languageDetectorResults: {
+              results,
+              requestId,
+            },
+          });
+        },
+      );
+    };
+    crossBrowser.runtime.onConnect.addListener(
+      this.contentScriptLanguageDetectorProxyPortListener,
+    );
   }
 
   async cleanup() {
@@ -159,6 +187,18 @@ class ExtensionGlue {
         );
       } catch (err) {
         console.warn("mainInterfacePortListener removal error", err);
+      }
+    }
+    if (this.contentScriptLanguageDetectorProxyPortListener) {
+      try {
+        crossBrowser.runtime.onConnect.removeListener(
+          this.contentScriptLanguageDetectorProxyPortListener,
+        );
+      } catch (err) {
+        console.warn(
+          "contentScriptLanguageDetectorProxyPortListener removal error",
+          err,
+        );
       }
     }
   }

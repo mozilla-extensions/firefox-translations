@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { browser } from "webextension-polyfill-ts";
+
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
 // string in order to prevent unnecessary resident memory growth.
@@ -19,7 +21,7 @@
 const LARGE_STRING = 1.5 * 1024 * 1024;
 const IDLE_TIMEOUT = 10 * 1000;
 
-const WORKER_URL = "resource:///modules/translation/cld-worker.js";
+const WORKER_URL = browser.runtime.getURL(`wasm/cld-worker.js`);
 
 const workerManager = {
   detectionQueue: [],
