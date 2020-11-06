@@ -14,7 +14,6 @@ const store = new Store(localStorageWrapper);
  * to access persistent storage and background-context API:s via cross-process messaging
  */
 class ExtensionGlue {
-  private getStartedPortListener;
   private extensionPreferencesPortListener: (port: Port) => void;
   private mainInterfacePortListener: (port: Port) => void;
   private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
@@ -162,15 +161,6 @@ class ExtensionGlue {
   }
 
   async cleanup() {
-    if (this.getStartedPortListener) {
-      try {
-        crossBrowser.runtime.onConnect.removeListener(
-          this.getStartedPortListener,
-        );
-      } catch (err) {
-        console.warn("extensionRemovalRequestPortListener removal error", err);
-      }
-    }
     if (this.extensionPreferencesPortListener) {
       try {
         crossBrowser.runtime.onConnect.removeListener(

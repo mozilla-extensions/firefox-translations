@@ -7,8 +7,8 @@
     "message": "Neural Machine Translation for the browser.",
     "description": "Description of the extension."
   },
-  "pageActionButtonTitle": {
-    "message": "Translate",
-    "description": "The page action button title."
+  "browserActionButtonTitle": {
+    "message": "Bergamot Translate",
+    "description": "The browser action button title."
   }
 }
