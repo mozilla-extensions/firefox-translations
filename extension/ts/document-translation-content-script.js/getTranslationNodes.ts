@@ -4,13 +4,14 @@ interface TranslationNode {
 }
 
 interface NodeListInterface {
+  translationNodes: TranslationNode[];
   length: number;
   item: (i) => TranslationNode;
   isTranslationRootAtIndex: (i) => boolean;
 }
 
 class NodeList implements NodeListInterface {
-  private readonly translationNodes: TranslationNode[];
+  public readonly translationNodes: TranslationNode[];
   constructor(translationNodes) {
     this.translationNodes = translationNodes;
   }
@@ -45,13 +46,13 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
     // Skip elements that usually contain non-translatable text content.
     if (
       [
-        "script",
-        "iframe",
-        "frameset",
-        "frame",
-        "code",
-        "noscript",
-        "style",
+        "SCRIPT",
+        "IFRAME",
+        "FRAMESET",
+        "FRAME",
+        "CODE",
+        "NOSCRIPT",
+        "STYLE",
       ].includes(content.tagName)
     ) {
       continue;

@@ -9,7 +9,8 @@ import {
   MAX_REQUEST_DATA,
   MAX_REQUESTS,
 } from "./bergamot.constants";
-import { BergamotRequest } from "../shared-resources/BergamotRequest";
+import { BergamotRequest } from "../background.js/BergamotRequest";
+import { TranslationRequest } from "../shared-resources/bergamot.types";
 
 /**
  * Outbound translator for a webpage using Bergamot's Translation API.
@@ -257,7 +258,7 @@ export class BergamotOutboundTranslator {
    * @param startIndex  The index in the form control elements from where the
    *                    data should be generated.
    */
-  _generateNextTranslationRequest(startIndex) {
+  _generateNextTranslationRequest(startIndex): TranslationRequest {
     let currentDataSize = 0;
     let currentChunks = 0;
     let output = [];

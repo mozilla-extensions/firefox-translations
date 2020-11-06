@@ -10,12 +10,14 @@ import {
   MAX_REQUESTS,
 } from "./bergamot.constants";
 import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
-import { BergamotRequest } from "../shared-resources/BergamotRequest";
+import { BergamotRequest } from "../background.js/BergamotRequest";
+import { TranslationRequest } from "../shared-resources/bergamot.types";
 
 // Temporary mock
 class PromiseUtils {
   static defer() {}
 }
+
 /**
  * Translates a webpage using Bergamot's Translation API.
  *
@@ -288,7 +290,7 @@ export class BergamotTranslator {
    * @param startIndex What is the index, in the roots list, that the
    *                   chunk should start.
    */
-  _generateNextTranslationRequest(startIndex) {
+  _generateNextTranslationRequest(startIndex: number): TranslationRequest {
     let currentDataSize = 0;
     let currentChunks = 0;
     let output = [];

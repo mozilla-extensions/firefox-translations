@@ -6,7 +6,8 @@
 
 import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
-import { LanguageDetector } from "../shared-resources/LanguageDetector";
+import { getTranslationNodes } from "./getTranslationNodes";
+import { ContentScriptLanguageDetectorProxy } from "../shared-resources/ContentScriptLanguageDetectorProxy";
 
 const STATE_OFFER = 0;
 const STATE_TRANSLATED = 2;
@@ -16,28 +17,13 @@ const STATE_ERROR = 3;
 class JSWindowActorChild {
   public contentWindow;
   public document;
-  sendAsyncMessage(ref, data) {}
-}
-
-// Temporary mock
-// noinspection JSUnusedLocalSymbols
-class DocumentEncoder {
-  public SkipInvisibleContent;
-  init(document, mimeType, skipInvisibleContent) {}
-  encodeToStringWithMaxLength(length): string {
-    return "foo";
+  sendAsyncMessage(ref, data) {
+    console.log("MOCK sendAsyncMessage", { ref, data });
   }
 }
 
-// Temporary mock
-class Cu {
-  static createDocumentEncoder(mimeType) {
-    return new DocumentEncoder();
-  }
-}
-
-interface Data {
-  state?: any;
+interface DocumentState {
+  state?: number;
   translatedFrom?: any;
   translatedTo?: any;
   originalShown?: any;
@@ -45,9 +31,10 @@ interface Data {
 }
 
 export class TranslationChild extends JSWindowActorChild {
-  constructor(document) {
+  constructor(document, contentWindow) {
     super();
     this.document = document;
+    this.contentWindow = contentWindow;
   }
 
   handleEvent(aEvent) {
@@ -59,7 +46,7 @@ export class TranslationChild extends JSWindowActorChild {
           return;
         }
 
-        let data: Data = {};
+        let data: DocumentState = {};
         let trDoc = content.translationDocument;
         if (trDoc) {
           data.state = trDoc.translationError ? STATE_ERROR : STATE_TRANSLATED;
@@ -82,38 +69,72 @@ export class TranslationChild extends JSWindowActorChild {
   }
 
   checkForTranslation() {
+    console.debug("Checking translation needs");
+
     let url = String(this.document.location);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      console.debug(
+        "Not a HTTP(S) url, not attempting new language detection",
+        { url },
+      );
       return;
     }
 
     let content = this.contentWindow;
     if (content.detectedLanguage) {
+      console.debug(
+        "Language already detected, not attempting new language detection",
+        content.detectedLanguage,
+      );
       return;
     }
 
     // Grab a 60k sample of text from the page.
-    let encoder = Cu.createDocumentEncoder("text/plain");
-    encoder.init(this.document, "text/plain", encoder.SkipInvisibleContent);
-    let string = encoder.encodeToStringWithMaxLength(60 * 1024);
+    // (The CLD2 library used by the language detector is capable of
+    // analyzing raw HTML. Unfortunately, that takes much more memory,
+    // and since it's hosted by emscripten, and therefore can't shrink
+    // its heap after it's grown, it has a performance cost.
+    // So we send plain text instead.)
+    let nodeList = getTranslationNodes(document.body);
+    const domElementsToStringWithMaxLength = (
+      elements: Element[],
+      maxLength,
+      // skipInvisibleContent = false,
+    ) => {
+      return elements
+        .map(el => el.textContent)
+        .join("\n")
+        .substr(0, maxLength);
+    };
+    const string = domElementsToStringWithMaxLength(
+      nodeList.translationNodes.map(tn => tn.content),
+      60 * 1024,
+    );
 
     // Language detection isn't reliable on very short strings.
     if (string.length < 100) {
+      console.debug(
+        "Language detection isn't reliable on very short strings. Skipping language detection",
+        { string },
+      );
       return;
     }
 
-    LanguageDetector.detectLanguage(string).then(result => {
+    ContentScriptLanguageDetectorProxy.detectLanguage(string).then(result => {
+      console.debug("Language detection results are in", { string, result });
+
       // Bail if we're not confident.
       if (!result.confident) {
+        console.debug(
+          "Language detection results not confident enough, bailing.",
+        );
         return;
       }
 
       // The window might be gone by now.
-      /* TODO: Restore check
-      if (Cu.isDeadWrapper(content)) {
+      if (!content) {
         return;
       }
-      */
 
       content.detectedLanguage = result.language;
 

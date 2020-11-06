@@ -1,5 +1,4 @@
 import { config } from "../config";
-import { captureExceptionWithExtras } from "./ErrorReporting";
 
 const MS_IN_A_MINUTE = 60 * 1000;
 
@@ -11,7 +10,7 @@ const fetchWithTimeout = (url, ms, options: any = {}): Promise<Response> => {
   return promise.finally(() => clearTimeout(timeout));
 };
 
-interface BergamotTranslationRequestPayload {
+interface BergamotRestApiTranslationRequestPayload {
   options?: {
     inputFormat?: "sentence" | "paragraph" | "wrappedText";
     nBest?: number;
@@ -52,7 +51,7 @@ export class BergamotApiClient {
   public sendTranslationRequest = async (
     texts: string | string[],
   ): Promise<string> => {
-    const payload: BergamotTranslationRequestPayload = {
+    const payload: BergamotRestApiTranslationRequestPayload = {
       text: texts,
       options: {
         // "inputFormat": "wrappedText",

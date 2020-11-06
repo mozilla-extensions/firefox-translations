@@ -1,15 +1,15 @@
-import { BergamotApiClient } from "../../shared-resources/BergamotApiClient";
+import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
 export class Translator {
   originLanguage: string;
   targetLanguage: string;
-  bergamotApiClient: BergamotApiClient;
+  bergamotApiClient: ContentScriptBergamotApiClient;
   delay: number;
 
   constructor(originLanague: string, targetLanguage: string) {
     this.originLanguage = "English";
     this.targetLanguage = "German";
-    this.bergamotApiClient = new BergamotApiClient();
+    this.bergamotApiClient = new ContentScriptBergamotApiClient();
     this.delay = 3000;
   }
 

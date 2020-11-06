@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { TranslationRequestData } from "../shared-resources/bergamot.types";
+
 // Temporary mock
 class httpRequest {
   constructor(url, options) {}
@@ -26,7 +28,11 @@ export class BergamotRequest {
   public characterCount;
   public networkRequest;
 
-  constructor(translationData, sourceLanguage, targetLanguage) {
+  constructor(
+    translationData: TranslationRequestData,
+    sourceLanguage,
+    targetLanguage,
+  ) {
     this.translationData = translationData;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
