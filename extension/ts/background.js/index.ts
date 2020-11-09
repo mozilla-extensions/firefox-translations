@@ -7,6 +7,7 @@ import { localStorageWrapper } from "./lib/localStorageWrapper";
 import { getCurrentTab } from "./lib/getCurrentTab";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
+import { DynamicActionIcon } from "./lib/DynamicActionIcon";
 const store = new Store(localStorageWrapper);
 
 /**
@@ -43,14 +44,50 @@ class ExtensionGlue {
   }
 
   async start() {
+    const dynamicActionIcon = new DynamicActionIcon(
+      crossBrowser.browserAction,
+      48,
+      48,
+      24,
+      29,
+    );
+
     const showSpecificExtensionIconOnTranslatablePages = async () => {
-      function setActiveExtensionIcon() {
+      const setActiveExtensionIcon = async tabId => {
         try {
-          crossBrowser.browserAction.setIcon({
-            path: "icons/extension-icon.38x38.png",
+          await dynamicActionIcon.setIcon({
+            path: "icons/extension-icon.48x48.png",
+            tabId,
           });
+          dynamicActionIcon.stopLoadingAnimation(tabId);
+          dynamicActionIcon.drawBadge(
+            {
+              text: "es",
+              textColor: "#000000",
+              backgroundColor: "#ffffffAA",
+            },
+            tabId,
+          );
+
+          setTimeout(() => {
+            dynamicActionIcon.startLoadingAnimation(tabId);
+          }, 2000);
+
+          setTimeout(() => {
+            dynamicActionIcon.stopLoadingAnimation(tabId);
+            dynamicActionIcon.drawBadge(
+              {
+                text: "es",
+                textColor: "#ffffff",
+                backgroundColor: "#000000AA",
+              },
+              tabId,
+            );
+          }, 4000);
+
           crossBrowser.browserAction.setPopup({
             popup: "/main-interface/main-interface.html#/",
+            tabId,
           });
         } catch (e) {
           if (e.message.indexOf("Invalid tab ID") === 0) {
@@ -59,14 +96,16 @@ class ExtensionGlue {
             throw e;
           }
         }
-      }
-      function setInactiveExtensionIcon() {
+      };
+      const setInactiveExtensionIcon = async tabId => {
         try {
           crossBrowser.browserAction.setIcon({
             path: "icons/extension-icon.inactive.38x38.png",
+            tabId,
           });
           crossBrowser.browserAction.setPopup({
             popup: "/main-interface/main-interface.html#/",
+            tabId,
           });
         } catch (e) {
           if (e.message.indexOf("Invalid tab ID") === 0) {
@@ -75,13 +114,13 @@ class ExtensionGlue {
             throw e;
           }
         }
-      }
+      };
 
       const tab = await getCurrentTab();
 
       // Sometimes there is no current tab object. Assume not a translatable page...
       if (!tab) {
-        setInactiveExtensionIcon();
+        setInactiveExtensionIcon(null);
         return;
       }
 
@@ -90,24 +129,26 @@ class ExtensionGlue {
 
       if (tab.url) {
         if (urlShouldNotBeTranslated(tab.url)) {
-          setInactiveExtensionIcon();
+          await setInactiveExtensionIcon(tab.id);
         } else {
-          setActiveExtensionIcon();
+          await setActiveExtensionIcon(tab.id);
         }
       } else {
         // tab.url is not available in Firefox unless the tabs permission is granted, hence this workaround:
-        const onExecuted = result => {
+        const onExecuted = async result => {
           const url = result ? result[0] : false;
           if (!url || urlShouldNotBeTranslated(url)) {
-            setInactiveExtensionIcon();
+            await setInactiveExtensionIcon(tab.id);
           } else {
-            setActiveExtensionIcon();
+            await setActiveExtensionIcon(tab.id);
           }
         };
         const executing = crossBrowser.tabs.executeScript({
           code: "location.href",
         });
-        executing.then(onExecuted, setInactiveExtensionIcon);
+        executing.then(onExecuted, async () => {
+          await setInactiveExtensionIcon(tab.id);
+        });
       }
     };
     crossBrowser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
