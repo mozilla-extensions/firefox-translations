@@ -63,6 +63,8 @@ async function generateManifest({ dotEnvPath }) {
   if (targetBrowser === "chrome") {
     manifest.browser_action.chrome_style = false;
     manifest.options_ui.chrome_style = false;
+    // https://github.com/WebAssembly/content-security-policy/issues/7
+    manifest.content_security_policy = "script-src 'self' 'unsafe-eval'; object-src 'self';"
   }
   const targetPath = path.join(destPath, "manifest.json");
   await fs.promises.mkdir(destPath, { recursive: true });
