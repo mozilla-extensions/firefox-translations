@@ -109,22 +109,6 @@ Sentry.configureScope(scope => {
       event.exception.values &&
       event.exception.values[0]
     ) {
-      // Change some messages that includes id numbers so that
-      // they are considered the same event regardless of the ID
-
-      if (event.exception.values[0].value.indexOf("Invalid tab ID: ") === 0) {
-        event.exception.values[0].value = "Invalid tab ID: #";
-      }
-
-      if (
-        event.exception.values[0].value.indexOf(
-          "The matching httpRequestEnvelope was not found for request id ",
-        ) === 0
-      ) {
-        event.exception.values[0].value =
-          "The matching httpRequestEnvelope was not found for request id #";
-      }
-
       // Required for Sentry to map web extension sourcemap paths properly
 
       if (event.culprit) {

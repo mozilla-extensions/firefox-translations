@@ -3,7 +3,7 @@ import Components from "./components/pages/Components";
 import Demo from "./components/pages/Demo";
 import Transition from "./components/pages/Transition";
 import "./styles.scss";
-import { Link, Switch, Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
 export const App = () => {
   return (

@@ -123,7 +123,7 @@ export class TranslationChild extends JSWindowActorChild {
     }
 
     this.languageDetector.detectLanguage(string).then(result => {
-      console.debug("Language detection results are in", { string, result });
+      console.debug("Language detection results are in", { result });
 
       // Bail if we're not confident.
       if (!result.confident) {
