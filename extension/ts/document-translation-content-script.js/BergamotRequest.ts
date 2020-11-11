@@ -8,7 +8,9 @@ import { TranslationRequestData } from "../shared-resources/bergamot.types";
 
 // Temporary mock
 class httpRequest {
-  constructor(url, options) {}
+  constructor(url, options) {
+    console.log("MOCK HTTP REQUEST", { url, options });
+  }
 }
 
 /**

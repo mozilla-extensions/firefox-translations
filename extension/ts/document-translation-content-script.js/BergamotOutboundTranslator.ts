@@ -9,7 +9,7 @@ import {
   MAX_REQUEST_DATA,
   MAX_REQUESTS,
 } from "./bergamot.constants";
-import { BergamotRequest } from "../background.js/BergamotRequest";
+import { BergamotRequest } from "./BergamotRequest";
 import { TranslationRequest } from "../shared-resources/bergamot.types";
 
 /**
@@ -41,10 +41,12 @@ export class BergamotOutboundTranslator {
    *
    */
   listenSubmitEvents() {
+    /* TODO: Remove all code that relates to "translate forms on submit" - it is not the approach we will take
     let ownerDocument = this.translationDocument.getOwnerDocument();
     for (let form of ownerDocument.forms) {
       form.addEventListener("submit", this);
     }
+     */
   }
 
   /**

@@ -1,12 +1,12 @@
 interface TranslationNode {
-  content: Element;
+  content: Node;
   isTranslationRoot: boolean;
 }
 
 interface NodeListInterface {
   translationNodes: TranslationNode[];
   length: number;
-  item: (i) => TranslationNode;
+  item: (i) => Node;
   isTranslationRootAtIndex: (i) => boolean;
 }
 
@@ -16,10 +16,10 @@ class NodeList implements NodeListInterface {
     this.translationNodes = translationNodes;
   }
   get length() {
-    return 0;
+    return this.translationNodes.length;
   }
   item(i) {
-    return this.translationNodes[i];
+    return this.translationNodes[i].content;
   }
   isTranslationRootAtIndex(i) {
     return this.translationNodes[i].isTranslationRoot;
@@ -27,7 +27,7 @@ class NodeList implements NodeListInterface {
 }
 
 export const getTranslationNodes = (rootElement: Element): NodeList => {
-  // nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
+  const translationNodesMap = new Map();
 
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
@@ -71,24 +71,25 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
         child.nodeType ===
         Node.TEXT_NODE /* && child->GetAsText()->HasTextForTranslation() */
       ) {
+        // TODO: Verify this assumption from C to JS:
         /*
         nsIFrame* frame = content->GetPrimaryFrame();
         bool isTranslationRoot = frame && frame->IsBlockFrameOrSubclass();
+        */
+        let isTranslationRoot = ["DIV"].includes(content.tagName);
+
         if (!isTranslationRoot) {
           // If an element is not a block element, it still
           // can be considered a translation root if the parent
           // of this element didn't make into the list of nodes
           // to be translated.
-          bool parentInList = false;
-          nsIContent* parent = content->GetParent();
+          let parentInList: boolean = false;
+          const parent: Node = content.parentNode;
           if (parent) {
-            parentInList = translationNodesHash.Contains(parent);
+            parentInList = translationNodesMap.has(parent);
           }
           isTranslationRoot = !parentInList;
         }
-        */
-
-        const isTranslationRoot = false;
 
         translationNodes.push({
           content,

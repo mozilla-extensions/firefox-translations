@@ -36,14 +36,14 @@
  *  }
  */
 export class TranslationItem {
-  private readonly isRoot = false;
+  public isRoot = false;
   public isSimpleRoot = false;
-  public nodeRef;
-  private id;
+  public nodeRef: Node;
+  public id;
   private readonly children;
   private translation;
 
-  constructor(node, id, isRoot) {
+  constructor(node: Node, id, isRoot: boolean) {
     this.nodeRef = node;
     this.id = id;
     this.isRoot = isRoot;
@@ -61,7 +61,7 @@ export class TranslationItem {
     }
     return (
       "[object TranslationItem: <" +
-      this.nodeRef.localName +
+      this.nodeRef.toString() +
       ">" +
       rootType +
       "]"

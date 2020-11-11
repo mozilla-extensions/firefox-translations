@@ -27,7 +27,7 @@ export class TranslationDocument {
   private itemsMap;
   private roots;
 
-  constructor(document) {
+  constructor(document: Document) {
     this.itemsMap = new Map();
     this.roots = [];
     this._init(document);
@@ -39,15 +39,16 @@ export class TranslationDocument {
    *
    * @param document  The document to be translated
    */
-  _init(document) {
+  _init(document: Document) {
     // Get all the translation nodes in the document's body:
     // a translation node is a node from the document which
     // contains useful content for translation, and therefore
     // must be included in the translation process.
-    let nodeList = getTranslationNodes(document.body);
+    const nodeList = getTranslationNodes(document.body);
     console.log({ nodeList });
 
-    let length = nodeList.length;
+    const length = nodeList.length;
+    console.log({ length });
 
     for (let i = 0; i < length; i++) {
       let node = nodeList.item(i);
@@ -95,11 +96,11 @@ export class TranslationDocument {
    *
    * @param node        The DOM node for this item.
    * @param id          A unique, numeric id for this item.
-   * @parem isRoot      A boolean saying whether this item is a root.
+   * @param isRoot      A boolean saying whether this item is a root.
    *
    * @returns           A TranslationItem object.
    */
-  _createItemForNode(node, id, isRoot): TranslationItem {
+  _createItemForNode(node, id, isRoot: boolean): TranslationItem {
     if (this.itemsMap.has(node)) {
       return this.itemsMap.get(node);
     }
@@ -134,7 +135,7 @@ export class TranslationDocument {
    *
    * @returns        A string representation of the TranslationItem.
    */
-  generateTextForItem(item: TranslationItem & { original: any }) {
+  generateTextForItem(item: TranslationItem & { original?: any }): string {
     if (item.original) {
       return regenerateTextFromOriginalHelper(item);
     }
@@ -149,7 +150,7 @@ export class TranslationDocument {
     item.original = [];
     let wasLastItemPlaceholder = false;
 
-    for (let child of item.nodeRef.childNodes) {
+    for (let child of Array.from(item.nodeRef.childNodes)) {
       if (child.nodeType == child.TEXT_NODE) {
         let x = child.nodeValue.trim();
         if (x != "") {
@@ -214,6 +215,8 @@ export class TranslationDocument {
    *                 or "original".
    */
   _swapDocumentContent(target) {
+    console.log("TODO _swapDocumentContent");
+
     (async () => {
       /* TODO: Reimplement
       // Let the event loop breath on every 100 nodes
@@ -237,7 +240,10 @@ export class TranslationDocument {
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-function generateTranslationHtmlForItem(item, content): string {
+function generateTranslationHtmlForItem(
+  item: TranslationItem,
+  content,
+): string {
   let localName = item.isRoot ? "div" : "b";
   return (
     "<" + localName + " id=n" + item.id + ">" + content + "</" + localName + ">"
@@ -253,7 +259,9 @@ function generateTranslationHtmlForItem(item, content): string {
  *
  * @returns        A string representation of the TranslationItem.
  */
-function regenerateTextFromOriginalHelper(item) {
+function regenerateTextFromOriginalHelper(
+  item: TranslationItem & { original?: any },
+) {
   if (item.isSimpleRoot) {
     return item.original[0];
   }

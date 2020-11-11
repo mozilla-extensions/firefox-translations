@@ -10,13 +10,8 @@ import {
   MAX_REQUESTS,
 } from "./bergamot.constants";
 import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
-import { BergamotRequest } from "../background.js/BergamotRequest";
+import { BergamotRequest } from "./BergamotRequest";
 import { TranslationRequest } from "../shared-resources/bergamot.types";
-
-// Temporary mock
-class PromiseUtils {
-  static defer() {}
-}
 
 /**
  * Translates a webpage using Bergamot's Translation API.
@@ -67,35 +62,39 @@ export class BergamotTranslator {
    * @returns {Promise}          A promise that will resolve when the translation
    *                             task is finished.
    */
-  async translate() {
+  async translate(): Promise<{
+    characterCount: number;
+  }> {
     let currentIndex = 0;
-    this._onFinishedDeferred = PromiseUtils.defer();
 
-    // Let's split the document into various requests to be sent to
-    // Bergamot's Translation API.
-    for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
-      // Determine the data for the next request.
-      let request = this._generateNextTranslationRequest(currentIndex);
+    return new Promise((resolve, reject) => {
+      // Deferred pattern
+      this._onFinishedDeferred = { resolve, reject };
 
-      // Create a real request for the server and add it to the pending requests list.
-      let bergamotRequest = new BergamotRequest(
-        request.data,
-        this.sourceLanguage,
-        this.targetLanguage,
-      );
-      this._pendingRequests++;
+      // Let's split the document into various requests to be sent to
+      // Bergamot's Translation API.
+      for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
+        // Determine the data for the next request.
+        let request = this._generateNextTranslationRequest(currentIndex);
 
-      bergamotRequest
-        .fireRequest(process.env.BERGAMOT_REST_API_INBOUND_URL)
-        .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
+        // Create a real request for the server and add it to the pending requests list.
+        let bergamotRequest = new BergamotRequest(
+          request.data,
+          this.sourceLanguage,
+          this.targetLanguage,
+        );
+        this._pendingRequests++;
 
-      currentIndex = request.lastIndex;
-      if (request.finished) {
-        break;
+        bergamotRequest
+          .fireRequest(process.env.BERGAMOT_REST_API_INBOUND_URL)
+          .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
+
+        currentIndex = request.lastIndex;
+        if (request.finished) {
+          break;
+        }
       }
-    }
-
-    return this._onFinishedDeferred.promise;
+    });
   }
 
   /**

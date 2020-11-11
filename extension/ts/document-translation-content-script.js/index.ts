@@ -16,7 +16,10 @@ const init = async () => {
   (window as any).bergamotApiClient = bergamotApiClient;
 
   const translationChild = new TranslationChild(document, window);
-  translationChild.checkForTranslation();
+  const stateAfterCheckForTranslation = await translationChild.checkForTranslation();
+  console.debug({ stateAfterCheckForTranslation });
+  const translationResult = await translationChild.doTranslation("foo", "bar");
+  console.debug({ translationResult });
 
   const translationResults = await bergamotApiClient.sendTranslationRequest([
     "Hello world",

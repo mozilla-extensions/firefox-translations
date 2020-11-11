@@ -70,7 +70,7 @@ export class TranslationChild extends JSWindowActorChild {
     }
   }
 
-  checkForTranslation() {
+  async checkForTranslation() {
     console.debug("Checking translation needs");
 
     let url = String(this.document.location);
@@ -99,7 +99,7 @@ export class TranslationChild extends JSWindowActorChild {
     // So we send plain text instead.)
     let nodeList = getTranslationNodes(document.body);
     const domElementsToStringWithMaxLength = (
-      elements: Element[],
+      elements: Node[],
       maxLength,
       // skipInvisibleContent = false,
     ) => {
@@ -122,31 +122,31 @@ export class TranslationChild extends JSWindowActorChild {
       return;
     }
 
-    this.languageDetector.detectLanguage(string).then(result => {
-      console.debug("Language detection results are in", { result });
+    const result = await this.languageDetector.detectLanguage(string);
+    console.debug("Language detection results are in", { result });
 
-      // Bail if we're not confident.
-      if (!result.confident) {
-        console.debug(
-          "Language detection results not confident enough, bailing.",
-        );
-        return;
-      }
+    // Bail if we're not confident.
+    if (!result.confident) {
+      console.debug(
+        "Language detection results not confident enough, bailing.",
+      );
+      return;
+    }
 
-      // The window might be gone by now.
-      if (!content) {
-        return;
-      }
+    // The window might be gone by now.
+    if (!content) {
+      return;
+    }
 
-      content.detectedLanguage = result.language;
+    content.detectedLanguage = result.language;
 
-      let data = {
-        state: STATE_OFFER,
-        originalShown: true,
-        detectedLanguage: result.language,
-      };
-      this.sendAsyncMessage("Translation:DocumentState", data);
-    });
+    let data = {
+      state: STATE_OFFER,
+      originalShown: true,
+      detectedLanguage: result.language,
+    };
+
+    return data;
   }
 
   async doTranslation(aFrom, aTo) {
@@ -179,6 +179,7 @@ export class TranslationChild extends JSWindowActorChild {
       translationDocument.showTranslation();
       return result;
     } catch (ex) {
+      console.error("doTranslation error", ex);
       translationDocument.translationError = true;
       result = { success: false };
       if (ex == "unavailable") {
