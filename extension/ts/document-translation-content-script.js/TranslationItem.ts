@@ -38,9 +38,9 @@
 export class TranslationItem {
   public isRoot = false;
   public isSimpleRoot = false;
-  public nodeRef: Node;
+  public nodeRef: Node | Element;
   public id;
-  private readonly children;
+  public readonly children;
   private translation;
 
   constructor(node: Node, id, isRoot: boolean) {
@@ -389,14 +389,6 @@ function swapTextForItem(item, target) {
             domNode.ownerDocument.createTextNode(" "),
           );
         }
-
-        // A trailing and a leading space must be preserved because
-        // they are meaningful in HTML.
-        let preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
-        let endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
-
-        curNode.nodeValue = preSpace + targetItem + endSpace;
-        curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
 
         /*
          */

@@ -25,7 +25,7 @@ export class TranslationDocument {
   private translationError = false;
   private originalShown = true;
   private itemsMap;
-  private roots;
+  private readonly roots: TranslationItem[];
 
   constructor(document: Document) {
     this.itemsMap = new Map();
@@ -72,7 +72,7 @@ export class TranslationDocument {
     // we are able to reduce their data payload sent to the translation service.
 
     for (let root of this.roots) {
-      if (!root.children.length && root.nodeRef.childElementCount == 0) {
+      if (!root.children.length && (root.nodeRef instanceof Element && root.nodeRef.childElementCount == 0)) {
         root.isSimpleRoot = true;
       }
     }
@@ -214,20 +214,9 @@ export class TranslationDocument {
    * @param target   A string that is either "translation"
    *                 or "original".
    */
-  _swapDocumentContent(target) {
-    console.log("TODO _swapDocumentContent");
-
+  _swapDocumentContent(target: "translation" | "original") {
     (async () => {
-      /* TODO: Reimplement
-      // Let the event loop breath on every 100 nodes
-      // that are replaced.
-      const YIELD_INTERVAL = 100;
-      await Async.yieldingForEach(
-        this.roots,
-        root => root.swapText(target),
-        YIELD_INTERVAL
-      );
-       */
+        this.roots.forEach(root => root.swapText(target));
     })();
   }
 }
