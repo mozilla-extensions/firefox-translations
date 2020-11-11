@@ -5,6 +5,7 @@
 "use strict";
 
 import { TranslationRequestData } from "../shared-resources/bergamot.types";
+import { ContentScriptBergamotApiClient } from "../shared-resources/ContentScriptBergamotApiClient";
 
 // Temporary mock
 class httpRequest {
@@ -28,7 +29,6 @@ export class BergamotRequest {
   private sourceLanguage;
   private targetLanguage;
   public characterCount;
-  public networkRequest;
 
   constructor(
     translationData: TranslationRequestData,
@@ -44,15 +44,9 @@ export class BergamotRequest {
   /**
    * Initiates the request
    */
-  fireRequest(url) {
-    // Prepare the headers
-    let headers = [["Content-Type", "application/json"]];
-
+  async fireRequest(bergamotApiClient: ContentScriptBergamotApiClient) {
     // Prepare the post data
-    let postData = {
-      text: [],
-      options: { returnSentenceScore: true },
-    };
+    const texts = [];
 
     // Prepare the content of the post
     for (let [, text] of this.translationData) {
@@ -66,28 +60,11 @@ export class BergamotRequest {
       // the translated result. So as a hack we just remove the
       // tags and hope the formatting is not too bad.
       text = text.replace(/<[^>]*>?/gm, " ");
-      postData["text"].push(text);
+      texts.push(text);
       this.characterCount += text.length;
     }
 
-    // Convert the post to a string
-    const postDataString = JSON.stringify(postData);
-
-    // Set up request options.
-    return new Promise((resolve, reject) => {
-      let options = {
-        onLoad: (responseText, xhr) => {
-          resolve(this);
-        },
-        onError(e, responseText, xhr) {
-          reject(xhr);
-        },
-        postDataString,
-        headers,
-      };
-
-      // Fire the request.
-      this.networkRequest = new httpRequest(url, options);
-    });
+    // Fire the request.
+    return bergamotApiClient.sendTranslationRequest(texts);
   }
 }

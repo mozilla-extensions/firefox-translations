@@ -85,8 +85,6 @@ export class BergamotApiClient {
     }
     const parsedResponse = await dataResponse.json();
     console.log({ parsedResponse });
-    return parsedResponse.text.map(translation =>
-      translation[0] ? translation[0][0].nBest[0].translation : "",
-    );
+    return parsedResponse;
   };
 }

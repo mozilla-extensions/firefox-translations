@@ -12,6 +12,7 @@ import {
 import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
 import { BergamotRequest } from "./BergamotRequest";
 import { TranslationRequest } from "../shared-resources/bergamot.types";
+import { ContentScriptBergamotApiClient } from "../shared-resources/ContentScriptBergamotApiClient";
 
 /**
  * Translates a webpage using Bergamot's Translation API.
@@ -33,6 +34,7 @@ export class BergamotTranslator {
   private _translatedCharacterCount;
   private _outboundTranslator;
   private _onFinishedDeferred;
+  private bergamotApiClient: ContentScriptBergamotApiClient;
 
   constructor(translationDocument, sourceLanguage, targetLanguage) {
     this.translationDocument = translationDocument;
@@ -42,6 +44,7 @@ export class BergamotTranslator {
     this._partialSuccess = false;
     this._translatedCharacterCount = 0;
     this._initBergamotOutboundTranslator();
+    this.bergamotApiClient = new ContentScriptBergamotApiClient();
   }
 
   /**
@@ -85,9 +88,16 @@ export class BergamotTranslator {
         );
         this._pendingRequests++;
 
+        // TODO: Restore ability to specify that this is inbound translation (process.env.BERGAMOT_REST_API_INBOUND_URL)
         bergamotRequest
-          .fireRequest(process.env.BERGAMOT_REST_API_INBOUND_URL)
-          .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
+          .fireRequest(this.bergamotApiClient)
+          .then(results => {
+            this._chunkCompleted(results, bergamotRequest);
+          })
+          .catch(err => {
+            console.error("fireRequest error", err);
+            // TODO: Restore error handling (this._chunkFailed.bind(this))
+          });
 
         currentIndex = request.lastIndex;
         if (request.finished) {
@@ -105,8 +115,8 @@ export class BergamotTranslator {
    *
    * @param   bergamotRequest   The BergamotRequest sent to the server.
    */
-  _chunkCompleted(bergamotRequest: BergamotRequest) {
-    if (this._parseChunkResult(bergamotRequest)) {
+  _chunkCompleted(results, bergamotRequest: BergamotRequest) {
+    if (this._parseChunkResult(results, bergamotRequest)) {
       this._partialSuccess = true;
       // Count the number of characters successfully translated.
       this._translatedCharacterCount += bergamotRequest.characterCount;
@@ -159,14 +169,7 @@ export class BergamotTranslator {
    * @param   bergamotRequest      The request sent to the server.
    * @returns boolean      True if parsing of this chunk was successful.
    */
-  _parseChunkResult(bergamotRequest: BergamotRequest) {
-    let results;
-    try {
-      let response = bergamotRequest.networkRequest.response;
-      results = JSON.parse(response);
-    } catch (e) {
-      return false;
-    }
+  _parseChunkResult(results, bergamotRequest: BergamotRequest) {
     let len = results.text.length;
     if (len != bergamotRequest.translationData.length) {
       // This should never happen, but if the service returns a different number

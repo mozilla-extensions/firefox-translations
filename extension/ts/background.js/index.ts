@@ -8,7 +8,9 @@ import { getCurrentTab } from "./lib/getCurrentTab";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
 import { DynamicActionIcon } from "./lib/DynamicActionIcon";
+import { BergamotApiClient } from "./BergamotApiClient";
 const store = new Store(localStorageWrapper);
+const bergamotApiClient = new BergamotApiClient();
 
 /**
  * Ties together overall execution logic and allows content scripts
@@ -18,6 +20,7 @@ class ExtensionGlue {
   private extensionPreferencesPortListener: (port: Port) => void;
   private mainInterfacePortListener: (port: Port) => void;
   private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
+  private contentScriptBergamotApiClientPortListener: (port: Port) => void;
 
   constructor() {}
 
@@ -199,6 +202,34 @@ class ExtensionGlue {
     crossBrowser.runtime.onConnect.addListener(
       this.contentScriptLanguageDetectorProxyPortListener,
     );
+
+    // Set up a connection / listener for the content-script-language-detector-proxy
+    let portFromContentScriptBergamotApiClient;
+    this.contentScriptBergamotApiClientPortListener = p => {
+      if (p.name !== "port-from-content-script-bergamot-api-client") {
+        return;
+      }
+      portFromContentScriptBergamotApiClient = p;
+      portFromContentScriptBergamotApiClient.onMessage.addListener(
+        async function(m: { texts: []; requestId: string }) {
+          console.log("Message from content-script-bergamot-api-client:", {
+            m,
+          });
+          const { texts, requestId } = m;
+          const results = await bergamotApiClient.sendTranslationRequest(texts);
+          console.log({ results });
+          portFromContentScriptBergamotApiClient.postMessage({
+            translationRequestResults: {
+              results,
+              requestId,
+            },
+          });
+        },
+      );
+    };
+    crossBrowser.runtime.onConnect.addListener(
+      this.contentScriptBergamotApiClientPortListener,
+    );
   }
 
   async cleanup() {
@@ -228,6 +259,18 @@ class ExtensionGlue {
       } catch (err) {
         console.warn(
           "contentScriptLanguageDetectorProxyPortListener removal error",
+          err,
+        );
+      }
+    }
+    if (this.contentScriptBergamotApiClientPortListener) {
+      try {
+        crossBrowser.runtime.onConnect.removeListener(
+          this.contentScriptBergamotApiClientPortListener,
+        );
+      } catch (err) {
+        console.warn(
+          "contentScriptBergamotApiClientPortListener removal error",
           err,
         );
       }

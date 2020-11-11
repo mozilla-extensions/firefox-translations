@@ -11,6 +11,7 @@ import {
 } from "./bergamot.constants";
 import { BergamotRequest } from "./BergamotRequest";
 import { TranslationRequest } from "../shared-resources/bergamot.types";
+import { ContentScriptBergamotApiClient } from "../shared-resources/ContentScriptBergamotApiClient";
 
 /**
  * Outbound translator for a webpage using Bergamot's Translation API.
@@ -28,12 +29,14 @@ export class BergamotOutboundTranslator {
   private _partialSuccess;
   private _translatedCharacterCount;
   private _formControlElements;
+  private bergamotApiClient: ContentScriptBergamotApiClient;
 
   constructor(translationDocument) {
     this.translationDocument = translationDocument;
     this._pendingRequests = 0;
     this._partialSuccess = false;
     this._translatedCharacterCount = 0;
+    this.bergamotApiClient = new ContentScriptBergamotApiClient();
   }
 
   /**
@@ -92,9 +95,16 @@ export class BergamotOutboundTranslator {
       );
       this._pendingRequests++;
 
+      // TODO: Restore ability to specify that this is outbound translation (process.env.BERGAMOT_REST_API_OUTBOUND_URL)
       bergamotRequest
-        .fireRequest(process.env.BERGAMOT_REST_API_OUTBOUND_URL)
-        .then(this._chunkCompleted.bind(this), this._chunkFailed.bind(this));
+        .fireRequest(this.bergamotApiClient)
+        .then(results => {
+          this._chunkCompleted(results, bergamotRequest);
+        })
+        .catch(err => {
+          console.error("fireRequest error", err);
+          // TODO: Restore error handling (this._chunkFailed.bind(this))
+        });
 
       currentIndex = request.lastIndex;
       if (request.finished) {
@@ -126,8 +136,8 @@ export class BergamotOutboundTranslator {
    *
    * @param   bergamotRequest   The BergamotRequest sent to the server.
    */
-  _chunkCompleted(bergamotRequest: BergamotRequest) {
-    if (this._parseChunkResult(bergamotRequest)) {
+  _chunkCompleted(results, bergamotRequest: BergamotRequest) {
+    if (this._parseChunkResult(results, bergamotRequest)) {
       this._partialSuccess = true;
       // Count the number of characters successfully translated.
       this._translatedCharacterCount += bergamotRequest.characterCount;
@@ -169,14 +179,7 @@ export class BergamotOutboundTranslator {
    * @param   bergamotRequest      The request sent to the server.
    * @returns boolean      True if parsing of this chunk was successful.
    */
-  _parseChunkResult(bergamotRequest: BergamotRequest) {
-    let results;
-    try {
-      let response = bergamotRequest.networkRequest.response;
-      results = JSON.parse(response);
-    } catch (e) {
-      return false;
-    }
+  _parseChunkResult(results, bergamotRequest: BergamotRequest) {
     let len = results.text.length;
     if (len != bergamotRequest.translationData.length) {
       // This should never happen, but if the service returns a different number
