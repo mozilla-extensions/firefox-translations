@@ -2,6 +2,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { captureExceptionWithExtras } from "./ErrorReporting";
 import { nanoid } from "nanoid";
+import { DetectedLanguageResults } from "./bergamot.types";
 
 export class ContentScriptLanguageDetectorProxy {
   private backgroundContextPort: Port;
@@ -13,9 +14,7 @@ export class ContentScriptLanguageDetectorProxy {
       name: "port-from-content-script-language-detector-proxy",
     });
   }
-  async detectLanguage(
-    str: string,
-  ): Promise<{ confident: boolean; language: string }> {
+  async detectLanguage(str: string): Promise<DetectedLanguageResults> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
       const resultsMessageListener = async (m: {

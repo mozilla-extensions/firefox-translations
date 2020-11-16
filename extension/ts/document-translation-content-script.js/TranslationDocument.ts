@@ -72,7 +72,11 @@ export class TranslationDocument {
     // we are able to reduce their data payload sent to the translation service.
 
     for (let root of this.roots) {
-      if (!root.children.length && (root.nodeRef instanceof Element && root.nodeRef.childElementCount == 0)) {
+      if (
+        !root.children.length &&
+        root.nodeRef instanceof Element &&
+        root.nodeRef.childElementCount == 0
+      ) {
         root.isSimpleRoot = true;
       }
     }
@@ -216,7 +220,7 @@ export class TranslationDocument {
    */
   _swapDocumentContent(target: "translation" | "original") {
     (async () => {
-        this.roots.forEach(root => root.swapText(target));
+      this.roots.forEach(root => root.swapText(target));
     })();
   }
 }

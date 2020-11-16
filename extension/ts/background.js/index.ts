@@ -178,54 +178,52 @@ class ExtensionGlue {
     crossBrowser.runtime.onConnect.addListener(this.mainInterfacePortListener);
 
     // Set up a connection / listener for the content-script-language-detector-proxy
-    let portFromContentScriptLanguageDetectorProxy;
-    this.contentScriptLanguageDetectorProxyPortListener = p => {
-      if (p.name !== "port-from-content-script-language-detector-proxy") {
+    this.contentScriptLanguageDetectorProxyPortListener = (port: Port) => {
+      if (port.name !== "port-from-content-script-language-detector-proxy") {
         return;
       }
-      portFromContentScriptLanguageDetectorProxy = p;
-      portFromContentScriptLanguageDetectorProxy.onMessage.addListener(
-        async function(m: { str: string; requestId: string }) {
-          // console.log("Message from content-script-language-detector-proxy:", { m });
-          const { str, requestId } = m;
-          const results = await LanguageDetector.detectLanguage({ text: str });
-          console.log({ results });
-          portFromContentScriptLanguageDetectorProxy.postMessage({
-            languageDetectorResults: {
-              results,
-              requestId,
-            },
-          });
-        },
-      );
+      port.onMessage.addListener(async function(m: {
+        str: string;
+        requestId: string;
+      }) {
+        // console.log("Message from content-script-language-detector-proxy:", { m });
+        const { str, requestId } = m;
+        const results = await LanguageDetector.detectLanguage({ text: str });
+        console.log({ results });
+        port.postMessage({
+          languageDetectorResults: {
+            results,
+            requestId,
+          },
+        });
+      });
     };
     crossBrowser.runtime.onConnect.addListener(
       this.contentScriptLanguageDetectorProxyPortListener,
     );
 
     // Set up a connection / listener for the content-script-language-detector-proxy
-    let portFromContentScriptBergamotApiClient;
-    this.contentScriptBergamotApiClientPortListener = p => {
-      if (p.name !== "port-from-content-script-bergamot-api-client") {
+    this.contentScriptBergamotApiClientPortListener = (port: Port) => {
+      if (port.name !== "port-from-content-script-bergamot-api-client") {
         return;
       }
-      portFromContentScriptBergamotApiClient = p;
-      portFromContentScriptBergamotApiClient.onMessage.addListener(
-        async function(m: { texts: []; requestId: string }) {
-          console.log("Message from content-script-bergamot-api-client:", {
-            m,
-          });
-          const { texts, requestId } = m;
-          const results = await bergamotApiClient.sendTranslationRequest(texts);
-          console.log({ results });
-          portFromContentScriptBergamotApiClient.postMessage({
-            translationRequestResults: {
-              results,
-              requestId,
-            },
-          });
-        },
-      );
+      port.onMessage.addListener(async function(m: {
+        texts: [];
+        requestId: string;
+      }) {
+        console.log("Message from content-script-bergamot-api-client:", {
+          m,
+        });
+        const { texts, requestId } = m;
+        const results = await bergamotApiClient.sendTranslationRequest(texts);
+        console.log({ results });
+        port.postMessage({
+          translationRequestResults: {
+            results,
+            requestId,
+          },
+        });
+      });
     };
     crossBrowser.runtime.onConnect.addListener(
       this.contentScriptBergamotApiClientPortListener,

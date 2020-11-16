@@ -1,4 +1,3 @@
-import { ContentScriptBergamotApiClient } from "../shared-resources/ContentScriptBergamotApiClient";
 import { TranslationChild } from "./TranslationChild";
 
 /**

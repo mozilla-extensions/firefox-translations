@@ -1,36 +1,6 @@
 # dom/base/nsDOMWindowUtils.cpp
 
-  nsTHashtable<nsPtrHashKey<nsIContent>> translationNodesHash(500);
-  RefPtr<nsTranslationNodeList> list = new nsTranslationNodeList;
-
-    // An element is a translation node if it contains
-    // at least one text node that has meaningful data
-    // for translation
-    for (nsIContent* child = content->GetFirstChild(); child;
-         child = child->GetNextSibling()) {
       if (child->IsText() && child->GetAsText()->HasTextForTranslation()) {
-        translationNodesHash.PutEntry(content);
-
-        nsIFrame* frame = content->GetPrimaryFrame();
-        bool isTranslationRoot = frame && frame->IsBlockFrameOrSubclass();
-        if (!isTranslationRoot) {
-          // If an element is not a block element, it still
-          // can be considered a translation root if the parent
-          // of this element didn't make into the list of nodes
-          // to be translated.
-          bool parentInList = false;
-          nsIContent* parent = content->GetParent();
-          if (parent) {
-            parentInList = translationNodesHash.Contains(parent);
-          }
-          isTranslationRoot = !parentInList;
-        }
-
-        list->AppendElement(content, isTranslationRoot);
-        --limit;
-        break;
-      }
-    }
 
 # dom/base/Text.cpp
 
