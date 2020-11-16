@@ -17,8 +17,11 @@ export class Translator {
     const translationResults = await this.bergamotApiClient.sendTranslationRequest(
       [text],
     );
-    console.log({ translationResults });
-    return translationResults[0];
+    const nbestTranslations = this.bergamotApiClient.parseNbestTranslationsFromResponse(
+      translationResults,
+    );
+    console.log({ nbestTranslations });
+    return nbestTranslations[0];
   }
 
   setDelay(milliseconds: number) {
