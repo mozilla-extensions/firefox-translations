@@ -7,7 +7,7 @@
   - [Get started](#get-started)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
-  - [Remotedev](#remotedev)
+    - [Bergamot REST API server (temporary requirement)](#bergamot-rest-api-server-temporary-requirement)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
