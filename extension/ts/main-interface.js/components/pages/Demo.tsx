@@ -1,20 +1,13 @@
 import * as React from "react";
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 import {
-  BsChevronRight,
-  BsLockFill,
   BsGear,
   BsLightningFill,
-  BsApp,
+  BsArrowRepeat,
+  BsPlus,
+  BsChevronDown,
 } from "react-icons/bs";
-import {
-  BiChevronRight,
-  BiBox,
-  BiShield,
-  BiAdjust,
-  BiSlider,
-  BiAnalyse,
-} from "react-icons/bi";
+import {BiChevronRight, BiAnalyse, BiBox, BiSlider} from "react-icons/bi";
 import Switch from "../Switch/Switch";
 import List from "../List/List";
 import TextField from "../TextField/TextField";
@@ -24,12 +17,13 @@ import {
   Route,
   Switch as ReactSwitch,
   Link,
-  useRouteMatch,
   withRouter,
 } from "react-router-dom";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { Translator } from "../../simulator/Translator";
-import InputBox from "../InputBox/InputBox";
+import { config } from "../../../config";
+import Button from "../Button/Button";
+import Menu from "../Menu/Menu";
+import { browser } from "webextension-polyfill-ts";
 
 const translator = new Translator("English", "Czech");
 translator.setDelay(7000);
@@ -55,11 +49,23 @@ const Home = () => {
       icon: <BiSlider />,
       action: <BiChevronRight />,
     },
+    /*
     {
-      text: `Always translate ${language}`,
+      text: (
+        <>
+          Always{" "}
+          <Menu setSelection={setLanguage}>
+            <span className={"LanguageSwitcher__select"}>
+              <BsChevronDown />
+            </span>
+          </Menu>{" "}
+          translate ${language}
+        </>
+      ),
       icon: <BsLightningFill />,
       action: <Switch />,
     },
+    */
     {
       text: "Show quality estimation",
       icon: <BsLightningFill />,
@@ -93,14 +99,17 @@ const Home = () => {
   return (
     <div className={"Home w-full"}>
       <div className="flex flex-col">
+        <Header />
+        {/*
         <div className={"BergamotApp__header"}>
           <TextField
             allowClear
             prefixIcon={<img alt={""} src={logo} width={16} />}
-            placeholder={"Search something"}
+            placeholder={"Quick translate"}
             style={{ width: "100%", borderRadius: "4px 4px 0 0" }}
           />
         </div>
+        */}
         <div className={"BergamotApp__languageSwitcher"}>
           <LanguageSwitcher onSwitch={setLanguage} />
         </div>
@@ -108,8 +117,24 @@ const Home = () => {
           {items}
         </List>
         <div className={"BergamotApp__footer mt-4"}>
-          <span>About</span>
-          <span>Feedback</span>
+          <span>
+            <a
+              className=""
+              target="_blank"
+              href={browser.runtime.getURL(`get-started/get-started.html`)}
+            >
+              About
+            </a>
+          </span>
+          <span>
+            <a
+              className="inline ml-1.5 underline hover:text-grey-60"
+              target="_blank"
+              href={config.feedbackSurveyUrl}
+            >
+              Feedback
+            </a>
+          </span>
         </div>
       </div>
     </div>
@@ -118,6 +143,7 @@ const Home = () => {
 
 const Translate = () => {
   const [text, setText] = React.useState("");
+  const [language, setLanguage] = React.useState("Czech");
   const [translatedText, setTranslatedText] = React.useState("");
   const [loading, setLoading] = React.useState(false);
 
@@ -138,6 +164,9 @@ const Translate = () => {
   return (
     <div className={"Translate w-full"}>
       <Header allowBack extra={<BsGear />} />
+      <div className={"BergamotApp__languageSwitcher"}>
+        <LanguageSwitcher onSwitch={setLanguage} />
+      </div>
       <div className={"Translate__body"}>
         <div className={"Translate__originText"}>
           <div className={"Translate__title"}>Origin</div>
