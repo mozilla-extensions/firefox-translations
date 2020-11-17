@@ -10,7 +10,6 @@ import {
   SerializedActionCallWithModelIdOverrides,
   setGlobalConfig,
 } from "mobx-keystone";
-import { cancelledActionSymbol } from "./todoList/logs";
 import { browser, Runtime } from "webextension-polyfill-ts";
 import { captureExceptionWithExtras } from "./ErrorReporting";
 import { nanoid } from "nanoid";
@@ -91,10 +90,7 @@ class MobxKeystoneProxy {
         reject({ m });
       };
       this.backgroundContextPort.onMessage.addListener(resultsMessageListener);
-      console.debug(
-        "requestInitialState via content script mobx keystone proxy",
-        {},
-      );
+      // console.debug("requestInitialState via content script mobx keystone proxy", {});
       this.backgroundContextPort.postMessage({
         requestInitialState: true,
         requestId,
@@ -169,7 +165,7 @@ export async function subscribeToExtensionState() {
         // and send it to the server
         // it will then be replicated by the server and properly executed
         server.sendMessage(serializeActionCall(actionCall, rootStore));
-        ctx.data[cancelledActionSymbol] = true; // just for logging purposes
+        ctx.data["cancelled"] = true; // just for logging purposes
         // "cancel" the action by returning undefined
         return {
           result: ActionTrackingResult.Return,
@@ -184,16 +180,6 @@ export async function subscribeToExtensionState() {
 
   // recommended by mobx-keystone (allows the model hook `onAttachedToRootStore` to work)
   registerRootStore(rootStore);
-
-  // connect the content-script-store to the redux dev tools
-  // skip this - enough to connect the background-context-store
-  /*
-  const connection = remotedev.connectViaExtension({
-    name: "Content Script",
-    realtime: true, port: 8181,
-  })
-  connectReduxDevTools(remotedev, connection, rootStore)
-   */
 
   return rootStore;
 }
