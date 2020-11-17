@@ -42,6 +42,7 @@ const drawBadge = (ctx, text, textColor, badgeBackgroundColor) => {
 };
 
 export class DynamicActionIcon {
+  private tabId: number;
   private ctx;
   private actionApi;
   private iconImg;
@@ -52,7 +53,14 @@ export class DynamicActionIcon {
   private badgeText: string;
   private badgeTextColor: ColorValue = "#ffffff";
   private badgeBackgroundColor: ColorValue = "#000000";
-  constructor(actionApi, width, height, rotationCenterX, rotationCenterY) {
+  constructor(
+    tabId: number,
+    actionApi,
+    width,
+    height,
+    rotationCenterX,
+    rotationCenterY,
+  ) {
     this.ctx = document.createElement("canvas").getContext("2d");
     this.actionApi = actionApi;
     this.width = width;
@@ -88,11 +96,15 @@ export class DynamicActionIcon {
       return;
     }
     const { badgeText, badgeTextColor, badgeBackgroundColor } = this;
-    console.debug("Drawing dynamic action icon", {
-      badgeText,
-      badgeTextColor,
-      badgeBackgroundColor,
-    });
+    console.debug(
+      "Drawing dynamic action icon",
+      { tabId },
+      {
+        badgeText,
+        badgeTextColor,
+        badgeBackgroundColor,
+      },
+    );
     this.clear();
     this.ctx.drawImage(this.iconImg, 0, 0);
     if (badgeText) {

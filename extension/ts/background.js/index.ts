@@ -4,15 +4,14 @@ import { initErrorReportingInBackgroundScript } from "../shared-resources/ErrorR
 import { browser as crossBrowser, Runtime } from "webextension-polyfill-ts";
 import { Store } from "./Store";
 import { localStorageWrapper } from "./lib/localStorageWrapper";
-import { getCurrentTab } from "./lib/getCurrentTab";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
-import { DynamicActionIcon } from "./lib/DynamicActionIcon";
 import { MobxKeystoneBackgroundContextHost } from "./MobxKeystoneBackgroundContextHost";
 import { BergamotApiClient } from "./BergamotApiClient";
 import { FrameInfo } from "../shared-resources/bergamot.types";
 import { ExtensionState } from "../shared-resources/models/ExtensionState";
 import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
+import { ExtensionIconTranslationState } from "./ExtensionIconTranslationState";
 const store = new Store(localStorageWrapper);
 const bergamotApiClient = new BergamotApiClient();
 
@@ -60,122 +59,11 @@ class ExtensionGlue {
   }
 
   async start() {
-    const dynamicActionIcon = new DynamicActionIcon(
-      crossBrowser.browserAction,
-      48,
-      48,
-      24,
-      29,
+    // Let extension icon react to document translation state changes
+    const extensionIconTranslationState = new ExtensionIconTranslationState(
+      this.extensionState,
     );
-
-    const showSpecificExtensionIconOnTranslatablePages = async () => {
-      const setActiveExtensionIcon = async tabId => {
-        try {
-          await dynamicActionIcon.setIcon({
-            path: "icons/extension-icon.48x48.png",
-            tabId,
-          });
-          dynamicActionIcon.stopLoadingAnimation(tabId);
-          dynamicActionIcon.drawBadge(
-            {
-              text: "es",
-              textColor: "#000000",
-              backgroundColor: "#ffffffAA",
-            },
-            tabId,
-          );
-
-          setTimeout(() => {
-            dynamicActionIcon.startLoadingAnimation(tabId);
-          }, 2000);
-
-          setTimeout(() => {
-            dynamicActionIcon.stopLoadingAnimation(tabId);
-            dynamicActionIcon.drawBadge(
-              {
-                text: "es",
-                textColor: "#ffffff",
-                backgroundColor: "#000000AA",
-              },
-              tabId,
-            );
-          }, 4000);
-
-          crossBrowser.browserAction.setPopup({
-            popup: "/main-interface/main-interface.html#/",
-            tabId,
-          });
-        } catch (e) {
-          if (e.message.indexOf("Invalid tab ID") === 0) {
-            // do nothing, the tab does not exist anymore
-          } else {
-            throw e;
-          }
-        }
-      };
-      const setInactiveExtensionIcon = async tabId => {
-        try {
-          crossBrowser.browserAction.setIcon({
-            path: "icons/extension-icon.inactive.38x38.png",
-            tabId,
-          });
-          crossBrowser.browserAction.setPopup({
-            popup: "/main-interface/main-interface.html#/",
-            tabId,
-          });
-        } catch (e) {
-          if (e.message.indexOf("Invalid tab ID") === 0) {
-            // do nothing, the tab does not exist anymore
-          } else {
-            throw e;
-          }
-        }
-      };
-
-      const tab = await getCurrentTab();
-
-      // Sometimes there is no current tab object. Assume not a translatable page...
-      if (!tab) {
-        setInactiveExtensionIcon(null);
-        return;
-      }
-
-      // TODO
-      const urlShouldNotBeTranslated = (url: string) => false;
-
-      if (tab.url) {
-        if (urlShouldNotBeTranslated(tab.url)) {
-          await setInactiveExtensionIcon(tab.id);
-        } else {
-          await setActiveExtensionIcon(tab.id);
-        }
-      } else {
-        // tab.url is not available in Firefox unless the tabs permission is granted, hence this workaround:
-        const onExecuted = async result => {
-          const url = result ? result[0] : false;
-          if (!url || urlShouldNotBeTranslated(url)) {
-            await setInactiveExtensionIcon(tab.id);
-          } else {
-            await setActiveExtensionIcon(tab.id);
-          }
-        };
-        const executing = crossBrowser.tabs.executeScript({
-          code: "location.href",
-        });
-        executing.then(onExecuted, async () => {
-          await setInactiveExtensionIcon(tab.id);
-        });
-      }
-    };
-    crossBrowser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-      showSpecificExtensionIconOnTranslatablePages();
-    });
-    crossBrowser.tabs.onActivated.addListener(({ tabId }) => {
-      showSpecificExtensionIconOnTranslatablePages();
-    });
-
-    // Make the page action show on translatable pages in case extension is loaded/reloaded while on one
-    await showSpecificExtensionIconOnTranslatablePages();
+    await extensionIconTranslationState.init();
 
     // Set up a connection / listener for the main interface content script
     let portFromMainInterface;
