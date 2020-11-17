@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "outDir": "./debug/ts-compiled-to-js-by-tsc",
     "sourceMap": true,
     "inlineSources": true,

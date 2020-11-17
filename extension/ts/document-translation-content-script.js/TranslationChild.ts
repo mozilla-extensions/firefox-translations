@@ -8,66 +8,48 @@ import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
 import { getTranslationNodes } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../shared-resources/ContentScriptLanguageDetectorProxy";
+import { ExtensionState } from "../shared-resources/models/ExtensionState";
+import { DocumentTranslationState } from "../shared-resources/models/DocumentTranslationState";
+import {
+  DetectedLanguageResults,
+  FrameInfo,
+} from "../shared-resources/bergamot.types";
+import { ModelInstanceCreationData } from "mobx-keystone";
+import { TranslationStatus } from "../shared-resources/models/BaseTranslationState";
 
-const STATE_OFFER = 0;
-const STATE_TRANSLATED = 2;
-const STATE_ERROR = 3;
-
-// Temporary mock
-class JSWindowActorChild {
+export class TranslationChild {
+  private frameInfo: FrameInfo;
   public contentWindow;
   public document;
-  sendAsyncMessage(ref, data) {
-    console.log("MOCK sendAsyncMessage", { ref, data });
-  }
-}
-
-interface DocumentState {
-  state?: number;
-  translatedFrom?: any;
-  translatedTo?: any;
-  originalShown?: any;
-  detectedLanguage?: any;
-}
-
-export class TranslationChild extends JSWindowActorChild {
+  private extensionState: ExtensionState;
+  private documentTranslationState: DocumentTranslationState;
   private languageDetector: ContentScriptLanguageDetectorProxy;
-  constructor(document, contentWindow) {
-    super();
+  constructor(
+    frameInfo: FrameInfo,
+    document,
+    contentWindow,
+    extensionState: ExtensionState,
+  ) {
+    this.frameInfo = frameInfo;
     this.document = document;
     this.contentWindow = contentWindow;
-    this.languageDetector = new ContentScriptLanguageDetectorProxy();
-  }
-
-  handleEvent(aEvent) {
-    switch (aEvent.type) {
-      case "pageshow":
-        // We are only listening to pageshow events.
-        let content = this.contentWindow;
-        if (!content.detectedLanguage) {
-          return;
-        }
-
-        let data: DocumentState = {};
-        let trDoc = content.translationDocument;
-        if (trDoc) {
-          data.state = trDoc.translationError ? STATE_ERROR : STATE_TRANSLATED;
-          data.translatedFrom = trDoc.translatedFrom;
-          data.translatedTo = trDoc.translatedTo;
-          data.originalShown = trDoc.originalShown;
-        } else {
-          data.state = STATE_OFFER;
-          data.originalShown = true;
-        }
-        data.detectedLanguage = content.detectedLanguage;
-
-        this.sendAsyncMessage("Translation:DocumentState", data);
-        break;
-
-      case "load":
-        this.checkForTranslation();
-        break;
+    this.extensionState = extensionState;
+    const dtsInitialData: ModelInstanceCreationData<DocumentTranslationState> = {
+      ...this.frameInfo,
+      translationStatus: TranslationStatus.UNKNOWN,
+      originalShown: true,
+    };
+    try {
+      this.documentTranslationState = new DocumentTranslationState(
+        dtsInitialData,
+      );
+      this.extensionState.upsertDocumentTranslationState(
+        this.documentTranslationState,
+      );
+    } catch (err) {
+      console.error("Instantiate DocumentTranslationState error", err);
     }
+    this.languageDetector = new ContentScriptLanguageDetectorProxy();
   }
 
   async checkForTranslation() {
@@ -122,7 +104,9 @@ export class TranslationChild extends JSWindowActorChild {
       return;
     }
 
-    const result = await this.languageDetector.detectLanguage(string);
+    const result: DetectedLanguageResults = await this.languageDetector.detectLanguage(
+      string,
+    );
     console.debug("Language detection results are in", { result });
 
     // Bail if we're not confident.
@@ -140,13 +124,11 @@ export class TranslationChild extends JSWindowActorChild {
 
     content.detectedLanguage = result.language;
 
-    let data = {
-      state: STATE_OFFER,
-      originalShown: true,
-      detectedLanguage: result.language,
-    };
-
-    return data;
+    this.documentTranslationState.detectedLanguageResults = result;
+    this.documentTranslationState.translationStatus = TranslationStatus.OFFER;
+    this.extensionState.upsertDocumentTranslationState(
+      this.documentTranslationState,
+    );
   }
 
   async doTranslation(aFrom, aTo) {
@@ -167,7 +149,9 @@ export class TranslationChild extends JSWindowActorChild {
 
     let result;
     try {
+      console.info("About to translate web page document", { aFrom, aTo });
       let translateResult = await translator.translate();
+      console.debug({ translateResult });
 
       result = {
         characterCount: translateResult.characterCount,

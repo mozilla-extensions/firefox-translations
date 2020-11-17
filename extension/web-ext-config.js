@@ -28,6 +28,7 @@ if (targetBrowser === "firefox") {
   defaultConfig.run.target = ["firefox-desktop"];
   defaultConfig.run.startUrl = [
     "about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt",
+    "http://localhost:8181/",
     examplePageToTranslate,
     "about:debugging#/runtime/this-firefox",
   ];

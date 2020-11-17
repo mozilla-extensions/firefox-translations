@@ -12,3 +12,8 @@ export interface DetectedLanguageResults {
     percent: number;
   }[];
 }
+export interface FrameInfo {
+  windowId: number;
+  tabId: number;
+  frameId: number;
+}

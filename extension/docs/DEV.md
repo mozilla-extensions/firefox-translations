@@ -7,6 +7,7 @@
   - [Get started](#get-started)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
+  - [Remotedev](#remotedev)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
@@ -83,6 +84,11 @@ In another terminal:
 The binary is currently only available for Mac OSX. For any other system, compile from source: [https://github.com/browsermt/mts](https://github.com/browsermt/mts).
 
 This dependence on a REST API server will be removed soon.
+
+## Remotedev
+
+yarn remotedev
+open http://localhost:8181/
 
 ## Opening up specific extension pages
 

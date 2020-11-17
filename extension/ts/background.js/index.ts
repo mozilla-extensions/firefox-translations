@@ -8,8 +8,11 @@ import { getCurrentTab } from "./lib/getCurrentTab";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
 import { DynamicActionIcon } from "./lib/DynamicActionIcon";
+import { MobxKeystoneBackgroundContextHost } from "./MobxKeystoneBackgroundContextHost";
 import { BergamotApiClient } from "./BergamotApiClient";
+import { FrameInfo } from "../shared-resources/bergamot.types";
 const store = new Store(localStorageWrapper);
+const mobxKeystoneBackgroundContextHost = new MobxKeystoneBackgroundContextHost();
 const bergamotApiClient = new BergamotApiClient();
 
 /**
@@ -21,10 +24,12 @@ class ExtensionGlue {
   private mainInterfacePortListener: (port: Port) => void;
   private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
   private contentScriptBergamotApiClientPortListener: (port: Port) => void;
+  private contentScriptFrameInfoPortListener: (port: Port) => void;
 
   constructor() {}
 
   async init() {
+    mobxKeystoneBackgroundContextHost.init();
     // Enable error reporting if not opted out
     this.extensionPreferencesPortListener = await initErrorReportingInBackgroundScript(
       store,
@@ -228,6 +233,34 @@ class ExtensionGlue {
     crossBrowser.runtime.onConnect.addListener(
       this.contentScriptBergamotApiClientPortListener,
     );
+
+    // Set up a connection / listener for content-script-frame-info
+    this.contentScriptFrameInfoPortListener = (port: Port) => {
+      if (port.name !== "port-from-content-script-frame-info") {
+        return;
+      }
+      port.onMessage.addListener(async function(
+        m: { requestId: string },
+        senderPort,
+      ) {
+        console.log("Message from port-from-content-script-frame-info:", {
+          m,
+        });
+        const { requestId } = m;
+        const frameInfo: FrameInfo = {
+          windowId: senderPort.sender.tab.windowId,
+          tabId: senderPort.sender.tab.id,
+          frameId: senderPort.sender.frameId,
+        };
+        port.postMessage({
+          requestId,
+          frameInfo,
+        });
+      });
+    };
+    crossBrowser.runtime.onConnect.addListener(
+      this.contentScriptFrameInfoPortListener,
+    );
   }
 
   async cleanup() {
@@ -271,6 +304,15 @@ class ExtensionGlue {
           "contentScriptBergamotApiClientPortListener removal error",
           err,
         );
+      }
+    }
+    if (this.contentScriptFrameInfoPortListener) {
+      try {
+        crossBrowser.runtime.onConnect.removeListener(
+          this.contentScriptFrameInfoPortListener,
+        );
+      } catch (err) {
+        console.warn("contentScriptFrameInfoPortListener removal error", err);
       }
     }
   }
