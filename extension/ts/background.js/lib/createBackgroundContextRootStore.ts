@@ -6,6 +6,7 @@ import {
 } from "mobx-keystone";
 import * as remotedev from "remotedev";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
+import {isChrome} from "./isChrome";
 
 // enable runtime data checking even in production mode
 setGlobalConfig({
@@ -19,12 +20,27 @@ export function createBackgroundContextRootStore(): ExtensionState {
   registerRootStore(rootStore);
 
   // connect the store to the redux dev tools
-  const connection = remotedev.connectViaExtension({
-    name: "Background Context",
-    realtime: true,
-    port: 8181,
-  });
-  connectReduxDevTools(remotedev, connection, rootStore);
+  // (different ports for different browser versions developed simultaneously)
+  if (process.env.NODE_ENV !== "production" && process.env.REMOTE_DEV_SERVER_PORT && !isChrome()) {
+    const port = process.env.REMOTE_DEV_SERVER_PORT;
+    console.warn(`Connecting the background store to the Redux dev tools on port ${port}`);
+    const connection = remotedev.connectViaExtension({
+      name: "Background Context (Firefox)",
+      realtime: true,
+      port,
+    });
+    connectReduxDevTools(remotedev, connection, rootStore);
+  }
+  if (process.env.NODE_ENV !== "production" && process.env.REMOTE_DEV_SERVER_PORT_CHROME && isChrome()) {
+    const port = process.env.REMOTE_DEV_SERVER_PORT_CHROME;
+    console.warn(`Connecting the background store to the Redux dev tools on port ${port}`);
+    const connection = remotedev.connectViaExtension({
+      name: "Background Context (Chrome)",
+      realtime: true,
+      port,
+    });
+    connectReduxDevTools(remotedev, connection, rootStore);
+  }
 
   return rootStore;
 }

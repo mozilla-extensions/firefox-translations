@@ -44,7 +44,11 @@ if (targetBrowser === "firefox") {
 
 if (targetBrowser === "chromium") {
   defaultConfig.run.target = ["chromium"];
-  defaultConfig.run.startUrl = ["chrome://extensions", examplePageToTranslate];
+  defaultConfig.run.startUrl = [
+    // "chrome://extensions", // Not available until https://github.com/mozilla/web-ext/issues/1979 is resolved
+    "http://localhost:8182/",
+    examplePageToTranslate,
+  ];
   defaultConfig.filename = `{name}-{version}-chrome.zip`;
 }
 

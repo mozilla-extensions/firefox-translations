@@ -61,11 +61,25 @@ To build for and launch Firefox, install the extension and start Webpack in watc
 yarn watch
 ```
 
+To utilize the Redux dev tools, run the following in another terminal:
+
+```
+yarn remotedev
+```
+
 For Chrome:
 
 ```
 yarn watch:chrome
 ```
+
+In another terminal:
+
+```
+yarn remotedev:chrome
+```
+
+### Bergamot REST API server (temporary requirement)
 
 Note: At this stage of development of the Bergamot translation engine, two REST API servers needs to be launched from the command line on the same system that the extension runs on:
 
@@ -84,11 +98,6 @@ In another terminal:
 The binary is currently only available for Mac OSX. For any other system, compile from source: [https://github.com/browsermt/mts](https://github.com/browsermt/mts).
 
 This dependence on a REST API server will be removed soon.
-
-## Remotedev
-
-yarn remotedev
-open http://localhost:8181/
 
 ## Opening up specific extension pages
 
