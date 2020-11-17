@@ -84,7 +84,7 @@ export class BergamotApiClient {
       throw new Error("Data response failed");
     }
     const parsedResponse = await dataResponse.json();
-    console.log({ parsedResponse });
+    // console.log({ parsedResponse });
     return parsedResponse;
   };
 }

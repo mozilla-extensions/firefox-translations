@@ -6,9 +6,7 @@ import Port = Runtime.Port;
 export class ContentScriptBergamotApiClient {
   private backgroundContextPort: Port;
   constructor() {
-    console.debug(
-      "ContentScriptBergamotApiClient: Connecting to the background script",
-    );
+    // console.debug("ContentScriptBergamotApiClient: Connecting to the background script");
     this.backgroundContextPort = browser.runtime.connect(browser.runtime.id, {
       name: "port-from-content-script-bergamot-api-client",
     });
@@ -24,12 +22,7 @@ export class ContentScriptBergamotApiClient {
           if (translationRequestResults.requestId !== requestId) {
             return;
           }
-          console.log(
-            "ContentScriptBergamotApiClient received translationRequestResults",
-            {
-              translationRequestResults,
-            },
-          );
+          // console.debug("ContentScriptBergamotApiClient received translationRequestResults", {translationRequestResults});
           this.backgroundContextPort.onMessage.removeListener(
             resultsMessageListener,
           );
@@ -41,12 +34,7 @@ export class ContentScriptBergamotApiClient {
         reject({ m });
       };
       this.backgroundContextPort.onMessage.addListener(resultsMessageListener);
-      console.debug(
-        "ContentScriptBergamotApiClient: Sending translation request",
-        {
-          texts,
-        },
-      );
+      // console.debug("ContentScriptBergamotApiClient: Sending translation request", {texts});
       this.backgroundContextPort.postMessage({
         texts,
         requestId,

@@ -23,12 +23,10 @@ setGlobalConfig({
 });
 
 export class MobxKeystoneBackgroundContextHost {
-  private backgroundContextRootStore: ExtensionState = createBackgroundContextRootStore();
   private mobxKeystoneProxyPortListener: (port: Port) => void;
   private connectedPorts: Port[] = [];
-  init() {
+  init(backgroundContextRootStore: ExtensionState) {
     // Set up a connection / listener for the mobx-keystone-proxy
-    let portFromMobxKeystoneProxy;
     this.mobxKeystoneProxyPortListener = port => {
       if (port.name !== "port-from-mobx-keystone-proxy") {
         return;
@@ -40,11 +38,11 @@ export class MobxKeystoneBackgroundContextHost {
           actionCall: SerializedActionCall;
           requestId: string;
         }) => {
-          console.log("Message from mobx-keystone-proxy:", { m });
+          // console.debug("Message from mobx-keystone-proxy:", { m });
           const { requestInitialState, actionCall, requestId } = m;
           if (requestInitialState) {
-            const initialState = getSnapshot(this.backgroundContextRootStore);
-            console.log({ initialState });
+            const initialState = getSnapshot(backgroundContextRootStore);
+            // console.debug({ initialState });
             port.postMessage({
               initialState,
               requestId,
@@ -63,7 +61,7 @@ export class MobxKeystoneBackgroundContextHost {
               // apply the action on the background context side and keep track of new model IDs being
               // generated, so the clients will have the chance to keep those in sync
               const applyActionResult = applySerializedActionAndTrackNewModelIds(
-                this.backgroundContextRootStore,
+                backgroundContextRootStore,
                 actionCall,
               );
 
@@ -81,8 +79,17 @@ export class MobxKeystoneBackgroundContextHost {
                     requestId,
                   });
                 } catch (err) {
-                  // TODO: fix onDisconnect listener so that this doesn't happen all the time
-                  console.warn("DISCONNECTED PORT BUT IT IS OK", err);
+                  if (
+                    err.message ===
+                    "Attempt to postMessage on disconnected port"
+                  ) {
+                    console.warn(
+                      "Attempt to postMessage on disconnected port, but it is ok",
+                      err,
+                    );
+                  } else {
+                    throw err;
+                  }
                 }
               });
             }
@@ -97,7 +104,7 @@ export class MobxKeystoneBackgroundContextHost {
         const existingPortIndex = this.connectedPorts.findIndex(
           p => p === port,
         );
-        this.connectedPorts = this.connectedPorts.splice(existingPortIndex, 1);
+        this.connectedPorts.splice(existingPortIndex, 1);
       });
     };
     browser.runtime.onConnect.addListener(this.mobxKeystoneProxyPortListener);

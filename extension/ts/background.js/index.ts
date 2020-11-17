@@ -11,8 +11,9 @@ import { DynamicActionIcon } from "./lib/DynamicActionIcon";
 import { MobxKeystoneBackgroundContextHost } from "./MobxKeystoneBackgroundContextHost";
 import { BergamotApiClient } from "./BergamotApiClient";
 import { FrameInfo } from "../shared-resources/bergamot.types";
+import { ExtensionState } from "../shared-resources/models/ExtensionState";
+import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
 const store = new Store(localStorageWrapper);
-const mobxKeystoneBackgroundContextHost = new MobxKeystoneBackgroundContextHost();
 const bergamotApiClient = new BergamotApiClient();
 
 /**
@@ -20,6 +21,7 @@ const bergamotApiClient = new BergamotApiClient();
  * to access persistent storage and background-context API:s via cross-process messaging
  */
 class ExtensionGlue {
+  private extensionState: ExtensionState = createBackgroundContextRootStore();
   private extensionPreferencesPortListener: (port: Port) => void;
   private mainInterfacePortListener: (port: Port) => void;
   private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
@@ -29,7 +31,13 @@ class ExtensionGlue {
   constructor() {}
 
   async init() {
-    mobxKeystoneBackgroundContextHost.init();
+    // Initiate the root extension state store
+    this.extensionState = createBackgroundContextRootStore();
+
+    // Make the root extension state store available to content script contexts
+    const mobxKeystoneBackgroundContextHost = new MobxKeystoneBackgroundContextHost();
+    mobxKeystoneBackgroundContextHost.init(this.extensionState);
+
     // Enable error reporting if not opted out
     this.extensionPreferencesPortListener = await initErrorReportingInBackgroundScript(
       store,
@@ -182,7 +190,7 @@ class ExtensionGlue {
     };
     crossBrowser.runtime.onConnect.addListener(this.mainInterfacePortListener);
 
-    // Set up a connection / listener for the content-script-language-detector-proxy
+    // Set up a connection / listener for content-script-language-detector-proxy
     this.contentScriptLanguageDetectorProxyPortListener = (port: Port) => {
       if (port.name !== "port-from-content-script-language-detector-proxy") {
         return;
@@ -191,23 +199,34 @@ class ExtensionGlue {
         str: string;
         requestId: string;
       }) {
-        // console.log("Message from content-script-language-detector-proxy:", { m });
+        // console.debug("Message from content-script-language-detector-proxy:", { m });
         const { str, requestId } = m;
         const results = await LanguageDetector.detectLanguage({ text: str });
-        console.log({ results });
-        port.postMessage({
-          languageDetectorResults: {
-            results,
-            requestId,
-          },
-        });
+        // console.debug({ results });
+        try {
+          port.postMessage({
+            languageDetectorResults: {
+              results,
+              requestId,
+            },
+          });
+        } catch (err) {
+          if (err.message === "Attempt to postMessage on disconnected port") {
+            console.warn(
+              "Attempt to postMessage on disconnected port, but it is ok",
+              err,
+            );
+          } else {
+            throw err;
+          }
+        }
       });
     };
     crossBrowser.runtime.onConnect.addListener(
       this.contentScriptLanguageDetectorProxyPortListener,
     );
 
-    // Set up a connection / listener for the content-script-language-detector-proxy
+    // Set up a connection / listener for content-script-bergamot-api-client
     this.contentScriptBergamotApiClientPortListener = (port: Port) => {
       if (port.name !== "port-from-content-script-bergamot-api-client") {
         return;
@@ -216,18 +235,27 @@ class ExtensionGlue {
         texts: [];
         requestId: string;
       }) {
-        console.log("Message from content-script-bergamot-api-client:", {
-          m,
-        });
+        // console.debug("Message from content-script-bergamot-api-client:", {m});
         const { texts, requestId } = m;
         const results = await bergamotApiClient.sendTranslationRequest(texts);
-        console.log({ results });
-        port.postMessage({
-          translationRequestResults: {
-            results,
-            requestId,
-          },
-        });
+        // console.log({ results });
+        try {
+          port.postMessage({
+            translationRequestResults: {
+              results,
+              requestId,
+            },
+          });
+        } catch (err) {
+          if (err.message === "Attempt to postMessage on disconnected port") {
+            console.warn(
+              "Attempt to postMessage on disconnected port, but it is ok",
+              err,
+            );
+          } else {
+            throw err;
+          }
+        }
       });
     };
     crossBrowser.runtime.onConnect.addListener(
@@ -243,19 +271,28 @@ class ExtensionGlue {
         m: { requestId: string },
         senderPort,
       ) {
-        console.log("Message from port-from-content-script-frame-info:", {
-          m,
-        });
+        // console.debug("Message from port-from-content-script-frame-info:", {m});
         const { requestId } = m;
         const frameInfo: FrameInfo = {
           windowId: senderPort.sender.tab.windowId,
           tabId: senderPort.sender.tab.id,
           frameId: senderPort.sender.frameId,
         };
-        port.postMessage({
-          requestId,
-          frameInfo,
-        });
+        try {
+          port.postMessage({
+            requestId,
+            frameInfo,
+          });
+        } catch (err) {
+          if (err.message === "Attempt to postMessage on disconnected port") {
+            console.warn(
+              "Attempt to postMessage on disconnected port, but it is ok",
+              err,
+            );
+          } else {
+            throw err;
+          }
+        }
       });
     };
     crossBrowser.runtime.onConnect.addListener(

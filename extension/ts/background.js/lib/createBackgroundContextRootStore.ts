@@ -13,11 +13,7 @@ setGlobalConfig({
 });
 export function createBackgroundContextRootStore(): ExtensionState {
   // the parameter is the initial data for the model
-  const rootStore = new ExtensionState({
-    documentTranslationStates: [],
-    fragmentTranslationStates: [],
-    translateOwnTextTranslationState: null,
-  });
+  const rootStore = new ExtensionState({});
 
   // recommended by mobx-keystone (allows the model hook `onAttachedToRootStore` to work and other goodies)
   registerRootStore(rootStore);

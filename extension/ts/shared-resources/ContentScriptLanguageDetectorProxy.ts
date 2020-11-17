@@ -7,9 +7,7 @@ import { DetectedLanguageResults } from "./bergamot.types";
 export class ContentScriptLanguageDetectorProxy {
   private backgroundContextPort: Port;
   constructor() {
-    console.debug(
-      "ContentScriptLanguageDetectorProxy: Connecting to the background script",
-    );
+    // console.debug("ContentScriptLanguageDetectorProxy: Connecting to the background script");
     this.backgroundContextPort = browser.runtime.connect(browser.runtime.id, {
       name: "port-from-content-script-language-detector-proxy",
     });
@@ -25,12 +23,7 @@ export class ContentScriptLanguageDetectorProxy {
           if (languageDetectorResults.requestId !== requestId) {
             return;
           }
-          console.log(
-            "ContentScriptLanguageDetectorProxy received language detector results",
-            {
-              languageDetectorResults,
-            },
-          );
+          // console.debug("ContentScriptLanguageDetectorProxy received language detector results", {languageDetectorResults});
           this.backgroundContextPort.onMessage.removeListener(
             resultsMessageListener,
           );
@@ -42,9 +35,7 @@ export class ContentScriptLanguageDetectorProxy {
         reject({ m });
       };
       this.backgroundContextPort.onMessage.addListener(resultsMessageListener);
-      console.debug("Attempting detectLanguage via content script proxy", {
-        str,
-      });
+      // console.debug("Attempting detectLanguage via content script proxy", {str});
       this.backgroundContextPort.postMessage({
         str,
         requestId,

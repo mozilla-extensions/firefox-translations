@@ -7,9 +7,7 @@ import { FrameInfo } from "./bergamot.types";
 export class ContentScriptFrameInfo {
   private backgroundContextPort: Port;
   constructor() {
-    console.debug(
-      "ContentScriptFrameInfo: Connecting to the background script",
-    );
+    // console.debug("ContentScriptFrameInfo: Connecting to the background script");
     this.backgroundContextPort = browser.runtime.connect(browser.runtime.id, {
       name: "port-from-content-script-frame-info",
     });
@@ -26,9 +24,7 @@ export class ContentScriptFrameInfo {
           if (m.requestId !== requestId) {
             return;
           }
-          console.log("ContentScriptFrameInfo received results", {
-            frameInfo,
-          });
+          // console.debug("ContentScriptFrameInfo received results", {frameInfo});
           this.backgroundContextPort.onMessage.removeListener(
             resultsMessageListener,
           );
