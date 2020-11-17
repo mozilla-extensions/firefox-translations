@@ -14,7 +14,7 @@ new ExtensionState({});
 const init = async () => {
   /*
   await initErrorReportingInContentScript(
-    "port-from-document-translation-content-script:index",
+    "port-from-dom-translation-content-script:index",
   );
   */
   console.debug({ document, window });

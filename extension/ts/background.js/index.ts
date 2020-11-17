@@ -46,7 +46,7 @@ class ExtensionGlue {
         "port-from-main-interface:index",
         "port-from-get-started:index",
         "port-from-get-started:component",
-        "port-from-document-translation-content-script:index",
+        "port-from-dom-translation-content-script:index",
       ],
     );
   }

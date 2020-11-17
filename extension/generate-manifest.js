@@ -22,7 +22,7 @@ async function generateManifest({ dotEnvPath }) {
     },
     content_scripts: [
       {
-        js: ["document-translation-content-script.js"],
+        js: ["dom-translation-content-script.js"],
         matches: ["<all_urls>"],
         all_frames: false,
         run_at: "document_idle",
