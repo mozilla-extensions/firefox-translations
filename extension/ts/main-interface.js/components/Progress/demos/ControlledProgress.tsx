@@ -17,7 +17,7 @@ const ControlledProgress = (props: Props) => {
 
   return (
     <div
-      className={"Demo"}
+      className={"DemoControlledProgress"}
       style={{
         display: "flex",
         alignItems: "center",

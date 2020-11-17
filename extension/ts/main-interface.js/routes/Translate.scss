@@ -1,0 +1,36 @@
+.Translate {
+  height: 100%;
+  display: inline-block;
+  flex-direction: column;
+  position: relative;
+
+  &__body {
+    height: 100%;
+    padding: 16px;
+  }
+
+  &__title {
+    margin-bottom: 8px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  &__originText {
+    margin-bottom: 16px;
+    height: 50%;
+
+    & textarea {
+      height: 50%;
+      resize: none;
+    }
+  }
+
+  &__targetText {
+    height: 50%;
+
+    & textarea {
+      height: 50%;
+      resize: none;
+    }
+  }
+}

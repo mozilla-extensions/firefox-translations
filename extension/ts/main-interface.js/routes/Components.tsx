@@ -1,10 +1,10 @@
 import React from "react";
-import Button from "../Button/Button";
-import Palette from "../Palette/Palette";
-import Switch from "../Switch/Switch";
-import TextField from "../TextField/TextField";
-import Alert from "../Alert/Alert";
-import Checkbox from "../Checkbox/Checkbox";
+import Button from "../components/Button/Button";
+import Palette from "../components/Palette/Palette";
+import Switch from "../components/Switch/Switch";
+import TextField from "../components/TextField/TextField";
+import Alert from "../components/Alert/Alert";
+import Checkbox from "../components/Checkbox/Checkbox";
 import {
   BsPerson,
   BsPlus,
@@ -22,13 +22,13 @@ import {
   BsVolumeUpFill,
   BsPower,
 } from "react-icons/bs";
-import Radio from "../Radio/Radio";
-import Card from "../Card/Card";
-import Progress from "../Progress/Progress";
-import ControlledProgress from "../Progress/demos/ControlledProgress";
-import Table from "../Table/Table";
-import List from "../List/List";
-import Menu from "../Menu/Menu";
+import Radio from "../components/Radio/Radio";
+import Card from "../components/Card/Card";
+import Progress from "../components/Progress/Progress";
+import ControlledProgress from "../components/Progress/demos/ControlledProgress";
+import Table from "../components/Table/Table";
+import List from "../components/List/List";
+import Menu from "../components/Menu/Menu";
 
 export const data = [
   {
@@ -58,7 +58,7 @@ export const data = [
   },
 ];
 
-export default function Components() {
+export function Components() {
   const [progressValue, setProgressValue] = React.useState(2);
 
   React.useEffect(() => {

@@ -1,7 +1,5 @@
 import React from "react";
 
-const Modules = () => {
+export const Modules = () => {
   return <div className={"Modules"}></div>;
 };
-
-export default Modules;

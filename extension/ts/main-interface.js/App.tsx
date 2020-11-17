@@ -1,22 +1,36 @@
 import React from "react";
-import Components from "./components/pages/Components";
-import Demo from "./components/pages/Demo";
-import Transition from "./components/pages/Transition";
 import "./styles.scss";
 import { Switch, Route } from "react-router-dom";
+import { observer } from "mobx-react";
+import { Home } from "./routes/Home";
+import { Translate } from "./routes/Translate";
+import { Components } from "./routes/Components";
+import { Transition } from "./routes/Transition";
 
-export const App = () => {
-  return (
-    <Switch>
-      <Route exact path="/components">
-        <Components />
-      </Route>
-      <Route path="/">
-        <Demo />
-      </Route>
-      <Route exact path="/transition">
-        <Transition />
-      </Route>
-    </Switch>
-  );
-};
+@observer
+export class App extends React.Component<{}, {}> {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div className={"BergamotApp"}>
+        <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
+          <Route exact path="/translate">
+            <Translate />
+          </Route>
+          <Route exact path="/components">
+            <Components />
+          </Route>
+          <Route exact path="/transition">
+            <Transition />
+          </Route>
+        </Switch>
+      </div>
+    );
+  }
+}

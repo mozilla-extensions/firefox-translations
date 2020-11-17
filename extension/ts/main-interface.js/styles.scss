@@ -60,10 +60,13 @@
 @import "./components/Card/_Card.scss";
 @import "./components/Progress/_Progress.scss";
 @import "./components/List/List.scss";
-@import "./components/pages/_Demo.scss";
 @import "./components/LanguageSwitcher/_LanguageSwitcher.scss";
 @import "./components/Header/_Header.scss";
 @import "./components/Icon/_Icon.scss";
 @import "./components/QualityEstimationContainer/_QualityEstimationContainer.scss";
 @import "./components/InputBox/_InputBox.scss";
 @import "./components/Menu/_Menu.scss";
+
+@import "./routes/Home.scss";
+@import "./routes/Translate.scss";
+@import "./App.scss";
