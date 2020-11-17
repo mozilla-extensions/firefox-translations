@@ -73,6 +73,12 @@ export class TranslationChild {
       return;
     }
 
+    this.documentTranslationState.translationStatus =
+      TranslationStatus.DETECTING_LANGUAGE;
+    this.extensionState.upsertDocumentTranslationState(
+      this.documentTranslationState,
+    );
+
     // Grab a 60k sample of text from the page.
     // (The CLD2 library used by the language detector is capable of
     // analyzing raw HTML. Unfortunately, that takes much more memory,
@@ -140,6 +146,13 @@ export class TranslationChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
+    this.documentTranslationState.targetLanguage = aTo;
+    this.documentTranslationState.translationStatus =
+      TranslationStatus.TRANSLATING;
+    this.extensionState.upsertDocumentTranslationState(
+      this.documentTranslationState,
+    );
+
     let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
     this.contentWindow.translationDocument = translationDocument;
@@ -161,6 +174,11 @@ export class TranslationChild {
       };
 
       translationDocument.showTranslation();
+      this.documentTranslationState.translationStatus =
+        TranslationStatus.TRANSLATED;
+      this.extensionState.upsertDocumentTranslationState(
+        this.documentTranslationState,
+      );
       return result;
     } catch (ex) {
       console.error("doTranslation error", ex);
@@ -169,6 +187,10 @@ export class TranslationChild {
       if (ex == "unavailable") {
         result.unavailable = true;
       }
+      this.documentTranslationState.translationStatus = TranslationStatus.ERROR;
+      this.extensionState.upsertDocumentTranslationState(
+        this.documentTranslationState,
+      );
     }
 
     return result;

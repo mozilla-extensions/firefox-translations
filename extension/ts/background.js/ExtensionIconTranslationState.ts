@@ -3,6 +3,7 @@ import { browser } from "webextension-polyfill-ts";
 import { ExtensionState } from "../shared-resources/models/ExtensionState";
 import { ModelInstanceData, onSnapshot } from "mobx-keystone";
 import { DocumentTranslationState } from "../shared-resources/models/DocumentTranslationState";
+import { TranslationStatus } from "../shared-resources/models/BaseTranslationState";
 
 export class ExtensionIconTranslationState {
   private extensionState: ExtensionState;
@@ -54,32 +55,70 @@ export class ExtensionIconTranslationState {
             path: "icons/extension-icon.48x48.png",
             tabId,
           });
-          dynamicActionIcon.stopLoadingAnimation(tabId);
-          if (dts.detectedLanguageResults) {
-            dynamicActionIcon.drawBadge(
-              {
-                text: dts.detectedLanguageResults.language,
-                textColor: "#000000",
-                backgroundColor: "#ffffffAA",
-              },
-              tabId,
-            );
+
+          switch (dts.translationStatus) {
+            case TranslationStatus.DETECTING_LANGUAGE:
+              dynamicActionIcon.stopLoadingIndication(tabId);
+              dynamicActionIcon.drawBadge(
+                {
+                  text: "",
+                  textColor: "#000000",
+                  backgroundColor: "#ffffffAA",
+                },
+                tabId,
+              );
+              break;
+            case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
+              dynamicActionIcon.stopLoadingIndication(tabId);
+              if (dts.detectedLanguageResults) {
+                dynamicActionIcon.drawBadge(
+                  {
+                    text: "??",
+                    textColor: "#000000",
+                    backgroundColor: "#ffffffAA",
+                  },
+                  tabId,
+                );
+              }
+              break;
+            case TranslationStatus.OFFER:
+              await dynamicActionIcon.stopLoadingIndication(tabId);
+              if (dts.detectedLanguageResults) {
+                dynamicActionIcon.drawBadge(
+                  {
+                    text: dts.detectedLanguageResults.language,
+                    textColor: "#000000",
+                    backgroundColor: "#ffffffAA",
+                  },
+                  tabId,
+                );
+              }
+              break;
+            case TranslationStatus.TRANSLATING:
+              dynamicActionIcon.setBadge(
+                {
+                  text: dts.detectedLanguageResults.language,
+                  textColor: "#000000",
+                  backgroundColor: "#ffffffAA",
+                },
+                tabId,
+              );
+              dynamicActionIcon.startLoadingIndication(tabId);
+              break;
+            case TranslationStatus.TRANSLATED:
+              await dynamicActionIcon.stopLoadingIndication(tabId);
+              dynamicActionIcon.drawBadge(
+                {
+                  text: dts.targetLanguage,
+                  textColor: "#ffffff",
+                  backgroundColor: "#000000AA",
+                },
+                tabId,
+              );
+              break;
+            case TranslationStatus.ERROR:
+              break;
           }
-
-          // TODO:
-          /*
-        dynamicActionIcon.startLoadingAnimation(tabId);
-
-        dynamicActionIcon.stopLoadingAnimation(tabId);
-        dynamicActionIcon.drawBadge(
-          {
-            text: "..",
-            textColor: "#ffffff",
-            backgroundColor: "#000000AA",
-          },
-          tabId,
-        );
-        */
         }
 
         // TODO: check previousDocumentTranslationStates for those that had something and now should be inactive

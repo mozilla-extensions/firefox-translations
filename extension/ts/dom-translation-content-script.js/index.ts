@@ -34,7 +34,7 @@ const init = async () => {
   );
   const stateAfterCheckForTranslation = await translationChild.checkForTranslation();
   console.debug({ stateAfterCheckForTranslation });
-  const translationResult = await translationChild.doTranslation("foo", "bar");
+  const translationResult = await translationChild.doTranslation("es", "en");
   console.debug({ translationResult });
 };
 // noinspection JSIgnoredPromiseFromCall

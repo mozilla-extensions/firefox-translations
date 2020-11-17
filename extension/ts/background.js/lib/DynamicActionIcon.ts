@@ -6,6 +6,7 @@ import SetBadgeTextColorDetailsType = BrowserAction.SetBadgeTextColorDetailsType
 import SetBadgeBackgroundColorDetailsType = BrowserAction.SetBadgeBackgroundColorDetailsType;
 import SetBadgeTextDetailsType = BrowserAction.SetBadgeTextDetailsType;
 import ColorValue = BrowserAction.ColorValue;
+import { isChrome } from "./isChrome";
 
 const roundRect = (ctx, x, y, w, h, r) => {
   if (w < 2 * r) r = w / 2;
@@ -44,7 +45,7 @@ const drawBadge = (ctx, text, textColor, badgeBackgroundColor) => {
 export class DynamicActionIcon {
   private tabId: number;
   private ctx;
-  private actionApi;
+  private actionApi: BrowserAction.Static;
   private iconImg;
   private width: number;
   private height: number;
@@ -79,7 +80,7 @@ export class DynamicActionIcon {
     this.ctx.restore();
   }
 
-  public drawBadge(
+  public setBadge(
     opts: { text: string; textColor: string; backgroundColor: string },
     tabId,
   ) {
@@ -90,9 +91,17 @@ export class DynamicActionIcon {
     this.draw(tabId);
   }
 
+  public drawBadge(
+    opts: { text: string; textColor: string; backgroundColor: string },
+    tabId,
+  ) {
+    this.setBadge(opts, tabId);
+    this.draw(tabId);
+  }
+
   private draw(tabId) {
     // Don't interrupt loading animation
-    if (!!this.loadingAnimationIntervalId) {
+    if (!!this.loadingIndicationIntervalId) {
       return;
     }
     const { badgeText, badgeTextColor, badgeBackgroundColor } = this;
@@ -148,18 +157,63 @@ export class DynamicActionIcon {
     this.draw(tabId);
   }
 
-  private loadingAnimationIntervalId: number;
-  startLoadingAnimation(tabId) {
+  private loadingIndicationIntervalId: number;
+  startLoadingIndication(tabId) {
     // Don't start if already ongoing
-    if (!!this.loadingAnimationIntervalId) {
+    if (!!this.loadingIndicationIntervalId) {
       return;
     }
-    const { ctx, rotationCenterX, rotationCenterY, width, height } = this;
+    const start = Date.now();
+    const loadingIndicatorTexts = "▉▊▋▌▍▎▏".split("").reverse();
+    const statesPerDuration = loadingIndicatorTexts.length;
+    const duration = 3000;
+    this.loadingIndicationIntervalId = (setInterval(async () => {
+      const durationFraction = ((Date.now() - start) / duration) % 1;
+      const loadingIndicationTick = Math.floor(
+        durationFraction * statesPerDuration,
+      );
+      const badgeText = loadingIndicatorTexts[loadingIndicationTick];
+      if (!isChrome()) {
+        await this.actionApi.setBadgeTextColor({
+          color: "#ffffff",
+          tabId,
+        });
+      }
+      await this.actionApi.setBadgeBackgroundColor({
+        color: "#B8CD10FF",
+        tabId,
+      });
+      await this.actionApi.setBadgeText({
+        text: badgeText,
+        tabId,
+      });
+    }, 1000 / 10) as unknown) as number;
+  }
+
+  async stopLoadingIndication(tabId) {
+    if (!!this.loadingIndicationIntervalId) {
+      clearInterval(this.loadingIndicationIntervalId);
+      delete this.loadingIndicationIntervalId;
+      await this.actionApi.setBadgeText({
+        text: "",
+        tabId,
+      });
+    }
+  }
+
+  /*
+  private rotationIntervalId: number;
+  startRotation(tabId) {
+    // Don't start if already ongoing
+    if (!!this.rotationIntervalId) {
+      return;
+    }
+    const { ctx, badgeText, badgeTextColor, badgeBackgroundColor, rotationCenterX, rotationCenterY, width, height } = this;
     const start = Date.now();
     const lines = 16;
     const cW = width;
     const cH = height;
-    this.loadingAnimationIntervalId = (setInterval(async () => {
+    this.rotationIntervalId = (setInterval(async () => {
       const rotation =
         Math.floor(((Date.now() - start) / 1000) * lines) / lines;
       ctx.save();
@@ -170,7 +224,12 @@ export class DynamicActionIcon {
       ctx.translate(-rotationCenterX, -rotationCenterY);
       ctx.drawImage(this.iconImg, 0, 0);
       const imageData = ctx.getImageData(0, 0, 48, 48);
-      await crossBrowser.browserAction.setIcon({
+      ctx.rotate(-Math.PI * 2 * rotation);
+      if (badgeText) {
+        drawBadge(ctx, badgeText, badgeTextColor, badgeBackgroundColor);
+      }
+      ctx.rotate(Math.PI * 2 * rotation);
+      await this.actionApi.setIcon({
         imageData: imageData,
         tabId,
       });
@@ -178,11 +237,12 @@ export class DynamicActionIcon {
     }, 1000 / 15) as unknown) as number;
   }
 
-  stopLoadingAnimation(tabId) {
-    if (!!this.loadingAnimationIntervalId) {
-      clearInterval(this.loadingAnimationIntervalId);
-      delete this.loadingAnimationIntervalId;
+  stopRotation(tabId) {
+    if (!!this.rotationIntervalId) {
+      clearInterval(this.rotationIntervalId);
+      delete this.rotationIntervalId;
       this.draw(tabId);
     }
   }
+  */
 }
