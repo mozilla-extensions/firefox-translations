@@ -18,7 +18,7 @@ const defaultConfig = {
     overwriteDest: true,
   },
   run: {
-    browserConsole: true,
+    browserConsole: false,
   },
 };
 

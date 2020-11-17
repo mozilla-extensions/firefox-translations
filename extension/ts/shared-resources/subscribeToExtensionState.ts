@@ -38,7 +38,7 @@ class MobxKeystoneProxy {
   constructor(msgListeners) {
     this.msgListeners = msgListeners;
 
-    console.debug("MobxKeystoneProxy: Connecting to the background script");
+    // console.debug("MobxKeystoneProxy: Connecting to the background script");
     this.backgroundContextPort = browser.runtime.connect(browser.runtime.id, {
       name: "port-from-mobx-keystone-proxy",
     });
@@ -49,9 +49,7 @@ class MobxKeystoneProxy {
     ) => {
       if (m.serializedActionCallToReplicate) {
         const { serializedActionCallToReplicate } = m;
-        console.log("MobxKeystoneProxy received applyActionResult", {
-          serializedActionCallToReplicate,
-        });
+        // console.log("MobxKeystoneProxy received applyActionResult", {serializedActionCallToReplicate});
         this.msgListeners.forEach(listener =>
           listener(serializedActionCallToReplicate!),
         );
@@ -77,9 +75,7 @@ class MobxKeystoneProxy {
           if (m.requestId !== requestId) {
             return;
           }
-          console.log("MobxKeystoneProxy received initialState", {
-            initialState,
-          });
+          // console.log("MobxKeystoneProxy received initialState", {initialState});
           this.backgroundContextPort.onMessage.removeListener(
             resultsMessageListener,
           );
@@ -108,7 +104,7 @@ class MobxKeystoneProxy {
   async actionCall(actionCall: SerializedActionCall): Promise<any> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
-      console.debug("actionCall via content script mobx keystone proxy", {});
+      // console.debug("actionCall via content script mobx keystone proxy", {});
       this.backgroundContextPort.postMessage({
         actionCall,
         requestId,

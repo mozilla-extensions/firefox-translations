@@ -24,7 +24,7 @@ const init = async () => {
   const frameInfo: FrameInfo = await contentScriptFrameInfo.getCurrentFrameInfo();
 
   const extensionState = await subscribeToExtensionState();
-  console.log({ extensionState });
+  // console.log({ extensionState });
 
   const translationChild = new TranslationChild(
     frameInfo,
@@ -32,8 +32,7 @@ const init = async () => {
     window,
     extensionState,
   );
-  const stateAfterCheckForTranslation = await translationChild.checkForTranslation();
-  console.debug({ stateAfterCheckForTranslation });
+  await translationChild.checkForTranslation();
   const translationResult = await translationChild.doTranslation("es", "en");
   console.debug({ translationResult });
 };

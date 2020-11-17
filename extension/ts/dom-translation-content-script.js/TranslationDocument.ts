@@ -45,10 +45,10 @@ export class TranslationDocument {
     // contains useful content for translation, and therefore
     // must be included in the translation process.
     const nodeList = getTranslationNodes(document.body);
-    console.log({ nodeList });
+    // console.debug({ nodeList });
 
     const length = nodeList.length;
-    console.log({ length });
+    // console.debug({ length });
 
     for (let i = 0; i < length; i++) {
       let node = nodeList.item(i);

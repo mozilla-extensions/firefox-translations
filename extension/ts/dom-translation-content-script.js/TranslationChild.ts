@@ -135,6 +135,8 @@ export class TranslationChild {
     this.extensionState.upsertDocumentTranslationState(
       this.documentTranslationState,
     );
+
+    return;
   }
 
   async doTranslation(aFrom, aTo) {
@@ -164,7 +166,6 @@ export class TranslationChild {
     try {
       console.info("About to translate web page document", { aFrom, aTo });
       let translateResult = await translator.translate();
-      console.debug({ translateResult });
 
       result = {
         characterCount: translateResult.characterCount,
@@ -173,15 +174,15 @@ export class TranslationChild {
         success: true,
       };
 
+      console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
       this.documentTranslationState.translationStatus =
         TranslationStatus.TRANSLATED;
       this.extensionState.upsertDocumentTranslationState(
         this.documentTranslationState,
       );
-      return result;
     } catch (ex) {
-      console.error("doTranslation error", ex);
+      console.error("Translation error", ex);
       translationDocument.translationError = true;
       result = { success: false };
       if (ex == "unavailable") {
