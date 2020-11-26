@@ -25,7 +25,6 @@ const init = async () => {
 
   const extensionState = await subscribeToExtensionState();
   // console.log({ extensionState });
-
   const translationChild = new TranslationChild(
     frameInfo,
     document,

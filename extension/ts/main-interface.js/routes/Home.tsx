@@ -6,7 +6,7 @@ import {
   BsChevronDown,
 } from "react-icons/bs";
 import { BiChevronRight, BiAnalyse, BiBox, BiSlider } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
 import { browser } from "webextension-polyfill-ts";
 import Switch from "../components/Switch/Switch";
 import Header from "../components/Header/Header";
@@ -16,79 +16,88 @@ import List from "../components/List/List";
 import { config } from "../../config";
 import Button from "../components/Button/Button";
 
-export const Home = () => {
-  const [language, setLanguage] = React.useState("Czech");
-  const [status, setStatus] = React.useState("origin");
+interface HomeState {
+  language: string;
+}
 
-  const data = [
-    {
-      text: "Translate own text",
-      icon: <BiAnalyse />,
-      action: <BiChevronRight />,
-      route: "translate",
-    },
-    {
-      text: "Module Management",
-      icon: <BiBox />,
-      action: <BiChevronRight />,
-    },
-    {
-      text: "Options",
-      icon: <BiSlider />,
-      action: <BiChevronRight />,
-    },
-    /*
-    {
-      text: (
-        <>
-          Always{" "}
-          <Menu setSelection={setLanguage}>
-            <span className={"LanguageSwitcher__select"}>
-              <BsChevronDown />
-            </span>
-          </Menu>{" "}
-          translate ${language}
-        </>
-      ),
-      icon: <BsLightningFill />,
-      action: <Switch />,
-    },
-    */
-    {
-      text: "Show quality estimation",
-      icon: <BsLightningFill />,
-      action: <Switch />,
-    },
-  ];
+export class Home extends React.Component<{}, HomeState> {
+  state = {
+    language: "foo",
+  };
+  setLanguage(language) {
+    this.setState({ language });
+  }
+  render() {
+    const { language } = this.state;
+    const data = [
+      {
+        text: "Translate own text",
+        icon: <BiAnalyse />,
+        action: <BiChevronRight />,
+        route: "translate",
+      },
+      {
+        text: "Module Management",
+        icon: <BiBox />,
+        action: <BiChevronRight />,
+      },
+      {
+        text: "Options",
+        icon: <BiSlider />,
+        action: <BiChevronRight />,
+      },
+      /*
+      {
+        text: (
+          <>
+            Always{" "}
+            <Menu setSelection={this.setLanguage}>
+              <span className={"LanguageSwitcher__select"}>
+                <BsChevronDown />
+              </span>
+            </Menu>{" "}
+            translate ${language}
+          </>
+        ),
+        icon: <BsLightningFill />,
+        action: <Switch />,
+      },
+      */
+      {
+        text: "Show quality estimation",
+        icon: <BsLightningFill />,
+        action: <Switch />,
+      },
+    ];
 
-  const items = data.map(i => {
-    if (i.route)
-      return (
-        <Link to={`${i.route}`}>
+    const items = data.map(i => {
+      if (i.route)
+        return (
+          <Link to={`${i.route}`}>
+            <List.Item
+              key={Math.random()}
+              text={i.text}
+              icon={i.icon}
+              action={i.action}
+            />
+          </Link>
+        );
+      else
+        return (
           <List.Item
             key={Math.random()}
             text={i.text}
             icon={i.icon}
             action={i.action}
           />
-        </Link>
-      );
-    else
-      return (
-        <List.Item
-          key={Math.random()}
-          text={i.text}
-          icon={i.icon}
-          action={i.action}
-        />
-      );
-  });
+        );
+    });
 
-  return (
-    <div className={"Home w-full"}>
-      <div className="flex flex-col">
-        <Header />
-        {/*
+    return (
+      <div className={"Home w-full"}>
+        <div className="flex flex-col">
+          <Header />
+          {/*
         <div className={"BergamotApp__header"}>
           <TextField
             allowClear
@@ -98,33 +107,34 @@ export const Home = () => {
           />
         </div>
         */}
-        <div className={"BergamotApp__languageSwitcher"}>
-          <LanguageSwitcher onSwitch={setLanguage} />
-        </div>
-        <List style={{ cursor: "pointer" }} borderless>
-          {items}
-        </List>
-        <div className={"BergamotApp__footer mt-4"}>
-          <span>
-            <a
-              className=""
-              target="_blank"
-              href={browser.runtime.getURL(`get-started/get-started.html`)}
-            >
-              About
-            </a>
-          </span>
-          <span>
-            <a
-              className="inline ml-1.5 underline hover:text-grey-60"
-              target="_blank"
-              href={config.feedbackSurveyUrl}
-            >
-              Feedback
-            </a>
-          </span>
+          <div className={"BergamotApp__languageSwitcher"}>
+            <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
+          </div>
+          <List style={{ cursor: "pointer" }} borderless>
+            {items}
+          </List>
+          <div className={"BergamotApp__footer mt-4"}>
+            <span>
+              <a
+                className=""
+                target="_blank"
+                href={browser.runtime.getURL(`get-started/get-started.html`)}
+              >
+                About
+              </a>
+            </span>
+            <span>
+              <a
+                className="inline ml-1.5 underline hover:text-grey-60"
+                target="_blank"
+                href={config.feedbackSurveyUrl}
+              >
+                Feedback
+              </a>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}

@@ -26,6 +26,7 @@ const plugins = [
   new Dotenv({
     path: dotEnvPath,
   }),
+  // Copy non-webpack-monitored files under "src" to the build directory
   new CopyPlugin({
     patterns: [{ from: "src", to: destPath }],
   }),
