@@ -1,7 +1,10 @@
 /* eslint-env node */
 const path = require("path");
 
-const examplePageToTranslate = "https://es.wikipedia.org";
+const examplePagesToTranslate = [
+  "https://es.wikipedia.org",
+  "https://www.mozilla.org/es-ES/",
+];
 
 const targetBrowser = process.env.TARGET_BROWSER || "firefox";
 
@@ -29,7 +32,7 @@ if (targetBrowser === "firefox") {
   defaultConfig.run.startUrl = [
     "about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt",
     "http://localhost:8181/",
-    examplePageToTranslate,
+    ...examplePagesToTranslate,
     "about:debugging#/runtime/this-firefox",
   ];
   defaultConfig.run.pref = [
@@ -47,7 +50,7 @@ if (targetBrowser === "chromium") {
   defaultConfig.run.startUrl = [
     // "chrome://extensions", // Not available until https://github.com/mozilla/web-ext/issues/1979 is resolved
     "http://localhost:8182/",
-    examplePageToTranslate,
+    ...examplePagesToTranslate,
   ];
   defaultConfig.filename = `{name}-{version}-chrome.zip`;
 }
