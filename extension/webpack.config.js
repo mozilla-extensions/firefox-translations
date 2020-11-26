@@ -52,6 +52,7 @@ module.exports = {
     "get-started": "./ts/get-started.js/index.tsx",
     "main-interface": "./ts/main-interface.js/index.tsx",
     "options-ui": "./ts/options-ui.js/index.tsx",
+    tests: "./ts/tests.js/index.ts",
   },
   output: {
     path: destPath,
