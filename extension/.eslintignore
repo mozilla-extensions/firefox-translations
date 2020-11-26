@@ -1,8 +1,7 @@
 # do not lint/format generated artifacts
 dist/
 build/
-test/build/
-test/results/coverage/
+test/unit/build/
 stats.json
 yarn-error.log
 *.map
