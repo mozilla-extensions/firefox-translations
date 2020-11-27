@@ -6,8 +6,8 @@ import {
   BsChevronDown,
 } from "react-icons/bs";
 import { BiChevronRight, BiAnalyse, BiBox, BiSlider } from "react-icons/bi";
-import { Link, Route } from "react-router-dom";
-import { browser } from "webextension-polyfill-ts";
+import { Link } from "react-router-dom";
+import { browser, Tabs } from "webextension-polyfill-ts";
 import Switch from "../components/Switch/Switch";
 import Header from "../components/Header/Header";
 import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
@@ -15,12 +15,34 @@ import Menu from "../components/Menu/Menu";
 import List from "../components/List/List";
 import { config } from "../../config";
 import Button from "../components/Button/Button";
+import { inject, observer } from "mobx-react";
+import { ExtensionState } from "../../shared-resources/models/ExtensionState";
+import Tab = Tabs.Tab;
+import {
+  getSnapshot,
+  ModelInstanceData,
+  SnapshotOutOfModel,
+} from "mobx-keystone";
+import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
+
+interface HomeProps {
+  extensionState: ExtensionState;
+  currentTab: Tab;
+}
 
 interface HomeState {
   language: string;
 }
 
-export class Home extends React.Component<{}, HomeState> {
+@inject("extensionState")
+@inject("currentTab")
+@observer
+export class Home extends React.Component<HomeProps, HomeState> {
+  // Workaround for "Object is possibly undefined". Source: https://github.com/mobxjs/mobx-react/issues/256#issuecomment-500247548s
+  public static defaultProps = {
+    extensionState: (null as unknown) as ExtensionState,
+    currentTab: (null as unknown) as Tab,
+  };
   state = {
     language: "foo",
   };
@@ -29,6 +51,7 @@ export class Home extends React.Component<{}, HomeState> {
   }
   render() {
     const { language } = this.state;
+    const { extensionState, currentTab } = this.props;
     const data = [
       {
         text: "Translate own text",
@@ -93,6 +116,22 @@ export class Home extends React.Component<{}, HomeState> {
         );
     });
 
+    // Extract the document translation states that relate to the currently opened tab
+    const documentTranslationStates = extensionState.documentTranslationStates;
+    const currentFrameDocumentTranslationStates = [];
+    documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (documentTranslationState.tabId === currentTab.id) {
+          currentFrameDocumentTranslationStates.push(
+            getSnapshot(documentTranslationState),
+          );
+        }
+      },
+    );
+    const topFrameDocumentTranslationState: SnapshotOutOfModel<DocumentTranslationState> = currentFrameDocumentTranslationStates.find(
+      dts => dts.frameId === 0,
+    );
+
     return (
       <div className={"Home w-full"}>
         <div className="flex flex-col">
@@ -109,6 +148,24 @@ export class Home extends React.Component<{}, HomeState> {
         */}
           <div className={"BergamotApp__languageSwitcher"}>
             <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
+          </div>
+          <div className={"flex flex-row"}>
+            <span className="inline">
+              This tab has {currentFrameDocumentTranslationStates.length} frames
+              with translation state
+            </span>
+          </div>
+          <div className={"flex flex-row"}>
+            <span className="inline">
+              Language:{" "}
+              {JSON.stringify(
+                topFrameDocumentTranslationState.detectedLanguageResults,
+              )}
+              Translation status:{" "}
+              {JSON.stringify(
+                topFrameDocumentTranslationState.translationStatus,
+              )}
+            </span>
           </div>
           <List style={{ cursor: "pointer" }} borderless>
             {items}
