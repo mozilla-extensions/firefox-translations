@@ -168,8 +168,8 @@ class ExtensionGlue {
         // console.debug("Message from port-from-content-script-frame-info:", {m});
         const { requestId } = m;
         const frameInfo: FrameInfo = {
-          windowId: senderPort.sender.tab.windowId,
-          tabId: senderPort.sender.tab.id,
+          windowId: senderPort.sender.tab?.windowId,
+          tabId: senderPort.sender.tab?.id,
           frameId: senderPort.sender.frameId,
         };
         try {

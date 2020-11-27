@@ -113,18 +113,18 @@
   "license": "MPL-2.0",
   "lint-staged": {
     "*.{jsm,js,json}": [
-      "eslint --ext jsm,js,json",
       "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "eslint --ext jsm,js,json",
       "git add"
     ],
     "*.{ts,tsx}": [
-      "tslint -t stylish",
       "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "tslint -t stylish",
       "git add"
     ],
     "*.{md}": [
-      "doctoc --title '**Contents**'",
       "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "doctoc --title '**Contents**'",
       "git add"
     ],
     "*.{css,scss,json}": [

@@ -149,24 +149,28 @@ export class Home extends React.Component<HomeProps, HomeState> {
           <div className={"BergamotApp__languageSwitcher"}>
             <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
           </div>
-          <div className={"flex flex-row"}>
-            <span className="inline">
-              This tab has {currentFrameDocumentTranslationStates.length} frames
-              with translation state
-            </span>
-          </div>
-          <div className={"flex flex-row"}>
-            <span className="inline">
-              Language:{" "}
-              {JSON.stringify(
-                topFrameDocumentTranslationState.detectedLanguageResults,
-              )}
-              Translation status:{" "}
-              {JSON.stringify(
-                topFrameDocumentTranslationState.translationStatus,
-              )}
-            </span>
-          </div>
+          {topFrameDocumentTranslationState && (
+            <>
+              <div className={"flex flex-row"}>
+                <span className="inline">
+                  This tab has {currentFrameDocumentTranslationStates.length}{" "}
+                  frames with translation state
+                </span>
+              </div>
+              <div className={"flex flex-row"}>
+                <span className="inline">
+                  Language:{" "}
+                  {JSON.stringify(
+                    topFrameDocumentTranslationState.detectedLanguageResults,
+                  )}
+                  Translation status:{" "}
+                  {JSON.stringify(
+                    topFrameDocumentTranslationState.translationStatus,
+                  )}
+                </span>
+              </div>
+            </>
+          )}
           <List style={{ cursor: "pointer" }} borderless>
             {items}
           </List>
