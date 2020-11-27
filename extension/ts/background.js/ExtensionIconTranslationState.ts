@@ -98,7 +98,7 @@ export class ExtensionIconTranslationState {
                 tabId,
               );
               break;
-            case TranslationStatus.TRANSLATION_NOT_PREFERRED:
+            case TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD:
               await dynamicActionIcon.stopLoadingIndication(tabId);
               if (dts.detectedLanguageResults) {
                 dynamicActionIcon.drawBadge(

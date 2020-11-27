@@ -1,9 +1,11 @@
 import * as React from "react";
-import { BsGear } from "react-icons/bs";
+import { BsBoxArrowUpRight, BsLightningFill } from "react-icons/bs";
 import Header from "../components/Header/Header";
 import { Translator } from "../simulator/Translator";
 import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
 import TextField from "../components/TextField/TextField";
+import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
+import Switch from "../components/Switch/Switch";
 
 const translator = new Translator("English", "Czech");
 translator.setDelay(7000);
@@ -28,9 +30,17 @@ export const Translate = () => {
     setText(e.target.value);
   };
 
+  const actionItems: ActionItem[] = [
+    {
+      text: "Show quality estimation",
+      icon: <BsLightningFill />,
+      action: <Switch />,
+    },
+  ];
+
   return (
     <div className={"Translate w-full"}>
-      <Header allowBack extra={<BsGear />} />
+      <Header allowBack extra={<BsBoxArrowUpRight />} />
       <div className={"BergamotApp__languageSwitcher"}>
         <LanguageSwitcher onSwitch={setLanguage} />
       </div>
@@ -44,6 +54,7 @@ export const Translate = () => {
           <TextField textArea value={translatedText} processing={loading} />
         </div>
       </div>
+      <ActionItems actionItems={actionItems} />
     </div>
   );
 };

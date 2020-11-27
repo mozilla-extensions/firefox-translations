@@ -1,29 +1,24 @@
 import * as React from "react";
 import {
   BsLightningFill,
-  BsArrowRepeat,
-  BsPlus,
-  BsChevronDown,
+  BsLayersHalf,
+  BsGear,
+  BsInfoCircleFill,
 } from "react-icons/bs";
-import { BiChevronRight, BiAnalyse, BiBox, BiSlider } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { BiChevronRight, BiAnalyse } from "react-icons/bi";
 import { browser, Tabs } from "webextension-polyfill-ts";
 import Switch from "../components/Switch/Switch";
 import Header from "../components/Header/Header";
 import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
-import Menu from "../components/Menu/Menu";
-import List from "../components/List/List";
 import { config } from "../../config";
 import Button from "../components/Button/Button";
 import { inject, observer } from "mobx-react";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import Tab = Tabs.Tab;
-import {
-  getSnapshot,
-  ModelInstanceData,
-  SnapshotOutOfModel,
-} from "mobx-keystone";
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
+import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
+import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
+import { DetectedLanguageResults } from "../../shared-resources/bergamot.types";
 
 interface HomeProps {
   extensionState: ExtensionState;
@@ -52,13 +47,104 @@ export class Home extends React.Component<HomeProps, HomeState> {
   render() {
     const { language } = this.state;
     const { extensionState, currentTab } = this.props;
-    const data = [
+
+    // Extract the document translation states that relate to the currently opened tab
+    const documentTranslationStates = extensionState.documentTranslationStates;
+    const currentFrameDocumentTranslationStates = [];
+    documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (documentTranslationState.tabId === currentTab.id) {
+          currentFrameDocumentTranslationStates.push(documentTranslationState);
+        }
+      },
+    );
+    const topFrameDocumentTranslationState: DocumentTranslationState = currentFrameDocumentTranslationStates.find(
+      dts => dts.frameId === 0,
+    ) || {
+      translationStatus: TranslationStatus.UNAVAILABLE,
+      detectedLanguageResults: null,
+    };
+
+    const {
+      translationStatus,
+      detectedLanguageResults,
+    } = topFrameDocumentTranslationState;
+
+    const infoActionItem = (
+      translationStatus: TranslationStatus,
+      detectedLanguageResults: DetectedLanguageResults | null,
+    ) => {
+      let action = <></>;
+      switch (translationStatus) {
+        case TranslationStatus.UNAVAILABLE:
+          break;
+        case TranslationStatus.DETECTING_LANGUAGE:
+          break;
+        case TranslationStatus.LANGUAGE_NOT_DETECTED:
+          break;
+        case TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD:
+          action = <Button type={"primary"} label={"Translate"} />;
+          break;
+        case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
+          break;
+        case TranslationStatus.OFFER:
+          action = <Button type={"primary"} label={"Translate"} />;
+          break;
+        case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
+          action = <Button type={"secondary"} label={"Cancel"} />;
+          break;
+        case TranslationStatus.TRANSLATING:
+          action = <Button type={"secondary"} label={"Cancel"} />;
+          break;
+        case TranslationStatus.TRANSLATED:
+          break;
+        case TranslationStatus.ERROR:
+          action = <Button type={"secondary"} label={"Retry"} />;
+          break;
+      }
+      let text = browser.i18n
+        .getMessage(
+          `translationStatus_${translationStatus}_mainInterfaceMessage`,
+        )
+        .replace("[TARGET_LANG]", "en");
+      if (detectedLanguageResults) {
+        text = text.replace("[SOURCE_LANG]", detectedLanguageResults.language);
+      }
+      return {
+        text,
+        icon: <BsInfoCircleFill />,
+        action,
+      };
+    };
+
+    const actionItems: ActionItem[] = [
+      infoActionItem(translationStatus, detectedLanguageResults),
+      ...([TranslationStatus.TRANSLATED].includes(translationStatus)
+        ? [
+            {
+              text: "Show original",
+              icon: <BsLayersHalf />,
+              action: <Switch />,
+            },
+            {
+              text: "Show quality estimation",
+              icon: <BsLightningFill />,
+              action: <Switch />,
+            },
+            {
+              text: <>Always translate {language}</>,
+              icon: <BsGear />,
+              action: <Switch />,
+            },
+          ]
+        : []),
       {
         text: "Translate own text",
         icon: <BiAnalyse />,
         action: <BiChevronRight />,
         route: "translate",
       },
+      /*
       {
         text: "Module Management",
         icon: <BiBox />,
@@ -69,73 +155,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
         icon: <BiSlider />,
         action: <BiChevronRight />,
       },
-      /*
-      {
-        text: (
-          <>
-            Always{" "}
-            <Menu setSelection={this.setLanguage}>
-              <span className={"LanguageSwitcher__select"}>
-                <BsChevronDown />
-              </span>
-            </Menu>{" "}
-            translate ${language}
-          </>
-        ),
-        icon: <BsLightningFill />,
-        action: <Switch />,
-      },
       */
-      {
-        text: "Show quality estimation",
-        icon: <BsLightningFill />,
-        action: <Switch />,
-      },
     ];
-
-    const items = data.map(i => {
-      if (i.route)
-        return (
-          <Link to={`${i.route}`}>
-            <List.Item
-              key={Math.random()}
-              text={i.text}
-              icon={i.icon}
-              action={i.action}
-            />
-          </Link>
-        );
-      else
-        return (
-          <List.Item
-            key={Math.random()}
-            text={i.text}
-            icon={i.icon}
-            action={i.action}
-          />
-        );
-    });
-
-    // Extract the document translation states that relate to the currently opened tab
-    const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentFrameDocumentTranslationStates = [];
-    documentTranslationStates.forEach(
-      (documentTranslationState: DocumentTranslationState) => {
-        if (documentTranslationState.tabId === currentTab.id) {
-          currentFrameDocumentTranslationStates.push(
-            getSnapshot(documentTranslationState),
-          );
-        }
-      },
-    );
-    const topFrameDocumentTranslationState: SnapshotOutOfModel<DocumentTranslationState> = currentFrameDocumentTranslationStates.find(
-      dts => dts.frameId === 0,
-    );
 
     return (
       <div className={"Home w-full"}>
         <div className="flex flex-col">
           <Header />
+          {/* extra={<BsGear />}*/}
           {/*
         <div className={"BergamotApp__header"}>
           <TextField
@@ -146,34 +173,22 @@ export class Home extends React.Component<HomeProps, HomeState> {
           />
         </div>
         */}
-          <div className={"BergamotApp__languageSwitcher"}>
-            <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
-          </div>
-          {topFrameDocumentTranslationState && (
+          {[
+            TranslationStatus.LANGUAGE_NOT_DETECTED,
+            TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
+            TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED,
+            TranslationStatus.OFFER,
+            TranslationStatus.DOWNLOADING_TRANSLATION_MODEL,
+            TranslationStatus.TRANSLATING,
+            TranslationStatus.TRANSLATED,
+          ].includes(translationStatus) && (
             <>
-              <div className={"flex flex-row"}>
-                <span className="inline">
-                  This tab has {currentFrameDocumentTranslationStates.length}{" "}
-                  frames with translation state
-                </span>
-              </div>
-              <div className={"flex flex-row"}>
-                <span className="inline">
-                  Language:{" "}
-                  {JSON.stringify(
-                    topFrameDocumentTranslationState.detectedLanguageResults,
-                  )}
-                  Translation status:{" "}
-                  {JSON.stringify(
-                    topFrameDocumentTranslationState.translationStatus,
-                  )}
-                </span>
+              <div className={"BergamotApp__languageSwitcher"}>
+                <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
               </div>
             </>
           )}
-          <List style={{ cursor: "pointer" }} borderless>
-            {items}
-          </List>
+          <ActionItems actionItems={actionItems} />
           <div className={"BergamotApp__footer mt-4"}>
             <span>
               <a
