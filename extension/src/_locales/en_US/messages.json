@@ -50,5 +50,25 @@
   "translationStatus_ERROR_mainInterfaceMessage": {
     "message": "There has been an error while preparing translation or translating this page.",
     "description": "Main interface dropdown message for: Page Translation Error"
+  },
+  "language_iso6391_en": {
+    "message": "English",
+    "description": "Language name of 'en' (ISO 639-1)"
+  },
+  "language_iso6391_de": {
+    "message": "German",
+    "description": "Language name of 'de' (ISO 639-1)"
+  },
+  "language_iso6391_es": {
+    "message": "Spanish",
+    "description": "Language name of 'es' (ISO 639-1)"
+  },
+  "language_iso6391_et": {
+    "message": "Estonian",
+    "description": "Language name of 'et' (ISO 639-1)"
+  },
+  "language_iso6391_cs": {
+    "message": "Czech",
+    "description": "Language name of 'cs' (ISO 639-1)"
   }
 }

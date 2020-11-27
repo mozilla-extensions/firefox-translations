@@ -6,7 +6,7 @@ export interface ActionItem {
   route?: string;
   text: string | ReactNode;
   icon: ReactNode;
-  action: ReactNode;
+  action: ReactNode | false;
 }
 
 export class ActionItems extends React.Component<
@@ -16,18 +16,23 @@ export class ActionItems extends React.Component<
   render() {
     const { actionItems } = this.props;
     return (
-      <List style={{ cursor: "pointer" }} borderless>
-        {actionItems.map(i => {
+      <List borderless>
+        {actionItems.map((i: ActionItem, index) => {
           if (i.route)
             return (
-              <Link key={`item-${i}`} to={`${i.route}`}>
+              <Link
+                key={`item-${index}`}
+                to={`${i.route}`}
+                style={i.action ? { cursor: "pointer" } : {}}
+              >
                 <List.Item text={i.text} icon={i.icon} action={i.action} />
               </Link>
             );
           else
             return (
               <List.Item
-                key={`item-${i}`}
+                style={i.action ? { cursor: "pointer" } : {}}
+                key={`item-${index}`}
                 text={i.text}
                 icon={i.icon}
                 action={i.action}

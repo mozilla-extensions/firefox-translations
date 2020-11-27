@@ -329,7 +329,7 @@ export function Components() {
 
       <h3>Menu</h3>
       <Card title={"Menu"} style={{ width: "100%" }}>
-        <Menu>
+        <Menu items={[]}>
           <Button label={"Button"} />
         </Menu>
       </Card>

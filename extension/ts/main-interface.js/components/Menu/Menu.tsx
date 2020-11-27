@@ -6,45 +6,26 @@ import Icon from "../Icon/Icon";
 
 const Item = MenuItem;
 
-const list = [
-  {
-    value: "English",
-    key: 0,
-  },
-  {
-    value: "Czech",
-    key: 1,
-  },
-  {
-    value: "German",
-    key: 2,
-  },
-  {
-    value: "French",
-    key: 3,
-  },
-];
-
 interface Props {
+  items: { key: string; value: string }[];
   setSelection?: Function;
   children?: React.ReactNode;
   getPopupContainer?: (node: HTMLElement) => Element;
 }
 
-const Menu = ({ setSelection, children }: Props) => {
+const Menu = ({ items, setSelection, children }: Props) => {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = React.useState(false);
 
   console.log(children);
 
-  const items = list.map(i => (
+  const itemElements = items.map(i => (
     <Item
-      key={i.key.toString()}
+      key={i.key}
       onClick={() => {
         setIsActive(false);
-        if (setSelection) setSelection(i.value);
+        if (setSelection) setSelection(i.key);
       }}
-      icon={<Icon icon={<BiDownload />} />}
     >
       {i.value}
     </Item>
@@ -86,7 +67,7 @@ const Menu = ({ setSelection, children }: Props) => {
       {dropdownTrigger}
       {isActive ? (
         <div className={classes} ref={menuRef}>
-          {items}
+          {itemElements}
         </div>
       ) : null}
     </div>

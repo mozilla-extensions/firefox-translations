@@ -24,11 +24,6 @@
     display: flex;
   }
 
-  .target {
-    display: flex;
-    align-items: center;
-  }
-
   &__sourceLanguage {
     cursor: pointer;
     transition: all 0.2s;

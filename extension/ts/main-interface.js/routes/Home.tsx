@@ -19,6 +19,7 @@ import { DocumentTranslationState } from "../../shared-resources/models/Document
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
 import { DetectedLanguageResults } from "../../shared-resources/bergamot.types";
+import { ReactNode } from "react";
 
 interface HomeProps {
   extensionState: ExtensionState;
@@ -26,7 +27,8 @@ interface HomeProps {
 }
 
 interface HomeState {
-  language: string;
+  sourceLanguage: string;
+  targetLanguage: string;
 }
 
 @inject("extensionState")
@@ -39,13 +41,17 @@ export class Home extends React.Component<HomeProps, HomeState> {
     currentTab: (null as unknown) as Tab,
   };
   state = {
-    language: "foo",
+    sourceLanguage: undefined,
+    targetLanguage: undefined,
   };
-  setLanguage(language) {
-    this.setState({ language });
+  async setSourceLanguage(sourceLanguage) {
+    return this.setState({ sourceLanguage });
+  }
+  async setTargetLanguage(targetLanguage) {
+    return this.setState({ targetLanguage });
   }
   render() {
-    const { language } = this.state;
+    const { sourceLanguage, targetLanguage } = this.state;
     const { extensionState, currentTab } = this.props;
 
     // Extract the document translation states that relate to the currently opened tab
@@ -70,11 +76,13 @@ export class Home extends React.Component<HomeProps, HomeState> {
       detectedLanguageResults,
     } = topFrameDocumentTranslationState;
 
+    const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
+
     const infoActionItem = (
       translationStatus: TranslationStatus,
       detectedLanguageResults: DetectedLanguageResults | null,
-    ) => {
-      let action = <></>;
+    ): ActionItem => {
+      let action: ReactNode | false = false;
       switch (translationStatus) {
         case TranslationStatus.UNAVAILABLE:
           break;
@@ -132,7 +140,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
               action: <Switch />,
             },
             {
-              text: <>Always translate {language}</>,
+              text: <>Always translate {sourceLanguage}</>,
               icon: <BsGear />,
               action: <Switch />,
             },
@@ -184,7 +192,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
           ].includes(translationStatus) && (
             <>
               <div className={"BergamotApp__languageSwitcher"}>
-                <LanguageSwitcher onSwitch={this.setLanguage.bind(this)} />
+                <LanguageSwitcher
+                  sourceLanguage={
+                    sourceLanguage || detectedLanguageResults?.language
+                  }
+                  targetLanguage={targetLanguage || browserUiLanguageCode}
+                  onChangeTargetLanguage={this.setTargetLanguage.bind(this)}
+                  onChangeSourceLanguage={this.setSourceLanguage.bind(this)}
+                />
               </div>
             </>
           )}

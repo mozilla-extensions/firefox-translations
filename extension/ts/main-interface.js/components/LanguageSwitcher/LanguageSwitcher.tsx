@@ -4,82 +4,94 @@ import { BsChevronDown } from "react-icons/bs";
 import Menu from "../Menu/Menu";
 import Icon from "../Icon/Icon";
 import { BiTransfer } from "react-icons/bi";
+import { config } from "../../../config";
 
 interface Props {
-  onSwitch: (language: string) => void;
+  sourceLanguage: string;
+  targetLanguage: string;
+  onChangeSourceLanguage: (sourceLanguage: string) => void;
+  onChangeTargetLanguage: (targetLanguage: string) => void;
 }
 
-const languageList = ["Czech", "French", "Spanish"];
-
-const sourceLanguage = "English";
-
-const LanguageSwitcher = ({ onSwitch }: Props) => {
-  const [language, setLanguage] = React.useState("source");
-  const [targetLanguage, setTargetLanaguage] = React.useState("Czech");
-  const [listOpen, setListOpen] = React.useState(false);
-
-  const classes = classNames({
-    LanguageSwitcher: "LanguageSwitcher",
-    [`${language}`]: language,
-  });
-
-  React.useEffect(() => {
-    onSwitch(targetLanguage);
-  }, [targetLanguage]);
-
-  const languages = languageList.map(i => (
-    <option value={i} key={Math.random()}>
-      {i}
-    </option>
-  ));
-
-  const switchLanguage = (e?: React.MouseEvent<HTMLSpanElement>) => {
-    return (language: string) => setLanguage(language);
+export class LanguageSwitcher extends React.Component<Props, {}> {
+  state = {
+    sourceLanguageListOpen: false,
+    targetLanguageListOpen: false,
   };
 
-  const changeTargetLanguage = (language: string) => {
-    setTargetLanaguage(language);
-  };
+  render() {
+    const {
+      sourceLanguage,
+      targetLanguage,
+      onChangeSourceLanguage,
+      onChangeTargetLanguage,
+    } = this.props;
 
-  const changeSwitchLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTargetLanaguage(e.target.value);
-  };
+    const sourceLanguages = [
+      ...new Set(config.supportedLanguagePairs.map(lp => lp[0])),
+    ];
+    const targetLanguages = [
+      ...new Set(config.supportedLanguagePairs.map(lp => lp[1])),
+    ];
 
-  const blurHandler = (e: React.FocusEvent<HTMLSpanElement>) => {
-    setListOpen(false);
-  };
+    const classes = classNames({
+      LanguageSwitcher: "LanguageSwitcher",
+    });
 
-  return (
-    <div className={classes}>
-      <span
-        className={"LanguageSwitcher__sourceLanguage"}
-        onClick={e => switchLanguage(e)("source")}
-      >
-        <span className={"LanguageSwitcher__languageType"}>Source</span>
-        {sourceLanguage}
-      </span>
-      <span className={"LanguageSwitcher__delimiter"}>
-        <Icon
-          style={{ width: 24, height: 24, color: "#30d5c8" }}
-          icon={<BiTransfer />}
-        />
-      </span>
-      <span
-        className={"LanguageSwitcher__targetLanguage"}
-        onClick={e => switchLanguage(e)("target")}
-      >
-        <span className={"LanguageSwitcher__languageType"}>Target</span>
-        <span className={"target"}>
-          {targetLanguage}
-          <Menu setSelection={changeTargetLanguage}>
-            <span className={"LanguageSwitcher__select"}>
-              <BsChevronDown />
-            </span>
-          </Menu>
+    const toLanguageOption = languageCode => ({
+      key: languageCode,
+      value: browser.i18n.getMessage(`language_iso6391_${languageCode}`),
+    });
+    const displayLanguage = (languageCode: string) => {
+      return languageCode
+        ? browser.i18n.getMessage(`language_iso6391_${languageCode}`)
+        : "??";
+    };
+
+    const switchLanguages = () => {
+      onChangeSourceLanguage(targetLanguage);
+      onChangeTargetLanguage(sourceLanguage);
+    };
+
+    return (
+      <div className={classes}>
+        <span className={"LanguageSwitcher__sourceLanguage"}>
+          <span className={"LanguageSwitcher__languageType"}>Source</span>
+          <span className={"flex items-center"}>
+            {displayLanguage(sourceLanguage)}
+            <Menu
+              items={sourceLanguages.map(toLanguageOption)}
+              setSelection={onChangeSourceLanguage}
+            >
+              <span className={"LanguageSwitcher__select"}>
+                <BsChevronDown />
+              </span>
+            </Menu>
+          </span>
         </span>
-      </span>
-    </div>
-  );
-};
+        <span className={"LanguageSwitcher__delimiter"}>
+          <Icon
+            style={{ width: 24, height: 24, color: "#30d5c8" }}
+            icon={<BiTransfer onClick={switchLanguages} />}
+          />
+        </span>
+        <span className={"LanguageSwitcher__targetLanguage"}>
+          <span className={"LanguageSwitcher__languageType"}>Target</span>
+          <span className={"flex items-center"}>
+            {displayLanguage(targetLanguage)}
+            <Menu
+              items={targetLanguages.map(toLanguageOption)}
+              setSelection={onChangeTargetLanguage}
+            >
+              <span className={"LanguageSwitcher__select"}>
+                <BsChevronDown />
+              </span>
+            </Menu>
+          </span>
+        </span>
+      </div>
+    );
+  }
+}
 
 export default LanguageSwitcher;

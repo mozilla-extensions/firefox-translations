@@ -4,6 +4,8 @@
 
 "use strict";
 
+import { config } from "../config";
+
 // Temporary mock
 class Services {
   static locale: { appLocaleAsBCP47: "foo" };
@@ -21,43 +23,9 @@ export const Translation = {
 
   serviceUnavailable: false,
 
-  // TODO: Update to reflect "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
-  supportedSourceLanguages: [
-    "bg",
-    "cs",
-    "de",
-    "en",
-    "es",
-    "fr",
-    "ja",
-    "ko",
-    "nl",
-    "no",
-    "pl",
-    "pt",
-    "ru",
-    "tr",
-    "vi",
-    "zh",
-  ],
-  supportedTargetLanguages: [
-    "bg",
-    "cs",
-    "de",
-    "en",
-    "es",
-    "fr",
-    "ja",
-    "ko",
-    "nl",
-    "no",
-    "pl",
-    "pt",
-    "ru",
-    "tr",
-    "vi",
-    "zh",
-  ],
+  // TODO: Refactor to take the combination of source+target as language pairs into consideration
+  supportedSourceLanguages: config.supportedLanguagePairs.map(lp => lp[0]),
+  supportedTargetLanguages: config.supportedLanguagePairs.map(lp => lp[1]),
 
   setListenerForTests(listener) {
     this.translationListener = listener;
