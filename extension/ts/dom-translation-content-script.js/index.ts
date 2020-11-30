@@ -11,7 +11,7 @@ import { TranslationStatus } from "../shared-resources/models/BaseTranslationSta
 new ExtensionState({});
 
 /**
- * Note that running the content script at "document_idle" guarantees it to run after the DOM is complete
+ * Note this content script runs at "document_idle" ie after the DOM is complete
  */
 const init = async () => {
   /*
@@ -27,7 +27,6 @@ const init = async () => {
   const tabFrameReference = `${frameInfo.tabId}-${frameInfo.frameId}`;
 
   const extensionState = await subscribeToExtensionState();
-  // console.log({ extensionState });
 
   const translationChild = new TranslationChild(
     frameInfo,
@@ -52,25 +51,20 @@ const init = async () => {
         },
       );
 
-      // Pick out the relevant state here
       const currentTabFrameDocumentTranslationState =
         documentTranslationStates[tabFrameReference];
 
-      console.log(
-        Object.keys(documentTranslationStates),
-        currentTabFrameDocumentTranslationState,
-      );
+      console.log(currentTabFrameDocumentTranslationState);
 
       if (
         currentTabFrameDocumentTranslationState.translationStatus ===
         TranslationStatus.OFFER
       ) {
         if (currentTabFrameDocumentTranslationState.translationRequested) {
-          const translationResult = await translationChild.doTranslation(
+          translationChild.doTranslation(
             currentTabFrameDocumentTranslationState.sourceLanguage,
             currentTabFrameDocumentTranslationState.targetLanguage,
           );
-          console.debug({ translationResult });
         }
       }
 
@@ -95,8 +89,9 @@ const init = async () => {
       }
 
       if (
+        translationChild?.contentWindow?.translationDocument &&
         currentTabFrameDocumentTranslationState.originalShown !==
-        translationChild.contentWindow.translationDocument.originalShown
+          translationChild.contentWindow.translationDocument.originalShown
       ) {
         if (translationChild.contentWindow.translationDocument.originalShown) {
           translationChild.contentWindow.translationDocument.showTranslation();
