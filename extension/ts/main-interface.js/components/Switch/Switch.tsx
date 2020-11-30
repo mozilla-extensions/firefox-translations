@@ -3,14 +3,13 @@ import classNames from "classnames";
 
 export interface Props {
   style?: CSSProperties;
+  checked?: boolean;
   disabled?: boolean;
   onToggle?: () => void;
   icon?: ReactNode;
 }
 
-const Switch = ({ disabled, onToggle, icon }: Props) => {
-  const [checked, setChecked] = useState(false);
-
+const Switch = ({ checked, disabled, onToggle, icon }: Props) => {
   const classes = classNames({
     Switch: "Switch",
     checked: checked,
@@ -18,10 +17,7 @@ const Switch = ({ disabled, onToggle, icon }: Props) => {
   });
 
   const toggle = (e: MouseEvent) => {
-    setChecked(!checked);
-    if (onToggle) {
-      onToggle();
-    }
+    onToggle();
   };
 
   return (

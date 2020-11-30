@@ -6,7 +6,7 @@ import {
   BsInfoCircleFill,
 } from "react-icons/bs";
 import { BiChevronRight, BiAnalyse } from "react-icons/bi";
-import { browser, Tabs } from "webextension-polyfill-ts";
+import { browser } from "webextension-polyfill-ts";
 import Switch from "../components/Switch/Switch";
 import Header from "../components/Header/Header";
 import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
@@ -14,7 +14,6 @@ import { config } from "../../config";
 import Button from "../components/Button/Button";
 import { inject, observer } from "mobx-react";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import Tab = Tabs.Tab;
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
@@ -23,7 +22,7 @@ import { ReactNode } from "react";
 
 interface HomeProps {
   extensionState: ExtensionState;
-  currentTab: Tab;
+  tabId: number;
 }
 
 interface HomeState {
@@ -32,13 +31,13 @@ interface HomeState {
 }
 
 @inject("extensionState")
-@inject("currentTab")
+@inject("tabId")
 @observer
 export class Home extends React.Component<HomeProps, HomeState> {
   // Workaround for "Object is possibly undefined". Source: https://github.com/mobxjs/mobx-react/issues/256#issuecomment-500247548s
   public static defaultProps = {
     extensionState: (null as unknown) as ExtensionState,
-    currentTab: (null as unknown) as Tab,
+    tabId: (null as unknown) as number,
   };
   state = {
     sourceLanguage: undefined,
@@ -52,14 +51,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
   }
   render() {
     const { sourceLanguage, targetLanguage } = this.state;
-    const { extensionState, currentTab } = this.props;
+    const { extensionState, tabId } = this.props;
 
     // Extract the document translation states that relate to the currently opened tab
     const documentTranslationStates = extensionState.documentTranslationStates;
     const currentFrameDocumentTranslationStates = [];
     documentTranslationStates.forEach(
       (documentTranslationState: DocumentTranslationState) => {
-        if (documentTranslationState.tabId === currentTab.id) {
+        if (documentTranslationState.tabId === tabId) {
           currentFrameDocumentTranslationStates.push(documentTranslationState);
         }
       },
@@ -78,6 +77,24 @@ export class Home extends React.Component<HomeProps, HomeState> {
 
     const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
 
+    const requestTranslation = () => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          dts.translationRequested = true;
+          extensionState.upsertDocumentTranslationState(dts);
+        },
+      );
+    };
+
+    const requestCancellation = () => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          dts.cancellationRequested = true;
+          extensionState.upsertDocumentTranslationState(dts);
+        },
+      );
+    };
+
     const infoActionItem = (
       translationStatus: TranslationStatus,
       detectedLanguageResults: DetectedLanguageResults | null,
@@ -91,38 +108,95 @@ export class Home extends React.Component<HomeProps, HomeState> {
         case TranslationStatus.LANGUAGE_NOT_DETECTED:
           break;
         case TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD:
-          action = <Button type={"primary"} label={"Translate"} />;
+          action = (
+            <Button
+              type={"primary"}
+              label={"Translate"}
+              onClick={requestTranslation}
+            />
+          );
           break;
         case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
           break;
         case TranslationStatus.OFFER:
-          action = <Button type={"primary"} label={"Translate"} />;
+          action = (
+            <Button
+              type={"primary"}
+              label={"Translate"}
+              onClick={requestTranslation}
+            />
+          );
           break;
         case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
-          action = <Button type={"secondary"} label={"Cancel"} />;
+          action = (
+            <Button
+              type={"secondary"}
+              label={"Cancel"}
+              onClick={requestCancellation}
+            />
+          );
           break;
         case TranslationStatus.TRANSLATING:
-          action = <Button type={"secondary"} label={"Cancel"} />;
+          action = (
+            <Button
+              type={"secondary"}
+              label={"Cancel"}
+              onClick={requestCancellation}
+            />
+          );
           break;
         case TranslationStatus.TRANSLATED:
           break;
         case TranslationStatus.ERROR:
-          action = <Button type={"secondary"} label={"Retry"} />;
+          action = (
+            <Button
+              type={"secondary"}
+              label={"Retry"}
+              onClick={requestTranslation}
+            />
+          );
           break;
       }
-      let text = browser.i18n
-        .getMessage(
-          `translationStatus_${translationStatus}_mainInterfaceMessage`,
-        )
-        .replace("[TARGET_LANG]", "en");
+      let text = browser.i18n.getMessage(
+        `translationStatus_${translationStatus}_mainInterfaceMessage`,
+      );
+      if (targetLanguage) {
+        text = text.replace(
+          "[TARGET_LANG]",
+          browser.i18n.getMessage(`language_iso6391_${targetLanguage}`),
+        );
+      }
       if (detectedLanguageResults) {
-        text = text.replace("[SOURCE_LANG]", detectedLanguageResults.language);
+        text = text.replace(
+          "[SOURCE_LANG]",
+          browser.i18n.getMessage(
+            `language_iso6391_${detectedLanguageResults.language}`,
+          ),
+        );
       }
       return {
         text,
         icon: <BsInfoCircleFill />,
         action,
       };
+    };
+
+    const toggleShowOriginal = () => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          dts.originalShown = !dts.originalShown;
+          extensionState.upsertDocumentTranslationState(dts);
+        },
+      );
+    };
+
+    const toggleQualityEstimation = () => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          dts.displayQualityEstimation = !dts.displayQualityEstimation;
+          extensionState.upsertDocumentTranslationState(dts);
+        },
+      );
     };
 
     const actionItems: ActionItem[] = [
@@ -132,12 +206,24 @@ export class Home extends React.Component<HomeProps, HomeState> {
             {
               text: "Show original",
               icon: <BsLayersHalf />,
-              action: <Switch />,
+              action: (
+                <Switch
+                  checked={topFrameDocumentTranslationState.originalShown}
+                  onToggle={toggleShowOriginal}
+                />
+              ),
             },
             {
               text: "Show quality estimation",
               icon: <BsLightningFill />,
-              action: <Switch />,
+              action: (
+                <Switch
+                  checked={
+                    topFrameDocumentTranslationState.displayQualityEstimation
+                  }
+                  onToggle={toggleQualityEstimation}
+                />
+              ),
             },
             {
               text: <>Always translate {sourceLanguage}</>,

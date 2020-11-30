@@ -52,7 +52,7 @@ export class TranslationChild {
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
   }
 
-  async checkForTranslation() {
+  async attemptToDetectLanguage() {
     console.debug("Checking translation needs");
 
     let url = String(this.document.location);
@@ -120,11 +120,20 @@ export class TranslationChild {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
+      this.documentTranslationState.detectedLanguageResults = result;
+      this.documentTranslationState.translationStatus =
+        TranslationStatus.LANGUAGE_NOT_DETECTED;
+      this.extensionState.upsertDocumentTranslationState(
+        this.documentTranslationState,
+      );
       return;
     }
 
     // The window might be gone by now.
     if (!content) {
+      this.extensionState.removeDocumentTranslationState(
+        this.documentTranslationState,
+      );
       return;
     }
 
@@ -162,20 +171,28 @@ export class TranslationChild {
     translationDocument.translatedTo = aTo;
     translationDocument.translationError = false;
 
-    let result;
     try {
       console.info("About to translate web page document", { aFrom, aTo });
-      let translateResult = await translator.translate();
-
+      await translator.translate();
+      /*
+      // TODO: Restore telemetry
+      const translateResult = await translator.translate();
       result = {
         characterCount: translateResult.characterCount,
         from: aFrom,
         to: aTo,
-        success: true,
       };
+      // Record the number of characters translated.
+      this.translationTelemetry.recordTranslation(
+        result.from,
+        result.to,
+        result.characterCount,
+      );
+       */
 
       console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
+      this.documentTranslationState.originalShown = false;
       this.documentTranslationState.translationStatus =
         TranslationStatus.TRANSLATED;
       this.extensionState.upsertDocumentTranslationState(
@@ -184,34 +201,29 @@ export class TranslationChild {
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
-      result = { success: false };
-      if (ex == "unavailable") {
-        result.unavailable = true;
-      }
       this.documentTranslationState.translationStatus = TranslationStatus.ERROR;
       this.extensionState.upsertDocumentTranslationState(
         this.documentTranslationState,
       );
     }
 
-    return result;
+    return;
   }
 
-  receiveMessage(aMessage) {
-    switch (aMessage.name) {
-      case "Translation:TranslateDocument": {
-        return this.doTranslation(aMessage.data.from, aMessage.data.to);
-      }
+  showOriginalContent() {
+    /*
+    this.originalShown = true;
+    this.showURLBarIcon();
+    this.sendAsyncMessage("Translation:ShowOriginal");
+    this.translationTelemetry.recordShowOriginalContent();
+     */
+  }
 
-      case "Translation:ShowOriginal":
-        this.contentWindow.translationDocument.showOriginal();
-        break;
-
-      case "Translation:ShowTranslation":
-        this.contentWindow.translationDocument.showTranslation();
-        break;
-    }
-
-    return undefined;
+  showTranslatedContent() {
+    /*
+    this.originalShown = false;
+    this.showURLBarIcon();
+    this.sendAsyncMessage("Translation:ShowTranslation");
+     */
   }
 }

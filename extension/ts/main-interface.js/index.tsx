@@ -26,11 +26,26 @@ const init = async () => {
   // Prepare some objects that can be injected anywhere in the React component tree
   const extensionState = await subscribeToExtensionState();
   const currentTab = await getCurrentTab();
+
+  // Allows the main interface for a specific tab to be rendered in a separate tab
+  let tabId = currentTab.id;
+  if (
+    typeof window !== "undefined" &&
+    window.location &&
+    window.location.search
+  ) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("tabId")) {
+      tabId = parseInt(urlParams.get("tabId"), 10);
+      console.log("Using tabId from URL");
+    }
+  }
+
   ReactDOM.render(
     <ErrorBoundary displayErrorComponent={DisplayError}>
       <React.StrictMode>
         <Router>
-          <Provider extensionState={extensionState} currentTab={currentTab}>
+          <Provider extensionState={extensionState} tabId={tabId}>
             <App />
           </Provider>
         </Router>

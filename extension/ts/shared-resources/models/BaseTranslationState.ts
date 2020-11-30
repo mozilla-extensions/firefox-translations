@@ -18,7 +18,9 @@ export enum TranslationStatus {
 @model("bergamotTranslate/BaseTranslationState")
 export class BaseTranslationState extends Model({
   documentIsVisible: prop<boolean>({ setterAction: true }),
-  requestQualityEstimation: prop<boolean>({ setterAction: true }),
+  displayQualityEstimation: prop<boolean>({ setterAction: true }),
+  translationRequested: prop<boolean>({ setterAction: true }),
+  cancellationRequested: prop<boolean>({ setterAction: true }),
   detectedLanguageResults: prop<DetectedLanguageResults | null>(() => null, {
     setterAction: true,
   }),
