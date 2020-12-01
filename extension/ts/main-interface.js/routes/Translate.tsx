@@ -11,37 +11,41 @@ import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 import { TranslatedText } from "./TranslatedText";
+import { MainInterfaceInitialProps } from "../index";
 
 interface TranslateProps {
   extensionState: ExtensionState;
-  tabId: number;
+  mainInterfaceInitialProps: MainInterfaceInitialProps;
 }
 interface TranslateState {
   text: string;
-  translatedText: string;
-  loading: boolean;
 }
 
 @inject("extensionState")
-@inject("tabId")
+@inject("mainInterfaceInitialProps")
 @observer
 export class Translate extends React.Component<TranslateProps, TranslateState> {
   // Workaround for "Object is possibly undefined". Source: https://github.com/mobxjs/mobx-react/issues/256#issuecomment-500247548s
   public static defaultProps = {
     extensionState: (null as unknown) as ExtensionState,
-    tabId: (null as unknown) as number,
+    mainInterfaceInitialProps: (null as unknown) as MainInterfaceInitialProps,
   };
 
   state = {
     text: "",
-    translatedText: "",
-    loading: false,
   };
 
+  componentDidMount() {
+    if (this.props.mainInterfaceInitialProps.initialText) {
+      this.setState({ text: this.props.mainInterfaceInitialProps.initialText });
+    }
+  }
+
   render() {
-    const { extensionState, tabId } = this.props;
+    const { extensionState, mainInterfaceInitialProps } = this.props;
+    const { tabId, standalone } = mainInterfaceInitialProps;
     const { translateOwnTextTranslationStates } = extensionState;
-    const { text, translatedText, loading } = this.state;
+    const { text } = this.state;
 
     let currentTranslateOwnTextTranslationState: TranslateOwnTextTranslationState;
     translateOwnTextTranslationStates.forEach(
@@ -114,17 +118,22 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
 
     const openInSeparateTab = () => {
       const url = browser.runtime.getURL(
-        `main-interface/main-interface.html?tabId=${tabId}#/translate`,
+        `main-interface/main-interface.html?standalone=1&tabId=${tabId}&initialText=${encodeURIComponent(
+          text,
+        )}#/translate`,
       );
       browser.tabs.create({ url });
+      window.close();
     };
 
     return (
       <div className={"Translate w-full"}>
-        <Header
-          allowBack
-          extra={<BsBoxArrowUpRight onClick={openInSeparateTab} />}
-        />
+        {(standalone && <Header />) || (
+          <Header
+            allowBack
+            extra={<BsBoxArrowUpRight onClick={openInSeparateTab} />}
+          />
+        )}
         <div className={"BergamotApp__languageSwitcher"}>
           <LanguageSwitcher
             sourceLanguage={sourceLanguage}

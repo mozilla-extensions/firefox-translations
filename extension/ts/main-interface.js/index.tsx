@@ -23,6 +23,12 @@ new ExtensionState({});
 new DocumentTranslationState({});
 new TranslateOwnTextTranslationState({});
 
+export interface MainInterfaceInitialProps {
+  tabId: number;
+  initialText: string;
+  standalone: boolean;
+}
+
 const init = async () => {
   await initErrorReportingInContentScript("port-from-main-interface:index");
   // Prepare some objects that can be injected anywhere in the React component tree
@@ -31,6 +37,8 @@ const init = async () => {
 
   // Allows the main interface for a specific tab to be rendered in a separate tab
   let tabId = currentTab.id;
+  let initialText = "";
+  let standalone = false;
   if (
     typeof window !== "undefined" &&
     window.location &&
@@ -41,13 +49,29 @@ const init = async () => {
       tabId = parseInt(urlParams.get("tabId"), 10);
       console.log("Using tabId from URL");
     }
+    if (urlParams.get("initialText")) {
+      initialText = urlParams.get("initialText");
+      console.log("Using initialText from URL");
+    }
+    if (urlParams.get("standalone")) {
+      standalone = true;
+      console.log("Using standalone from URL");
+    }
   }
+  const mainInterfaceInitialProps = {
+    tabId,
+    initialText,
+    standalone,
+  };
 
   ReactDOM.render(
     <ErrorBoundary displayErrorComponent={DisplayError}>
       <React.StrictMode>
         <Router>
-          <Provider extensionState={extensionState} tabId={tabId}>
+          <Provider
+            extensionState={extensionState}
+            mainInterfaceInitialProps={mainInterfaceInitialProps}
+          >
             <App />
           </Provider>
         </Router>

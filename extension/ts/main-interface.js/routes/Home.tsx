@@ -19,22 +19,23 @@ import { TranslationStatus } from "../../shared-resources/models/BaseTranslation
 import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
 import { DetectedLanguageResults } from "../../shared-resources/bergamot.types";
 import { ReactNode } from "react";
+import { MainInterfaceInitialProps } from "../index";
 
 interface HomeProps {
   extensionState: ExtensionState;
-  tabId: number;
+  mainInterfaceInitialProps: MainInterfaceInitialProps;
 }
 
 interface HomeState {}
 
 @inject("extensionState")
-@inject("tabId")
+@inject("mainInterfaceInitialProps")
 @observer
 export class Home extends React.Component<HomeProps, HomeState> {
   // Workaround for "Object is possibly undefined". Source: https://github.com/mobxjs/mobx-react/issues/256#issuecomment-500247548s
   public static defaultProps = {
     extensionState: (null as unknown) as ExtensionState,
-    tabId: (null as unknown) as number,
+    mainInterfaceInitialProps: (null as unknown) as MainInterfaceInitialProps,
   };
   state = {};
   async setSourceLanguage(sourceLanguage) {
@@ -44,7 +45,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
     return this.setState({ targetLanguage });
   }
   render() {
-    const { extensionState, tabId } = this.props;
+    const { extensionState, mainInterfaceInitialProps } = this.props;
+    const { tabId } = mainInterfaceInitialProps;
 
     // Extract the document translation states that relate to the currently opened tab
     const documentTranslationStates = extensionState.documentTranslationStates;
