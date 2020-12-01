@@ -43,7 +43,7 @@ export class TranslationChild {
       this.documentTranslationState = new DocumentTranslationState(
         dtsInitialData,
       );
-      this.extensionState.upsertDocumentTranslationState(
+      this.extensionState.setDocumentTranslationState(
         this.documentTranslationState,
       );
     } catch (err) {
@@ -75,7 +75,7 @@ export class TranslationChild {
 
     this.documentTranslationState.translationStatus =
       TranslationStatus.DETECTING_LANGUAGE;
-    this.extensionState.upsertDocumentTranslationState(
+    this.extensionState.setDocumentTranslationState(
       this.documentTranslationState,
     );
 
@@ -123,7 +123,7 @@ export class TranslationChild {
       this.documentTranslationState.detectedLanguageResults = result;
       this.documentTranslationState.translationStatus =
         TranslationStatus.LANGUAGE_NOT_DETECTED;
-      this.extensionState.upsertDocumentTranslationState(
+      this.extensionState.setDocumentTranslationState(
         this.documentTranslationState,
       );
       return;
@@ -131,7 +131,7 @@ export class TranslationChild {
 
     // The window might be gone by now.
     if (!content) {
-      this.extensionState.removeDocumentTranslationState(
+      this.extensionState.deleteDocumentTranslationState(
         this.documentTranslationState,
       );
       return;
@@ -141,7 +141,7 @@ export class TranslationChild {
 
     this.documentTranslationState.detectedLanguageResults = result;
     this.documentTranslationState.translationStatus = TranslationStatus.OFFER;
-    this.extensionState.upsertDocumentTranslationState(
+    this.extensionState.setDocumentTranslationState(
       this.documentTranslationState,
     );
 
@@ -160,7 +160,7 @@ export class TranslationChild {
     this.documentTranslationState.targetLanguage = aTo;
     this.documentTranslationState.translationStatus =
       TranslationStatus.TRANSLATING;
-    this.extensionState.upsertDocumentTranslationState(
+    this.extensionState.setDocumentTranslationState(
       this.documentTranslationState,
     );
 
@@ -195,14 +195,14 @@ export class TranslationChild {
       this.documentTranslationState.originalShown = false;
       this.documentTranslationState.translationStatus =
         TranslationStatus.TRANSLATED;
-      this.extensionState.upsertDocumentTranslationState(
+      this.extensionState.setDocumentTranslationState(
         this.documentTranslationState,
       );
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
       this.documentTranslationState.translationStatus = TranslationStatus.ERROR;
-      this.extensionState.upsertDocumentTranslationState(
+      this.extensionState.setDocumentTranslationState(
         this.documentTranslationState,
       );
     }

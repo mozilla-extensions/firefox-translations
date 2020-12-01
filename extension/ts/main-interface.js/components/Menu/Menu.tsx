@@ -17,8 +17,6 @@ const Menu = ({ items, setSelection, children }: Props) => {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const [isActive, setIsActive] = React.useState(false);
 
-  console.log(children);
-
   const itemElements = items.map(i => (
     <Item
       key={i.key}

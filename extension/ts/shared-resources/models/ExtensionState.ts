@@ -3,8 +3,12 @@ import { DocumentTranslationState } from "./DocumentTranslationState";
 import { FragmentTranslationState } from "./FragmentTranslationState";
 import { TranslateOwnTextTranslationState } from "./TranslateOwnTextTranslationState";
 
-const documentTranslationStateMapKey = (dts: DocumentTranslationState) =>
+export const documentTranslationStateMapKey = (dts: DocumentTranslationState) =>
   `${dts.tabId}-${dts.frameId}`;
+
+export const translateOwnTextTranslationStateMapKey = (
+  totts: TranslateOwnTextTranslationState,
+) => `${totts.tabId}`;
 
 @model("bergamotTranslate/ExtensionState")
 export class ExtensionState extends Model({
@@ -14,10 +18,12 @@ export class ExtensionState extends Model({
   fragmentTranslationStates: prop_mapObject(
     () => new Map<string, FragmentTranslationState>(),
   ),
-  translateOwnTextTranslationState: prop<TranslateOwnTextTranslationState>(),
+  translateOwnTextTranslationStates: prop_mapObject(
+    () => new Map<string, TranslateOwnTextTranslationState>(),
+  ),
 }) {
   @modelAction
-  upsertDocumentTranslationState(
+  setDocumentTranslationState(
     documentTranslationState: DocumentTranslationState,
   ) {
     this.documentTranslationStates.set(
@@ -26,11 +32,28 @@ export class ExtensionState extends Model({
     );
   }
   @modelAction
-  removeDocumentTranslationState(
+  deleteDocumentTranslationState(
     documentTranslationState: DocumentTranslationState,
   ) {
     this.documentTranslationStates.delete(
       documentTranslationStateMapKey(documentTranslationState),
+    );
+  }
+  @modelAction
+  setTranslateOwnTextTranslationState(
+    translateOwnTextTranslationState: TranslateOwnTextTranslationState,
+  ) {
+    this.translateOwnTextTranslationStates.set(
+      translateOwnTextTranslationStateMapKey(translateOwnTextTranslationState),
+      translateOwnTextTranslationState,
+    );
+  }
+  @modelAction
+  deleteTranslateOwnTextTranslationState(
+    translateOwnTextTranslationState: TranslateOwnTextTranslationState,
+  ) {
+    this.translateOwnTextTranslationStates.delete(
+      translateOwnTextTranslationStateMapKey(translateOwnTextTranslationState),
     );
   }
 }

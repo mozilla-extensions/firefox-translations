@@ -6,6 +6,5 @@ export class TranslateOwnTextTranslationState extends ExtendedModel(
   BaseTranslationState,
   {
     translateAutomatically: prop<boolean>(true),
-    displayQualityEstimation: prop<boolean>(false),
   },
 ) {}

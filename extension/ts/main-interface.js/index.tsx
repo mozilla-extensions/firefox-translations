@@ -15,11 +15,13 @@ import { ExtensionState } from "../shared-resources/models/ExtensionState";
 import { Provider } from "mobx-react";
 import { DocumentTranslationState } from "../shared-resources/models/DocumentTranslationState";
 import { getCurrentTab } from "../../../../../mofo/regrets-reporter/ts/background.js/lib/getCurrentTab";
+import { TranslateOwnTextTranslationState } from "../shared-resources/models/TranslateOwnTextTranslationState";
 
 // Workaround for https://github.com/xaviergonz/mobx-keystone/issues/183
 // We need to import some models explicitly lest they fail to be registered by mobx-keystone
 new ExtensionState({});
 new DocumentTranslationState({});
+new TranslateOwnTextTranslationState({});
 
 const init = async () => {
   await initErrorReportingInContentScript("port-from-main-interface:index");

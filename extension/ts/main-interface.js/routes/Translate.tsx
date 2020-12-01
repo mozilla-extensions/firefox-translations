@@ -1,69 +1,154 @@
 import * as React from "react";
 import { BsBoxArrowUpRight, BsLightningFill } from "react-icons/bs";
 import Header from "../components/Header/Header";
-import { Translator } from "../simulator/Translator";
 import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
 import TextField from "../components/TextField/TextField";
 import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
 import Switch from "../components/Switch/Switch";
 import { browser } from "webextension-polyfill-ts";
+import { inject, observer } from "mobx-react";
+import { ExtensionState } from "../../shared-resources/models/ExtensionState";
+import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
+import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
+import { TranslatedText } from "./TranslatedText";
 
-const translator = new Translator("English", "Czech");
-translator.setDelay(7000);
+interface TranslateProps {
+  extensionState: ExtensionState;
+  tabId: number;
+}
+interface TranslateState {
+  text: string;
+  translatedText: string;
+  loading: boolean;
+}
 
-export const Translate = () => {
-  const [text, setText] = React.useState("");
-  const [sourceLanguage, setSourceLanguage] = React.useState(undefined);
-  const [targetLanguage, setTargetLanguage] = React.useState(undefined);
-  const [translatedText, setTranslatedText] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-
-  React.useEffect(() => {
-    setLoading(true);
-    translator.translate(text).then(res => {
-      setTranslatedText(res);
-      setLoading(false);
-    });
-  }, [text]);
-
-  const changeHandler = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setText(e.target.value);
+@inject("extensionState")
+@inject("tabId")
+@observer
+export class Translate extends React.Component<TranslateProps, TranslateState> {
+  // Workaround for "Object is possibly undefined". Source: https://github.com/mobxjs/mobx-react/issues/256#issuecomment-500247548s
+  public static defaultProps = {
+    extensionState: (null as unknown) as ExtensionState,
+    tabId: (null as unknown) as number,
   };
 
-  const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
+  state = {
+    text: "",
+    translatedText: "",
+    loading: false,
+  };
 
-  const actionItems: ActionItem[] = [
-    {
-      text: "Show quality estimation",
-      icon: <BsLightningFill />,
-      action: <Switch />,
-    },
-  ];
+  render() {
+    const { extensionState, tabId } = this.props;
+    const { translateOwnTextTranslationStates } = extensionState;
+    const { text, translatedText, loading } = this.state;
 
-  return (
-    <div className={"Translate w-full"}>
-      <Header allowBack extra={<BsBoxArrowUpRight />} />
-      <div className={"BergamotApp__languageSwitcher"}>
-        <LanguageSwitcher
-          sourceLanguage={sourceLanguage}
-          targetLanguage={targetLanguage || browserUiLanguageCode}
-          onChangeSourceLanguage={setSourceLanguage}
-          onChangeTargetLanguage={setTargetLanguage}
+    let currentTranslateOwnTextTranslationState: TranslateOwnTextTranslationState;
+    translateOwnTextTranslationStates.forEach(
+      (translateOwnTextTranslationState: TranslateOwnTextTranslationState) => {
+        if (translateOwnTextTranslationState.tabId === tabId) {
+          currentTranslateOwnTextTranslationState = translateOwnTextTranslationState;
+        }
+      },
+    );
+    if (!currentTranslateOwnTextTranslationState) {
+      extensionState.setTranslateOwnTextTranslationState(
+        new TranslateOwnTextTranslationState({
+          tabId,
+          translationStatus: TranslationStatus.UNAVAILABLE,
+          detectedLanguageResults: null,
+        }),
+      );
+      // Return null and wait until the above state update has gone through
+      return null;
+    }
+
+    const {
+      sourceLanguage,
+      targetLanguage,
+    } = currentTranslateOwnTextTranslationState;
+
+    const setSourceLanguage = $sourceLanguage => {
+      currentTranslateOwnTextTranslationState.sourceLanguage = $sourceLanguage;
+      extensionState.setTranslateOwnTextTranslationState(
+        currentTranslateOwnTextTranslationState,
+      );
+    };
+
+    const setTargetLanguage = $targetLanguage => {
+      currentTranslateOwnTextTranslationState.targetLanguage = $targetLanguage;
+      extensionState.setTranslateOwnTextTranslationState(
+        currentTranslateOwnTextTranslationState,
+      );
+    };
+
+    const changeHandler = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
+      this.setState({ text: e.target.value });
+    };
+
+    const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
+
+    const toggleQualityEstimation = () => {
+      currentTranslateOwnTextTranslationState.displayQualityEstimation = !currentTranslateOwnTextTranslationState.displayQualityEstimation;
+      extensionState.setTranslateOwnTextTranslationState(
+        currentTranslateOwnTextTranslationState,
+      );
+    };
+
+    const actionItems: ActionItem[] = [
+      {
+        text: "Show quality estimation",
+        icon: <BsLightningFill />,
+        action: (
+          <Switch
+            checked={
+              currentTranslateOwnTextTranslationState.displayQualityEstimation
+            }
+            onToggle={toggleQualityEstimation}
+          />
+        ),
+      },
+    ];
+
+    const openInSeparateTab = () => {
+      const url = browser.runtime.getURL(
+        `main-interface/main-interface.html?tabId=${tabId}#/translate`,
+      );
+      browser.tabs.create({ url });
+    };
+
+    return (
+      <div className={"Translate w-full"}>
+        <Header
+          allowBack
+          extra={<BsBoxArrowUpRight onClick={openInSeparateTab} />}
         />
-      </div>
-      <div className={"Translate__body"}>
-        <div className={"Translate__originText"}>
-          <div className={"Translate__title"}>Origin</div>
-          <TextField textArea value={text} onChange={changeHandler} />
+        <div className={"BergamotApp__languageSwitcher"}>
+          <LanguageSwitcher
+            sourceLanguage={sourceLanguage}
+            targetLanguage={targetLanguage || browserUiLanguageCode}
+            onChangeSourceLanguage={setSourceLanguage}
+            onChangeTargetLanguage={setTargetLanguage}
+          />
         </div>
-        <div className={"Translate__targetText"}>
-          <div className={"Translate__title"}>Target</div>
-          <TextField textArea value={translatedText} processing={loading} />
+        <div className={"Translate__body"}>
+          <div className={"Translate__originText"}>
+            <div className={"Translate__title"}>Origin</div>
+            <TextField textArea value={text} onChange={changeHandler} />
+          </div>
+          <div className={"Translate__targetText"}>
+            <div className={"Translate__title"}>Target</div>
+            <TranslatedText
+              text={text}
+              sourceLanguage={sourceLanguage}
+              targetLanguage={targetLanguage}
+            />
+          </div>
         </div>
+        <ActionItems actionItems={actionItems} />
       </div>
-      <ActionItems actionItems={actionItems} />
-    </div>
-  );
-};
+    );
+  }
+}

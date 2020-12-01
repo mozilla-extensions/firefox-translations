@@ -16,6 +16,7 @@ interface Props {
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   defaultValue?: string;
   value?: string;
+  disabled?: boolean;
 }
 
 const TextField = ({
@@ -29,6 +30,7 @@ const TextField = ({
   allowDrop,
   allowClear,
   value,
+  disabled,
   defaultValue,
   onChange,
 }: Props) => {
@@ -98,6 +100,7 @@ const TextField = ({
             placeholder ? placeholder : "Please type in something..."
           }
           maxLength={maxLength}
+          disabled={disabled}
           onChange={value === undefined ? changeHandler : onChange}
           value={value === undefined ? content : value}
         />
@@ -108,6 +111,7 @@ const TextField = ({
             placeholder ? placeholder : "Please type in something..."
           }
           maxLength={maxLength}
+          disabled={disabled}
           onChange={changeHandler === undefined ? changeHandler : onChange}
           value={value === undefined ? content : value}
         />

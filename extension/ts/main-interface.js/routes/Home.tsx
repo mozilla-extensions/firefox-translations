@@ -25,10 +25,7 @@ interface HomeProps {
   tabId: number;
 }
 
-interface HomeState {
-  sourceLanguage: string;
-  targetLanguage: string;
-}
+interface HomeState {}
 
 @inject("extensionState")
 @inject("tabId")
@@ -39,10 +36,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     extensionState: (null as unknown) as ExtensionState,
     tabId: (null as unknown) as number,
   };
-  state = {
-    sourceLanguage: undefined,
-    targetLanguage: undefined,
-  };
+  state = {};
   async setSourceLanguage(sourceLanguage) {
     return this.setState({ sourceLanguage });
   }
@@ -50,7 +44,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
     return this.setState({ targetLanguage });
   }
   render() {
-    const { sourceLanguage, targetLanguage } = this.state;
     const { extensionState, tabId } = this.props;
 
     // Extract the document translation states that relate to the currently opened tab
@@ -73,6 +66,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const {
       translationStatus,
       detectedLanguageResults,
+      sourceLanguage,
+      targetLanguage,
     } = topFrameDocumentTranslationState;
 
     const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
@@ -81,7 +76,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           dts.translationRequested = true;
-          extensionState.upsertDocumentTranslationState(dts);
+          extensionState.setDocumentTranslationState(dts);
         },
       );
     };
@@ -90,7 +85,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           dts.cancellationRequested = true;
-          extensionState.upsertDocumentTranslationState(dts);
+          extensionState.setDocumentTranslationState(dts);
         },
       );
     };
@@ -185,7 +180,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           dts.originalShown = !dts.originalShown;
-          extensionState.upsertDocumentTranslationState(dts);
+          extensionState.setDocumentTranslationState(dts);
         },
       );
     };
@@ -194,7 +189,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           dts.displayQualityEstimation = !dts.displayQualityEstimation;
-          extensionState.upsertDocumentTranslationState(dts);
+          extensionState.setDocumentTranslationState(dts);
         },
       );
     };
@@ -279,10 +274,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
             <>
               <div className={"BergamotApp__languageSwitcher"}>
                 <LanguageSwitcher
-                  sourceLanguage={
-                    sourceLanguage || detectedLanguageResults?.language
-                  }
-                  targetLanguage={targetLanguage || browserUiLanguageCode}
+                  sourceLanguage={sourceLanguage}
+                  targetLanguage={targetLanguage}
                   onChangeTargetLanguage={this.setTargetLanguage.bind(this)}
                   onChangeSourceLanguage={this.setSourceLanguage.bind(this)}
                 />
