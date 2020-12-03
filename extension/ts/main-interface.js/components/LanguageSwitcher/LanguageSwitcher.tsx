@@ -1,4 +1,5 @@
 import * as React from "react";
+import { browser } from "webextension-polyfill-ts";
 import classNames from "classnames";
 import { BsChevronDown } from "react-icons/bs";
 import Menu from "../Menu/Menu";

@@ -33,7 +33,7 @@ const Button = ({
 
   return (
     <button
-      className={classes}
+      className={`${classes} focus:outline-none`}
       disabled={disabled}
       style={style}
       onClick={onClick}

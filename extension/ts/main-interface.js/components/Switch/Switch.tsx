@@ -21,7 +21,7 @@ const Switch = ({ checked, disabled, onToggle, icon }: Props) => {
   };
 
   return (
-    <button className={classes} onClick={toggle}>
+    <button className={`${classes} focus:outline-none`} onClick={toggle}>
       <div className={`Switch__slider`}>
         {icon ? <span className={"Switch__icon"}>{icon}</span> : null}
       </div>
