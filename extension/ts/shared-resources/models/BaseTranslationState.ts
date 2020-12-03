@@ -29,4 +29,5 @@ export class BaseTranslationState extends Model({
   translationStatus: prop<TranslationStatus>(TranslationStatus.UNKNOWN, {
     setterAction: true,
   }),
+  tabId: prop<number>(),
 }) {}

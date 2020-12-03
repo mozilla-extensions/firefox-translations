@@ -1,10 +1,20 @@
-import { Model, model, modelAction, prop, prop_mapObject } from "mobx-keystone";
+import {
+  applyPatches,
+  Model,
+  model,
+  modelAction,
+  Patch,
+  prop,
+  prop_mapObject,
+} from "mobx-keystone";
 import { DocumentTranslationState } from "./DocumentTranslationState";
 import { FragmentTranslationState } from "./FragmentTranslationState";
 import { TranslateOwnTextTranslationState } from "./TranslateOwnTextTranslationState";
+import { computed } from "mobx";
+import { FrameInfo } from "../bergamot.types";
 
-export const documentTranslationStateMapKey = (dts: DocumentTranslationState) =>
-  `${dts.tabId}-${dts.frameId}`;
+export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
+  `${frameInfo.tabId}-${frameInfo.frameId}`;
 
 export const translateOwnTextTranslationStateMapKey = (
   totts: TranslateOwnTextTranslationState,
@@ -32,11 +42,20 @@ export class ExtensionState extends Model({
     );
   }
   @modelAction
-  deleteDocumentTranslationState(
-    documentTranslationState: DocumentTranslationState,
+  patchDocumentTranslationStateByFrameInfo(
+    frameInfo: FrameInfo,
+    patches: Patch[],
   ) {
+    const key = documentTranslationStateMapKey(frameInfo);
+    const dts = this.documentTranslationStates.get(key);
+    applyPatches(dts, patches);
+    this.documentTranslationStates.set(key, dts);
+    console.debug("UPDATED A DTS - PROPAGATING??", { patches });
+  }
+  @modelAction
+  deleteDocumentTranslationStateByFrameInfo(frameInfo: FrameInfo) {
     this.documentTranslationStates.delete(
-      documentTranslationStateMapKey(documentTranslationState),
+      documentTranslationStateMapKey(frameInfo),
     );
   }
   @modelAction

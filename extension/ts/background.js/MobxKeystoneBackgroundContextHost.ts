@@ -1,6 +1,5 @@
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
-import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
 import {
   applySerializedActionAndTrackNewModelIds,
   getSnapshot,

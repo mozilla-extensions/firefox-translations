@@ -9,12 +9,10 @@ import { BergamotTranslator } from "./BergamotTranslator";
 import { getTranslationNodes } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../shared-resources/ContentScriptLanguageDetectorProxy";
 import { ExtensionState } from "../shared-resources/models/ExtensionState";
-import { DocumentTranslationState } from "../shared-resources/models/DocumentTranslationState";
 import {
   DetectedLanguageResults,
   FrameInfo,
 } from "../shared-resources/bergamot.types";
-import { ModelInstanceCreationData } from "mobx-keystone";
 import { TranslationStatus } from "../shared-resources/models/BaseTranslationState";
 
 export class TranslationChild {
@@ -22,7 +20,6 @@ export class TranslationChild {
   public contentWindow;
   public document;
   private extensionState: ExtensionState;
-  private documentTranslationState: DocumentTranslationState;
   private languageDetector: ContentScriptLanguageDetectorProxy;
   constructor(
     frameInfo: FrameInfo,
@@ -34,50 +31,43 @@ export class TranslationChild {
     this.document = document;
     this.contentWindow = contentWindow;
     this.extensionState = extensionState;
-    const dtsInitialData: ModelInstanceCreationData<DocumentTranslationState> = {
-      ...this.frameInfo,
-      translationStatus: TranslationStatus.UNKNOWN,
-      originalShown: true,
-    };
-    try {
-      this.documentTranslationState = new DocumentTranslationState(
-        dtsInitialData,
-      );
-      this.extensionState.setDocumentTranslationState(
-        this.documentTranslationState,
-      );
-    } catch (err) {
-      console.error("Instantiate DocumentTranslationState error", err);
-    }
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
   }
 
   async attemptToDetectLanguage() {
-    console.debug("Checking translation needs");
+    console.debug("Attempting to detect language");
 
     let url = String(this.document.location);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      console.debug(
-        "Not a HTTP(S) url, not attempting new language detection",
-        { url },
-      );
+      console.debug("Not a HTTP(S) url, translation unavailable", { url });
+      setTimeout(() => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+          [
+            {
+              op: "replace",
+              path: ["translationStatus"],
+              value: TranslationStatus.UNAVAILABLE,
+            },
+          ],
+        );
+      }, 0);
       return;
     }
 
-    let content = this.contentWindow;
-    if (content.detectedLanguage) {
-      console.debug(
-        "Language already detected, not attempting new language detection",
-        content.detectedLanguage,
+    console.debug("Setting status to reflect detection of language ongoing");
+    setTimeout(() => {
+      this.extensionState.patchDocumentTranslationStateByFrameInfo(
+        this.frameInfo,
+        [
+          {
+            op: "replace",
+            path: ["translationStatus"],
+            value: TranslationStatus.DETECTING_LANGUAGE,
+          },
+        ],
       );
-      return;
-    }
-
-    this.documentTranslationState.translationStatus =
-      TranslationStatus.DETECTING_LANGUAGE;
-    this.extensionState.setDocumentTranslationState(
-      this.documentTranslationState,
-    );
+    }, 0);
 
     // Grab a 60k sample of text from the page.
     // (The CLD2 library used by the language detector is capable of
@@ -107,6 +97,18 @@ export class TranslationChild {
         "Language detection isn't reliable on very short strings. Skipping language detection",
         { string },
       );
+      setTimeout(() => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+          [
+            {
+              op: "replace",
+              path: ["translationStatus"],
+              value: TranslationStatus.LANGUAGE_NOT_DETECTED,
+            },
+          ],
+        );
+      }, 0);
       return;
     }
 
@@ -115,36 +117,65 @@ export class TranslationChild {
     );
     console.debug("Language detection results are in", { result });
 
-    // Bail if we're not confident.
+    // The window might be gone by now.
+    if (!this.contentWindow) {
+      console.log(
+        "Content window reference invalid, deleting document translation state",
+      );
+      setTimeout(() => {
+        this.extensionState.deleteDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+        );
+      }, 0);
+      return;
+    }
+
+    // Save results in extension state
+    setTimeout(() => {
+      this.extensionState.patchDocumentTranslationStateByFrameInfo(
+        this.frameInfo,
+        [
+          {
+            op: "add",
+            path: ["detectedLanguageResults"],
+            value: result,
+          },
+        ],
+      );
+    }, 0);
+
     if (!result.confident) {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
-      this.documentTranslationState.detectedLanguageResults = result;
-      this.documentTranslationState.translationStatus =
-        TranslationStatus.LANGUAGE_NOT_DETECTED;
-      this.extensionState.setDocumentTranslationState(
-        this.documentTranslationState,
-      );
+      setTimeout(() => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+          [
+            {
+              op: "replace",
+              path: ["translationStatus"],
+              value: TranslationStatus.LANGUAGE_NOT_DETECTED,
+            },
+          ],
+        );
+      }, 0);
       return;
     }
 
-    // The window might be gone by now.
-    if (!content) {
-      this.extensionState.deleteDocumentTranslationState(
-        this.documentTranslationState,
+    console.debug("Updating state to reflect that language has been detected");
+    setTimeout(() => {
+      this.extensionState.patchDocumentTranslationStateByFrameInfo(
+        this.frameInfo,
+        [
+          {
+            op: "replace",
+            path: ["translationStatus"],
+            value: TranslationStatus.OFFER,
+          },
+        ],
       );
-      return;
-    }
-
-    content.detectedLanguage = result.language;
-
-    this.documentTranslationState.detectedLanguageResults = result;
-    this.documentTranslationState.translationStatus = TranslationStatus.OFFER;
-    this.extensionState.setDocumentTranslationState(
-      this.documentTranslationState,
-    );
-
+    }, 0);
     return;
   }
 
@@ -157,12 +188,18 @@ export class TranslationChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    this.documentTranslationState.targetLanguage = aTo;
-    this.documentTranslationState.translationStatus =
-      TranslationStatus.TRANSLATING;
-    this.extensionState.setDocumentTranslationState(
-      this.documentTranslationState,
-    );
+    setTimeout(() => {
+      this.extensionState.patchDocumentTranslationStateByFrameInfo(
+        this.frameInfo,
+        [
+          {
+            op: "replace",
+            path: ["translationStatus"],
+            value: TranslationStatus.TRANSLATING,
+          },
+        ],
+      );
+    }, 0);
 
     let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
@@ -192,19 +229,33 @@ export class TranslationChild {
 
       console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
-      this.documentTranslationState.originalShown = false;
-      this.documentTranslationState.translationStatus =
-        TranslationStatus.TRANSLATED;
-      this.extensionState.setDocumentTranslationState(
-        this.documentTranslationState,
-      );
+      setTimeout(() => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+          [
+            {
+              op: "replace",
+              path: ["translationStatus"],
+              value: TranslationStatus.TRANSLATED,
+            },
+          ],
+        );
+      }, 0);
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
-      this.documentTranslationState.translationStatus = TranslationStatus.ERROR;
-      this.extensionState.setDocumentTranslationState(
-        this.documentTranslationState,
-      );
+      setTimeout(() => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(
+          this.frameInfo,
+          [
+            {
+              op: "replace",
+              path: ["translationStatus"],
+              value: TranslationStatus.ERROR,
+            },
+          ],
+        );
+      }, 0);
     }
 
     return;

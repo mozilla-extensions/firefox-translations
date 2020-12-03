@@ -74,7 +74,7 @@ class MobxKeystoneProxy {
           if (m.requestId !== requestId) {
             return;
           }
-          // console.log("MobxKeystoneProxy received initialState", {initialState});
+          // console.debug("MobxKeystoneProxy received initialState", {initialState});
           this.backgroundContextPort.onMessage.removeListener(
             resultsMessageListener,
           );
@@ -98,13 +98,14 @@ class MobxKeystoneProxy {
     });
   }
   async actionCall(actionCall: SerializedActionCall): Promise<any> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const requestId = nanoid();
-      // console.debug("actionCall via content script mobx keystone proxy", {});
+      // console.debug("MobxKeystoneProxy (Content Script Context): actionCall via content script mobx keystone proxy", { actionCall });
       this.backgroundContextPort.postMessage({
         actionCall,
         requestId,
       });
+      resolve();
     });
   }
 }

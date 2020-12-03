@@ -67,6 +67,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
 
     const {
       translationStatus,
+      translationRequested,
       detectedLanguageResults,
       sourceLanguage,
       targetLanguage,
@@ -77,8 +78,13 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const requestTranslation = () => {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
-          dts.translationRequested = true;
-          extensionState.setDocumentTranslationState(dts);
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["translationRequested"],
+              value: true,
+            },
+          ]);
         },
       );
     };
@@ -86,14 +92,20 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const requestCancellation = () => {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
-          dts.cancellationRequested = true;
-          extensionState.setDocumentTranslationState(dts);
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["cancellationRequested"],
+              value: true,
+            },
+          ]);
         },
       );
     };
 
     const infoActionItem = (
       translationStatus: TranslationStatus,
+      translationRequested: boolean,
       detectedLanguageResults: DetectedLanguageResults | null,
     ): ActionItem => {
       let action: ReactNode | false = false;
@@ -105,6 +117,16 @@ export class Home extends React.Component<HomeProps, HomeState> {
         case TranslationStatus.LANGUAGE_NOT_DETECTED:
           break;
         case TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD:
+        case TranslationStatus.OFFER:
+          if (translationRequested) {
+            action = (
+              <Button
+                type={"primary"}
+                label={"Translating..."}
+                disabled={true}
+              />
+            );
+          }
           action = (
             <Button
               type={"primary"}
@@ -114,15 +136,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
           );
           break;
         case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
-          break;
-        case TranslationStatus.OFFER:
-          action = (
-            <Button
-              type={"primary"}
-              label={"Translate"}
-              onClick={requestTranslation}
-            />
-          );
           break;
         case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
           action = (
@@ -181,8 +194,13 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const toggleShowOriginal = () => {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
-          dts.originalShown = !dts.originalShown;
-          extensionState.setDocumentTranslationState(dts);
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["originalShown"],
+              value: !dts.originalShown,
+            },
+          ]);
         },
       );
     };
@@ -190,14 +208,23 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const toggleQualityEstimation = () => {
       currentFrameDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
-          dts.displayQualityEstimation = !dts.displayQualityEstimation;
-          extensionState.setDocumentTranslationState(dts);
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["displayQualityEstimation"],
+              value: !dts.displayQualityEstimation,
+            },
+          ]);
         },
       );
     };
 
     const actionItems: ActionItem[] = [
-      infoActionItem(translationStatus, detectedLanguageResults),
+      infoActionItem(
+        translationStatus,
+        translationRequested,
+        detectedLanguageResults,
+      ),
       ...([TranslationStatus.TRANSLATED].includes(translationStatus)
         ? [
             {
