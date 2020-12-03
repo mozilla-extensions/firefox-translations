@@ -119,10 +119,10 @@ const init = async () => {
         }
       }
 
-      if (hasChanged("originalShown")) {
+      if (hasChanged("showOriginal")) {
         if (
           translationChild?.contentWindow?.translationDocument &&
-          currentTabFrameDocumentTranslationState.originalShown !==
+          currentTabFrameDocumentTranslationState.showOriginal !==
             translationChild.contentWindow.translationDocument.originalShown
         ) {
           if (

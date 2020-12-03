@@ -105,13 +105,13 @@ From the background context:
 
 ```javascript
 (typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `main-interface/main-interface.html`,
+  `main-interface/popup.html`,
 );
 ```
 
 ```javascript
 (typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `main-interface/main-interface.html#/components`,
+  `main-interface/popup.html#/components`,
 );
 ```
 

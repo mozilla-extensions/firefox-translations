@@ -50,7 +50,6 @@ export class ExtensionState extends Model({
     const dts = this.documentTranslationStates.get(key);
     applyPatches(dts, patches);
     this.documentTranslationStates.set(key, dts);
-    console.debug("UPDATED A DTS - PROPAGATING??", { patches });
   }
   @modelAction
   deleteDocumentTranslationStateByFrameInfo(frameInfo: FrameInfo) {

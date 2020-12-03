@@ -197,8 +197,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
               op: "replace",
-              path: ["originalShown"],
-              value: !dts.originalShown,
+              path: ["showOriginal"],
+              value: !dts.showOriginal,
             },
           ]);
         },
@@ -232,7 +232,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
               icon: <BsLayersHalf />,
               action: (
                 <Switch
-                  checked={topFrameDocumentTranslationState.originalShown}
+                  checked={topFrameDocumentTranslationState.showOriginal}
                   onToggle={toggleShowOriginal}
                 />
               ),

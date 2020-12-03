@@ -7,6 +7,6 @@ export class DocumentTranslationState extends ExtendedModel(
   {
     windowId: prop<number>(),
     frameId: prop<number>(),
-    originalShown: prop<boolean>({ setterAction: true }),
+    showOriginal: prop<boolean>({ setterAction: true }),
   },
 ) {}

@@ -118,7 +118,7 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
 
     const openInSeparateTab = () => {
       const url = browser.runtime.getURL(
-        `main-interface/main-interface.html?standalone=1&tabId=${tabId}&initialText=${encodeURIComponent(
+        `main-interface/standalone.html?standalone=1&tabId=${tabId}&initialText=${encodeURIComponent(
           text,
         )}#/translate`,
       );

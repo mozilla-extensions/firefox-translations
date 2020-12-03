@@ -44,7 +44,7 @@ async function generateManifest({ dotEnvPath }) {
     browser_action: {
       default_icon: "icons/extension-icon.inactive.38x38.png",
       default_title: "__MSG_browserActionButtonTitle__",
-      default_popup: "main-interface/main-interface.html",
+      default_popup: "main-interface/popup.html",
     },
     options_ui: {
       page: "options-ui/options-ui.html",
