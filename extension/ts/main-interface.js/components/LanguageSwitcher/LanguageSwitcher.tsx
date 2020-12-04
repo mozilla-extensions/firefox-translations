@@ -28,10 +28,10 @@ export class LanguageSwitcher extends React.Component<Props, {}> {
       onChangeTranslateTo,
     } = this.props;
 
-    const translateFroms = [
+    const translateFromLanguages = [
       ...new Set(config.supportedLanguagePairs.map(lp => lp[0])),
     ];
-    const translateTos = [
+    const translateToLanguages = [
       ...new Set(config.supportedLanguagePairs.map(lp => lp[1])),
     ];
 
@@ -61,7 +61,7 @@ export class LanguageSwitcher extends React.Component<Props, {}> {
           <span className={"flex items-center"}>
             {displayLanguage(translateFrom)}
             <Menu
-              items={translateFroms.map(toLanguageOption)}
+              items={translateFromLanguages.map(toLanguageOption)}
               setSelection={onChangeTranslateFrom}
             >
               <span className={"LanguageSwitcher__select"}>
@@ -81,7 +81,7 @@ export class LanguageSwitcher extends React.Component<Props, {}> {
           <span className={"flex items-center"}>
             {displayLanguage(translateTo)}
             <Menu
-              items={translateTos.map(toLanguageOption)}
+              items={translateToLanguages.map(toLanguageOption)}
               setSelection={onChangeTranslateTo}
             >
               <span className={"LanguageSwitcher__select"}>

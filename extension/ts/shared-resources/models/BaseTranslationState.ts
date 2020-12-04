@@ -1,5 +1,7 @@
 import { Model, model, prop } from "mobx-keystone";
 import { DetectedLanguageResults } from "../bergamot.types";
+import { computed } from "mobx";
+import { browser } from "webextension-polyfill-ts";
 
 export enum TranslationStatus {
   UNKNOWN = "UNKNOWN",
@@ -30,4 +32,22 @@ export class BaseTranslationState extends Model({
     setterAction: true,
   }),
   tabId: prop<number>(),
-}) {}
+}) {
+  @computed
+  get effectiveTranslateFrom() {
+    return this.translateFrom || this.detectedLanguageResults?.language;
+  }
+  @computed
+  get effectiveTranslateTo() {
+    const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
+    /*
+    const acceptedLanguages: string[] = await browser.i18n.getAcceptLanguages();
+    acceptedLanguages.forEach(languageCode => {
+      if (targetLanguages.includes(languageCode)) {
+        this.setState({ targetLanguage: languageCode });
+      }
+    })
+    */
+    return this.translateTo || browserUiLanguageCode;
+  }
+}

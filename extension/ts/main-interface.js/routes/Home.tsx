@@ -38,12 +38,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
     mainInterfaceInitialProps: (null as unknown) as MainInterfaceInitialProps,
   };
   state = {};
-  async setTranslateFrom(translateFrom) {
-    return this.setState({ translateFrom });
-  }
-  async setTranslateTo(translateTo) {
-    return this.setState({ translateTo });
-  }
   render() {
     const { extensionState, mainInterfaceInitialProps } = this.props;
     const { tabId } = mainInterfaceInitialProps;
@@ -68,12 +62,9 @@ export class Home extends React.Component<HomeProps, HomeState> {
     const {
       translationStatus,
       translationRequested,
-      detectedLanguageResults,
-      translateFrom,
-      translateTo,
+      effectiveTranslateFrom,
+      effectiveTranslateTo,
     } = topFrameDocumentTranslationState;
-
-    const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
 
     const requestTranslation = () => {
       currentFrameDocumentTranslationStates.forEach(
@@ -103,11 +94,35 @@ export class Home extends React.Component<HomeProps, HomeState> {
       );
     };
 
-    const infoActionItem = (
-      translationStatus: TranslationStatus,
-      translationRequested: boolean,
-      detectedLanguageResults: DetectedLanguageResults | null,
-    ): ActionItem => {
+    const setTranslateFrom = $translateFrom => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["translateFrom"],
+              value: $translateFrom,
+            },
+          ]);
+        },
+      );
+    };
+
+    const setTranslateTo = $translateTo => {
+      currentFrameDocumentTranslationStates.forEach(
+        (dts: DocumentTranslationState) => {
+          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+            {
+              op: "replace",
+              path: ["translateTo"],
+              value: $translateTo,
+            },
+          ]);
+        },
+      );
+    };
+
+    const infoActionItem = (): ActionItem => {
       let action: ReactNode | false = false;
       switch (translationStatus) {
         case TranslationStatus.UNAVAILABLE:
@@ -170,18 +185,16 @@ export class Home extends React.Component<HomeProps, HomeState> {
       let text = browser.i18n.getMessage(
         `translationStatus_${translationStatus}_mainInterfaceMessage`,
       );
-      if (translateTo) {
-        text = text.replace(
-          "[TARGET_LANG]",
-          browser.i18n.getMessage(`language_iso6391_${translateTo}`),
-        );
-      }
-      if (detectedLanguageResults) {
+      if (effectiveTranslateFrom) {
         text = text.replace(
           "[SOURCE_LANG]",
-          browser.i18n.getMessage(
-            `language_iso6391_${detectedLanguageResults.language}`,
-          ),
+          browser.i18n.getMessage(`language_iso6391_${effectiveTranslateFrom}`),
+        );
+      }
+      if (effectiveTranslateTo) {
+        text = text.replace(
+          "[TARGET_LANG]",
+          browser.i18n.getMessage(`language_iso6391_${effectiveTranslateTo}`),
         );
       }
       return {
@@ -220,11 +233,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const actionItems: ActionItem[] = [
-      infoActionItem(
-        translationStatus,
-        translationRequested,
-        detectedLanguageResults,
-      ),
+      infoActionItem(),
       ...([TranslationStatus.TRANSLATED].includes(translationStatus)
         ? [
             {
@@ -250,7 +259,14 @@ export class Home extends React.Component<HomeProps, HomeState> {
               ),
             },
             {
-              text: <>Always translate {translateFrom}</>,
+              text: (
+                <>
+                  Always translate{" "}
+                  {browser.i18n.getMessage(
+                    `language_iso6391_${effectiveTranslateFrom}`,
+                  )}
+                </>
+              ),
               icon: <BsGear />,
               action: <Switch />,
             },
@@ -303,10 +319,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
             <>
               <div className={"BergamotApp__languageSwitcher"}>
                 <LanguageSwitcher
-                  translateFrom={translateFrom}
-                  translateTo={translateTo}
-                  onChangeTranslateTo={this.setTranslateTo.bind(this)}
-                  onChangeTranslateFrom={this.setTranslateFrom.bind(this)}
+                  translateFrom={effectiveTranslateFrom}
+                  translateTo={effectiveTranslateTo}
+                  onChangeTranslateTo={setTranslateTo}
+                  onChangeTranslateFrom={setTranslateFrom}
                 />
               </div>
             </>

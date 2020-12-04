@@ -68,8 +68,8 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
     }
 
     const {
-      translateFrom,
-      translateTo,
+      effectiveTranslateFrom,
+      effectiveTranslateTo,
     } = currentTranslateOwnTextTranslationState;
 
     const setTranslateFrom = $translateFrom => {
@@ -91,8 +91,6 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
     ) => {
       this.setState({ text: e.target.value });
     };
-
-    const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
 
     const toggleQualityEstimation = () => {
       currentTranslateOwnTextTranslationState.displayQualityEstimation = !currentTranslateOwnTextTranslationState.displayQualityEstimation;
@@ -136,8 +134,8 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
         )}
         <div className={"BergamotApp__languageSwitcher"}>
           <LanguageSwitcher
-            translateFrom={translateFrom}
-            translateTo={translateTo || browserUiLanguageCode}
+            translateFrom={effectiveTranslateFrom}
+            translateTo={effectiveTranslateTo}
             onChangeTranslateFrom={setTranslateFrom}
             onChangeTranslateTo={setTranslateTo}
           />
@@ -151,8 +149,8 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
             <div className={"Translate__title"}>Target</div>
             <TranslatedText
               text={text}
-              translateFrom={translateFrom}
-              translateTo={translateTo}
+              translateFrom={effectiveTranslateFrom}
+              translateTo={effectiveTranslateTo}
             />
           </div>
         </div>
