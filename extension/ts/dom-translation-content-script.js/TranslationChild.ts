@@ -34,28 +34,13 @@ export class TranslationChild {
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
   }
 
-  async attemptToDetectLanguage() {
-    console.debug("Attempting to detect language");
-
-    let url = String(this.document.location);
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-      console.debug("Not a HTTP(S) url, translation unavailable", { url });
-      setTimeout(() => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-          [
-            {
-              op: "replace",
-              path: ["translationStatus"],
-              value: TranslationStatus.UNAVAILABLE,
-            },
-          ],
-        );
-      }, 0);
-      return;
-    }
-
-    console.debug("Setting status to reflect detection of language ongoing");
+  /**
+   * Wrapped in setTimeout to prevent automatic batching of updates - we want status indicators
+   * to get the updated translation status immediately.
+   *
+   * @param translationStatus
+   */
+  broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
     setTimeout(() => {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
         this.frameInfo,
@@ -63,11 +48,27 @@ export class TranslationChild {
           {
             op: "replace",
             path: ["translationStatus"],
-            value: TranslationStatus.DETECTING_LANGUAGE,
+            value: translationStatus,
           },
         ],
       );
     }, 0);
+  }
+
+  async attemptToDetectLanguage() {
+    console.debug("Attempting to detect language");
+
+    let url = String(this.document.location);
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      console.debug("Not a HTTP(S) url, translation unavailable", { url });
+      this.broadcastUpdatedTranslationStatus(TranslationStatus.UNAVAILABLE);
+      return;
+    }
+
+    console.debug("Setting status to reflect detection of language ongoing");
+    this.broadcastUpdatedTranslationStatus(
+      TranslationStatus.DETECTING_LANGUAGE,
+    );
 
     // Grab a 60k sample of text from the page.
     // (The CLD2 library used by the language detector is capable of
@@ -97,18 +98,9 @@ export class TranslationChild {
         "Language detection isn't reliable on very short strings. Skipping language detection",
         { string },
       );
-      setTimeout(() => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-          [
-            {
-              op: "replace",
-              path: ["translationStatus"],
-              value: TranslationStatus.LANGUAGE_NOT_DETECTED,
-            },
-          ],
-        );
-      }, 0);
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.LANGUAGE_NOT_DETECTED,
+      );
       return;
     }
 
@@ -148,34 +140,14 @@ export class TranslationChild {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
-      setTimeout(() => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-          [
-            {
-              op: "replace",
-              path: ["translationStatus"],
-              value: TranslationStatus.LANGUAGE_NOT_DETECTED,
-            },
-          ],
-        );
-      }, 0);
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.LANGUAGE_NOT_DETECTED,
+      );
       return;
     }
 
     console.debug("Updating state to reflect that language has been detected");
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationStatus"],
-            value: TranslationStatus.OFFER,
-          },
-        ],
-      );
-    }, 0);
+    this.broadcastUpdatedTranslationStatus(TranslationStatus.OFFER);
     return;
   }
 
@@ -188,18 +160,7 @@ export class TranslationChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationStatus"],
-            value: TranslationStatus.TRANSLATING,
-          },
-        ],
-      );
-    }, 0);
+    this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATING);
 
     let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
@@ -229,33 +190,11 @@ export class TranslationChild {
 
       console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
-      setTimeout(() => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-          [
-            {
-              op: "replace",
-              path: ["translationStatus"],
-              value: TranslationStatus.TRANSLATED,
-            },
-          ],
-        );
-      }, 0);
+      this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATED);
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
-      setTimeout(() => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-          [
-            {
-              op: "replace",
-              path: ["translationStatus"],
-              value: TranslationStatus.ERROR,
-            },
-          ],
-        );
-      }, 0);
+      this.broadcastUpdatedTranslationStatus(TranslationStatus.ERROR);
     }
 
     return;
