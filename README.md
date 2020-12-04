@@ -1,6 +1,6 @@
-# Bergamot Browser Extension
+# Bergamot Translate Browser Extension
 
-Neural Machine Translation for the browser.
+For more information see [The Bergamot Project website](https://browser.mt/).
 
 ## Developer documentation
 
