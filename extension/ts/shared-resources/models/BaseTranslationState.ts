@@ -24,8 +24,8 @@ export class BaseTranslationState extends Model({
   detectedLanguageResults: prop<DetectedLanguageResults | null>(() => null, {
     setterAction: true,
   }),
-  sourceLanguage: prop<string>({ setterAction: true }),
-  targetLanguage: prop<string>({ setterAction: true }),
+  translateFrom: prop<string>({ setterAction: true }),
+  translateTo: prop<string>({ setterAction: true }),
   translationStatus: prop<TranslationStatus>(TranslationStatus.UNKNOWN, {
     setterAction: true,
   }),

@@ -68,19 +68,19 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
     }
 
     const {
-      sourceLanguage,
-      targetLanguage,
+      translateFrom,
+      translateTo,
     } = currentTranslateOwnTextTranslationState;
 
-    const setSourceLanguage = $sourceLanguage => {
-      currentTranslateOwnTextTranslationState.sourceLanguage = $sourceLanguage;
+    const setTranslateFrom = $translateFrom => {
+      currentTranslateOwnTextTranslationState.translateFrom = $translateFrom;
       extensionState.setTranslateOwnTextTranslationState(
         currentTranslateOwnTextTranslationState,
       );
     };
 
-    const setTargetLanguage = $targetLanguage => {
-      currentTranslateOwnTextTranslationState.targetLanguage = $targetLanguage;
+    const setTranslateTo = $translateTo => {
+      currentTranslateOwnTextTranslationState.translateTo = $translateTo;
       extensionState.setTranslateOwnTextTranslationState(
         currentTranslateOwnTextTranslationState,
       );
@@ -136,10 +136,10 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
         )}
         <div className={"BergamotApp__languageSwitcher"}>
           <LanguageSwitcher
-            sourceLanguage={sourceLanguage}
-            targetLanguage={targetLanguage || browserUiLanguageCode}
-            onChangeSourceLanguage={setSourceLanguage}
-            onChangeTargetLanguage={setTargetLanguage}
+            translateFrom={translateFrom}
+            translateTo={translateTo || browserUiLanguageCode}
+            onChangeTranslateFrom={setTranslateFrom}
+            onChangeTranslateTo={setTranslateTo}
           />
         </div>
         <div className={"Translate__body"}>
@@ -151,8 +151,8 @@ export class Translate extends React.Component<TranslateProps, TranslateState> {
             <div className={"Translate__title"}>Target</div>
             <TranslatedText
               text={text}
-              sourceLanguage={sourceLanguage}
-              targetLanguage={targetLanguage}
+              translateFrom={translateFrom}
+              translateTo={translateTo}
             />
           </div>
         </div>

@@ -38,11 +38,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
     mainInterfaceInitialProps: (null as unknown) as MainInterfaceInitialProps,
   };
   state = {};
-  async setSourceLanguage(sourceLanguage) {
-    return this.setState({ sourceLanguage });
+  async setTranslateFrom(translateFrom) {
+    return this.setState({ translateFrom });
   }
-  async setTargetLanguage(targetLanguage) {
-    return this.setState({ targetLanguage });
+  async setTranslateTo(translateTo) {
+    return this.setState({ translateTo });
   }
   render() {
     const { extensionState, mainInterfaceInitialProps } = this.props;
@@ -69,8 +69,8 @@ export class Home extends React.Component<HomeProps, HomeState> {
       translationStatus,
       translationRequested,
       detectedLanguageResults,
-      sourceLanguage,
-      targetLanguage,
+      translateFrom,
+      translateTo,
     } = topFrameDocumentTranslationState;
 
     const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
@@ -170,10 +170,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
       let text = browser.i18n.getMessage(
         `translationStatus_${translationStatus}_mainInterfaceMessage`,
       );
-      if (targetLanguage) {
+      if (translateTo) {
         text = text.replace(
           "[TARGET_LANG]",
-          browser.i18n.getMessage(`language_iso6391_${targetLanguage}`),
+          browser.i18n.getMessage(`language_iso6391_${translateTo}`),
         );
       }
       if (detectedLanguageResults) {
@@ -250,7 +250,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
               ),
             },
             {
-              text: <>Always translate {sourceLanguage}</>,
+              text: <>Always translate {translateFrom}</>,
               icon: <BsGear />,
               action: <Switch />,
             },
@@ -303,10 +303,10 @@ export class Home extends React.Component<HomeProps, HomeState> {
             <>
               <div className={"BergamotApp__languageSwitcher"}>
                 <LanguageSwitcher
-                  sourceLanguage={sourceLanguage}
-                  targetLanguage={targetLanguage}
-                  onChangeTargetLanguage={this.setTargetLanguage.bind(this)}
-                  onChangeSourceLanguage={this.setSourceLanguage.bind(this)}
+                  translateFrom={translateFrom}
+                  translateTo={translateTo}
+                  onChangeTranslateTo={this.setTranslateTo.bind(this)}
+                  onChangeTranslateFrom={this.setTranslateFrom.bind(this)}
                 />
               </div>
             </>

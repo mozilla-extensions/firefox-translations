@@ -159,7 +159,7 @@ export class ExtensionIconTranslationState {
               await dynamicActionIcon.stopLoadingIndication(tabId);
               dynamicActionIcon.drawBadge(
                 {
-                  text: dts.targetLanguage,
+                  text: dts.translateTo,
                   textColor: "#ffffff",
                   backgroundColor: "#000000AA",
                 },

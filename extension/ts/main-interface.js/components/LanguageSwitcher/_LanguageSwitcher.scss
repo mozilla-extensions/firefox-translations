@@ -24,7 +24,7 @@
     display: flex;
   }
 
-  &__sourceLanguage {
+  &__translateFrom {
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -33,7 +33,7 @@
     justify-content: flex-start;
   }
 
-  &__targetLanguage {
+  &__translateTo {
     cursor: pointer;
     position: relative;
     display: flex;
@@ -68,13 +68,13 @@
   }
 
   &.source {
-    .LanguageSwitcher__sourceLanguage {
+    .LanguageSwitcher__translateFrom {
       color: var(--color-teal-6);
     }
   }
 
   &.target {
-    .LanguageSwitcher__targetLanguage {
+    .LanguageSwitcher__translateTo {
       color: var(--color-teal-6);
     }
 

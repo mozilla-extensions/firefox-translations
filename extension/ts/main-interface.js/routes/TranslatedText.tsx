@@ -4,13 +4,13 @@ import { Translator } from "../lib/Translator";
 const translator = new Translator();
 interface TranslatedTextProps {
   text: string;
-  sourceLanguage: string;
-  targetLanguage: string;
+  translateFrom: string;
+  translateTo: string;
 }
 export const TranslatedText = ({
   text,
-  sourceLanguage,
-  targetLanguage,
+  translateFrom,
+  translateTo,
 }: TranslatedTextProps) => {
   const [translatedText, setTranslatedText] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -19,11 +19,11 @@ export const TranslatedText = ({
       return;
     }
     setLoading(true);
-    translator.translate(sourceLanguage, targetLanguage, text).then(res => {
+    translator.translate(translateFrom, translateTo, text).then(res => {
       setTranslatedText(res);
       setLoading(false);
     });
-  }, [sourceLanguage, targetLanguage, text]);
+  }, [translateFrom, translateTo, text]);
   return (
     <TextField
       textArea

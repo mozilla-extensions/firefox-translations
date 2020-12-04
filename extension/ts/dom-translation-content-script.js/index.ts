@@ -76,8 +76,8 @@ const init = async () => {
         if (currentTabFrameDocumentTranslationState.translationRequested) {
           console.info("Translating web page");
           await translationChild.doTranslation(
-            currentTabFrameDocumentTranslationState.sourceLanguage,
-            currentTabFrameDocumentTranslationState.targetLanguage,
+            currentTabFrameDocumentTranslationState.translateFrom,
+            currentTabFrameDocumentTranslationState.translateTo,
           );
           console.info("Translated web page");
           extensionState.patchDocumentTranslationStateByFrameInfo(frameInfo, [

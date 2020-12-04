@@ -8,30 +8,30 @@ import { BiTransfer } from "react-icons/bi";
 import { config } from "../../../config";
 
 interface Props {
-  sourceLanguage: string;
-  targetLanguage: string;
-  onChangeSourceLanguage: (sourceLanguage: string) => void;
-  onChangeTargetLanguage: (targetLanguage: string) => void;
+  translateFrom: string;
+  translateTo: string;
+  onChangeTranslateFrom: (translateFrom: string) => void;
+  onChangeTranslateTo: (translateTo: string) => void;
 }
 
 export class LanguageSwitcher extends React.Component<Props, {}> {
   state = {
-    sourceLanguageListOpen: false,
-    targetLanguageListOpen: false,
+    translateFromListOpen: false,
+    translateToListOpen: false,
   };
 
   render() {
     const {
-      sourceLanguage,
-      targetLanguage,
-      onChangeSourceLanguage,
-      onChangeTargetLanguage,
+      translateFrom,
+      translateTo,
+      onChangeTranslateFrom,
+      onChangeTranslateTo,
     } = this.props;
 
-    const sourceLanguages = [
+    const translateFroms = [
       ...new Set(config.supportedLanguagePairs.map(lp => lp[0])),
     ];
-    const targetLanguages = [
+    const translateTos = [
       ...new Set(config.supportedLanguagePairs.map(lp => lp[1])),
     ];
 
@@ -50,19 +50,19 @@ export class LanguageSwitcher extends React.Component<Props, {}> {
     };
 
     const switchLanguages = () => {
-      onChangeSourceLanguage(targetLanguage);
-      onChangeTargetLanguage(sourceLanguage);
+      onChangeTranslateFrom(translateTo);
+      onChangeTranslateTo(translateFrom);
     };
 
     return (
       <div className={classes}>
-        <span className={"LanguageSwitcher__sourceLanguage"}>
+        <span className={"LanguageSwitcher__translateFrom"}>
           <span className={"LanguageSwitcher__languageType"}>Source</span>
           <span className={"flex items-center"}>
-            {displayLanguage(sourceLanguage)}
+            {displayLanguage(translateFrom)}
             <Menu
-              items={sourceLanguages.map(toLanguageOption)}
-              setSelection={onChangeSourceLanguage}
+              items={translateFroms.map(toLanguageOption)}
+              setSelection={onChangeTranslateFrom}
             >
               <span className={"LanguageSwitcher__select"}>
                 <BsChevronDown />
@@ -76,13 +76,13 @@ export class LanguageSwitcher extends React.Component<Props, {}> {
             icon={<BiTransfer onClick={switchLanguages} />}
           />
         </span>
-        <span className={"LanguageSwitcher__targetLanguage"}>
+        <span className={"LanguageSwitcher__translateTo"}>
           <span className={"LanguageSwitcher__languageType"}>Target</span>
           <span className={"flex items-center"}>
-            {displayLanguage(targetLanguage)}
+            {displayLanguage(translateTo)}
             <Menu
-              items={targetLanguages.map(toLanguageOption)}
-              setSelection={onChangeTargetLanguage}
+              items={translateTos.map(toLanguageOption)}
+              setSelection={onChangeTranslateTo}
             >
               <span className={"LanguageSwitcher__select"}>
                 <BsChevronDown />
