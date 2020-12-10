@@ -8,5 +8,8 @@ export class DocumentTranslationState extends ExtendedModel(
     windowId: prop<number>(),
     frameId: prop<number>(),
     showOriginal: prop<boolean>({ setterAction: true }),
+    url: prop<string>(),
+    wordCountInViewport: prop<number>(),
+    wordCountVisibleInViewport: prop<number>(),
   },
 ) {}

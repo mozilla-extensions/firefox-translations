@@ -38,6 +38,9 @@ const init = async () => {
     extensionState,
   );
 
+  const documentTranslationStatistics = await translationChild.getDocumentTranslationStatistics();
+  console.log({ documentTranslationStatistics });
+
   // TODO: Prevent multiple translations from occurring simultaneously + enable cancellations of existing translation jobs
 
   // Any subsequent actions are determined by document translation state changes
@@ -145,6 +148,11 @@ const init = async () => {
       new DocumentTranslationState({
         ...frameInfo,
         translationStatus: TranslationStatus.UNKNOWN,
+        url: window.location.href,
+        wordCount: documentTranslationStatistics.wordCount,
+        wordCountInViewport: documentTranslationStatistics.wordCountInViewport,
+        wordCountVisibleInViewport:
+          documentTranslationStatistics.wordCountVisibleInViewport,
       }),
     );
   } catch (err) {

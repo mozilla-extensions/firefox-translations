@@ -32,6 +32,7 @@ export class BaseTranslationState extends Model({
     setterAction: true,
   }),
   tabId: prop<number>(),
+  wordCount: prop<number>(),
 }) {
   @computed
   get effectiveTranslateFrom() {
