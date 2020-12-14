@@ -1,0 +1,48 @@
+.Radio {
+  display: flex;
+  align-items: center;
+
+  & label {
+    cursor: pointer;
+  }
+
+  & input {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  &__checkmark {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 4px;
+    border-radius: 50%;
+    border: 1px solid lightgray;
+    transition: all 0.2s ease;
+    background-size: 0 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-white);
+    cursor: pointer;
+
+    & svg {
+      stroke-width: 2;
+      transform: scale(0);
+      transition: all 0.2s ease;
+    }
+  }
+
+  & input:checked ~ .Radio__checkmark {
+    background: var(--color-teal-6);
+    border: 1px solid var(--color-teal-6);
+    background-size: 100% 100%;
+
+    & svg {
+      stroke-width: 2;
+      transform: scale(1.5);
+    }
+  }
+}

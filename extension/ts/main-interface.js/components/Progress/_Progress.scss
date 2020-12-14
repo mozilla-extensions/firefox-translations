@@ -1,0 +1,67 @@
+.DemoControlledProgress {
+  display: flex;
+
+  & .Text {
+    flex: 1;
+    border: 1px solid var(--color-neutral-5);
+    margin-left: 120px;
+    padding: 40px 40px;
+    border-radius: 2px;
+  }
+}
+
+.Progress {
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+
+  &.bar &__outer {
+    width: 300px;
+    height: 4px;
+    background: lightgray;
+    display: block;
+    position: relative;
+    border-radius: 4px;
+  }
+
+  &.bar &__inner {
+    width: 40px;
+    height: 100%;
+    background: var(--color-teal-6);
+    display: inline-block;
+    position: absolute;
+    border-radius: 4px;
+  }
+
+  &.bar &__label {
+    font-size: 12px;
+    color: darkgray;
+    margin-left: 8px;
+  }
+
+  &.finished &__inner {
+    background-color: var(--color-green-6);
+  }
+
+  &.paused &__inner {
+    background-color: darkgray;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    & svg {
+      stroke-width: 1;
+    }
+  }
+
+  &.paused &__icon {
+    color: darkgray;
+  }
+
+  &.finished &__icon {
+    color: var(--color-green-6);
+  }
+}

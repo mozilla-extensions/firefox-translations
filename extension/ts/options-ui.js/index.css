@@ -1,0 +1,21 @@
+/* purgecss start ignore */
+
+html {
+  font-size: 12px;
+}
+
+body {
+  background-color: #fff;
+}
+
+.btn {
+  @apply py-2 px-4 rounded;
+}
+.btn-grey {
+  @apply bg-gray-200;
+}
+.btn-grey:hover {
+  @apply bg-gray-300;
+}
+
+/* purgecss end ignore */

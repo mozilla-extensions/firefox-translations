@@ -1,0 +1,75 @@
+.Alert {
+  width: 100%;
+  position: relative;
+  background: var(--color-teal-1);
+  color: var(--color-teal-6);
+  font-size: 14px;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+
+  &__closeButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 8px;
+    cursor: pointer;
+
+    &:hover::after {
+      content: "";
+      position: absolute;
+      display: inline-block;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__prefixIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    margin-left: 4px;
+  }
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 100%;
+    position: absolute;
+    background: var(--color-teal-6);
+    left: 0;
+    top: 0;
+    transition: all 0.5s ease;
+  }
+
+  &.error {
+    background: var(--color-red-1);
+    color: var(--color-red-6);
+
+    &::before {
+      background: var(--color-red-6);
+    }
+  }
+
+  &.success {
+    background: var(--color-green-1);
+    color: var(--color-green-6);
+
+    &::before {
+      background: var(--color-green-6);
+    }
+  }
+
+  &.warning {
+    background: var(--color-orange-1);
+    color: var(--color-orange-6);
+
+    &::before {
+      background: var(--color-orange-6);
+    }
+  }
+}

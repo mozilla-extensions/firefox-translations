@@ -1,0 +1,72 @@
+.Swatch {
+  width: 240px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  text-align: center;
+  transition: all 0.1s;
+  cursor: pointer;
+
+  &:hover {
+    border-radius: 0.1rem;
+    transform: scale(1.1);
+    box-shadow: 1px 1px 20px rgba(black, 0.1);
+  }
+}
+
+.router-wrapper {
+  height: 100%;
+  width: 100%;
+}
+
+.fade-enter {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: all 3000ms;
+}
+
+.fade-enter-active {
+  height: 100%;
+  width: 100%;
+  opacity: 1;
+  transition: all 3000ms;
+}
+
+.fade-exit {
+  height: 100%;
+  width: 100%;
+  opacity: 1;
+  transition: all 3000ms;
+}
+
+.fade-exit-active {
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: all 3000ms;
+}
+
+@import "./scss/_variables.scss";
+@import "./scss/_base.scss";
+@import "./scss/_animation.scss";
+
+@import "./components/Button/_Button.scss";
+@import "./components/Switch/_Switch.scss";
+@import "./components/TextField/_TextField.scss";
+@import "./components/Alert/_Alert.scss";
+@import "./components/Checkbox/_Checkbox.scss";
+@import "./components/Radio/_Radio.scss";
+@import "./components/Card/_Card.scss";
+@import "./components/Progress/_Progress.scss";
+@import "./components/List/List.scss";
+@import "./components/LanguageSwitcher/_LanguageSwitcher.scss";
+@import "./components/Header/_Header.scss";
+@import "./components/Icon/_Icon.scss";
+@import "./components/QualityEstimationContainer/_QualityEstimationContainer.scss";
+@import "./components/InputBox/_InputBox.scss";
+@import "./components/Menu/_Menu.scss";
+
+@import "./routes/Home.scss";
+@import "./routes/Translate.scss";
+@import "./App.scss";

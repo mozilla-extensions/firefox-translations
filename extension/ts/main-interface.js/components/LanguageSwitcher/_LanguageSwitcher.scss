@@ -1,0 +1,85 @@
+.LanguageSwitcher {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  // margin: 8px;
+  font-size: 24px;
+  color: var(--color-neutral-5);
+  background-color: var(--color-white);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(var(--color-black-rgb), 0.05);
+
+  &__languageType {
+    color: var(--color-neutral-5);
+    font-size: 12px;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  & > * {
+    margin: 10px;
+  }
+
+  & span {
+    display: flex;
+  }
+
+  &__translateFrom {
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  &__translateTo {
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    & select {
+      display: none;
+    }
+
+    & option {
+      font-size: 12px;
+    }
+  }
+
+  &__select {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 4px;
+    font-size: 12px;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: var(--color-neutral-4);
+    }
+
+    & svg {
+      stroke-width: 2px;
+    }
+  }
+
+  &.source {
+    .LanguageSwitcher__translateFrom {
+      color: var(--color-teal-6);
+    }
+  }
+
+  &.target {
+    .LanguageSwitcher__translateTo {
+      color: var(--color-teal-6);
+    }
+
+    .LanguageSwitcher__select {
+      color: var(--color-neutral-7);
+    }
+  }
+}
