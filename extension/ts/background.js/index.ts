@@ -6,7 +6,7 @@ import { Store } from "./Store";
 import { localStorageWrapper } from "./lib/localStorageWrapper";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
-import { MobxKeystoneBackgroundContextHost } from "./MobxKeystoneBackgroundContextHost";
+import { MobxKeystoneBackgroundContextHost } from "./lib/MobxKeystoneBackgroundContextHost";
 import { BergamotApiClient } from "./BergamotApiClient";
 import { FrameInfo } from "../shared-resources/bergamot.types";
 import { ExtensionState } from "../shared-resources/models/ExtensionState";

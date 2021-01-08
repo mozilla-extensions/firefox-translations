@@ -37,11 +37,11 @@
   },
   "translationStatus_DOWNLOADING_TRANSLATION_MODEL_mainInterfaceMessage": {
     "message": "Downloading language files for translation...",
-    "description": "Main interface dropdown message for: Translation in Progress"
+    "description": "Main interface dropdown message for: When language files are downloaded"
   },
   "translationStatus_TRANSLATING_mainInterfaceMessage": {
     "message": "Translating page content...",
-    "description": "Main interface dropdown message for: Translation in Progress"
+    "description": "Main interface dropdown message for: When translation is in progress"
   },
   "translationStatus_TRANSLATED_mainInterfaceMessage": {
     "message": "This page has been translated from [SOURCE_LANG] to [TARGET_LANG].",

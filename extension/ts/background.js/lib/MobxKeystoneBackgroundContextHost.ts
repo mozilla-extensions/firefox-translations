@@ -8,10 +8,10 @@ import {
   SerializedActionCallWithModelIdOverrides,
   setGlobalConfig,
 } from "mobx-keystone";
-import { captureExceptionWithExtras } from "../shared-resources/ErrorReporting";
-import { ExtensionState } from "../shared-resources/models/ExtensionState";
-import { DocumentTranslationState } from "../shared-resources/models/DocumentTranslationState";
-import { TranslateOwnTextTranslationState } from "../shared-resources/models/TranslateOwnTextTranslationState";
+import { captureExceptionWithExtras } from "../../shared-resources/ErrorReporting";
+import { ExtensionState } from "../../shared-resources/models/ExtensionState";
+import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
+import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 
 // If we don't import and use all relevant models here, we can't reference models in this build
 // Ref: https://github.com/xaviergonz/mobx-keystone/issues/183
