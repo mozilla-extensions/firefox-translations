@@ -2,7 +2,7 @@
 
 For more information see [The Bergamot Project website](https://browser.mt/).
 
-## Installation and usage instructions
+## Installation instructions
 
 See [extension/docs/INSTALL.md](./extension/docs/INSTALL.md) for instructions on how to get a pre-released version of the extension running locally.
 
