@@ -19,7 +19,7 @@ This document outlines how to get a pre-released version of the extension runnin
 
 ## Firefox
 
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.1.0/bergamot_translate-0.1.0-firefox.xpi)
+- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.1.0/bergamot_translate-0.1.0-an+fx.xpi)
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
 
