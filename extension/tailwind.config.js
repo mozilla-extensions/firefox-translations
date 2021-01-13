@@ -1,6 +1,7 @@
 /* eslint-env node */
 
 module.exports = {
+  purge: false,
   theme: {
     fontFamily: {
       sans: [
