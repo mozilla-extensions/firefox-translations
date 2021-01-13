@@ -4,7 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const packageJson = require("./package.json");
 const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const destPath = path.join(__dirname, "build", targetBrowser);
+const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const destPath = path.join(__dirname, "build", targetBrowser, ui);
+
+// Using native UI requires a special build and signing process, restricted to specific extension ids
+const extensionId = (targetBrowser === "firefox" && ui === "native-ui") ? "translation@mozilla.org" : "bergamot-browser-extension@browser.mt";
 
 async function generateManifest({ dotEnvPath }) {
   require("dotenv").config({ path: dotEnvPath });
@@ -40,23 +44,48 @@ async function generateManifest({ dotEnvPath }) {
       96: "icons/extension-icon.96x96.png",
       128: "icons/extension-icon.128x128.png",
     },
-    browser_action: {
-      default_icon: "icons/extension-icon.inactive.38x38.png",
-      default_title: "__MSG_browserActionButtonTitle__",
-      default_popup: "main-interface/popup.html",
-    },
     options_ui: {
       page: "options-ui/options-ui.html",
     },
   };
+  if (ui === "native-ui") {
+    manifest.hidden = true;
+    manifest.experiment_apis = {
+      translateUi: {
+        schema: "./experiment-apis/translateUi/schema.json",
+        parent: {
+          scopes: ["addon_parent"],
+          script: "./experiment-apis/translateUi/api.js",
+          paths: [["experiments", "translateUi"]],
+        },
+      },
+    };
+    manifest.page_action = {
+      browser_style: false,
+      default_icon: {
+        "16": "icons/translation-16.png",
+        "32": "icons/translation-16@2x.png",
+      },
+      default_title: "Translate",
+      default_popup: "main-interface/popup.html",
+    };
+  } else {
+    manifest.browser_action = {
+      default_icon: "icons/extension-icon.inactive.38x38.png",
+      default_title: "__MSG_browserActionButtonTitle__",
+      default_popup: "main-interface/popup.html",
+    };
+  }
   if (targetBrowser === "firefox") {
     manifest.applications = {
       gecko: {
-        id: "bergamot-browser-extension@browser.mt",
+        id: extensionId,
         strict_min_version: "77.0a1",
       },
     };
-    manifest.browser_action.browser_style = false;
+    if (ui === "extension-ui") {
+      manifest.browser_action.browser_style = false;
+    }
     manifest.options_ui.browser_style = false;
   }
   if (targetBrowser === "chrome") {

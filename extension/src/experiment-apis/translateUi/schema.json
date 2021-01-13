@@ -1,0 +1,22 @@
+[
+  {
+    "namespace": "experiments.translateUi",
+    "description": "Provides browser chrome UI that reacts to translation states and fires events on user interaction",
+    "functions": [
+      {
+        "name": "start",
+        "type": "function",
+        "async": true,
+        "description": "Start reacting to translation state updates",
+        "parameters": []
+      },
+      {
+        "name": "stop",
+        "type": "function",
+        "async": true,
+        "description": "Stop reacting to translation state updates",
+        "parameters": []
+      }
+    ]
+  }
+]

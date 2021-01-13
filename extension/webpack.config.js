@@ -7,7 +7,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
 const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const destPath = path.join(__dirname, "build", targetBrowser);
+const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const destPath = path.join(__dirname, "build", targetBrowser, ui);
 
 const dotEnvPath =
   process.env.NODE_ENV === "production"
@@ -47,7 +48,7 @@ if (
 
 module.exports = {
   entry: {
-    background: "./ts/background-scripts/background.js/index.ts",
+    background: `./ts/background-scripts/background.js/${ui}.ts`,
     "dom-translation-content-script":
       "./ts/content-scripts/dom-translation-content-script.js/index.ts",
     "get-started": "./ts/extension-ui/get-started.js/index.tsx",

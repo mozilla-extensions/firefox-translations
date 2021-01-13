@@ -1,21 +1,13 @@
-// Temporary mock
-// noinspection JSUnusedLocalSymbols
-class JSWindowActorParent {
-  public browsingContext;
-}
-
-export class TranslationBrowserChromeUi extends JSWindowActorParent {
-  private originalShown;
-
-  get browser() {
-    return this.browsingContext.top.embedderElement;
+export class TranslationBrowserChromeUi {
+  constructor(browser) {
+    this.browser = browser;
   }
 
   showURLBarIcon() {
-    let chromeWin = this.browser.ownerGlobal;
-    let PopupNotifications = chromeWin.PopupNotifications;
-    let removeId = this.originalShown ? "translated" : "translate";
-    let notification = PopupNotifications.getNotification(
+    const chromeWin = this.browser.ownerGlobal;
+    const PopupNotifications = chromeWin.PopupNotifications;
+    const removeId = this.originalShown ? "translated" : "translate";
+    const notification = PopupNotifications.getNotification(
       removeId,
       this.browser,
     );
@@ -23,9 +15,9 @@ export class TranslationBrowserChromeUi extends JSWindowActorParent {
       PopupNotifications.remove(notification);
     }
 
-    let callback = aTopic => {
-      if (aTopic == "swapping") {
-        let infoBarVisible = this.notificationBox.getNotificationWithValue(
+    const callback = aTopic => {
+      if (aTopic === "swapping") {
+        const infoBarVisible = this.notificationBox.getNotificationWithValue(
           "translation",
         );
         if (infoBarVisible) {
@@ -34,10 +26,10 @@ export class TranslationBrowserChromeUi extends JSWindowActorParent {
         return true;
       }
 
-      if (aTopic != "showing") {
+      if (aTopic !== "showing") {
         return false;
       }
-      let translationNotification = this.notificationBox.getNotificationWithValue(
+      const translationNotification = this.notificationBox.getNotificationWithValue(
         "translation",
       );
       if (translationNotification) {
@@ -48,7 +40,7 @@ export class TranslationBrowserChromeUi extends JSWindowActorParent {
       return true;
     };
 
-    let addId = this.originalShown ? "translate" : "translated";
+    const addId = this.originalShown ? "translate" : "translated";
     PopupNotifications.show(
       this.browser,
       addId,
@@ -65,8 +57,8 @@ export class TranslationBrowserChromeUi extends JSWindowActorParent {
   }
 
   showTranslationInfoBar() {
-    let notificationBox = this.notificationBox;
-    let notif = notificationBox.appendNotification(
+    const notificationBox = this.notificationBox;
+    const notif = notificationBox.appendNotification(
       "",
       "translation",
       null,
@@ -78,5 +70,4 @@ export class TranslationBrowserChromeUi extends JSWindowActorParent {
     notif.init(this);
     return notif;
   }
-
 }

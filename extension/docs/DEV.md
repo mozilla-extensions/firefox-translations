@@ -44,7 +44,7 @@ To build for Firefox:
 yarn build:production
 ```
 
-The build artifact will be created under `dist/firefox/`.
+The build artifact will be created under `dist/firefox/extension-ui`.
 
 For Chrome:
 
@@ -52,7 +52,15 @@ For Chrome:
 TARGET_BROWSER=chrome yarn build:production
 ```
 
-The build artifact will be created under `dist/chrome/`.
+The build artifact will be created under `dist/chrome/extension-ui`.
+
+To build the Firefox native UI variant:
+
+```
+UI=native-ui yarn build:production
+```
+
+The build artifact will be created under `dist/firefox/native-ui`.
 
 ## Development mode
 
@@ -72,6 +80,12 @@ Then:
 
 ```
 yarn watch
+```
+
+Or, for the Firefox native UI variant:
+
+```
+UI=native-ui yarn watch
 ```
 
 ### Chrome
@@ -124,7 +138,7 @@ After version bumping and setting the API_KEY and API_SECRET env vars:
 yarn build:production && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
 ```
 
-Note: This is for Firefox only. Chrome Web Store does not offer signed builds for self-distribution.
+Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
 
 ## Troubleshooting
 
