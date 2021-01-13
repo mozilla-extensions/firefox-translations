@@ -47,12 +47,12 @@ if (
 
 module.exports = {
   entry: {
-    background: "./ts/background.js/index.ts",
+    background: "./ts/background-scripts/background.js/index.ts",
     "dom-translation-content-script":
-      "./ts/dom-translation-content-script.js/index.ts",
-    "get-started": "./ts/get-started.js/index.tsx",
-    "main-interface": "./ts/main-interface.js/index.tsx",
-    "options-ui": "./ts/options-ui.js/index.tsx",
+      "./ts/content-scripts/dom-translation-content-script.js/index.ts",
+    "get-started": "./ts/extension-ui/get-started.js/index.tsx",
+    "main-interface": "./ts/extension-ui/main-interface.js/index.tsx",
+    "options-ui": "./ts/extension-ui/options-ui.js/index.tsx",
     tests: "./ts/tests.js/index.ts",
   },
   output: {
