@@ -12,7 +12,10 @@ const sourceDir = path.join(".", "build", targetBrowser, ui);
 const artifactsDir = path.join(".", "dist", targetBrowser, ui);
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
-const extensionId = (targetBrowser === "firefox" && ui === "native-ui") ? "translation@mozilla.org" : "bergamot-browser-extension@browser.mt";
+const extensionId =
+  targetBrowser === "firefox" && ui === "native-ui"
+    ? "translation@mozilla.org"
+    : "bergamot-browser-extension@browser.mt";
 
 const defaultConfig = {
   // Global options:
@@ -33,7 +36,9 @@ if (targetBrowser === "firefox") {
     process.env.FIREFOX_BINARY || "firefoxdeveloperedition";
   defaultConfig.run.target = ["firefox-desktop"];
   defaultConfig.run.startUrl = [
-    `about:devtools-toolbox?type=extension&id=${encodeURIComponent(extensionId)}`,
+    `about:devtools-toolbox?type=extension&id=${encodeURIComponent(
+      extensionId,
+    )}`,
     "http://localhost:8181/",
     ...examplePagesToTranslate,
     "about:debugging#/runtime/this-firefox",
