@@ -71,6 +71,8 @@ async function generateManifest({ dotEnvPath }) {
       },
       default_title: "Translate",
       default_popup: "main-interface/popup.html",
+      show_matches: ["<all_urls>"],
+      pinned: true,
     };
   } else {
     manifest.browser_action = {
