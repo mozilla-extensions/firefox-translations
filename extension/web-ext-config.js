@@ -27,7 +27,7 @@ const defaultConfig = {
     overwriteDest: true,
   },
   run: {
-    browserConsole: false,
+    browserConsole: ui === "native-ui",
   },
 };
 
