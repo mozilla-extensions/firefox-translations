@@ -56,9 +56,9 @@ interface BrowserWithExperimentAPIs extends browserInterface {
       onSelectTranslateFrom: Event<any>;
       onInfoBarClosed: Event<any>;
       onNeverTranslateThisSite: Event<any>;
-      onNotNowButtonPressed: Event<any>;
       onTranslateButtonPressed: Event<any>;
       onShowOriginalButtonPressed: Event<any>;
+      onShowTranslatedButtonPressed: Event<any>;
     };
   };
 }
@@ -69,9 +69,9 @@ type NativeTranslateUiEventRef =
   | "onSelectTranslateFrom"
   | "onInfoBarClosed"
   | "onNeverTranslateThisSite"
-  | "onNotNowButtonPressed"
   | "onTranslateButtonPressed"
-  | "onShowOriginalButtonPressed";
+  | "onShowOriginalButtonPressed"
+  | "onShowTranslatedButtonPressed";
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;
@@ -84,9 +84,9 @@ export class NativeTranslateUiBroker {
       "onSelectTranslateFrom",
       "onInfoBarClosed",
       "onNeverTranslateThisSite",
-      "onNotNowButtonPressed",
       "onTranslateButtonPressed",
       "onShowOriginalButtonPressed",
+      "onShowTranslatedButtonPressed",
     ];
   }
 
@@ -106,7 +106,9 @@ export class NativeTranslateUiBroker {
         dts.translationStatus,
       );
       return {
-        detectedLanguage: dts.detectedLanguageResults ? dts.detectedLanguageResults.language : undefined,
+        detectedLanguage: dts.detectedLanguageResults
+          ? dts.detectedLanguageResults.language
+          : undefined,
         infobarState,
         translatedFrom: dts.translateFrom,
         translatedTo: dts.translateTo,
@@ -190,16 +192,16 @@ export class NativeTranslateUiBroker {
     console.log("onNeverTranslateThisSite", { foo });
   }
 
-  onNotNowButtonPressed(foo) {
-    console.log("onNotNowButtonPressed", { foo });
-  }
-
-  onTranslateButtonPressed(foo) {
-    console.log("onTranslateButtonPressed", { foo });
+  onTranslateButtonPressed(from, to) {
+    console.log("onTranslateButtonPressed", { from, to });
   }
 
   onShowOriginalButtonPressed(foo) {
     console.log("onShowOriginalButtonPressed", { foo });
+  }
+
+  onShowTranslatedButtonPressed(foo) {
+    console.log("onShowTranslatedButtonPressed", { foo });
   }
 
   async stop() {

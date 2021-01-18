@@ -47,11 +47,6 @@ this.translateUi = class extends ExtensionAPI {
     );
     const { ExtensionError } = ExtensionUtils;
 
-    const { BrowserWindowTracker } = ChromeUtils.import(
-      "resource:///modules/BrowserWindowTracker.jsm",
-      {},
-    );
-
     /**
      * Boilerplate-reducing factory method translating between
      * apiEventEmitter.emit("translateUi.onFoo", ...args)
@@ -70,6 +65,26 @@ this.translateUi = class extends ExtensionAPI {
       });
     };
 
+    const { tabManager } = context.extension;
+    const translationBrowserChromeUiInstancesByTabId = new Map();
+    const getTranslationBrowserChromeUiInstanceByTabId = tabId => {
+      if (translationBrowserChromeUiInstancesByTabId.has(tabId)) {
+        return translationBrowserChromeUiInstancesByTabId.get(tabId);
+      }
+      const tab = tabManager.get(tabId);
+      const { browser } = tab;
+      const translationBrowserChromeUi = new TranslationBrowserChromeUi(
+        browser,
+        context,
+        apiEventEmitter,
+      );
+      translationBrowserChromeUiInstancesByTabId.set(
+        tabId,
+        translationBrowserChromeUi,
+      );
+      return translationBrowserChromeUi;
+    };
+
     return {
       experiments: {
         translateUi: {
@@ -77,23 +92,6 @@ this.translateUi = class extends ExtensionAPI {
           start: async function start() {
             try {
               console.log("Called start()");
-
-              function getMostRecentBrowserWindow() {
-                return BrowserWindowTracker.getTopWindow({
-                  private: false,
-                  allowPopups: false,
-                });
-              }
-
-              const recentWindow = getMostRecentBrowserWindow();
-              if (recentWindow && recentWindow.gBrowser) {
-                const translationBrowserChromeUi = new TranslationBrowserChromeUi(
-                  recentWindow.gBrowser,
-                  context,
-                );
-                translationBrowserChromeUi.showURLBarIcon();
-                translationBrowserChromeUi.showTranslationInfoBar();
-              }
 
               return undefined;
             } catch (error) {
@@ -110,6 +108,10 @@ this.translateUi = class extends ExtensionAPI {
                 tabId,
                 uiState,
               });
+              const translationBrowserChromeUi = getTranslationBrowserChromeUiInstanceByTabId(
+                tabId,
+              );
+              translationBrowserChromeUi.onUiStateUpdate(uiState);
               return undefined;
             } catch (error) {
               // Surface otherwise silent or obscurely reported errors

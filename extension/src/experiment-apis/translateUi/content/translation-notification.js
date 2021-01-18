@@ -65,16 +65,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             <menuitem anonid="neverForSite" oncommand="this.closest('notification').neverForSite();" label="&translation.options.neverForSite.label;" accesskey="&translation.options.neverForSite.accesskey;"/>
             <menuseparator/>
             <menuitem oncommand="openPreferences('paneGeneral');" label="&translation.options.preferences.label;" accesskey="&translation.options.preferences.accesskey;"/>
-            <menuitem class="subviewbutton panel-subview-footer" oncommand="this.closest('notification').openProviderAttribution();">
-              <deck anonid="translationEngine" selectedIndex="0">
-                <hbox class="translation-attribution">
-                  <label/>
-                  <image src="chrome://browser/content/microsoft-translator-attribution.png" aria-label="Microsoft Translator"/>
-                  <label/>
-                </hbox>
-                <label class="translation-attribution"/>
-              </deck>
-            </menuitem>
           </menupopup>
         </button>
       </hbox>
@@ -132,7 +122,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     return this._getAnonElt("translationStates").selectedIndex;
   }
 
-  // aTranslation is the TranslationParent actor.
+  // aTranslation is a TranslationBrowserChromeUiNotificationManager instance.
   init(aTranslation) {
     this.translation = aTranslation;
 
@@ -147,56 +137,38 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     const detectedLanguage = this._getAnonElt("detectedLanguage");
     const fromLanguage = this._getAnonElt("fromLanguage");
     const sourceLanguages = sortByLocalizedName(
-      Translation.supportedSourceLanguages,
+      this.translation.uiState.supportedSourceLanguages,
     );
     for (const [code, name] of sourceLanguages) {
       detectedLanguage.appendItem(name, code);
       fromLanguage.appendItem(name, code);
     }
-    detectedLanguage.value = this.translation.detectedLanguage;
+    detectedLanguage.value = this.translation.uiState.detectedLanguage;
+    console.log("detectedLanguage.value", detectedLanguage.value, {
+      sourceLanguages,
+      detectedLanguage,
+    });
 
     // translatedFrom is only set if we have already translated this page.
-    if (aTranslation.translatedFrom) {
-      fromLanguage.value = aTranslation.translatedFrom;
+    if (aTranslation.uiState.translatedFrom) {
+      fromLanguage.value = aTranslation.uiState.translatedFrom;
     }
 
     // Fill the list of supported target languages.
     const toLanguage = this._getAnonElt("toLanguage");
     const targetLanguages = sortByLocalizedName(
-      Translation.supportedTargetLanguages,
+      this.translation.uiState.supportedTargetLanguages,
     );
     for (const [code, name] of targetLanguages) {
       toLanguage.appendItem(name, code);
     }
 
-    if (aTranslation.translatedTo) {
-      toLanguage.value = aTranslation.translatedTo;
+    if (aTranslation.uiState.translatedTo) {
+      toLanguage.value = aTranslation.uiState.translatedTo;
     }
 
-    if (aTranslation.state) {
-      this.state = aTranslation.state;
-    }
-
-    // Show attribution for the preferred translator.
-    let engineIndex = Object.keys(Translation.supportedEngines).indexOf(
-      Translation.translationEngine,
-    );
-    // We currently only have attribution for the Bing and Yandex engines.
-    if (engineIndex >= 0) {
-      --engineIndex;
-    }
-    const attributionNode = this._getAnonElt("translationEngine");
-    if (engineIndex !== -1) {
-      attributionNode.selectedIndex = engineIndex;
-    } else {
-      // Hide the attribution menuitem
-      let footer = attributionNode.parentNode;
-      footer.hidden = true;
-      // Make the 'Translation preferences' item the new footer.
-      footer = footer.previousSibling;
-      footer.setAttribute("class", "subviewbutton panel-subview-footer");
-      // And hide the menuseparator.
-      footer.previousSibling.hidden = true;
+    if (aTranslation.uiState.infoBarState) {
+      this.state = aTranslation.uiState.infoBarState;
     }
 
     const kWelcomePref = "browser.translation.ui.welcomeMessageShown";
@@ -302,7 +274,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   _handleButtonHiding() {
-    const originalShown = this.translation.originalShown;
+    const originalShown = this.translation.uiState.originalShown;
     this._getAnonElt("showOriginal").hidden = originalShown;
     this._getAnonElt("showTranslation").hidden = !originalShown;
   }
@@ -328,7 +300,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       // If we have never attempted to translate the page before the
       // service became unavailable, "fromLanguage" isn't set.
       if (!lang && this.state === Translation.STATE_UNAVAILABLE) {
-        lang = this.translation.detectedLanguage;
+        lang = this.translation.uiState.detectedLanguage;
       }
     }
 
@@ -388,10 +360,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     perms.addFromPrincipal(principal, "translate", perms.DENY_ACTION);
 
     this.closeCommand();
-  }
-
-  openProviderAttribution() {
-    Translation.openProviderAttribution();
   }
 };
 

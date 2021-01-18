@@ -59,13 +59,13 @@ Foo
 
 **Parameters**
 
-### `browser.experiments.translateUi.onNotNowButtonPressed ()` Event
+### `browser.experiments.translateUi.onShowOriginalButtonPressed ()` Event
 
 Foo
 
 **Parameters**
 
-### `browser.experiments.translateUi.onShowOriginalButtonPressed ()` Event
+### `browser.experiments.translateUi.onShowTranslatedButtonPressed ()` Event
 
 Foo
 

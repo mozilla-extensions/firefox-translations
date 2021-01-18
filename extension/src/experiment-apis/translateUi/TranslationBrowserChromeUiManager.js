@@ -1,35 +1,41 @@
-/* global Services */
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "(TranslationBrowserChromeUiNotificationManager)" }]*/
 
 class TranslationBrowserChromeUiNotificationManager {
-  constructor(browser) {
+  constructor(browser, apiEventEmitter) {
+    this.apiEventEmitter = apiEventEmitter;
     this.browser = browser;
   }
 
-  shouldShowInfoBar(aPrincipal) {
-    // Check if we should never show the infobar for this language.
-    const neverForLangs = Services.prefs.getCharPref(
-      "browser.translation.neverForLanguages",
+  translate(aFrom, aTo) {
+    console.log("translate", { aFrom, aTo });
+    this.apiEventEmitter.emit(
+      "translateUi.onTranslateButtonPressed",
+      aFrom,
+      aTo,
     );
-    if (neverForLangs.split(",").includes(this.detectedLanguage)) {
-      // TranslationTelemetry.recordAutoRejectedTranslationOffer();
-      return false;
-    }
+  }
 
-    // or if we should never show the infobar for this domain.
-    const perms = Services.perms;
-    if (
-      perms.testExactPermissionFromPrincipal(aPrincipal, "translate") ===
-      perms.DENY_ACTION
-    ) {
-      // TranslationTelemetry.recordAutoRejectedTranslationOffer();
-      return false;
-    }
+  showOriginalContent() {
+    console.log("showOriginalContent");
+    this.apiEventEmitter.emit("translateUi.onShowOriginalButtonPressed", "foo");
+  }
 
-    return true;
+  showTranslatedContent() {
+    console.log("showTranslatedContent");
+    this.apiEventEmitter.emit(
+      "translateUi.onShowTranslatedButtonPressed",
+      "foo",
+    );
   }
 
   infobarClosed() {
     console.log("infobarClosed");
+    this.apiEventEmitter.emit("translateUi.onInfoBarClosed", "foo");
   }
+
+  /*
+  | "onSelectTranslateTo"
+  | "onSelectTranslateFrom"
+  | "onNeverTranslateThisSite"
+   */
 }

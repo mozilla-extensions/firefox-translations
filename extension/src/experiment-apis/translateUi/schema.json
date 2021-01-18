@@ -60,13 +60,13 @@
         "parameters": []
       },
       {
-        "name": "onNotNowButtonPressed",
+        "name": "onShowOriginalButtonPressed",
         "type": "function",
         "description": "Foo",
         "parameters": []
       },
       {
-        "name": "onShowOriginalButtonPressed",
+        "name": "onShowTranslatedButtonPressed",
         "type": "function",
         "description": "Foo",
         "parameters": []
