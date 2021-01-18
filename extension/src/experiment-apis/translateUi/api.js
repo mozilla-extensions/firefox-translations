@@ -7,25 +7,55 @@
 
 this.translateUi = class extends ExtensionAPI {
   getAPI(context) {
-    /*
     const { Services } = ChromeUtils.import(
       "resource://gre/modules/Services.jsm",
       {},
     );
-     */
 
+    /*
     const { ExtensionCommon } = ChromeUtils.import(
       "resource://gre/modules/ExtensionCommon.jsm",
       {},
     );
 
-    // const { EventManager, EventEmitter } = ExtensionCommon;
+    const { EventManager, EventEmitter } = ExtensionCommon;
+    */
+
+    const now = Date.now();
+
+    /* global TranslationBrowserChromeUiManager */
+    Services.scriptloader.loadSubScript(
+      context.extension.getURL(
+        "experiment-apis/translateUi/TranslationBrowserChromeUiManager.js",
+      ) +
+        "?cachebuster=" +
+        now,
+    );
+    /* global TranslationBrowserChromeUi */
+    Services.scriptloader.loadSubScript(
+      context.extension.getURL(
+        "experiment-apis/translateUi/TranslationBrowserChromeUi.js",
+      ) +
+        "?cachebuster=" +
+        now,
+    );
+    /* global EveryWindow */
+    Services.scriptloader.loadSubScript(
+      context.extension.getURL("experiment-apis/translateUi/EveryWindow.js") +
+        "?cachebuster=" +
+        now,
+    );
 
     const { ExtensionUtils } = ChromeUtils.import(
       "resource://gre/modules/ExtensionUtils.jsm",
       {},
     );
     const { ExtensionError } = ExtensionUtils;
+
+    const { BrowserWindowTracker } = ChromeUtils.import(
+      "resource:///modules/BrowserWindowTracker.jsm",
+      {},
+    );
 
     // const apiEventEmitter = new EventEmitter();
     return {
@@ -35,6 +65,24 @@ this.translateUi = class extends ExtensionAPI {
           start: async function start() {
             try {
               console.log("Called start()");
+
+              function getMostRecentBrowserWindow() {
+                return BrowserWindowTracker.getTopWindow({
+                  private: false,
+                  allowPopups: false,
+                });
+              }
+
+              const recentWindow = getMostRecentBrowserWindow();
+              if (recentWindow && recentWindow.gBrowser) {
+                const translationBrowserChromeUi = new TranslationBrowserChromeUi(
+                  recentWindow.gBrowser,
+                  context,
+                );
+                translationBrowserChromeUi.showURLBarIcon();
+                translationBrowserChromeUi.showTranslationInfoBar();
+              }
+
               return undefined;
             } catch (error) {
               // Surface otherwise silent or obscurely reported errors

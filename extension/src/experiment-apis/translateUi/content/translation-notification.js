@@ -4,7 +4,7 @@
 
 "use strict";
 
-class MozTranslationNotification extends MozElements.Notification {
+window.MozTranslationNotification = class extends MozElements.Notification {
   static get markup() {
     return `
       <hbox anonid="details" align="center" flex="1">
@@ -391,6 +391,6 @@ class MozTranslationNotification extends MozElements.Notification {
   }
 }
 
-customElements.define("translation-notification", MozTranslationNotification, {
+customElements.define(`translation-notification-${window.now}`, window.MozTranslationNotification, {
   extends: "notification",
 });
