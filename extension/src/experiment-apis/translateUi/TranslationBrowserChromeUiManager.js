@@ -5,8 +5,8 @@ class TranslationBrowserChromeUiNotificationManager {
 
   shouldShowInfoBar(aPrincipal) {
     // Check if we should never show the infobar for this language.
-    let neverForLangs = Services.prefs.getCharPref(
-      "browser.translation.neverForLanguages"
+    const neverForLangs = Services.prefs.getCharPref(
+      "browser.translation.neverForLanguages",
     );
     if (neverForLangs.split(",").includes(this.detectedLanguage)) {
       TranslationTelemetry.recordAutoRejectedTranslationOffer();
@@ -14,7 +14,7 @@ class TranslationBrowserChromeUiNotificationManager {
     }
 
     // or if we should never show the infobar for this domain.
-    let perms = Services.perms;
+    const perms = Services.perms;
     if (
       perms.testExactPermissionFromPrincipal(aPrincipal, "translate") ==
       perms.DENY_ACTION

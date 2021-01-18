@@ -93,7 +93,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   connectedCallback() {
     this.appendChild(this.constructor.fragment);
 
-    for (let [propertyName, selector] of [
+    for (const [propertyName, selector] of [
       ["details", "[anonid=details]"],
       ["messageImage", ".messageImage"],
       ["spacer", "[anonid=spacer]"],
@@ -103,15 +103,15 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   set state(val) {
-    let deck = this._getAnonElt("translationStates");
+    const deck = this._getAnonElt("translationStates");
 
-    let activeElt = document.activeElement;
+    const activeElt = document.activeElement;
     if (activeElt && deck.contains(activeElt)) {
       activeElt.blur();
     }
 
     let stateName;
-    for (let name of ["OFFER", "TRANSLATING", "TRANSLATED", "ERROR"]) {
+    for (const name of ["OFFER", "TRANSLATING", "TRANSLATED", "ERROR"]) {
       if (Translation["STATE_" + name] == val) {
         stateName = name.toLowerCase();
         break;
@@ -134,20 +134,20 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   init(aTranslation) {
     this.translation = aTranslation;
 
-    let sortByLocalizedName = function(aList) {
-      let names = Services.intl.getLanguageDisplayNames(undefined, aList);
+    const sortByLocalizedName = function(aList) {
+      const names = Services.intl.getLanguageDisplayNames(undefined, aList);
       return aList
         .map((code, i) => [code, names[i]])
         .sort((a, b) => a[1].localeCompare(b[1]));
     };
 
     // Fill the lists of supported source languages.
-    let detectedLanguage = this._getAnonElt("detectedLanguage");
-    let fromLanguage = this._getAnonElt("fromLanguage");
-    let sourceLanguages = sortByLocalizedName(
-      Translation.supportedSourceLanguages
+    const detectedLanguage = this._getAnonElt("detectedLanguage");
+    const fromLanguage = this._getAnonElt("fromLanguage");
+    const sourceLanguages = sortByLocalizedName(
+      Translation.supportedSourceLanguages,
     );
-    for (let [code, name] of sourceLanguages) {
+    for (const [code, name] of sourceLanguages) {
       detectedLanguage.appendItem(name, code);
       fromLanguage.appendItem(name, code);
     }
@@ -159,11 +159,11 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
 
     // Fill the list of supported target languages.
-    let toLanguage = this._getAnonElt("toLanguage");
-    let targetLanguages = sortByLocalizedName(
-      Translation.supportedTargetLanguages
+    const toLanguage = this._getAnonElt("toLanguage");
+    const targetLanguages = sortByLocalizedName(
+      Translation.supportedTargetLanguages,
     );
-    for (let [code, name] of targetLanguages) {
+    for (const [code, name] of targetLanguages) {
       toLanguage.appendItem(name, code);
     }
 
@@ -177,13 +177,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     // Show attribution for the preferred translator.
     let engineIndex = Object.keys(Translation.supportedEngines).indexOf(
-      Translation.translationEngine
+      Translation.translationEngine,
     );
     // We currently only have attribution for the Bing and Yandex engines.
     if (engineIndex >= 0) {
       --engineIndex;
     }
-    let attributionNode = this._getAnonElt("translationEngine");
+    const attributionNode = this._getAnonElt("translationEngine");
     if (engineIndex != -1) {
       attributionNode.selectedIndex = engineIndex;
     } else {
@@ -210,7 +210,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       function() {
         // These strings are hardcoded because they need to reach beta
         // without riding the trains.
-        let localizedStrings = {
+        const localizedStrings = {
           en: [
             "Hey look! It's something new!",
             "Now the Web is even more accessible with our new in-page translation feature. Click the translate button to try it!",
@@ -253,22 +253,22 @@ window.MozTranslationNotification = class extends MozElements.Notification {
         if (!(locale in localizedStrings)) {
           locale = "en";
         }
-        let strings = localizedStrings[locale];
+        const strings = localizedStrings[locale];
 
         this._getAnonElt("welcomeHeadline").setAttribute("value", strings[0]);
         this._getAnonElt("welcomeBody").textContent = strings[1];
         this._getAnonElt("learnMore").setAttribute("value", strings[2]);
         this._getAnonElt("thanksButton").setAttribute("label", strings[3]);
 
-        let panel = this._getAnonElt("welcomePanel");
+        const panel = this._getAnonElt("welcomePanel");
         panel.openPopup(
           this._getAnonElt("messageImage"),
-          "bottomcenter topleft"
+          "bottomcenter topleft",
         );
 
         Services.prefs.setBoolPref(kWelcomePref, true);
       },
-      { once: true }
+      { once: true },
     );
   }
 
@@ -279,14 +279,14 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   translate() {
     if (this.state == Translation.STATE_OFFER) {
       this._getAnonElt("fromLanguage").value = this._getAnonElt(
-        "detectedLanguage"
+        "detectedLanguage",
       ).value;
       this._getAnonElt("toLanguage").value = Translation.defaultTargetLanguage;
     }
 
     this.translation.translate(
       this._getAnonElt("fromLanguage").value,
-      this._getAnonElt("toLanguage").value
+      this._getAnonElt("toLanguage").value,
     );
   }
 
@@ -300,7 +300,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   _handleButtonHiding() {
-    let originalShown = this.translation.originalShown;
+    const originalShown = this.translation.originalShown;
     this._getAnonElt("showOriginal").hidden = originalShown;
     this._getAnonElt("showTranslation").hidden = !originalShown;
   }
@@ -330,34 +330,34 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       }
     }
 
-    let langName = Services.intl.getLanguageDisplayNames(undefined, [lang])[0];
+    const langName = Services.intl.getLanguageDisplayNames(undefined, [lang])[0];
 
     // Set the label and accesskey on the menuitem.
-    let bundle = Services.strings.createBundle(
-      "chrome://browser/locale/translation.properties"
+    const bundle = Services.strings.createBundle(
+      "chrome://browser/locale/translation.properties",
     );
     let item = this._getAnonElt("neverForLanguage");
     const kStrId = "translation.options.neverForLanguage";
     item.setAttribute(
       "label",
-      bundle.formatStringFromName(kStrId + ".label", [langName])
+      bundle.formatStringFromName(kStrId + ".label", [langName]),
     );
     item.setAttribute(
       "accesskey",
-      bundle.GetStringFromName(kStrId + ".accesskey")
+      bundle.GetStringFromName(kStrId + ".accesskey"),
     );
     item.langCode = lang;
 
     // We may need to disable the menuitems if they have already been used.
     // Check if translation is already disabled for this language:
-    let neverForLangs = Services.prefs.getCharPref(
-      "browser.translation.neverForLanguages"
+    const neverForLangs = Services.prefs.getCharPref(
+      "browser.translation.neverForLanguages",
     );
     item.disabled = neverForLangs.split(",").includes(lang);
 
     // Check if translation is disabled for the domain:
-    let principal = this.translation.browser.contentPrincipal;
-    let perms = Services.perms;
+    const principal = this.translation.browser.contentPrincipal;
+    const perms = Services.perms;
     item = this._getAnonElt("neverForSite");
     item.disabled =
       perms.testExactPermissionFromPrincipal(principal, "translate") ==
@@ -379,8 +379,8 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   neverForSite() {
-    let principal = this.translation.browser.contentPrincipal;
-    let perms = Services.perms;
+    const principal = this.translation.browser.contentPrincipal;
+    const perms = Services.perms;
     perms.addFromPrincipal(principal, "translate", perms.DENY_ACTION);
 
     this.closeCommand();
@@ -389,8 +389,12 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   openProviderAttribution() {
     Translation.openProviderAttribution();
   }
-}
+};
 
-customElements.define(`translation-notification-${window.now}`, window.MozTranslationNotification, {
-  extends: "notification",
-});
+customElements.define(
+  `translation-notification-${window.now}`,
+  window.MozTranslationNotification,
+  {
+    extends: "notification",
+  },
+);
