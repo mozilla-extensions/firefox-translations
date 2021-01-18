@@ -11,8 +11,18 @@ import { createBackgroundContextRootStore } from "./lib/createBackgroundContextR
 import { contentScriptBergamotApiClientPortListener } from "./lib/contentScriptBergamotApiClientPortListener";
 import { contentScriptFrameInfoPortListener } from "./lib/contentScriptFrameInfoPortListener";
 import { contentScriptLanguageDetectorProxyPortListener } from "./lib/contentScriptLanguageDetectorProxyPortListener";
-import { ExtensionIconTranslationState } from "./lib/ExtensionIconTranslationState";
+// import { ExtensionIconTranslationState } from "./lib/ExtensionIconTranslationState";
 const store = new Store(localStorageWrapper);
+
+type browserInterface = typeof crossBrowser;
+interface BrowserWithExperimentAPIs extends browserInterface {
+  experiments: {
+    translateUi: {
+      start: () => {};
+    };
+  };
+}
+const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
 /**
  * Ties together overall execution logic and allows content scripts
@@ -49,27 +59,9 @@ class ExtensionGlue {
     );
   }
 
-  async openGetStarted() {
-    const consentFormUrl = crossBrowser.runtime.getURL(
-      `get-started/get-started.html`,
-    );
-    await crossBrowser.tabs.create({ url: consentFormUrl });
-  }
-
   async start() {
-    if (process.env.NODE_ENV !== "production") {
-      // Open the test-runner to run tests
-      const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
-        `test-runner/index.html`,
-      );
-      await crossBrowser.tabs.create({ url: extensionPageForTestsUrl });
-    }
-
-    // Let extension icon react to document translation state changes
-    const extensionIconTranslationState = new ExtensionIconTranslationState(
-      this.extensionState,
-    );
-    await extensionIconTranslationState.init();
+    // Initiate the native UI
+    await browserWithExperimentAPIs.experiments.translateUi.start();
 
     // Set up content script port listeners
     this.contentScriptLanguageDetectorProxyPortListener = contentScriptLanguageDetectorProxyPortListener;
@@ -111,15 +103,10 @@ const runMigrations = async () => {
 
 // init the extension glue on every extension load
 async function onEveryExtensionLoad() {
+  // TODO: disable behind pref - incl pref listener to react to pref changes
+
   await extensionGlue.init();
   await runMigrations();
-  const { hasOpenedGetStarted } = await crossBrowser.storage.local.get(
-    "hasOpenedGetStarted",
-  );
-  if (!hasOpenedGetStarted) {
-    await extensionGlue.openGetStarted();
-    await crossBrowser.storage.local.set({ hasOpenedGetStarted: true });
-  }
   await extensionGlue.start();
 }
 onEveryExtensionLoad().then();
