@@ -1,5 +1,6 @@
 /* eslint-env commonjs */
 /* eslint no-unused-vars: off */
+/* eslint no-inner-declarations: off */
 /* eslint no-console: ["warn", { allow: ["info", "warn", "error"] }] */
 /* global ExtensionAPI */
 
@@ -27,12 +28,6 @@ this.translateUi = class extends ExtensionAPI {
       context.extension.getURL(
         "experiment-apis/translateUi/TranslationBrowserChromeUi.js",
       ) +
-        "?cachebuster=" +
-        now,
-    );
-    /* global EveryWindow */
-    Services.scriptloader.loadSubScript(
-      context.extension.getURL("experiment-apis/translateUi/EveryWindow.js") +
         "?cachebuster=" +
         now,
     );

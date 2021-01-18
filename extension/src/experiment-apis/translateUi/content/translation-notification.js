@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* global MozElements */
+
 "use strict";
 
 window.MozTranslationNotification = class extends MozElements.Notification {
@@ -112,14 +114,14 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     let stateName;
     for (const name of ["OFFER", "TRANSLATING", "TRANSLATED", "ERROR"]) {
-      if (Translation["STATE_" + name] == val) {
+      if (Translation["STATE_" + name] === val) {
         stateName = name.toLowerCase();
         break;
       }
     }
     this.setAttribute("state", stateName);
 
-    if (val == Translation.STATE_TRANSLATED) {
+    if (val === Translation.STATE_TRANSLATED) {
       this._handleButtonHiding();
     }
 
@@ -184,7 +186,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       --engineIndex;
     }
     const attributionNode = this._getAnonElt("translationEngine");
-    if (engineIndex != -1) {
+    if (engineIndex !== -1) {
       attributionNode.selectedIndex = engineIndex;
     } else {
       // Hide the attribution menuitem
@@ -200,7 +202,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     const kWelcomePref = "browser.translation.ui.welcomeMessageShown";
     if (
       Services.prefs.prefHasUserValue(kWelcomePref) ||
-      this.translation.browser != gBrowser.selectedBrowser
+      this.translation.browser !== gBrowser.selectedBrowser
     ) {
       return;
     }
@@ -277,7 +279,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   translate() {
-    if (this.state == Translation.STATE_OFFER) {
+    if (this.state === Translation.STATE_OFFER) {
       this._getAnonElt("fromLanguage").value = this._getAnonElt(
         "detectedLanguage",
       ).value;
@@ -318,19 +320,21 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   optionsShowing() {
     // Get the source language name.
     let lang;
-    if (this.state == Translation.STATE_OFFER) {
+    if (this.state === Translation.STATE_OFFER) {
       lang = this._getAnonElt("detectedLanguage").value;
     } else {
       lang = this._getAnonElt("fromLanguage").value;
 
       // If we have never attempted to translate the page before the
       // service became unavailable, "fromLanguage" isn't set.
-      if (!lang && this.state == Translation.STATE_UNAVAILABLE) {
+      if (!lang && this.state === Translation.STATE_UNAVAILABLE) {
         lang = this.translation.detectedLanguage;
       }
     }
 
-    const langName = Services.intl.getLanguageDisplayNames(undefined, [lang])[0];
+    const langName = Services.intl.getLanguageDisplayNames(undefined, [
+      lang,
+    ])[0];
 
     // Set the label and accesskey on the menuitem.
     const bundle = Services.strings.createBundle(
@@ -360,7 +364,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     const perms = Services.perms;
     item = this._getAnonElt("neverForSite");
     item.disabled =
-      perms.testExactPermissionFromPrincipal(principal, "translate") ==
+      perms.testExactPermissionFromPrincipal(principal, "translate") ===
       perms.DENY_ACTION;
   }
 

@@ -20,12 +20,12 @@ import {
  * @param document  The document to be translated
  */
 export class TranslationDocument {
-  private translatedFrom = "";
-  private translatedTo = "";
-  private translationError = false;
+  public translatedFrom = "";
+  public translatedTo = "";
+  public translationError = false;
   private originalShown = true;
   private itemsMap;
-  private readonly roots: TranslationItem[];
+  public readonly roots: TranslationItem[];
 
   constructor(document: Document) {
     this.itemsMap = new Map();
