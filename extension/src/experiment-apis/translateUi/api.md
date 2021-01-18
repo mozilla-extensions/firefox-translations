@@ -10,6 +10,23 @@ Start reacting to translation state updates
 
 **Parameters**
 
+### `browser.experiments.translateUi.setUiState( tabId, uiState )`
+
+Set current ui state
+
+**Parameters**
+
+- `tabId`
+
+  - type: tabId
+  - \$ref:
+  - optional: false
+
+- `uiState`
+  - type: uiState
+  - \$ref:
+  - optional: false
+
 ### `browser.experiments.translateUi.stop( )`
 
 Stop reacting to translation state updates
@@ -18,7 +35,47 @@ Stop reacting to translation state updates
 
 ## Events
 
-(None)
+### `browser.experiments.translateUi.onSelectTranslateTo ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onSelectTranslateFrom ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onInfoBarClosed ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onNeverTranslateThisSite ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onNotNowButtonPressed ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onShowOriginalButtonPressed ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onTranslateButtonPressed ()` Event
+
+Foo
+
+**Parameters**
 
 ## Properties TBD
 

@@ -12,15 +12,6 @@ this.translateUi = class extends ExtensionAPI {
       {},
     );
 
-    /*
-    const { ExtensionCommon } = ChromeUtils.import(
-      "resource://gre/modules/ExtensionCommon.jsm",
-      {},
-    );
-
-    const { EventManager, EventEmitter } = ExtensionCommon;
-    */
-
     const now = Date.now();
 
     /* global TranslationBrowserChromeUiManager */
@@ -46,6 +37,15 @@ this.translateUi = class extends ExtensionAPI {
         now,
     );
 
+    const { ExtensionCommon } = ChromeUtils.import(
+      "resource://gre/modules/ExtensionCommon.jsm",
+      {},
+    );
+
+    const { EventManager, EventEmitter } = ExtensionCommon;
+
+    const apiEventEmitter = new EventEmitter();
+
     const { ExtensionUtils } = ChromeUtils.import(
       "resource://gre/modules/ExtensionUtils.jsm",
       {},
@@ -57,7 +57,24 @@ this.translateUi = class extends ExtensionAPI {
       {},
     );
 
-    // const apiEventEmitter = new EventEmitter();
+    /**
+     * Boilerplate-reducing factory method translating between
+     * apiEventEmitter.emit("translateUi.onFoo", ...args)
+     * and the actual web extension event being emitted
+     * @param {string} eventRef the event reference, eg "onFoo"
+     * @returns {void}
+     */
+    const eventManagerFactory = eventRef => {
+      const eventId = `translateUi.${eventRef}`;
+      return new EventManager(context, eventId, fire => {
+        const listener = (event, ...args) => fire.async(...args);
+        apiEventEmitter.on(eventId, listener);
+        return () => {
+          apiEventEmitter.off(eventId, listener);
+        };
+      });
+    };
+
     return {
       experiments: {
         translateUi: {
@@ -91,6 +108,21 @@ this.translateUi = class extends ExtensionAPI {
             }
           },
 
+          /* Set current ui state */
+          setUiState: async function setUiState(tabId, uiState) {
+            try {
+              console.log("Called setUiState(tabId, uiState)", {
+                tabId,
+                uiState,
+              });
+              return undefined;
+            } catch (error) {
+              // Surface otherwise silent or obscurely reported errors
+              console.error(error.message, error.stack);
+              throw new ExtensionError(error.message);
+            }
+          },
+
           /* Stop reacting to translation state updates */
           stop: async function stop() {
             try {
@@ -102,6 +134,25 @@ this.translateUi = class extends ExtensionAPI {
               throw new ExtensionError(error.message);
             }
           },
+
+          /* Event boilerplate with listeners that forwards all but the first argument to the web extension event */
+          onSelectTranslateTo: eventManagerFactory("onSelectTranslateTo").api(),
+          onSelectTranslateFrom: eventManagerFactory(
+            "onSelectTranslateFrom",
+          ).api(),
+          onInfoBarClosed: eventManagerFactory("onInfoBarClosed").api(),
+          onNeverTranslateThisSite: eventManagerFactory(
+            "onNeverTranslateThisSite",
+          ).api(),
+          onNotNowButtonPressed: eventManagerFactory(
+            "onNotNowButtonPressed",
+          ).api(),
+          onShowOriginalButtonPressed: eventManagerFactory(
+            "onShowOriginalButtonPressed",
+          ).api(),
+          onTranslateButtonPressed: eventManagerFactory(
+            "onTranslateButtonPressed",
+          ).api(),
         },
       },
     };

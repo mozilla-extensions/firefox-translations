@@ -11,18 +11,8 @@ import { createBackgroundContextRootStore } from "./lib/createBackgroundContextR
 import { contentScriptBergamotApiClientPortListener } from "./lib/contentScriptBergamotApiClientPortListener";
 import { contentScriptFrameInfoPortListener } from "./lib/contentScriptFrameInfoPortListener";
 import { contentScriptLanguageDetectorProxyPortListener } from "./lib/contentScriptLanguageDetectorProxyPortListener";
-// import { ExtensionIconTranslationState } from "./lib/ExtensionIconTranslationState";
+import { NativeTranslateUiBroker } from "./lib/NativeTranslateUiBroker";
 const store = new Store(localStorageWrapper);
-
-type browserInterface = typeof crossBrowser;
-interface BrowserWithExperimentAPIs extends browserInterface {
-  experiments: {
-    translateUi: {
-      start: () => {};
-    };
-  };
-}
-const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
 /**
  * Ties together overall execution logic and allows content scripts
@@ -60,8 +50,11 @@ class ExtensionGlue {
   }
 
   async start() {
-    // Initiate the native UI
-    await browserWithExperimentAPIs.experiments.translateUi.start();
+    // Set up native translate ui
+    const nativeTranslateUiBroker = new NativeTranslateUiBroker(
+      this.extensionState,
+    );
+    await nativeTranslateUiBroker.start();
 
     // Set up content script port listeners
     this.contentScriptLanguageDetectorProxyPortListener = contentScriptLanguageDetectorProxyPortListener;
