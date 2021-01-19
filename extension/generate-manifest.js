@@ -63,17 +63,6 @@ async function generateManifest({ dotEnvPath }) {
         },
       },
     };
-    manifest.page_action = {
-      browser_style: false,
-      default_icon: {
-        "16": "icons/translation.16x16.png",
-        "32": "icons/translation.32x32.png",
-      },
-      default_title: "Translate",
-      default_popup: "main-interface/popup.html",
-      show_matches: ["<all_urls>"],
-      pinned: true,
-    };
   } else {
     manifest.browser_action = {
       default_icon: "icons/extension-icon.inactive.38x38.png",
