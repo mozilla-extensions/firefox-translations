@@ -7,7 +7,8 @@
   - [Get started](#get-started)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
-    - [Bergamot REST API server (temporary requirement)](#bergamot-rest-api-server-temporary-requirement)
+    - [Firefox](#firefox)
+    - [Chrome](#chrome)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
@@ -55,49 +56,37 @@ The build artifact will be created under `dist/chrome/`.
 
 ## Development mode
 
-To build for and launch Firefox, install the extension and start Webpack in watch mode:
+To build for, launch the browser, install the extension and start Webpack in watch mode.
 
-```
-yarn watch
-```
+Note that you also temporarily need a REST server running locally. See [INSTALL.md](./INSTALL.md).
 
-To utilize the Redux dev tools, run the following in another terminal:
+### Firefox
+
+First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8181)) in a separate terminal session:
 
 ```
 yarn remotedev
 ```
 
-For Chrome:
+Then:
 
 ```
-yarn watch:chrome
+yarn watch
 ```
 
-In another terminal:
+### Chrome
+
+First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8182)) in a separate terminal session:
 
 ```
 yarn remotedev:chrome
 ```
 
-### Bergamot REST API server (temporary requirement)
-
-Note: At this stage of development of the Bergamot translation engine, two REST API servers needs to be launched from the command line on the same system that the extension runs on:
+Then:
 
 ```
-git clone https://github.com/browsermt/macos-server.git
-cd macos-server
-./server/rest-server -c inboundModel/config.yml -p 8787 --log-level debug -w 5000
+yarn watch:chrome
 ```
-
-In another terminal:
-
-```
-./server/rest-server -c outboundModel/config.yml -p 8788 --log-level debug -w 5000
-```
-
-The binary is currently only available for Mac OSX. For any other system, compile from source: [https://github.com/browsermt/mts](https://github.com/browsermt/mts).
-
-This dependence on a REST API server will be removed soon.
 
 ## Opening up specific extension pages
 

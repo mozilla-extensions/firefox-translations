@@ -6,7 +6,7 @@ import { Store } from "./Store";
 import { localStorageWrapper } from "./lib/localStorageWrapper";
 import Port = Runtime.Port;
 import { LanguageDetector } from "./LanguageDetector";
-import { MobxKeystoneBackgroundContextHost } from "./MobxKeystoneBackgroundContextHost";
+import { MobxKeystoneBackgroundContextHost } from "./lib/MobxKeystoneBackgroundContextHost";
 import { BergamotApiClient } from "./BergamotApiClient";
 import { FrameInfo } from "../shared-resources/bergamot.types";
 import { ExtensionState } from "../shared-resources/models/ExtensionState";
@@ -59,11 +59,13 @@ class ExtensionGlue {
   }
 
   async start() {
-    // Open the test-runner to run tests
-    const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
-      `test-runner/index.html`,
-    );
-    await crossBrowser.tabs.create({ url: extensionPageForTestsUrl });
+    if (process.env.NODE_ENV !== "production") {
+      // Open the test-runner to run tests
+      const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
+        `test-runner/index.html`,
+      );
+      await crossBrowser.tabs.create({ url: extensionPageForTestsUrl });
+    }
 
     // Let extension icon react to document translation state changes
     const extensionIconTranslationState = new ExtensionIconTranslationState(
