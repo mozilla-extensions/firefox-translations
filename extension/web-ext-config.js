@@ -48,6 +48,7 @@ if (targetBrowser === "firefox") {
   ];
   defaultConfig.run.pref = [
     "browser.aboutConfig.showWarning=false",
+    "browser.proton.enabled=true",
     "extensions.experiments.enabled=true",
     // "browser.translation.ui.show=true",
     // "browser.translation.detectLanguage=true",
