@@ -111,7 +111,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
     this.setAttribute("state", stateName);
 
-    if (val === Translation.STATE_TRANSLATED) {
+    if (val === this.translation.TranslationInfoBarStates.STATE_TRANSLATED) {
       this._handleButtonHiding();
     }
 
@@ -144,10 +144,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       fromLanguage.appendItem(name, code);
     }
     detectedLanguage.value = this.translation.uiState.detectedLanguage;
-    console.log("detectedLanguage.value", detectedLanguage.value, {
-      sourceLanguages,
-      detectedLanguage,
-    });
 
     // translatedFrom is only set if we have already translated this page.
     if (aTranslation.uiState.translatedFrom) {
@@ -165,10 +161,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     if (aTranslation.uiState.translatedTo) {
       toLanguage.value = aTranslation.uiState.translatedTo;
-    }
-
-    if (aTranslation.uiState.infoBarState) {
-      this.state = aTranslation.uiState.infoBarState;
     }
 
     const kWelcomePref = "browser.translation.ui.welcomeMessageShown";
@@ -251,7 +243,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   translate() {
-    if (this.state === Translation.STATE_OFFER) {
+    if (
+      this.translation.uiState.infobarState ===
+      this.translation.TranslationInfoBarStates.STATE_OFFER
+    ) {
       this._getAnonElt("fromLanguage").value = this._getAnonElt(
         "detectedLanguage",
       ).value;
@@ -292,14 +287,21 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   optionsShowing() {
     // Get the source language name.
     let lang;
-    if (this.state === Translation.STATE_OFFER) {
+    if (
+      this.translation.uiState.infobarState ===
+      this.translation.TranslationInfoBarStates.STATE_OFFER
+    ) {
       lang = this._getAnonElt("detectedLanguage").value;
     } else {
       lang = this._getAnonElt("fromLanguage").value;
 
       // If we have never attempted to translate the page before the
       // service became unavailable, "fromLanguage" isn't set.
-      if (!lang && this.state === Translation.STATE_UNAVAILABLE) {
+      if (
+        !lang &&
+        this.translation.uiState.infobarState ===
+          this.translation.TranslationInfoBarStates.STATE_UNAVAILABLE
+      ) {
         lang = this.translation.uiState.detectedLanguage;
       }
     }

@@ -51,17 +51,22 @@ this.translateUi = class extends ExtensionAPI {
      * Boilerplate-reducing factory method translating between
      * apiEventEmitter.emit("translateUi.onFoo", ...args)
      * and the actual web extension event being emitted
+     *
      * @param {string} eventRef the event reference, eg "onFoo"
      * @returns {void}
      */
     const eventManagerFactory = eventRef => {
       const eventId = `translateUi.${eventRef}`;
-      return new EventManager(context, eventId, fire => {
-        const listener = (event, ...args) => fire.async(...args);
-        apiEventEmitter.on(eventId, listener);
-        return () => {
-          apiEventEmitter.off(eventId, listener);
-        };
+      return new EventManager({
+        context,
+        name: eventId,
+        register: fire => {
+          const listener = (event, ...args) => fire.async(...args);
+          apiEventEmitter.on(eventRef, listener);
+          return () => {
+            apiEventEmitter.off(eventRef, listener);
+          };
+        },
       });
     };
 
@@ -74,6 +79,7 @@ this.translateUi = class extends ExtensionAPI {
       const tab = tabManager.get(tabId);
       const { browser } = tab;
       const translationBrowserChromeUi = new TranslationBrowserChromeUi(
+        Services,
         browser,
         context,
         apiEventEmitter,

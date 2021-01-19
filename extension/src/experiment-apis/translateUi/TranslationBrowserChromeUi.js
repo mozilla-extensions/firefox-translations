@@ -1,4 +1,4 @@
-/* global Services, TranslationBrowserChromeUiNotificationManager */
+/* global TranslationBrowserChromeUiNotificationManager */
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "(TranslationBrowserChromeUi)" }]*/
 
 const TranslationInfoBarStates = {
@@ -10,7 +10,8 @@ const TranslationInfoBarStates = {
 };
 
 class TranslationBrowserChromeUi {
-  constructor(browser, context, apiEventEmitter) {
+  constructor(Services, browser, context, apiEventEmitter) {
+    this.Services = Services;
     this.uiState = null;
     this.browser = browser;
     this.context = context;
@@ -20,12 +21,13 @@ class TranslationBrowserChromeUi {
     this.translationBrowserChromeUiNotificationManager = new TranslationBrowserChromeUiNotificationManager(
       browser,
       apiEventEmitter,
+      TranslationInfoBarStates,
     );
   }
 
   get defaultTargetLanguage() {
     if (!this._defaultTargetLanguage) {
-      this._defaultTargetLanguage = Services.locale.appLocaleAsBCP47.split(
+      this._defaultTargetLanguage = this.Services.locale.appLocaleAsBCP47.split(
         "-",
       )[0];
     }
@@ -34,17 +36,6 @@ class TranslationBrowserChromeUi {
 
   get notificationBox() {
     return this.browser.ownerGlobal.gBrowser.getNotificationBox(this.browser);
-  }
-
-  /**
-   * Syncs infobarState with the inner infobar state variable of the infobar
-   * @param val
-   */
-  setInfobarState(val) {
-    const notif = this.notificationBox.getNotificationWithValue("translation");
-    if (notif) {
-      notif.state = val;
-    }
   }
 
   importTranslationNotification() {
@@ -59,7 +50,7 @@ class TranslationBrowserChromeUi {
       chromeWin.customElements.setElementCreationCallback(
         `translation-notification-${chromeWin.now}`,
         () => {
-          Services.scriptloader.loadSubScript(
+          this.Services.scriptloader.loadSubScript(
             this.context.extension.getURL(
               "experiment-apis/translateUi/content/translation-notification.js",
             ) +
@@ -80,7 +71,7 @@ class TranslationBrowserChromeUi {
   onUiStateUpdate(uiState) {
     console.debug("onUiStateUpdate", { uiState });
 
-    if (uiState.infoBarState === TranslationInfoBarStates.STATE_OFFER) {
+    if (uiState.infobarState === TranslationInfoBarStates.STATE_OFFER) {
       if (uiState.detectedLanguage === this.defaultTargetLanguage) {
         // Detected language is the same as the user's locale.
         console.info("Detected language is the same as the user's locale.");
@@ -100,7 +91,6 @@ class TranslationBrowserChromeUi {
 
     // Set all values before showing a new translation infobar.
     this.translationBrowserChromeUiNotificationManager.uiState = uiState;
-    this.setInfobarState(uiState.infoBarState);
 
     this.showURLBarIcon();
 
@@ -122,8 +112,21 @@ class TranslationBrowserChromeUi {
   */
 
   shouldShowInfoBar(aPrincipal) {
+    if (
+      ![
+        TranslationInfoBarStates.STATE_OFFER,
+        TranslationInfoBarStates.STATE_TRANSLATING,
+        TranslationInfoBarStates.STATE_TRANSLATED,
+        TranslationInfoBarStates.STATE_ERROR,
+      ].includes(
+        this.translationBrowserChromeUiNotificationManager.uiState.infobarState,
+      )
+    ) {
+      return false;
+    }
+
     // Check if we should never show the infobar for this language.
-    const neverForLangs = Services.prefs.getCharPref(
+    const neverForLangs = this.Services.prefs.getCharPref(
       "browser.translation.neverForLanguages",
     );
     if (neverForLangs.split(",").includes(this.detectedLanguage)) {
@@ -132,7 +135,7 @@ class TranslationBrowserChromeUi {
     }
 
     // or if we should never show the infobar for this domain.
-    const perms = Services.perms;
+    const perms = this.Services.perms;
     if (
       perms.testExactPermissionFromPrincipal(aPrincipal, "translate") ===
       perms.DENY_ACTION
@@ -147,7 +150,10 @@ class TranslationBrowserChromeUi {
   showURLBarIcon() {
     const chromeWin = this.browser.ownerGlobal;
     const PopupNotifications = chromeWin.PopupNotifications;
-    const removeId = this.originalShown ? "translated" : "translate";
+    const removeId = this.translationBrowserChromeUiNotificationManager.uiState
+      .originalShown
+      ? "translated"
+      : "translate";
     const notification = PopupNotifications.getNotification(
       removeId,
       this.browser,
@@ -181,9 +187,11 @@ class TranslationBrowserChromeUi {
       return true;
     };
 
-    // TODO: Figure out why this A. Doesn't show an url bar icon and
-    // B. Shows a strangely rendered popup at the corner of the window instead next to the URL bar
-    const addId = this.originalShown ? "translate" : "translated";
+    // TODO: Figure out why this shows a strangely rendered popup at the corner of the window instead next to the URL bar
+    const addId = this.translationBrowserChromeUiNotificationManager.uiState
+      .originalShown
+      ? "translate"
+      : "translated";
     PopupNotifications.show(
       this.browser,
       addId,
