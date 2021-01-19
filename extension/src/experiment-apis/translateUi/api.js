@@ -111,10 +111,7 @@ this.translateUi = class extends ExtensionAPI {
           /* Set current ui state */
           setUiState: async function setUiState(tabId, uiState) {
             try {
-              console.log("Called setUiState(tabId, uiState)", {
-                tabId,
-                uiState,
-              });
+              // console.log("Called setUiState(tabId, uiState)", {tabId,uiState});
               const translationBrowserChromeUi = getTranslationBrowserChromeUiInstanceByTabId(
                 tabId,
               );

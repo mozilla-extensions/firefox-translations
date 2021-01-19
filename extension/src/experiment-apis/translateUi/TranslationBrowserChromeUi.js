@@ -61,31 +61,9 @@ class TranslationBrowserChromeUi {
   }
 
   onUiStateUpdate(uiState) {
-    console.debug("onUiStateUpdate", { uiState });
-
     // Set all values before showing a new translation infobar.
     this.translationBrowserChromeUiNotificationManager.uiState = uiState;
     this.setInfobarState(uiState.infobarState);
-
-    if (uiState.infobarState === TranslationInfoBarStates.STATE_OFFER) {
-      if (uiState.acceptedTargetLanguages.includes(uiState.detectedLanguage)) {
-        // Detected language is the same as the user's locale.
-        console.info(
-          "Detected language is in one of the user's accepted target languages.",
-        );
-        return;
-      }
-
-      if (
-        !uiState.supportedTargetLanguages.includes(uiState.detectedLanguage)
-      ) {
-        // Detected language is not part of the supported languages.
-        console.info(
-          "Detected language is not part of the supported languages.",
-        );
-        return;
-      }
-    }
 
     if (this.shouldShowInfoBar(this.browser.contentPrincipal)) {
       this.showTranslationInfoBarIfNotAlreadyShown();

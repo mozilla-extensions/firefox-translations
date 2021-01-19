@@ -150,7 +150,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
             />
           );
           break;
-        case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
+        case TranslationStatus.TRANSLATION_UNSUPPORTED:
           break;
         case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
           action = (
@@ -310,7 +310,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
           {[
             TranslationStatus.LANGUAGE_NOT_DETECTED,
             TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
-            TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED,
+            TranslationStatus.TRANSLATION_UNSUPPORTED,
             TranslationStatus.OFFER,
             TranslationStatus.DOWNLOADING_TRANSLATION_MODEL,
             TranslationStatus.TRANSLATING,

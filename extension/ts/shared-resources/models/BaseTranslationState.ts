@@ -9,7 +9,7 @@ export enum TranslationStatus {
   DETECTING_LANGUAGE = "DETECTING_LANGUAGE",
   LANGUAGE_NOT_DETECTED = "LANGUAGE_NOT_DETECTED",
   SOURCE_LANGUAGE_UNDERSTOOD = "SOURCE_LANGUAGE_UNDERSTOOD",
-  DETECTED_LANGUAGE_UNSUPPORTED = "DETECTED_LANGUAGE_UNSUPPORTED",
+  TRANSLATION_UNSUPPORTED = "TRANSLATION_UNSUPPORTED",
   OFFER = "OFFER",
   DOWNLOADING_TRANSLATION_MODEL = "DOWNLOADING_TRANSLATION_MODEL",
   TRANSLATING = "TRANSLATING",
@@ -41,14 +41,6 @@ export class BaseTranslationState extends Model({
   @computed
   get effectiveTranslateTo() {
     const browserUiLanguageCode = browser.i18n.getUILanguage().split("-")[0];
-    /*
-    const acceptedLanguages: string[] = await browser.i18n.getAcceptLanguages();
-    acceptedLanguages.forEach(languageCode => {
-      if (targetLanguages.includes(languageCode)) {
-        this.setState({ targetLanguage: languageCode });
-      }
-    })
-    */
     return this.translateTo || browserUiLanguageCode;
   }
 }

@@ -7,8 +7,8 @@ import { DocumentTranslationState } from "../../../shared-resources/models/Docum
 import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
 import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
-import { config } from "../../../config";
 import Event = Events.Event;
+import { LanguageSupport } from "../../../shared-resources/LanguageSupport";
 
 enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
@@ -30,6 +30,7 @@ enum NativeTranslateUiStateInfobarState {
 interface NativeTranslateUiState {
   acceptedTargetLanguages: string[];
   detectedLanguage: string;
+  defaultTargetLanguage: string;
   infobarState: NativeTranslateUiStateInfobarState;
   translatedFrom: string;
   translatedTo: string;
@@ -97,31 +98,38 @@ export class NativeTranslateUiBroker {
     });
     await browserWithExperimentAPIs.experiments.translateUi.start();
 
+    const { summarizeLanguageSupport } = new LanguageSupport();
+
     // Boils down extension state to the subset relevant for the native translate ui
-    const nativeTranslateUiStateFromDocumentTranslationState = (
+    const nativeTranslateUiStateFromDocumentTranslationState = async (
       dts: SnapshotOutOfModel<DocumentTranslationState>,
-      acceptedTargetLanguages: string[],
-    ): NativeTranslateUiState => {
+    ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         dts.translationStatus,
       );
 
+      const detectedLanguage = dts.detectedLanguageResults?.language;
+      const {
+        acceptedTargetLanguages,
+        // defaultSourceLanguage,
+        defaultTargetLanguage,
+        supportedSourceLanguages,
+        // supportedTargetLanguagesGivenDefaultSourceLanguage,
+        allPossiblySupportedTargetLanguages,
+      } = await summarizeLanguageSupport(detectedLanguage);
+
       return {
         acceptedTargetLanguages,
-        detectedLanguage: dts.detectedLanguageResults
-          ? dts.detectedLanguageResults.language
-          : undefined,
+        detectedLanguage,
+        // defaultSourceLanguage,
+        defaultTargetLanguage,
         infobarState,
         translatedFrom: dts.translateFrom,
         translatedTo: dts.translateTo,
         originalShown: dts.showOriginal,
         // Additionally, since supported source and target languages are only supported in specific pairs, keep these dynamic:
-        supportedSourceLanguages: [
-          ...new Set(config.supportedLanguagePairs.map(lp => lp[0])),
-        ],
-        supportedTargetLanguages: [
-          ...new Set(config.supportedLanguagePairs.map(lp => lp[1])),
-        ],
+        supportedSourceLanguages,
+        supportedTargetLanguages: allPossiblySupportedTargetLanguages,
       };
     };
     const nativeTranslateUiStateInfobarStateFromTranslationStatus = (
@@ -136,7 +144,7 @@ export class NativeTranslateUiBroker {
           return NativeTranslateUiStateInfobarState.STATE_OFFER;
         case TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD:
           return NativeTranslateUiStateInfobarState.STATE_UNAVAILABLE;
-        case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
+        case TranslationStatus.TRANSLATION_UNSUPPORTED:
           return NativeTranslateUiStateInfobarState.STATE_UNAVAILABLE;
         case TranslationStatus.OFFER:
           return NativeTranslateUiStateInfobarState.STATE_OFFER;
@@ -155,14 +163,6 @@ export class NativeTranslateUiBroker {
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
       async (documentTranslationStates, previousDocumentTranslationStates) => {
-        const acceptedTargetLanguages = [
-          ...new Set(
-            [
-              ...(await crossBrowser.i18n.getAcceptLanguages()),
-              crossBrowser.i18n.getUILanguage(),
-            ].map(localeCode => localeCode.split("-")[0]),
-          ),
-        ];
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
@@ -173,9 +173,8 @@ export class NativeTranslateUiBroker {
           );
         for (const dts of tabTopFrameStates) {
           const { tabId } = dts;
-          const uiState = nativeTranslateUiStateFromDocumentTranslationState(
+          const uiState = await nativeTranslateUiStateFromDocumentTranslationState(
             dts,
-            acceptedTargetLanguages,
           );
           browserWithExperimentAPIs.experiments.translateUi.setUiState(
             tabId,
@@ -201,20 +200,20 @@ export class NativeTranslateUiBroker {
     return currentFrameDocumentTranslationStates;
   }
 
-  onSelectTranslateTo(foo) {
-    console.log("onSelectTranslateTo", { foo });
+  onSelectTranslateFrom(tabId) {
+    console.log("onSelectTranslateFrom", { tabId });
   }
 
-  onSelectTranslateFrom(foo) {
-    console.log("onSelectTranslateFrom", { foo });
+  onSelectTranslateTo(tabId) {
+    console.log("onSelectTranslateTo", { tabId });
   }
 
-  onInfoBarClosed(foo) {
-    console.log("onInfoBarClosed", { foo });
+  onInfoBarClosed(tabId) {
+    console.log("onInfoBarClosed", { tabId });
   }
 
-  onNeverTranslateThisSite(foo) {
-    console.log("onNeverTranslateThisSite", { foo });
+  onNeverTranslateThisSite(tabId) {
+    console.log("onNeverTranslateThisSite", { tabId });
   }
 
   onTranslateButtonPressed(tabId, from, to) {

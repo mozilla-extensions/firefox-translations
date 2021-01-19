@@ -34,9 +34,17 @@ class TranslationBrowserChromeUiNotificationManager {
     this.apiEventEmitter.emit("onInfoBarClosed", this.tabId);
   }
 
+  fromLanguageChanged() {
+    console.log("fromLanguageChanged");
+    this.apiEventEmitter.emit("onSelectTranslateFrom", this.tabId);
+  }
+
+  toLanguageChanged() {
+    console.log("toLanguageChanged");
+    this.apiEventEmitter.emit("onSelectTranslateTo", this.tabId);
+  }
+
   /*
-  | "onSelectTranslateTo"
-  | "onSelectTranslateFrom"
   | "onNeverTranslateThisSite"
    */
 }

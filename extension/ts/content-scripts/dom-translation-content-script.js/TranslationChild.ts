@@ -14,6 +14,7 @@ import {
   FrameInfo,
 } from "../../shared-resources/bergamot.types";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
+import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 
 export class TranslationChild {
   private frameInfo: FrameInfo;
@@ -104,10 +105,12 @@ export class TranslationChild {
       return;
     }
 
-    const result: DetectedLanguageResults = await this.languageDetector.detectLanguage(
+    const detectedLanguageResults: DetectedLanguageResults = await this.languageDetector.detectLanguage(
       string,
     );
-    console.debug("Language detection results are in", { result });
+    console.debug("Language detection results are in", {
+      detectedLanguageResults,
+    });
 
     // The window might be gone by now.
     if (!this.contentWindow) {
@@ -130,13 +133,13 @@ export class TranslationChild {
           {
             op: "add",
             path: ["detectedLanguageResults"],
-            value: result,
+            value: detectedLanguageResults,
           },
         ],
       );
     }, 0);
 
-    if (!result.confident) {
+    if (!detectedLanguageResults.confident) {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
@@ -147,8 +150,85 @@ export class TranslationChild {
     }
 
     console.debug("Updating state to reflect that language has been detected");
-    this.broadcastUpdatedTranslationStatus(TranslationStatus.OFFER);
+    await this.checkLanguageSupport(detectedLanguageResults);
+
     return;
+  }
+
+  async checkLanguageSupport(detectedLanguageResults: DetectedLanguageResults) {
+    const { summarizeLanguageSupport } = new LanguageSupport();
+
+    const detectedLanguage = detectedLanguageResults.language;
+    const {
+      acceptedTargetLanguages,
+      // defaultSourceLanguage,
+      defaultTargetLanguage,
+      supportedSourceLanguages,
+      supportedTargetLanguagesGivenDefaultSourceLanguage,
+      allPossiblySupportedTargetLanguages,
+    } = await summarizeLanguageSupport(detectedLanguage);
+
+    if (acceptedTargetLanguages.includes(detectedLanguage)) {
+      // Detected language is the same as the user's accepted target languages.
+      console.info(
+        "Detected language is in one of the user's accepted target languages.",
+        {
+          acceptedTargetLanguages,
+        },
+      );
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
+      );
+      return;
+    }
+
+    if (!supportedSourceLanguages.includes(detectedLanguage)) {
+      // Detected language is not part of the supported source languages.
+      console.info(
+        "Detected language is not part of the supported source languages.",
+        { detectedLanguage, supportedSourceLanguages },
+      );
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATION_UNSUPPORTED,
+      );
+      return;
+    }
+
+    if (!allPossiblySupportedTargetLanguages.includes(defaultTargetLanguage)) {
+      // Detected language is not part of the supported source languages.
+      console.info(
+        "Default target language is not part of the supported target languages.",
+        {
+          acceptedTargetLanguages,
+          defaultTargetLanguage,
+          allPossiblySupportedTargetLanguages,
+        },
+      );
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATION_UNSUPPORTED,
+      );
+      return;
+    }
+
+    if (
+      !defaultTargetLanguage ||
+      !supportedTargetLanguagesGivenDefaultSourceLanguage.includes(
+        defaultTargetLanguage,
+      )
+    ) {
+      // Combination of source and target languages unsupported
+      console.info("Combination of source and target languages unsupported.", {
+        acceptedTargetLanguages,
+        defaultTargetLanguage,
+        supportedTargetLanguagesGivenDefaultSourceLanguage,
+      });
+      this.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATION_UNSUPPORTED,
+      );
+      return;
+    }
+
+    this.broadcastUpdatedTranslationStatus(TranslationStatus.OFFER);
   }
 
   async doTranslation(aFrom, aTo) {

@@ -38,11 +38,11 @@ window.MozTranslationNotification = class extends MozElements.Notification {
           </vbox>
           <hbox class="translated-box" align="center">
             <label class="translate-infobar-element" value="&translation.translatedFrom.label;"/>
-            <menulist class="translate-infobar-element" anonid="fromLanguage" oncommand="this.closest('notification').translate();">
+            <menulist class="translate-infobar-element" anonid="fromLanguage" oncommand="this.closest('notification').fromLanguageChanged();">
               <menupopup/>
             </menulist>
             <label class="translate-infobar-element" value="&translation.translatedTo.label;"/>
-            <menulist class="translate-infobar-element" anonid="toLanguage" oncommand="this.closest('notification').translate();">
+            <menulist class="translate-infobar-element" anonid="toLanguage" oncommand="this.closest('notification').toLanguageChanged();">
               <menupopup/>
             </menulist>
             <label class="translate-infobar-element" value="&translation.translatedToSuffix.label;"/>
@@ -247,6 +247,16 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     return this.querySelector("[anonid=" + aAnonId + "]");
   }
 
+  fromLanguageChanged() {
+    this.translation.fromLanguageChanged(
+      this._getAnonElt("fromLanguage").value,
+    );
+  }
+
+  toLanguageChanged() {
+    this.translation.toLanguageChanged(this._getAnonElt("toLanguage").value);
+  }
+
   translate() {
     if (
       this.translation.uiState.infobarState ===
@@ -255,7 +265,9 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       this._getAnonElt("fromLanguage").value = this._getAnonElt(
         "detectedLanguage",
       ).value;
-      this._getAnonElt("toLanguage").value = Translation.defaultTargetLanguage;
+      this._getAnonElt(
+        "toLanguage",
+      ).value = this.translation.uiState.defaultTargetLanguage;
     }
 
     this.translation.translate(
