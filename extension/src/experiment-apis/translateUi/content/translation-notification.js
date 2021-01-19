@@ -251,10 +251,12 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     this.translation.fromLanguageChanged(
       this._getAnonElt("fromLanguage").value,
     );
+    this.translate();
   }
 
   toLanguageChanged() {
     this.translation.toLanguageChanged(this._getAnonElt("toLanguage").value);
+    this.translate();
   }
 
   translate() {
