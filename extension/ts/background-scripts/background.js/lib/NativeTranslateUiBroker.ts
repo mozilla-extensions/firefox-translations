@@ -4,11 +4,7 @@ import {
   SnapshotOutOfModel,
 } from "mobx-keystone";
 import { DocumentTranslationState } from "../../../shared-resources/models/DocumentTranslationState";
-import {
-  browser as crossBrowser,
-  browser,
-  Events,
-} from "webextension-polyfill-ts";
+import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
 import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 import { config } from "../../../config";
@@ -107,6 +103,7 @@ export class NativeTranslateUiBroker {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         dts.translationStatus,
       );
+
       return {
         detectedLanguage: dts.detectedLanguageResults
           ? dts.detectedLanguageResults.language
@@ -178,6 +175,20 @@ export class NativeTranslateUiBroker {
     );
   }
 
+  getFrameDocumentTranslationStatesByTabId(tabId) {
+    const { extensionState } = this;
+    const documentTranslationStates = extensionState.documentTranslationStates;
+    const currentFrameDocumentTranslationStates = [];
+    documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (documentTranslationState.tabId === tabId) {
+          currentFrameDocumentTranslationStates.push(documentTranslationState);
+        }
+      },
+    );
+    return currentFrameDocumentTranslationStates;
+  }
+
   onSelectTranslateTo(foo) {
     console.log("onSelectTranslateTo", { foo });
   }
@@ -197,22 +208,9 @@ export class NativeTranslateUiBroker {
   onTranslateButtonPressed(tabId, from, to) {
     console.log("onTranslateButtonPressed", { tabId, from, to });
 
-    const { extensionState } = this;
-
-    // Extract the document translation states that relate to the currently opened tab
-    const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentFrameDocumentTranslationStates = [];
-    documentTranslationStates.forEach(
-      (documentTranslationState: DocumentTranslationState) => {
-        if (documentTranslationState.tabId === tabId) {
-          currentFrameDocumentTranslationStates.push(documentTranslationState);
-        }
-      },
-    );
-
-    currentFrameDocumentTranslationStates.forEach(
+    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
-        extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
           {
             op: "replace",
             path: ["translateFrom"],
@@ -233,12 +231,34 @@ export class NativeTranslateUiBroker {
     );
   }
 
-  onShowOriginalButtonPressed(foo) {
-    console.log("onShowOriginalButtonPressed", { foo });
+  onShowOriginalButtonPressed(tabId) {
+    console.log("onShowOriginalButtonPressed", { tabId });
+    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["showOriginal"],
+            value: true,
+          },
+        ]);
+      },
+    );
   }
 
-  onShowTranslatedButtonPressed(foo) {
-    console.log("onShowTranslatedButtonPressed", { foo });
+  onShowTranslatedButtonPressed(tabId) {
+    console.log("onShowTranslatedButtonPressed", { tabId });
+    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["showOriginal"],
+            value: false,
+          },
+        ]);
+      },
+    );
   }
 
   async stop() {

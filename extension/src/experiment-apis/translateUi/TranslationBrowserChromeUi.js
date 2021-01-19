@@ -92,6 +92,7 @@ class TranslationBrowserChromeUi {
 
     // Set all values before showing a new translation infobar.
     this.translationBrowserChromeUiNotificationManager.uiState = uiState;
+    this.setInfobarState(uiState.infobarState);
 
     this.showURLBarIcon();
 
@@ -100,17 +101,16 @@ class TranslationBrowserChromeUi {
     }
   }
 
-  /*
-  translationFinished(result) {
-    if (result.success) {
-      this.originalShown = false;
-      this.state = TranslationInfoBarStates.STATE_TRANSLATED;
-      this.showURLBarIcon();
-    } else {
-      this.state = TranslationInfoBarStates.STATE_ERROR;
+  /**
+   * Syncs infobarState with the inner infobar state variable of the infobar
+   * @param val
+   */
+  setInfobarState(val) {
+    const notif = this.notificationBox.getNotificationWithValue("translation");
+    if (notif) {
+      notif.state = val;
     }
   }
-  */
 
   shouldShowInfoBar(aPrincipal) {
     if (
@@ -130,7 +130,14 @@ class TranslationBrowserChromeUi {
     const neverForLangs = this.Services.prefs.getCharPref(
       "browser.translation.neverForLanguages",
     );
-    if (neverForLangs.split(",").includes(this.detectedLanguage)) {
+    if (
+      neverForLangs
+        .split(",")
+        .includes(
+          this.translationBrowserChromeUiNotificationManager.uiState
+            .detectedLanguage,
+        )
+    ) {
       // TranslationTelemetry.recordAutoRejectedTranslationOffer();
       return false;
     }
@@ -188,7 +195,6 @@ class TranslationBrowserChromeUi {
       return true;
     };
 
-    // TODO: Figure out why this shows a strangely rendered popup at the corner of the window instead next to the URL bar
     const addId = this.translationBrowserChromeUiNotificationManager.uiState
       .originalShown
       ? "translate"

@@ -154,6 +154,9 @@ this.translateUi = class extends ExtensionAPI {
           onShowOriginalButtonPressed: eventManagerFactory(
             "onShowOriginalButtonPressed",
           ).api(),
+          onShowTranslatedButtonPressed: eventManagerFactory(
+            "onShowTranslatedButtonPressed",
+          ).api(),
           onTranslateButtonPressed: eventManagerFactory(
             "onTranslateButtonPressed",
           ).api(),

@@ -3,7 +3,10 @@ const path = require("path");
 
 const examplePagesToTranslate = [
   "https://es.wikipedia.org",
+  "https://www.mozilla.org/",
   "https://www.mozilla.org/es-ES/",
+  "https://www.mozilla.org/fr/",
+  "https://www.mozilla.org/fi/",
 ];
 
 const targetBrowser = process.env.TARGET_BROWSER || "firefox";
@@ -44,6 +47,7 @@ if (targetBrowser === "firefox") {
     "about:debugging#/runtime/this-firefox",
   ];
   defaultConfig.run.pref = [
+    "browser.aboutConfig.showWarning=false",
     "extensions.experiments.enabled=true",
     // "browser.translation.ui.show=true",
     // "browser.translation.detectLanguage=true",

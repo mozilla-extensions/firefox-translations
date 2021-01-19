@@ -163,6 +163,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       toLanguage.value = aTranslation.uiState.translatedTo;
     }
 
+    if (aTranslation.uiState.infobarState) {
+      this.state = aTranslation.uiState.infobarState;
+    }
+
     const kWelcomePref = "browser.translation.ui.welcomeMessageShown";
     if (
       Services.prefs.prefHasUserValue(kWelcomePref) ||
@@ -226,6 +230,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
         this._getAnonElt("learnMore").setAttribute("value", strings[2]);
         this._getAnonElt("thanksButton").setAttribute("label", strings[3]);
 
+        // TODO: Figure out why this shows a strangely rendered popup at the corner of the window instead next to the URL bar
         const panel = this._getAnonElt("welcomePanel");
         panel.openPopup(
           this._getAnonElt("messageImage"),

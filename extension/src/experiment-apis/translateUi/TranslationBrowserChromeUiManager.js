@@ -21,21 +21,17 @@ class TranslationBrowserChromeUiNotificationManager {
 
   showOriginalContent() {
     console.log("showOriginalContent");
-    this.apiEventEmitter.emit("onShowOriginalButtonPressed", this.tabId, "foo");
+    this.apiEventEmitter.emit("onShowOriginalButtonPressed", this.tabId);
   }
 
   showTranslatedContent() {
     console.log("showTranslatedContent");
-    this.apiEventEmitter.emit(
-      "onShowTranslatedButtonPressed",
-      this.tabId,
-      "foo",
-    );
+    this.apiEventEmitter.emit("onShowTranslatedButtonPressed", this.tabId);
   }
 
   infobarClosed() {
     console.log("infobarClosed");
-    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId, "foo");
+    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId);
   }
 
   /*

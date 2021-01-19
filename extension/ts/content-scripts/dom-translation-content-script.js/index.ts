@@ -110,16 +110,6 @@ const init = async () => {
             console.debug("TODO: Implement");
           }
         }
-
-        if (
-          currentTabFrameDocumentTranslationState.translationStatus ===
-          TranslationStatus.TRANSLATING
-        ) {
-          if (currentTabFrameDocumentTranslationState.cancellationRequested) {
-            console.debug("Cancellation requested");
-            console.debug("TODO: Implement");
-          }
-        }
       }
 
       if (hasChanged("showOriginal")) {
