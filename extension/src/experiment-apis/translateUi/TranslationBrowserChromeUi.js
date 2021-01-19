@@ -63,6 +63,10 @@ class TranslationBrowserChromeUi {
   onUiStateUpdate(uiState) {
     console.debug("onUiStateUpdate", { uiState });
 
+    // Set all values before showing a new translation infobar.
+    this.translationBrowserChromeUiNotificationManager.uiState = uiState;
+    this.setInfobarState(uiState.infobarState);
+
     if (uiState.infobarState === TranslationInfoBarStates.STATE_OFFER) {
       if (uiState.acceptedTargetLanguages.includes(uiState.detectedLanguage)) {
         // Detected language is the same as the user's locale.
@@ -83,14 +87,10 @@ class TranslationBrowserChromeUi {
       }
     }
 
-    // Set all values before showing a new translation infobar.
-    this.translationBrowserChromeUiNotificationManager.uiState = uiState;
-    this.setInfobarState(uiState.infobarState);
-
-    this.showURLBarIcon();
-
     if (this.shouldShowInfoBar(this.browser.contentPrincipal)) {
       this.showTranslationInfoBarIfNotAlreadyShown();
+    } else {
+      this.hideTranslationInfoBarIfShown();
     }
   }
 
@@ -146,6 +146,22 @@ class TranslationBrowserChromeUi {
     }
 
     return true;
+  }
+
+  hideURLBarIcon() {
+    const chromeWin = this.browser.ownerGlobal;
+    const PopupNotifications = chromeWin.PopupNotifications;
+    const removeId = this.translationBrowserChromeUiNotificationManager.uiState
+      .originalShown
+      ? "translated"
+      : "translate";
+    const notification = PopupNotifications.getNotification(
+      removeId,
+      this.browser,
+    );
+    if (notification) {
+      PopupNotifications.remove(notification);
+    }
   }
 
   showURLBarIcon() {
@@ -204,12 +220,23 @@ class TranslationBrowserChromeUi {
   }
 
   showTranslationInfoBarIfNotAlreadyShown() {
-    const infoBarVisible = this.notificationBox.getNotificationWithValue(
+    const translationNotification = this.notificationBox.getNotificationWithValue(
       "translation",
     );
-    if (!infoBarVisible) {
+    if (!translationNotification) {
       this.showTranslationInfoBar();
     }
+    this.showURLBarIcon();
+  }
+
+  hideTranslationInfoBarIfShown() {
+    const translationNotification = this.notificationBox.getNotificationWithValue(
+      "translation",
+    );
+    if (translationNotification) {
+      translationNotification.close();
+    }
+    this.hideURLBarIcon();
   }
 
   showTranslationInfoBar() {
