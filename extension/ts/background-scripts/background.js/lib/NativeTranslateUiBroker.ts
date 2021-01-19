@@ -28,6 +28,7 @@ enum NativeTranslateUiStateInfobarState {
  *   version of the page is shown.
  */
 interface NativeTranslateUiState {
+  acceptedTargetLanguages: string[];
   detectedLanguage: string;
   infobarState: NativeTranslateUiStateInfobarState;
   translatedFrom: string;
@@ -99,12 +100,14 @@ export class NativeTranslateUiBroker {
     // Boils down extension state to the subset relevant for the native translate ui
     const nativeTranslateUiStateFromDocumentTranslationState = (
       dts: SnapshotOutOfModel<DocumentTranslationState>,
+      acceptedTargetLanguages: string[],
     ): NativeTranslateUiState => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         dts.translationStatus,
       );
 
       return {
+        acceptedTargetLanguages,
         detectedLanguage: dts.detectedLanguageResults
           ? dts.detectedLanguageResults.language
           : undefined,
@@ -152,6 +155,14 @@ export class NativeTranslateUiBroker {
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
       async (documentTranslationStates, previousDocumentTranslationStates) => {
+        const acceptedTargetLanguages = [
+          ...new Set(
+            [
+              ...(await crossBrowser.i18n.getAcceptLanguages()),
+              crossBrowser.i18n.getUILanguage(),
+            ].map(localeCode => localeCode.split("-")[0]),
+          ),
+        ];
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
@@ -164,6 +175,7 @@ export class NativeTranslateUiBroker {
           const { tabId } = dts;
           const uiState = nativeTranslateUiStateFromDocumentTranslationState(
             dts,
+            acceptedTargetLanguages,
           );
           browserWithExperimentAPIs.experiments.translateUi.setUiState(
             tabId,

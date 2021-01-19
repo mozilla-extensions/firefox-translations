@@ -26,15 +26,6 @@ class TranslationBrowserChromeUi {
     );
   }
 
-  get defaultTargetLanguage() {
-    if (!this._defaultTargetLanguage) {
-      this._defaultTargetLanguage = this.Services.locale.appLocaleAsBCP47.split(
-        "-",
-      )[0];
-    }
-    return this._defaultTargetLanguage;
-  }
-
   get notificationBox() {
     return this.browser.ownerGlobal.gBrowser.getNotificationBox(this.browser);
   }
@@ -73,9 +64,11 @@ class TranslationBrowserChromeUi {
     console.debug("onUiStateUpdate", { uiState });
 
     if (uiState.infobarState === TranslationInfoBarStates.STATE_OFFER) {
-      if (uiState.detectedLanguage === this.defaultTargetLanguage) {
+      if (uiState.acceptedTargetLanguages.includes(uiState.detectedLanguage)) {
         // Detected language is the same as the user's locale.
-        console.info("Detected language is the same as the user's locale.");
+        console.info(
+          "Detected language is in one of the user's accepted target languages.",
+        );
         return;
       }
 
