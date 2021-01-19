@@ -52,13 +52,15 @@ interface BrowserWithExperimentAPIs extends browserInterface {
         tabId: number,
         uiState: NativeTranslateUiState,
       ) => Promise<void>;
-      onSelectTranslateTo: Event<any>;
-      onSelectTranslateFrom: Event<any>;
-      onInfoBarClosed: Event<any>;
-      onNeverTranslateThisSite: Event<any>;
-      onTranslateButtonPressed: Event<any>;
-      onShowOriginalButtonPressed: Event<any>;
-      onShowTranslatedButtonPressed: Event<any>;
+      onSelectTranslateTo: Event<(tabId: number) => void>;
+      onSelectTranslateFrom: Event<(tabId: number) => void>;
+      onInfoBarClosed: Event<(tabId: number) => void>;
+      onNeverTranslateThisSite: Event<(tabId: number) => void>;
+      onTranslateButtonPressed: Event<
+        (tabId: number, from: string, to: string) => void
+      >;
+      onShowOriginalButtonPressed: Event<(tabId: number) => void>;
+      onShowTranslatedButtonPressed: Event<(tabId: number) => void>;
     };
   };
 }
@@ -192,8 +194,43 @@ export class NativeTranslateUiBroker {
     console.log("onNeverTranslateThisSite", { foo });
   }
 
-  onTranslateButtonPressed(from, to) {
-    console.log("onTranslateButtonPressed", { from, to });
+  onTranslateButtonPressed(tabId, from, to) {
+    console.log("onTranslateButtonPressed", { tabId, from, to });
+
+    const { extensionState } = this;
+
+    // Extract the document translation states that relate to the currently opened tab
+    const documentTranslationStates = extensionState.documentTranslationStates;
+    const currentFrameDocumentTranslationStates = [];
+    documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (documentTranslationState.tabId === tabId) {
+          currentFrameDocumentTranslationStates.push(documentTranslationState);
+        }
+      },
+    );
+
+    currentFrameDocumentTranslationStates.forEach(
+      (dts: DocumentTranslationState) => {
+        extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["translateFrom"],
+            value: from,
+          },
+          {
+            op: "replace",
+            path: ["translateTo"],
+            value: to,
+          },
+          {
+            op: "replace",
+            path: ["translationRequested"],
+            value: true,
+          },
+        ]);
+      },
+    );
   }
 
   onShowOriginalButtonPressed(foo) {
@@ -209,7 +246,7 @@ export class NativeTranslateUiBroker {
     this.eventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[
         eventRef
-      ].removeListener(this[eventRef]);
+      ].removeListener(this[eventRef] as any);
     });
   }
 }

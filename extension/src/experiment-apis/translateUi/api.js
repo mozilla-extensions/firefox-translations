@@ -83,6 +83,7 @@ this.translateUi = class extends ExtensionAPI {
         browser,
         context,
         apiEventEmitter,
+        tabId,
       );
       translationBrowserChromeUiInstancesByTabId.set(
         tabId,

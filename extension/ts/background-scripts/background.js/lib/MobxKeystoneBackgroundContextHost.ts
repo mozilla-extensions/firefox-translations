@@ -1,9 +1,13 @@
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import {
+  ActionTrackingResult,
+  applySerializedActionAndSyncNewModelIds,
   applySerializedActionAndTrackNewModelIds,
   getSnapshot,
   ModelAutoTypeCheckingMode,
+  onActionMiddleware,
+  serializeActionCall,
   SerializedActionCall,
   SerializedActionCallWithModelIdOverrides,
   setGlobalConfig,
@@ -27,7 +31,10 @@ export class MobxKeystoneBackgroundContextHost {
   private mobxKeystoneProxyPortListener: (port: Port) => void;
   private connectedPorts: Port[] = [];
   init(backgroundContextRootStore: ExtensionState) {
+    let actionIsBeingAppliedForPropagationToContentScripts = false;
+
     // Set up a connection / listener for the mobx-keystone-proxy
+    // allowing state changes to be sent from content scripts
     this.mobxKeystoneProxyPortListener = port => {
       if (port.name !== "port-from-mobx-keystone-proxy") {
         return;
@@ -51,50 +58,13 @@ export class MobxKeystoneBackgroundContextHost {
             return null;
           }
           if (actionCall) {
-            // apply the action over the server root store
-            // sometimes applying actions might fail (for example on invalid operations
-            // such as when one client asks to delete a model from an array and other asks to mutate it)
-            // so we try / catch it
-            let serializedActionCallToReplicate:
-              | SerializedActionCallWithModelIdOverrides
-              | undefined;
-            try {
-              // apply the action on the background context side and keep track of new model IDs being
-              // generated, so the clients will have the chance to keep those in sync
-              const applyActionResult = applySerializedActionAndTrackNewModelIds(
-                backgroundContextRootStore,
-                actionCall,
-              );
-
-              serializedActionCallToReplicate =
-                applyActionResult.serializedActionCall;
-            } catch (err) {
-              console.error("error applying action to server:", err);
-            }
-            if (serializedActionCallToReplicate) {
-              // and distribute message, which includes new model IDs to keep them in sync
-              this.connectedPorts.forEach($port => {
-                try {
-                  $port.postMessage({
-                    serializedActionCallToReplicate,
-                    requestId,
-                  });
-                } catch (err) {
-                  if (
-                    err.message ===
-                    "Attempt to postMessage on disconnected port"
-                  ) {
-                    console.warn(
-                      "Attempt to postMessage on disconnected port, but it is ok",
-                      err,
-                    );
-                  } else {
-                    throw err;
-                  }
-                }
-              });
-            }
-
+            const _ = actionIsBeingAppliedForPropagationToContentScripts;
+            actionIsBeingAppliedForPropagationToContentScripts = true;
+            this.handleLocallyCancelledActionCall(
+              actionCall,
+              backgroundContextRootStore,
+            );
+            actionIsBeingAppliedForPropagationToContentScripts = _;
             return null;
           }
           captureExceptionWithExtras(new Error("Unexpected message"), { m });
@@ -109,5 +79,83 @@ export class MobxKeystoneBackgroundContextHost {
       });
     };
     browser.runtime.onConnect.addListener(this.mobxKeystoneProxyPortListener);
+
+    // Set up a listener for local (background context) actions to be replicated to content scripts
+    // in the same way that actions stemming from content scripts do
+    onActionMiddleware(backgroundContextRootStore, {
+      onStart: (actionCall, ctx) => {
+        if (!actionIsBeingAppliedForPropagationToContentScripts) {
+          // if the action comes from the background context cancel it silently
+          // and send resubmit it in the same way that content script actions are treated
+          // it will then be replicated by the server (background context) and properly executed everywhere
+          const serializedActionCall = serializeActionCall(
+            actionCall,
+            backgroundContextRootStore,
+          );
+          this.handleLocallyCancelledActionCall(
+            serializedActionCall,
+            backgroundContextRootStore,
+          );
+          ctx.data["cancelled"] = true; // just for logging purposes
+          // "cancel" the action by returning undefined
+          return {
+            result: ActionTrackingResult.Return,
+            value: undefined,
+          };
+        } else {
+          // run actions that are being applied for propagation to content scripts unmodified
+          return undefined;
+        }
+      },
+    });
+  }
+
+  handleLocallyCancelledActionCall(
+    serializedActionCall: SerializedActionCall,
+    backgroundContextRootStore,
+  ) {
+    // apply the action over the server root store
+    // sometimes applying actions might fail (for example on invalid operations
+    // such as when one client asks to delete a model from an array and other asks to mutate it)
+    // so we try / catch it
+    let serializedActionCallToReplicate:
+      | SerializedActionCallWithModelIdOverrides
+      | undefined;
+    try {
+      // apply the action on the background context side and keep track of new model IDs being
+      // generated, so the clients will have the chance to keep those in sync
+      const applyActionResult = applySerializedActionAndTrackNewModelIds(
+        backgroundContextRootStore,
+        serializedActionCall,
+      );
+      serializedActionCallToReplicate = applyActionResult.serializedActionCall;
+    } catch (err) {
+      console.error("error applying action to server:", err);
+    }
+    if (serializedActionCallToReplicate) {
+      this.propagateActionToContentScripts(serializedActionCallToReplicate);
+    }
+  }
+
+  propagateActionToContentScripts(
+    serializedActionCallToReplicate: SerializedActionCallWithModelIdOverrides,
+  ) {
+    // and distribute message, which includes new model IDs to keep them in sync
+    this.connectedPorts.forEach($port => {
+      try {
+        $port.postMessage({
+          serializedActionCallToReplicate,
+        });
+      } catch (err) {
+        if (err.message === "Attempt to postMessage on disconnected port") {
+          console.warn(
+            "Attempt to postMessage on disconnected port, but it is ok",
+            err,
+          );
+        } else {
+          throw err;
+        }
+      }
+    });
   }
 }

@@ -10,7 +10,7 @@ const TranslationInfoBarStates = {
 };
 
 class TranslationBrowserChromeUi {
-  constructor(Services, browser, context, apiEventEmitter) {
+  constructor(Services, browser, context, apiEventEmitter, tabId) {
     this.Services = Services;
     this.uiState = null;
     this.browser = browser;
@@ -21,6 +21,7 @@ class TranslationBrowserChromeUi {
     this.translationBrowserChromeUiNotificationManager = new TranslationBrowserChromeUiNotificationManager(
       browser,
       apiEventEmitter,
+      tabId,
       TranslationInfoBarStates,
     );
   }
