@@ -16,6 +16,21 @@ const dotEnvPath =
     ? "./.env.production"
     : "./.env.development";
 
+// Set entry points based on build variant
+const entry = {
+  background: `./ts/background-scripts/background.js/${ui}.ts`,
+  "dom-translation-content-script":
+    "./ts/content-scripts/dom-translation-content-script.js/index.ts",
+};
+if (ui === "extension-ui") {
+  entry["options-ui"] = "./ts/extension-ui/options-ui.js/index.tsx";
+  entry["get-started"] = "./ts/extension-ui/get-started.js/index.tsx";
+  entry["main-interface"] = "./ts/extension-ui/main-interface.js/index.tsx";
+}
+if (process.env.NODE_ENV !== "production") {
+  entry.tests = "./ts/tests.js/index.ts";
+}
+
 // Make env vars available in the current scope
 require("dotenv").config({ path: dotEnvPath });
 
@@ -51,15 +66,7 @@ if (
 }
 
 module.exports = {
-  entry: {
-    background: `./ts/background-scripts/background.js/${ui}.ts`,
-    "dom-translation-content-script":
-      "./ts/content-scripts/dom-translation-content-script.js/index.ts",
-    "get-started": "./ts/extension-ui/get-started.js/index.tsx",
-    "main-interface": "./ts/extension-ui/main-interface.js/index.tsx",
-    "options-ui": "./ts/extension-ui/options-ui.js/index.tsx",
-    tests: "./ts/tests.js/index.ts",
-  },
+  entry,
   output: {
     path: destPath,
     filename: "[name].js",
