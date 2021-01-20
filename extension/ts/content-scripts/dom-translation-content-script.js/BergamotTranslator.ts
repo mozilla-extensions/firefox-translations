@@ -194,7 +194,7 @@ export class BergamotTranslator {
         }
 
         // Show original rather than an empty or obviously invalid translation
-        if (["", "*", "* ()".includes(translation)]) {
+        if (["", "*", "* ()"].includes(translation)) {
           translation = root.original[0];
         }
 
