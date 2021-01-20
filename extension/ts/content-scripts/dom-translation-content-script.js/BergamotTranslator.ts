@@ -9,7 +9,6 @@ import {
   MAX_REQUEST_DATA,
   MAX_REQUESTS,
 } from "./bergamot.constants";
-import { BergamotOutboundTranslator } from "./BergamotOutboundTranslator";
 import { BergamotRequest } from "./BergamotRequest";
 import { TranslationRequest } from "../../shared-resources/bergamot.types";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
@@ -43,19 +42,7 @@ export class BergamotTranslator {
     this._pendingRequests = 0;
     this._partialSuccess = false;
     this._translatedCharacterCount = 0;
-    this._initBergamotOutboundTranslator();
     this.bergamotApiClient = new ContentScriptBergamotApiClient();
-  }
-
-  /**
-   * Instantiate BergamotOutboundTranslator object and add listener for all "submit"
-   * events on the document.
-   */
-  _initBergamotOutboundTranslator() {
-    this._outboundTranslator = new BergamotOutboundTranslator(
-      this.translationDocument,
-    );
-    this._outboundTranslator.listenSubmitEvents();
   }
 
   /**
