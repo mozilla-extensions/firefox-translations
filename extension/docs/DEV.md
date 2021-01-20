@@ -138,7 +138,6 @@ Firefox:
 
 ```
 yarn build:production
-NODE_ENV=production npx webpack --mode=production --profile --json > build/firefox/extension-ui.stats.json
 npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
 ```
 
@@ -146,7 +145,6 @@ Chrome:
 
 ```
 yarn build:production:chrome
-TARGET_BROWSER=chrome npx webpack --mode=production --profile --json > build/chrome/extension-ui.stats.json
 npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
 ```
 
@@ -154,6 +152,5 @@ Firefox native UI variant:
 
 ```
 yarn build:production:native-ui
-UI=native-ui npx webpack --mode=production --profile --json > build/firefox/native-ui.stats.json
 npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
 ```
