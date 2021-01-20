@@ -160,17 +160,14 @@
     "prebuild:production": "NODE_ENV=production npm-run-all clean generate-manifest",
     "prestart": "npm run build:development",
     "pretest:unit:mocha": "NODE_ENV=test npx webpack --entry ./test/unit/all-tests.ts --output-path test/unit/build --output-filename all-tests.js --target node",
-    "remotedev": "remotedev --port=8181",
-    "remotedev:chrome": "remotedev --port=8182",
-    "remotedev:native-ui": "remotedev --port=8183",
     "start": "TARGET_BROWSER=firefox web-ext run",
     "start:chrome": "TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 web-ext run -t chromium",
     "test": "npm-run-all -n test:unit",
     "test:unit": "npm-run-all -n clean:test test:unit:mocha",
     "test:unit:mocha": "DOTENV_CONFIG_PATH=.env.development mocha -r source-map-support/register -r ./test/unit/browser-polyfills.ts -r dotenv/config --globals global test/unit/build/all-tests.js",
-    "watch": "TARGET_BROWSER=firefox REMOTE_DEV_SERVER_PORT=8181 npm-run-all build:development && TARGET_BROWSER=firefox REMOTE_DEV_SERVER_PORT=8181 concurrently 'webpack --watch' 'web-ext run'",
-    "watch:chrome": "TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 npm-run-all build:development && TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 concurrently 'webpack --watch' 'web-ext run -t chromium'",
-    "watch:native-ui": "TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 npm-run-all build:development && TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 concurrently 'webpack --watch' 'web-ext run'",
+    "watch": "TARGET_BROWSER=firefox REMOTE_DEV_SERVER_PORT=8181 npm-run-all build:development && TARGET_BROWSER=firefox REMOTE_DEV_SERVER_PORT=8181 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8181'",
+    "watch:chrome": "TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 npm-run-all build:development && TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 concurrently 'webpack --watch' 'web-ext run -t chromium' 'remotedev --port=8182'",
+    "watch:native-ui": "TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 npm-run-all build:development && TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8183'",
     "webpack:stats": "webpack --profile --json --mode=production > stats.json"
   }
 }

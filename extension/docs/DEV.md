@@ -70,14 +70,6 @@ Note that you also temporarily need a REST server running locally. See [INSTALL.
 
 ### Firefox
 
-First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8181)) in a separate terminal session:
-
-```
-yarn remotedev
-```
-
-Then:
-
 ```
 yarn watch
 ```
@@ -85,19 +77,10 @@ yarn watch
 Or, for the Firefox native UI variant:
 
 ```
-yarn remotedev:native-ui
 yarn watch:native-ui
 ```
 
 ### Chrome
-
-First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8182)) in a separate terminal session:
-
-```
-yarn remotedev:chrome
-```
-
-Then:
 
 ```
 yarn watch:chrome
