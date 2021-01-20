@@ -1,3 +1,5 @@
+import { hasTextForTranslation } from "./hasTextForTranslation";
+
 interface TranslationNode {
   content: Node;
   isTranslationRoot: boolean;
@@ -68,8 +70,8 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
     ) {
       // console.log({child});
       if (
-        child.nodeType ===
-        Node.TEXT_NODE /* && child->GetAsText()->HasTextForTranslation() */
+        child.nodeType === Node.TEXT_NODE &&
+        hasTextForTranslation(child.textContent)
       ) {
         // TODO: Verify this assumption from C to JS:
         /*
