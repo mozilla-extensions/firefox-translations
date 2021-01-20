@@ -85,7 +85,8 @@ yarn watch
 Or, for the Firefox native UI variant:
 
 ```
-UI=native-ui yarn watch
+yarn remotedev:native-ui
+yarn watch:native-ui
 ```
 
 ### Chrome

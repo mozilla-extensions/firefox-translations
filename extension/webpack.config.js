@@ -2,6 +2,7 @@
 
 const path = require("path");
 
+const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
@@ -23,14 +24,17 @@ const fs = require("fs");
 fs.createReadStream(dotEnvPath).pipe(fs.createWriteStream("./.env"));
 
 const plugins = [
-  // Make env vars available in the scope of webpack plugins/loaders
+  // Make .env vars available in the scope of webpack plugins/loaders and the build itself
   new Dotenv({
     path: dotEnvPath,
+    safe: true,
   }),
   // Copy non-webpack-monitored files under "src" to the build directory
   new CopyPlugin({
     patterns: [{ from: "src", to: destPath }],
   }),
+  // Make some environment variables available
+  new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]),
 ];
 
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
