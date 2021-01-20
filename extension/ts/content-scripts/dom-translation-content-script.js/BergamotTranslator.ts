@@ -178,36 +178,86 @@ export class BergamotTranslator {
       return false;
     }
 
+    const showQualityEstimation = false;
+
     let error = false;
     for (let i = 0; i < len; i++) {
       try {
-        // The 'text' field of results is a list of 'Paragraph'. Parse each
-        // 'Paragraph' entry and generate QE annotated HTML of the translated text
-        let translation = this._generateQEAnnotatedHTMLFromParagraph(
-          results.text[i],
-        );
+        // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
+        let translation = this[
+          showQualityEstimation
+            ? "_generateQEAnnotatedHTMLFromParagraph"
+            : "_parseTranslatedTextFromParagraph"
+        ](results.text[i]);
+
         let root = bergamotRequest.translationData[i][0];
         if (root.isSimpleRoot && translation.includes("&")) {
           // If translation contains HTML entities, we need to convert them.
           // It is because simple roots expect a plain text result.
-          // ToDo: Add message-system logging later
           let doc = new DOMParser().parseFromString(translation, "text/html");
           translation = doc.body.firstChild.nodeValue;
         }
 
-        // No root (TranslationItem) is simple anymore because now each root will store
-        // DOM node (having QE annotations) in it's "translation" property. This needs
-        // to be done because translated text with QE annotations have to be shown inplace
-        // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
-        // setting isSimpleRoot to false. Once this use case changes, it can be reverted back.
-        root.isSimpleRoot = false;
+        if (showQualityEstimation) {
+          // No root (TranslationItem) is simple anymore because now each root will store
+          // DOM node (having QE annotations) in it's "translation" property. This needs
+          // to be done because translated text with QE annotations have to be shown inplace
+          // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
+          // setting isSimpleRoot to false. Once this use case changes, it can be reverted back.
+          root.isSimpleRoot = false;
+        }
+
+        // Workaround issues with empty translations
+        if (translation === "") {
+          translation = "(missing translation)";
+        }
+
         root.parseResult(translation);
       } catch (e) {
         error = true;
+        console.error("Translation error: ", e);
       }
     }
 
     return !error;
+  }
+
+  /**
+   * This function parses 'Paragraph' entity of the response for the
+   * the translated text and returns it. The API response format
+   * can be referred here: https://github.com/browsermt/mts
+   *
+   * @param   paragraph    paragraph entry in the response of server.
+   *
+   * @returns string       translated text in target language
+   */
+  _parseTranslatedTextFromParagraph(paragraph) {
+    // Each 'Paragraph' contains a list of 'Sentence translation' list.
+    // There should be only 1 such list.
+    let sentenceTranslationList = paragraph[0];
+
+    let result = "";
+
+    // 'Sentence translation' list contains 'Sentence translation' objects
+    // where each object contains all the information related to translation
+    // of each sentence in source language.
+    for (let index = 0; index < sentenceTranslationList.length; index++) {
+      let sentenceTranslation = sentenceTranslationList[index];
+      let nBestTranslations = sentenceTranslation.nBest;
+
+      // Depending on the request, there might be multiple 'best translations'.
+      // We are fetching the best one (present in 'translation' field).
+      let translation = nBestTranslations[0].translation;
+
+      // ToDo: Currently the rest server doesn't retain the leading/trailing
+      // whitespace information of sentences. It is a bug on rest server side.
+      // Once it is fixed there, we need to stop appending whitespaces.
+      if (index != 0) {
+        translation = " " + translation;
+      }
+      result += translation;
+    }
+    return result;
   }
 
   /**
