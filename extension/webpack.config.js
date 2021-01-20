@@ -7,8 +7,7 @@ const Dotenv = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
-const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const { targetBrowser, ui } = require("./build-config.js");
 const destPath = path.join(__dirname, "build", targetBrowser, ui);
 
 const dotEnvPath =

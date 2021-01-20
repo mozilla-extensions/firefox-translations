@@ -3,8 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const packageJson = require("./package.json");
-const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const { targetBrowser, ui } = require("./build-config.js");
 const destPath = path.join(__dirname, "build", targetBrowser, ui);
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
