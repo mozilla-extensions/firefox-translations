@@ -4,7 +4,7 @@
 
 "use strict";
 
-import { TranslationRequestData } from "../../shared-resources/bergamot.types";
+import { TranslationRequestData } from "../../shared-resources/types/bergamot.types";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
 // Temporary mock

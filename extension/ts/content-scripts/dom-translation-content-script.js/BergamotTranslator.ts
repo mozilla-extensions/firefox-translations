@@ -10,7 +10,7 @@ import {
   MAX_REQUESTS,
 } from "./bergamot.constants";
 import { BergamotRequest } from "./BergamotRequest";
-import { TranslationRequest } from "../../shared-resources/bergamot.types";
+import { TranslationRequest } from "../../shared-resources/types/bergamot.types";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
 /**
@@ -31,7 +31,6 @@ export class BergamotTranslator {
   private _pendingRequests;
   private _partialSuccess;
   private _translatedCharacterCount;
-  private _outboundTranslator;
   private _onFinishedDeferred;
   private bergamotApiClient: ContentScriptBergamotApiClient;
 

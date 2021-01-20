@@ -2,7 +2,6 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import {
   ActionTrackingResult,
-  applySerializedActionAndSyncNewModelIds,
   applySerializedActionAndTrackNewModelIds,
   getSnapshot,
   ModelAutoTypeCheckingMode,

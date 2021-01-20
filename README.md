@@ -8,4 +8,4 @@ See [extension/docs/INSTALL.md](./extension/docs/INSTALL.md) for instructions on
 
 ## Developer documentation
 
-See [extension/docs/DEV.md](./extension/docs/DEV.md) for more details on how to work with this extension as a developer.
+See [extension/docs/DEV.md](./extension/docs/DEV.md) for details on how to work with this extension as a developer.

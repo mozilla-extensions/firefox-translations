@@ -6,7 +6,7 @@ import SetBadgeTextColorDetailsType = BrowserAction.SetBadgeTextColorDetailsType
 import SetBadgeBackgroundColorDetailsType = BrowserAction.SetBadgeBackgroundColorDetailsType;
 import SetBadgeTextDetailsType = BrowserAction.SetBadgeTextDetailsType;
 import ColorValue = BrowserAction.ColorValue;
-import { isChrome } from "./isChrome";
+import { isChrome } from "../lib/isChrome";
 
 const roundRect = (ctx, x, y, w, h, r) => {
   if (w < 2 * r) r = w / 2;

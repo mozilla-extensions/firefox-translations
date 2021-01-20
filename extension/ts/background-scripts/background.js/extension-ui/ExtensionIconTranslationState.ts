@@ -1,7 +1,7 @@
-import { DynamicActionIcon } from "./DynamicActionIcon";
 import { browser } from "webextension-polyfill-ts";
-import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
+import { DynamicActionIcon } from "./DynamicActionIcon";
 import { ModelInstanceData, onSnapshot } from "mobx-keystone";
+import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
 import { DocumentTranslationState } from "../../../shared-resources/models/DocumentTranslationState";
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 

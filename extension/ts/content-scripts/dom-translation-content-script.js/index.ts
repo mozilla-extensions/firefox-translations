@@ -1,9 +1,10 @@
-import { TranslationChild } from "./TranslationChild";
-import { subscribeToExtensionState } from "../../shared-resources/subscribeToExtensionState";
-import { ContentScriptFrameInfo } from "../../shared-resources/ContentScriptFrameInfo";
-import { FrameInfo } from "../../shared-resources/bergamot.types";
-import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { onSnapshot } from "mobx-keystone";
+import { TranslationChild } from "./TranslationChild";
+import { subscribeToExtensionState } from "../../shared-resources/state-management/subscribeToExtensionState";
+import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
+import { FrameInfo } from "../../shared-resources/types/bergamot.types";
+import { ContentScriptFrameInfo } from "../../shared-resources/ContentScriptFrameInfo";
+import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
@@ -30,12 +31,15 @@ const init = async () => {
   const tabFrameReference = `${frameInfo.tabId}-${frameInfo.frameId}`;
 
   const extensionState = await subscribeToExtensionState();
+  const documentTranslationStateCommunicator = new DocumentTranslationStateCommunicator(
+    frameInfo,
+    extensionState,
+  );
 
   const translationChild = new TranslationChild(
-    frameInfo,
+    documentTranslationStateCommunicator,
     document,
     window,
-    extensionState,
   );
 
   const documentTranslationStatistics = await translationChild.getDocumentTranslationStatistics();

@@ -1,5 +1,5 @@
 import { Model, model, prop } from "mobx-keystone";
-import { DetectedLanguageResults } from "../bergamot.types";
+import { DetectedLanguageResults } from "../types/bergamot.types";
 import { computed } from "mobx";
 import { browser } from "webextension-polyfill-ts";
 

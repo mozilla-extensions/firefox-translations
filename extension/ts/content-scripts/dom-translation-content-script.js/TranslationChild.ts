@@ -8,52 +8,21 @@ import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
 import { getTranslationNodes } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
-import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import {
-  DetectedLanguageResults,
-  FrameInfo,
-} from "../../shared-resources/bergamot.types";
+import { DetectedLanguageResults } from "../../shared-resources/types/bergamot.types";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
+import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 
 export class TranslationChild {
-  private frameInfo: FrameInfo;
+  private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
   public contentWindow;
   public document;
-  private extensionState: ExtensionState;
   private languageDetector: ContentScriptLanguageDetectorProxy;
-  constructor(
-    frameInfo: FrameInfo,
-    document,
-    contentWindow,
-    extensionState: ExtensionState,
-  ) {
-    this.frameInfo = frameInfo;
+  constructor(documentTranslationStateCommunicator, document, contentWindow) {
+    this.documentTranslationStateCommunicator = documentTranslationStateCommunicator;
     this.document = document;
     this.contentWindow = contentWindow;
-    this.extensionState = extensionState;
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
-  }
-
-  /**
-   * Wrapped in setTimeout to prevent automatic batching of updates - we want status indicators
-   * to get the updated translation status immediately.
-   *
-   * @param translationStatus
-   */
-  broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationStatus"],
-            value: translationStatus,
-          },
-        ],
-      );
-    }, 0);
   }
 
   async attemptToDetectLanguage() {
@@ -62,12 +31,14 @@ export class TranslationChild {
     let url = String(this.document.location);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       console.debug("Not a HTTP(S) url, translation unavailable", { url });
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.UNAVAILABLE);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.UNAVAILABLE,
+      );
       return;
     }
 
     console.debug("Setting status to reflect detection of language ongoing");
-    this.broadcastUpdatedTranslationStatus(
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
       TranslationStatus.DETECTING_LANGUAGE,
     );
 
@@ -99,7 +70,7 @@ export class TranslationChild {
         "Language detection isn't reliable on very short strings. Skipping language detection",
         { string },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.LANGUAGE_NOT_DETECTED,
       );
       return;
@@ -117,33 +88,20 @@ export class TranslationChild {
       console.log(
         "Content window reference invalid, deleting document translation state",
       );
-      setTimeout(() => {
-        this.extensionState.deleteDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-        );
-      }, 0);
+      this.documentTranslationStateCommunicator.clear();
       return;
     }
 
     // Save results in extension state
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "add",
-            path: ["detectedLanguageResults"],
-            value: detectedLanguageResults,
-          },
-        ],
-      );
-    }, 0);
+    this.documentTranslationStateCommunicator.updatedDetectedLanguageResults(
+      detectedLanguageResults,
+    );
 
     if (!detectedLanguageResults.confident) {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.LANGUAGE_NOT_DETECTED,
       );
       return;
@@ -176,7 +134,7 @@ export class TranslationChild {
           acceptedTargetLanguages,
         },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
       );
       return;
@@ -188,7 +146,7 @@ export class TranslationChild {
         "Detected language is not part of the supported source languages.",
         { detectedLanguage, supportedSourceLanguages },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
@@ -204,7 +162,7 @@ export class TranslationChild {
           allPossiblySupportedTargetLanguages,
         },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
@@ -222,13 +180,15 @@ export class TranslationChild {
         defaultTargetLanguage,
         supportedTargetLanguagesGivenDefaultSourceLanguage,
       });
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
     }
 
-    this.broadcastUpdatedTranslationStatus(TranslationStatus.OFFER);
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+      TranslationStatus.OFFER,
+    );
   }
 
   async doTranslation(aFrom, aTo) {
@@ -240,7 +200,9 @@ export class TranslationChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATING);
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+      TranslationStatus.TRANSLATING,
+    );
 
     let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
 
@@ -270,31 +232,18 @@ export class TranslationChild {
 
       console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATED);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATED,
+      );
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.ERROR);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.ERROR,
+      );
     }
 
     return;
-  }
-
-  showOriginalContent() {
-    /*
-    this.originalShown = true;
-    this.showURLBarIcon();
-    this.sendAsyncMessage("Translation:ShowOriginal");
-    this.translationTelemetry.recordShowOriginalContent();
-     */
-  }
-
-  showTranslatedContent() {
-    /*
-    this.originalShown = false;
-    this.showURLBarIcon();
-    this.sendAsyncMessage("Translation:ShowTranslation");
-     */
   }
 
   async getDocumentTranslationStatistics() {
