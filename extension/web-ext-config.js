@@ -51,7 +51,6 @@ if (targetBrowser === "firefox") {
     "extensions.experiments.enabled=true",
     // "browser.translation.ui.show=true",
     // "browser.translation.detectLanguage=true",
-    // "browser.translation.engine=Google",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
   defaultConfig.filename = `${extensionId}-{version}-firefox.xpi`;

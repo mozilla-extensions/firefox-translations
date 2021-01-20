@@ -12,6 +12,7 @@ import { contentScriptFrameInfoPortListener } from "./contentScriptFrameInfoPort
 import { contentScriptLanguageDetectorProxyPortListener } from "./contentScriptLanguageDetectorProxyPortListener";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { NativeTranslateUiBroker } from "./native-ui/NativeTranslateUiBroker";
+import { connectRootStoreToDevTools } from "./state-management/connectRootStoreToDevTools";
 const store = new Store(localStorageWrapper);
 
 /**
@@ -30,6 +31,15 @@ class ExtensionGlue {
   async init() {
     // Initiate the root extension state store
     this.extensionState = createBackgroundContextRootStore();
+
+    // Allow for easy introspection of extension state in development mode
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REMOTE_DEV_SERVER_PORT
+    ) {
+      // noinspection ES6MissingAwait
+      connectRootStoreToDevTools(this.extensionState);
+    }
 
     // Make the root extension state store available to content script contexts
     const mobxKeystoneBackgroundContextHost = new MobxKeystoneBackgroundContextHost();

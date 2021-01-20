@@ -6,6 +6,8 @@ const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
 const { targetBrowser, ui } = require("./build-config.js");
 const destPath = path.join(__dirname, "build", targetBrowser, ui);
@@ -47,9 +49,22 @@ const plugins = [
   new CopyPlugin({
     patterns: [{ from: "src", to: destPath }],
   }),
-  // Make some environment variables available
-  new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]),
 ];
+
+//
+if (process.env.NODE_ENV === "production") {
+  // Generate a stats file associated with each build
+  plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerMode: "disabled",
+      generateStatsFile: true,
+      statsFilename: `../${ui}.stats.json`,
+    }),
+  );
+} else {
+  // Make the remote dev server port environment variable available
+  plugins.push(new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]));
+}
 
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
 if (
