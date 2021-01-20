@@ -12,6 +12,7 @@
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
+  - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -130,3 +131,29 @@ Note: This is for Firefox and non-native UI only. Chrome Web Store does not offe
 2. Click Console
 
 To clear the current output, click the Trash can icon in the top left.
+
+## Analyze webpack bundle size
+
+Firefox:
+
+```
+yarn build:production
+NODE_ENV=production npx webpack --mode=production --profile --json > build/firefox/extension-ui.stats.json
+npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
+```
+
+Chrome:
+
+```
+TARGET_BROWSER=chrome yarn build:production
+TARGET_BROWSER=chrome npx webpack --mode=production --profile --json > build/chrome/extension-ui.stats.json
+npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
+```
+
+Firefox native UI variant:
+
+```
+UI=native-ui yarn build:production
+UI=native-ui npx webpack --mode=production --profile --json > build/firefox/native-ui.stats.json
+npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
+```
