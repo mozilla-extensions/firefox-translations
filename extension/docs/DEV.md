@@ -50,7 +50,7 @@ The build artifact will be created under `dist/firefox/extension-ui`.
 For Chrome:
 
 ```
-TARGET_BROWSER=chrome yarn build:production
+yarn build:production:chrome
 ```
 
 The build artifact will be created under `dist/chrome/extension-ui`.
@@ -58,7 +58,7 @@ The build artifact will be created under `dist/chrome/extension-ui`.
 To build the Firefox native UI variant:
 
 ```
-UI=native-ui yarn build:production
+yarn build:production:native-ui
 ```
 
 The build artifact will be created under `dist/firefox/native-ui`.
@@ -145,7 +145,7 @@ npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/
 Chrome:
 
 ```
-TARGET_BROWSER=chrome yarn build:production
+yarn build:production:chrome
 TARGET_BROWSER=chrome npx webpack --mode=production --profile --json > build/chrome/extension-ui.stats.json
 npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
 ```
@@ -153,7 +153,7 @@ npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/ex
 Firefox native UI variant:
 
 ```
-UI=native-ui yarn build:production
+yarn build:production:native-ui
 UI=native-ui npx webpack --mode=production --profile --json > build/firefox/native-ui.stats.json
 npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
 ```
