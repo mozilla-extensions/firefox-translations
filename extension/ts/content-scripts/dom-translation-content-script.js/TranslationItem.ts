@@ -117,10 +117,10 @@ export class TranslationItem {
    * Swap the text of this TranslationItem between
    * its original and translated states.
    *
-   * @param target   A string that is either "translation"
-   *                 or "original".
+   * @param target   A string that is either "translation",
+   *                 "original" or "qe-annotated".
    */
-  swapText(target) {
+  swapText(target: "translation" | "original" | "qe-annotated") {
     swapTextForItem(this, target);
   }
 }
@@ -242,10 +242,13 @@ function parseResultNode(item, node) {
  *
  *
  * @param item     A TranslationItem object
- * @param target   A string that is either "translation"
- *                 or "original".
+ * @param target   A string that is either "translation",
+ *                 "original" or "qe-annotated".
  */
-function swapTextForItem(item, target) {
+function swapTextForItem(
+  item,
+  target: "translation" | "original" | "qe-annotated",
+) {
   // visitStack is the stack of items that we still need to visit.
   // Let's start the process by adding the root item.
   let visitStack = [item];

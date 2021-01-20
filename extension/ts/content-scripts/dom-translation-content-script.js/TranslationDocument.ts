@@ -213,13 +213,22 @@ export class TranslationDocument {
   }
 
   /**
+   * Changes the document to display the translation with quality estimation metadata
+   * content.
+   */
+  showQualityEstimation() {
+    this.originalShown = true;
+    this._swapDocumentContent("qe-annotated");
+  }
+
+  /**
    * Swap the document with the resulting translation,
    * or back with the original content.
    *
-   * @param target   A string that is either "translation"
-   *                 or "original".
+   * @param target   A string that is either "translation",
+   *                 "original" or "qe-annotated".
    */
-  _swapDocumentContent(target: "translation" | "original") {
+  _swapDocumentContent(target: "translation" | "original" | "qe-annotated") {
     (async () => {
       this.roots.forEach(root => root.swapText(target));
     })();
