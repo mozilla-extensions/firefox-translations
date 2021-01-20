@@ -212,7 +212,10 @@ export class TranslationChild {
     translationDocument.translationError = false;
 
     try {
-      console.info("About to translate web page document", { aFrom, aTo });
+      console.info(
+        `About to translate web page document (${translationDocument.roots.length} translation items)`,
+        { aFrom, aTo },
+      );
       await translator.translate();
       /*
       // TODO: Restore telemetry
