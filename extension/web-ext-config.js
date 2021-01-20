@@ -42,7 +42,7 @@ if (targetBrowser === "firefox") {
     `about:devtools-toolbox?type=extension&id=${encodeURIComponent(
       extensionId,
     )}`,
-    "http://localhost:8181/",
+    `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
     ...examplePagesToTranslate,
     "about:debugging#/runtime/this-firefox",
   ];

@@ -31,23 +31,7 @@ export function createBackgroundContextRootStore(): ExtensionState {
       `Connecting the background store to the Redux dev tools on port ${port}`,
     );
     const connection = remotedev.connectViaExtension({
-      name: "Background Context (Firefox)",
-      realtime: true,
-      port,
-    });
-    connectReduxDevTools(remotedev, connection, rootStore);
-  }
-  if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.REMOTE_DEV_SERVER_PORT_CHROME &&
-    isChrome()
-  ) {
-    const port = process.env.REMOTE_DEV_SERVER_PORT_CHROME;
-    console.info(
-      `Connecting the background store to the Redux dev tools on port ${port}`,
-    );
-    const connection = remotedev.connectViaExtension({
-      name: "Background Context (Chrome)",
+      name: `Background Context (Port ${port})`,
       realtime: true,
       port,
     });
