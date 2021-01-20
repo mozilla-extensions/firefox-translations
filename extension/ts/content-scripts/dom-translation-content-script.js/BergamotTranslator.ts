@@ -194,9 +194,9 @@ export class BergamotTranslator {
           root.isSimpleRoot = false;
         }
 
-        // Workaround issues with empty translations
-        if (translation === "") {
-          translation = "(missing translation)";
+        // Show original rather than an empty or obviously invalid translation
+        if (["", "*", "* ()".includes(translation)]) {
+          translation = root.original[0];
         }
 
         root.parseResult(translation);
