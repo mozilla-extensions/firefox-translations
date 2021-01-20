@@ -1,7 +1,7 @@
 import {
   ExtensionPreferences,
   Store,
-} from "../background-scripts/background.js/lib/Store";
+} from "../../background-scripts/background.js/state-management/Store";
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 

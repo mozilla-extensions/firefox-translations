@@ -4,14 +4,12 @@ import {
   model,
   modelAction,
   Patch,
-  prop,
   prop_mapObject,
 } from "mobx-keystone";
 import { DocumentTranslationState } from "./DocumentTranslationState";
 import { FragmentTranslationState } from "./FragmentTranslationState";
 import { TranslateOwnTextTranslationState } from "./TranslateOwnTextTranslationState";
-import { computed } from "mobx";
-import { FrameInfo } from "../bergamot.types";
+import { FrameInfo } from "../types/bergamot.types";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;

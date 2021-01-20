@@ -2,16 +2,16 @@
 
 import { initErrorReportingInBackgroundScript } from "../../shared-resources/ErrorReporting";
 import { browser as crossBrowser, Runtime } from "webextension-polyfill-ts";
-import { Store } from "./lib/Store";
-import { localStorageWrapper } from "./lib/localStorageWrapper";
 import Port = Runtime.Port;
-import { MobxKeystoneBackgroundContextHost } from "./lib/MobxKeystoneBackgroundContextHost";
+import { Store } from "./state-management/Store";
+import { localStorageWrapper } from "./state-management/localStorageWrapper";
+import { MobxKeystoneBackgroundContextHost } from "./state-management/MobxKeystoneBackgroundContextHost";
+import { createBackgroundContextRootStore } from "./state-management/createBackgroundContextRootStore";
+import { contentScriptBergamotApiClientPortListener } from "./contentScriptBergamotApiClientPortListener";
+import { contentScriptFrameInfoPortListener } from "./contentScriptFrameInfoPortListener";
+import { contentScriptLanguageDetectorProxyPortListener } from "./contentScriptLanguageDetectorProxyPortListener";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
-import { contentScriptBergamotApiClientPortListener } from "./lib/contentScriptBergamotApiClientPortListener";
-import { contentScriptFrameInfoPortListener } from "./lib/contentScriptFrameInfoPortListener";
-import { contentScriptLanguageDetectorProxyPortListener } from "./lib/contentScriptLanguageDetectorProxyPortListener";
-import { ExtensionIconTranslationState } from "./lib/ExtensionIconTranslationState";
+import { ExtensionIconTranslationState } from "./extension-ui/ExtensionIconTranslationState";
 const store = new Store(localStorageWrapper);
 
 /**

@@ -1,4 +1,6 @@
 /**
+ * (This file has not yet been updated to reflect Bergamot integration requirements)
+ *
  * Uses telemetry histograms for collecting statistics on the usage of the
  * translation component.
  *

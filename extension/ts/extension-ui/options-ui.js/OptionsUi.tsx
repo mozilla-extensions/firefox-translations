@@ -1,18 +1,18 @@
 import * as React from "react";
 import { Component, MouseEvent } from "react";
 import "photon-colors/photon-colors.css";
-import "../../shared-resources//photon-components-web/index.css";
-import "../../shared-resources//photon-components-web/attributes/index.css";
-import "../../shared-resources//tailwind.css";
+import "../../shared-resources/photon-components-web/index.css";
+import "../../shared-resources/photon-components-web/attributes/index.css";
+import "../../shared-resources/tailwind.css";
 import "./index.css";
-import { Checkbox } from "../../shared-resources//photon-components-web/photon-components/Checkbox";
-import "../../shared-resources//photon-components-web/photon-components/Checkbox/light-theme.css";
+import { Checkbox } from "../../shared-resources/photon-components-web/photon-components/Checkbox";
+import "../../shared-resources/photon-components-web/photon-components/Checkbox/light-theme.css";
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { DisplayError } from "./DisplayError";
-import { ExtensionPreferences } from "../../background-scripts/background.js/lib/Store";
-import { captureExceptionWithExtras } from "../../shared-resources//ErrorReporting";
-import Button from "../../shared-resources//photon-components-web/photon-components/Button";
+import { ExtensionPreferences } from "../../background-scripts/background.js/state-management/Store";
+import { captureExceptionWithExtras } from "../../shared-resources/ErrorReporting";
+import Button from "../../shared-resources/photon-components-web/photon-components/Button";
 import { config } from "../../config";
 
 export interface OptionsUiProps {}

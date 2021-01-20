@@ -2,7 +2,7 @@ import * as React from "react";
 import { MouseEvent } from "react";
 import { browser } from "webextension-polyfill-ts";
 import { config } from "../config";
-import { Link } from "../shared-resources/photon-components-web/photon-components/Link";
+import { Link } from "./photon-components-web/photon-components/Link";
 
 export class GeneralErrorMessage extends React.Component<
   {

@@ -2,7 +2,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { captureExceptionWithExtras } from "./ErrorReporting";
 import { nanoid } from "nanoid";
-import { FrameInfo } from "./bergamot.types";
+import { FrameInfo } from "./types/bergamot.types";
 
 export class ContentScriptFrameInfo {
   private backgroundContextPort: Port;

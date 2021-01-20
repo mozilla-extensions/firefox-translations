@@ -1,4 +1,4 @@
-import { FrameInfo } from "../../../shared-resources/bergamot.types";
+import { FrameInfo } from "../../shared-resources/types/bergamot.types";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 

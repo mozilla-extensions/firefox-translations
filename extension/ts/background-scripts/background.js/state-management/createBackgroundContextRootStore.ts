@@ -6,7 +6,7 @@ import {
 } from "mobx-keystone";
 import * as remotedev from "remotedev";
 import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
-import { isChrome } from "./isChrome";
+import { isChrome } from "../lib/isChrome";
 
 // enable runtime data checking even in production mode
 setGlobalConfig({

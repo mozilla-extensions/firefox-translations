@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Component, MouseEvent } from "react";
-import "../../shared-resources//tailwind.css";
+import "../../shared-resources/tailwind.css";
 import { config } from "../../config";
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
-import { ExtensionPreferences } from "../../background-scripts/background.js/lib/Store";
-import { captureExceptionWithExtras } from "../../shared-resources//ErrorReporting";
+import { ExtensionPreferences } from "../../background-scripts/background.js/state-management/Store";
+import { captureExceptionWithExtras } from "../../shared-resources/ErrorReporting";
 import { DisplayError } from "../options-ui.js/DisplayError";
 
 export interface GetStartedProps {}

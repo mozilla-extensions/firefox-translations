@@ -209,6 +209,7 @@ export class TranslationDocument {
   showOriginal() {
     this.originalShown = true;
     this._swapDocumentContent("original");
+    // TranslationTelemetry.recordShowOriginalContent();
   }
 
   /**

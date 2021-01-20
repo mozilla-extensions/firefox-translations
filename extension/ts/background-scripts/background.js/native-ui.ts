@@ -2,16 +2,16 @@
 
 import { initErrorReportingInBackgroundScript } from "../../shared-resources/ErrorReporting";
 import { browser as crossBrowser, Runtime } from "webextension-polyfill-ts";
-import { Store } from "./lib/Store";
-import { localStorageWrapper } from "./lib/localStorageWrapper";
 import Port = Runtime.Port;
-import { MobxKeystoneBackgroundContextHost } from "./lib/MobxKeystoneBackgroundContextHost";
+import { Store } from "./state-management/Store";
+import { localStorageWrapper } from "./state-management/localStorageWrapper";
+import { MobxKeystoneBackgroundContextHost } from "./state-management/MobxKeystoneBackgroundContextHost";
+import { createBackgroundContextRootStore } from "./state-management/createBackgroundContextRootStore";
+import { contentScriptBergamotApiClientPortListener } from "./contentScriptBergamotApiClientPortListener";
+import { contentScriptFrameInfoPortListener } from "./contentScriptFrameInfoPortListener";
+import { contentScriptLanguageDetectorProxyPortListener } from "./contentScriptLanguageDetectorProxyPortListener";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
-import { contentScriptBergamotApiClientPortListener } from "./lib/contentScriptBergamotApiClientPortListener";
-import { contentScriptFrameInfoPortListener } from "./lib/contentScriptFrameInfoPortListener";
-import { contentScriptLanguageDetectorProxyPortListener } from "./lib/contentScriptLanguageDetectorProxyPortListener";
-import { NativeTranslateUiBroker } from "./lib/NativeTranslateUiBroker";
+import { NativeTranslateUiBroker } from "./native-ui/NativeTranslateUiBroker";
 const store = new Store(localStorageWrapper);
 
 /**
@@ -96,8 +96,6 @@ const runMigrations = async () => {
 
 // init the extension glue on every extension load
 async function onEveryExtensionLoad() {
-  // TODO: disable behind pref - incl pref listener to react to pref changes
-
   await extensionGlue.init();
   await runMigrations();
   await extensionGlue.start();

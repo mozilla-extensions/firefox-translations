@@ -4,12 +4,12 @@ import { config } from "../config";
 import {
   ExtensionPreferences,
   Store,
-} from "../background-scripts/background.js/lib/Store";
+} from "../background-scripts/background.js/state-management/Store";
 import {
   communicateExtensionPreferenceChangesToContentScripts,
   subscribeToExtensionPreferenceChangesInBackgroundScript,
   subscribeToExtensionPreferenceChangesInContentScript,
-} from "./subscribeToExtensionPreferenceChanges";
+} from "./state-management/subscribeToExtensionPreferenceChanges";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { flatten } from "flat";

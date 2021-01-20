@@ -5,7 +5,7 @@
 "use strict";
 
 import { browser } from "webextension-polyfill-ts";
-import { DetectedLanguageResults } from "../../../shared-resources/bergamot.types";
+import { DetectedLanguageResults } from "../../../shared-resources/types/bergamot.types";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
