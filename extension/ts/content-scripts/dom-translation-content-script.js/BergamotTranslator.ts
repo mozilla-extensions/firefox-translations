@@ -155,7 +155,7 @@ export class BergamotTranslator {
    * This function will determine what is the data to be used for
    * the Nth request we are generating, based on the input params.
    *
-   * @param startIndex What is the index, in the roots list, that the
+   * @param startIndex What is the index, in the translation roots list, that the
    *                   chunk should start.
    */
   private generateNextTranslationRequestChunk(
@@ -164,11 +164,11 @@ export class BergamotTranslator {
     let currentDataSize = 0;
     let currentChunks = 0;
     let output = [];
-    let rootsList = this.translationDocument.roots;
+    let translationRootsList = this.translationDocument.translationRoots;
 
-    for (let i = startIndex; i < rootsList.length; i++) {
-      let root = rootsList[i];
-      let text = this.translationDocument.generateTextForItem(root);
+    for (let i = startIndex; i < translationRootsList.length; i++) {
+      let translationRoot = translationRootsList[i];
+      let text = this.translationDocument.generateTextForItem(translationRoot);
       if (!text) {
         continue;
       }
@@ -190,7 +190,7 @@ export class BergamotTranslator {
 
       currentDataSize = newCurSize;
       currentChunks = newChunks;
-      output.push([root, text]);
+      output.push([translationRoot, text]);
     }
 
     return {
@@ -204,7 +204,7 @@ export class BergamotTranslator {
 function preprocessBergamotTranslationRequestData(
   translationRequestData: TranslationRequestData,
 ): TranslationRequestData {
-  return translationRequestData.map(([translationItem, text]) => {
+  return translationRequestData.map(([translationRoot, text]) => {
     // The next line is a hack to delay dealing with the problem of
     //               <b>Do not</b> touch.
     // being translated to something like
@@ -215,7 +215,7 @@ function preprocessBergamotTranslationRequestData(
     // the translated result. So as a hack we just remove the
     // tags and hope the formatting is not too bad.
     text = text.replace(/<[^>]*>?/gm, " ");
-    return [translationItem, text];
+    return [translationRoot, text];
   });
 }
 
@@ -240,12 +240,15 @@ function parseChunkResult(
   let error = false;
   for (let i = 0; i < len; i++) {
     try {
-      const root = bergamotRequest.translationRequestData[i][0];
+      const translationRoot: TranslationItem =
+        bergamotRequest.translationRequestData[i][0];
+      // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
+      const paragraph = results.text[i];
       const translation = preprocessBergamotTranslationResult(
-        results.text[i],
-        root,
+        paragraph,
+        translationRoot,
       );
-      root.parseResult(translation);
+      translationRoot.parseResult(translation);
     } catch (e) {
       error = true;
       console.error("Translation error: ", e);
@@ -255,15 +258,17 @@ function parseChunkResult(
   return !error;
 }
 
-function preprocessBergamotTranslationResult(translationResult, root) {
+function preprocessBergamotTranslationResult(
+  paragraph,
+  translationRoot: TranslationItem,
+) {
   const showQualityEstimation = false;
 
-  // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
   let translation = showQualityEstimation
-    ? generateQEAnnotatedHTMLFromParagraph(translationResult)
-    : parseTranslatedTextFromParagraph(translationResult);
+    ? generateQEAnnotatedHTMLFromParagraph(paragraph)
+    : parseTranslatedTextFromParagraph(paragraph);
 
-  if (root.isSimpleRoot && translation.includes("&")) {
+  if (translationRoot.isSimleTranslationRoot && translation.includes("&")) {
     // If translation contains HTML entities, we need to convert them.
     // It is because simple roots expect a plain text result.
     let doc = new DOMParser().parseFromString(translation, "text/html");
@@ -271,17 +276,17 @@ function preprocessBergamotTranslationResult(translationResult, root) {
   }
 
   if (showQualityEstimation) {
-    // No root (TranslationItem) is simple anymore because now each root will store
+    // No translation root is simple anymore because now each translationRoot will store
     // DOM node (having QE annotations) in it's "translation" property. This needs
     // to be done because translated text with QE annotations have to be shown inplace
     // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
-    // setting isSimpleRoot to false. Once this use case changes, it can be reverted back.
-    root.isSimpleRoot = false;
+    // setting isSimleTranslationRoot to false. Once this use case changes, it can be reverted back.
+    translationRoot.isSimleTranslationRoot = false;
   }
 
   // Show original rather than an empty or obviously invalid translation
   if (["", "*", "* ()"].includes(translation)) {
-    translation = root.original[0];
+    translation = translationRoot.original[0];
   }
   return translation;
 }
