@@ -24,7 +24,7 @@ export class TranslationDocument {
   public translatedTo = "";
   public translationError = false;
   private originalShown = true;
-  private itemsMap;
+  private itemsMap: Map<Node, TranslationItem>;
   public readonly roots: TranslationItem[];
 
   constructor(document: Document) {
@@ -81,18 +81,6 @@ export class TranslationDocument {
       }
     }
   }
-
-  /*
-   */
-  getOwnerDocument() {
-    for (let root of this.roots) {
-      if (root.nodeRef.ownerDocument) {
-        return root.nodeRef.ownerDocument;
-      }
-    }
-  }
-  /*
-   */
 
   /**
    * Creates a TranslationItem object, which should be called

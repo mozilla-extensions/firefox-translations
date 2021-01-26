@@ -4,17 +4,25 @@
 
 "use strict";
 
-import {
-  MAX_REQUEST_CHUNKS,
-  MAX_REQUEST_DATA,
-  MAX_REQUESTS,
-} from "./bergamot.constants";
-import { BergamotRequest } from "./BergamotRequest";
+import { BergamotTranslationRequest } from "./BergamotTranslationRequest";
 import { TranslationRequest } from "../../shared-resources/types/bergamot.types";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
+// The maximum amount of net data allowed per request on Bergamot's API.
+export const MAX_REQUEST_DATA = 5000; // XXX This is the Bing value
+
+// The maximum number of chunks allowed to be translated in a single
+// request.
+export const MAX_REQUEST_CHUNKS = 128; // TODO: Determine the real value for this
+
+// Self-imposed limit of 1920 requests. This means that a page that would need
+// to be broken in more than 1920 requests won't be fully translated.
+// The maximum amount of data that we will translate for a single page
+// is MAX_REQUESTS * MAX_REQUEST_DATA.
+export const MAX_REQUESTS = 15;
+
 /**
- * Translates a webpage using Bergamot's Translation API.
+ * Translates a webpage using Bergamot's Translation backend.
  *
  * @param translationDocument  The TranslationDocument object that represents
  *                             the webpage to be translated
@@ -67,7 +75,7 @@ export class BergamotTranslator {
         let request = this._generateNextTranslationRequest(currentIndex);
 
         // Create a real request for the server and add it to the pending requests list.
-        let bergamotRequest = new BergamotRequest(
+        let bergamotRequest = new BergamotTranslationRequest(
           request.data,
           this.sourceLanguage,
           this.targetLanguage,
@@ -101,7 +109,7 @@ export class BergamotTranslator {
    *
    * @param   bergamotRequest   The BergamotRequest sent to the server.
    */
-  _chunkCompleted(results, bergamotRequest: BergamotRequest) {
+  _chunkCompleted(results, bergamotRequest: BergamotTranslationRequest) {
     if (this._parseChunkResult(results, bergamotRequest)) {
       this._partialSuccess = true;
       // Count the number of characters successfully translated.
@@ -155,7 +163,7 @@ export class BergamotTranslator {
    * @param   bergamotRequest      The request sent to the server.
    * @returns boolean      True if parsing of this chunk was successful.
    */
-  _parseChunkResult(results, bergamotRequest: BergamotRequest) {
+  _parseChunkResult(results, bergamotRequest: BergamotTranslationRequest) {
     let len = results.text.length;
     if (len != bergamotRequest.translationData.length) {
       // This should never happen, but if the service returns a different number
@@ -164,40 +172,14 @@ export class BergamotTranslator {
       return false;
     }
 
-    const showQualityEstimation = false;
-
     let error = false;
     for (let i = 0; i < len; i++) {
       try {
-        // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
-        let translation = this[
-          showQualityEstimation
-            ? "_generateQEAnnotatedHTMLFromParagraph"
-            : "_parseTranslatedTextFromParagraph"
-        ](results.text[i]);
-
-        let root = bergamotRequest.translationData[i][0];
-        if (root.isSimpleRoot && translation.includes("&")) {
-          // If translation contains HTML entities, we need to convert them.
-          // It is because simple roots expect a plain text result.
-          let doc = new DOMParser().parseFromString(translation, "text/html");
-          translation = doc.body.firstChild.nodeValue;
-        }
-
-        if (showQualityEstimation) {
-          // No root (TranslationItem) is simple anymore because now each root will store
-          // DOM node (having QE annotations) in it's "translation" property. This needs
-          // to be done because translated text with QE annotations have to be shown inplace
-          // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
-          // setting isSimpleRoot to false. Once this use case changes, it can be reverted back.
-          root.isSimpleRoot = false;
-        }
-
-        // Show original rather than an empty or obviously invalid translation
-        if (["", "*", "* ()"].includes(translation)) {
-          translation = root.original[0];
-        }
-
+        const root = bergamotRequest.translationData[i][0];
+        const translation = preprocessBergamotTranslationResult(
+          results.text[i],
+          root,
+        );
         root.parseResult(translation);
       } catch (e) {
         error = true;
@@ -206,119 +188,6 @@ export class BergamotTranslator {
     }
 
     return !error;
-  }
-
-  /**
-   * This function parses 'Paragraph' entity of the response for the
-   * the translated text and returns it. The API response format
-   * can be referred here: https://github.com/browsermt/mts
-   *
-   * @param   paragraph    paragraph entry in the response of server.
-   *
-   * @returns string       translated text in target language
-   */
-  _parseTranslatedTextFromParagraph(paragraph) {
-    // Each 'Paragraph' contains a list of 'Sentence translation' list.
-    // There should be only 1 such list.
-    let sentenceTranslationList = paragraph[0];
-
-    let result = "";
-
-    // 'Sentence translation' list contains 'Sentence translation' objects
-    // where each object contains all the information related to translation
-    // of each sentence in source language.
-    for (let index = 0; index < sentenceTranslationList.length; index++) {
-      let sentenceTranslation = sentenceTranslationList[index];
-      let nBestTranslations = sentenceTranslation.nBest;
-
-      // Depending on the request, there might be multiple 'best translations'.
-      // We are fetching the best one (present in 'translation' field).
-      let translation = nBestTranslations[0].translation;
-
-      // ToDo: Currently the rest server doesn't retain the leading/trailing
-      // whitespace information of sentences. It is a bug on rest server side.
-      // Once it is fixed there, we need to stop appending whitespaces.
-      if (index != 0) {
-        translation = " " + translation;
-      }
-      result += translation;
-    }
-    return result;
-  }
-
-  /**
-   * This function parses 'Paragraph' entity of the response and returns
-   * QE Annotated HTML of the translated text. The API response format
-   * can be referred here: https://github.com/browsermt/mts
-   *
-   * @param   paragraph    paragraph entry in the response of server.
-   * @returns string       QE Annotated HTML of the translated text
-   *                       in target language
-   */
-  _generateQEAnnotatedHTMLFromParagraph(paragraph) {
-    // ToDo: Add message-system logging later in this method
-    // Each 'Paragraph' contains a list of 'Sentence translation' list.
-    // There should be only 1 such list.
-    let sentenceTranslationList = paragraph[0];
-
-    let qeAnnotatedParagraphHTML = "";
-
-    // 'Sentence translation' list contains 'Sentence translation' objects
-    // where each object contains all the information related to translation
-    // of each sentence in source language.
-    for (let index = 0; index < sentenceTranslationList.length; index++) {
-      let sentenceTranslation = sentenceTranslationList[index];
-      let nBestTranslations = sentenceTranslation.nBest;
-
-      // Depending on the request, there might be multiple 'best translations'.
-      // We are fetching the best one (present in 'translation' field).
-      let translation = nBestTranslations[0].translation;
-
-      // Currently, sentence scores are used as quality estimates
-      let sentenceScore = nBestTranslations[0].sentenceScore;
-
-      // ToDo: Currently the rest server doesn't retain the leading/trailing
-      // whitespace information of sentences. It is a bug on rest server side.
-      // Once it is fixed there, we need to stop appending whitespaces.
-      if (index != 0) {
-        translation = " " + translation;
-      }
-
-      // Generate QE Annotated HTML for each sentence and append it to the result
-      qeAnnotatedParagraphHTML += this._generateQEAnnotatedHTML(
-        translation,
-        sentenceScore,
-      );
-    }
-
-    // Wrap the result with identifier "QE-ANNOTATED" to make it easy to switch
-    // b/w "original" and "translation" in TranslationDocument.swapTextForItem() method
-    return `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`;
-  }
-
-  /**
-   * This function generates the Quality Estimation annotated HTML of a string
-   * based on its score.
-   *
-   * @param   translation    input string
-   * @param   score          score of the input string
-   * @returns string         QE annotated HTML of input string
-   */
-  _generateQEAnnotatedHTML(translation, score) {
-    // Color choices and thresholds below are chosen based on intuitiveness.
-    // They will be changed according to the UI design of Translator once it
-    // is fixed.
-    let color: string;
-    if (score >= -0.2) {
-      color = "green";
-    } else if (score >= -0.5 && score < -0.2) {
-      color = "black";
-    } else if (score >= -0.8 && score < -0.5) {
-      color = "mediumvioletred";
-    } else {
-      color = "red";
-    }
-    return `<span style="color:${color}">${translation}</span>`;
   }
 
   /**
@@ -367,4 +236,148 @@ export class BergamotTranslator {
       lastIndex: 0,
     };
   }
+}
+
+function preprocessBergamotTranslationResult(translationResult, root) {
+  const showQualityEstimation = false;
+
+  // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
+  let translation = showQualityEstimation
+    ? generateQEAnnotatedHTMLFromParagraph(translationResult)
+    : parseTranslatedTextFromParagraph(translationResult);
+
+  if (root.isSimpleRoot && translation.includes("&")) {
+    // If translation contains HTML entities, we need to convert them.
+    // It is because simple roots expect a plain text result.
+    let doc = new DOMParser().parseFromString(translation, "text/html");
+    translation = doc.body.firstChild.nodeValue;
+  }
+
+  if (showQualityEstimation) {
+    // No root (TranslationItem) is simple anymore because now each root will store
+    // DOM node (having QE annotations) in it's "translation" property. This needs
+    // to be done because translated text with QE annotations have to be shown inplace
+    // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
+    // setting isSimpleRoot to false. Once this use case changes, it can be reverted back.
+    root.isSimpleRoot = false;
+  }
+
+  // Show original rather than an empty or obviously invalid translation
+  if (["", "*", "* ()"].includes(translation)) {
+    translation = root.original[0];
+  }
+  return translation;
+}
+
+/**
+ * This function parses 'Paragraph' entity of the response for the
+ * the translated text and returns it. The API response format
+ * can be referred here: https://github.com/browsermt/mts
+ *
+ * @param   paragraph    paragraph entry in the response of server.
+ *
+ * @returns string       translated text in target language
+ */
+function parseTranslatedTextFromParagraph(paragraph) {
+  // Each 'Paragraph' contains a list of 'Sentence translation' list.
+  // There should be only 1 such list.
+  let sentenceTranslationList = paragraph[0];
+
+  let result = "";
+
+  // 'Sentence translation' list contains 'Sentence translation' objects
+  // where each object contains all the information related to translation
+  // of each sentence in source language.
+  for (let index = 0; index < sentenceTranslationList.length; index++) {
+    let sentenceTranslation = sentenceTranslationList[index];
+    let nBestTranslations = sentenceTranslation.nBest;
+
+    // Depending on the request, there might be multiple 'best translations'.
+    // We are fetching the best one (present in 'translation' field).
+    let translation = nBestTranslations[0].translation;
+
+    // ToDo: Currently the rest server doesn't retain the leading/trailing
+    // whitespace information of sentences. It is a bug on rest server side.
+    // Once it is fixed there, we need to stop appending whitespaces.
+    if (index != 0) {
+      translation = " " + translation;
+    }
+    result += translation;
+  }
+  return result;
+}
+
+/**
+ * This function parses 'Paragraph' entity of the response and returns
+ * QE Annotated HTML of the translated text. The API response format
+ * can be referred here: https://github.com/browsermt/mts
+ *
+ * @param   paragraph    paragraph entry in the response of server.
+ * @returns string       QE Annotated HTML of the translated text
+ *                       in target language
+ */
+function generateQEAnnotatedHTMLFromParagraph(paragraph) {
+  // ToDo: Add message-system logging later in this method
+  // Each 'Paragraph' contains a list of 'Sentence translation' list.
+  // There should be only 1 such list.
+  let sentenceTranslationList = paragraph[0];
+
+  let qeAnnotatedParagraphHTML = "";
+
+  // 'Sentence translation' list contains 'Sentence translation' objects
+  // where each object contains all the information related to translation
+  // of each sentence in source language.
+  for (let index = 0; index < sentenceTranslationList.length; index++) {
+    let sentenceTranslation = sentenceTranslationList[index];
+    let nBestTranslations = sentenceTranslation.nBest;
+
+    // Depending on the request, there might be multiple 'best translations'.
+    // We are fetching the best one (present in 'translation' field).
+    let translation = nBestTranslations[0].translation;
+
+    // Currently, sentence scores are used as quality estimates
+    let sentenceScore = nBestTranslations[0].sentenceScore;
+
+    // ToDo: Currently the rest server doesn't retain the leading/trailing
+    // whitespace information of sentences. It is a bug on rest server side.
+    // Once it is fixed there, we need to stop appending whitespaces.
+    if (index != 0) {
+      translation = " " + translation;
+    }
+
+    // Generate QE Annotated HTML for each sentence and append it to the result
+    qeAnnotatedParagraphHTML += generateQEAnnotatedHTML(
+      translation,
+      sentenceScore,
+    );
+  }
+
+  // Wrap the result with identifier "QE-ANNOTATED" to make it easy to switch
+  // b/w "original" and "translation" in TranslationDocument.swapTextForItem() method
+  return `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`;
+}
+
+/**
+ * This function generates the Quality Estimation annotated HTML of a string
+ * based on its score.
+ *
+ * @param   translation    input string
+ * @param   score          score of the input string
+ * @returns string         QE annotated HTML of input string
+ */
+function generateQEAnnotatedHTML(translation, score) {
+  // Color choices and thresholds below are chosen based on intuitiveness.
+  // They will be changed according to the UI design of Translator once it
+  // is fixed.
+  let color: string;
+  if (score >= -0.2) {
+    color = "green";
+  } else if (score >= -0.5 && score < -0.2) {
+    color = "black";
+  } else if (score >= -0.8 && score < -0.5) {
+    color = "mediumvioletred";
+  } else {
+    color = "red";
+  }
+  return `<span style="color:${color}">${translation}</span>`;
 }
