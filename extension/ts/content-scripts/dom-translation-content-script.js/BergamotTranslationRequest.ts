@@ -7,13 +7,6 @@
 import { TranslationRequestData } from "../../shared-resources/types/bergamot.types";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
-// Temporary mock
-class httpRequest {
-  constructor(url, options) {
-    console.log("MOCK HTTP REQUEST", { url, options });
-  }
-}
-
 /**
  * Represents a request (for 1 chunk) sent off to Bergamot's service.
  *
@@ -24,7 +17,7 @@ class httpRequest {
  * @param targetLanguage    The target language for the translation.
  *
  */
-export class BergamotRequest {
+export class BergamotTranslationRequest {
   public translationData;
   private sourceLanguage;
   private targetLanguage;
