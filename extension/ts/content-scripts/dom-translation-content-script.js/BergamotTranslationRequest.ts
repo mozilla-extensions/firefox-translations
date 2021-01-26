@@ -4,7 +4,7 @@
 
 "use strict";
 
-import { TranslationRequestData } from "../../shared-resources/types/bergamot.types";
+import { TranslationRequestData } from "./BergamotTranslator";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
 
 /**
@@ -18,46 +18,32 @@ import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentSc
  *
  */
 export class BergamotTranslationRequest {
-  public translationData;
-  private sourceLanguage;
-  private targetLanguage;
-  public characterCount;
+  public translationRequestData: TranslationRequestData;
+  private sourceLanguage: string;
+  private targetLanguage: string;
+  public characterCount: number;
 
   constructor(
-    translationData: TranslationRequestData,
-    sourceLanguage,
-    targetLanguage,
+    translationRequestData: TranslationRequestData,
+    sourceLanguage: string,
+    targetLanguage: string,
   ) {
-    this.translationData = translationData;
+    this.translationRequestData = translationRequestData;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
-    this.characterCount = 0;
+    for (let [, text] of this.translationRequestData) {
+      this.characterCount += text.length;
+    }
   }
 
   /**
    * Initiates the request
    */
   async fireRequest(bergamotApiClient: ContentScriptBergamotApiClient) {
-    // Prepare the post data
     const texts = [];
-
-    // Prepare the content of the post
-    for (let [, text] of this.translationData) {
-      // The next line is a hack to delay dealing with the problem of
-      //               <b>Do not</b> touch.
-      // being translated to something like
-      //           <b>Ne</b> touche <b>pas</b>.
-      // The server can only deal with pure text. The client has no
-      // knowledge of semantics. So it can not remove the tags and
-      // replace them as it doesn't know how to insert them in to
-      // the translated result. So as a hack we just remove the
-      // tags and hope the formatting is not too bad.
-      text = text.replace(/<[^>]*>?/gm, " ");
+    for (let [, text] of this.translationRequestData) {
       texts.push(text);
-      this.characterCount += text.length;
     }
-
-    // Fire the request.
     return bergamotApiClient.sendTranslationRequest(texts);
   }
 }
