@@ -1,5 +1,5 @@
 import { onSnapshot } from "mobx-keystone";
-import { TranslationChild } from "./TranslationChild";
+import { DomTranslator } from "./DomTranslator";
 import { subscribeToExtensionState } from "../../shared-resources/state-management/subscribeToExtensionState";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 import { FrameInfo } from "../../shared-resources/types/bergamot.types";
@@ -36,7 +36,7 @@ const init = async () => {
     extensionState,
   );
 
-  const translationChild = new TranslationChild(
+  const translationChild = new DomTranslator(
     documentTranslationStateCommunicator,
     document,
     window,
