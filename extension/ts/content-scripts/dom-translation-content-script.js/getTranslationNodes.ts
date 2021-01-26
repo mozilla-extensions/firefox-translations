@@ -34,7 +34,7 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
 
-  // Query child elements in order to explicitly skip the root tag from being a translation node
+  // Query child elements in order to explicitly skip the root element from being a translation node
   const childElements: HTMLCollectionOf<Element> = rootElement.getElementsByTagName(
     "*",
   );

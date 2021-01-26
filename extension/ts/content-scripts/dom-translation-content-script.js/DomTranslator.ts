@@ -213,7 +213,7 @@ export class DomTranslator {
 
     try {
       console.info(
-        `About to translate web page document (${translationDocument.roots.length} translation items)`,
+        `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
         { aFrom, aTo },
       );
       await translator.translate();
@@ -266,10 +266,10 @@ export class DomTranslator {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    let rootsList = translationDocument.roots;
+    let translationRootsList = translationDocument.translationRoots;
 
-    const elements = translationDocument.roots.map(
-      translationItem => translationItem.nodeRef,
+    const elements = translationDocument.translationRoots.map(
+      translationRoot => translationRoot.nodeRef,
     );
     const elementsVisibleInViewport = await this.getElementsVisibleInViewport(
       elements,
@@ -278,10 +278,10 @@ export class DomTranslator {
     const texts = [];
     const textsInViewport = [];
     const textsVisibleInViewport = [];
-    for (let i = 0; i < rootsList.length; i++) {
-      let root = rootsList[i];
+    for (let i = 0; i < translationRootsList.length; i++) {
+      let translationRoot = translationRootsList[i];
 
-      let text = translationDocument.generateTextForItem(root);
+      let text = translationDocument.generateTextForItem(translationRoot);
       if (!text) {
         continue;
       }
@@ -291,13 +291,13 @@ export class DomTranslator {
 
       texts.push(text);
 
-      const inViewport = isElementInViewport(root.nodeRef);
+      const inViewport = isElementInViewport(translationRoot.nodeRef);
       if (inViewport) {
         textsInViewport.push(text);
       }
 
       const visibleInViewport = elementsVisibleInViewport.find(
-        el => el === root.nodeRef,
+        el => el === translationRoot.nodeRef,
       );
       if (visibleInViewport) {
         textsVisibleInViewport.push(text);

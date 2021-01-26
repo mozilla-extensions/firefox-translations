@@ -1,3 +1,5 @@
+import { translationDocumentTarget } from "./TranslationDocument";
+
 /**
  * This class represents an item for translation. It's basically our
  * wrapper class around a node returned by getTranslationNode, with
@@ -14,7 +16,7 @@
  * are parsed.
  *
  * They are both arrays, which contain a mix of strings and references to
- * child TranslationItems. The references in both arrays point to the * same *
+ * child translation roots. The references in both arrays point to the * same *
  * TranslationItem object, but they might appear in different orders between the
  * "original" and "translation" arrays.
  *
@@ -36,24 +38,25 @@
  *  }
  */
 export class TranslationItem {
-  public isRoot = false;
-  public isSimpleRoot = false;
+  public isTranslationRoot = false;
+  public isSimleTranslationRoot = false;
   public nodeRef: Node | Element;
   public id;
   public readonly children;
   private translation;
+  public original;
 
-  constructor(node: Node, id, isRoot: boolean) {
+  constructor(node: Node, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
     this.id = id;
-    this.isRoot = isRoot;
+    this.isTranslationRoot = isTranslationRoot;
     this.children = [];
   }
 
   toString() {
     let rootType = "";
-    if (this.isRoot) {
-      if (this.isSimpleRoot) {
+    if (this.isTranslationRoot) {
+      if (this.isSimleTranslationRoot) {
         rootType = " (simple root)";
       } else {
         rootType = " (non simple root)";
@@ -86,7 +89,7 @@ export class TranslationItem {
    *                  which can be plain-text or a serialized HTML doc.
    */
   parseResult(result) {
-    if (this.isSimpleRoot) {
+    if (this.isSimleTranslationRoot) {
       this.translation = [result];
       return;
     }
@@ -116,11 +119,8 @@ export class TranslationItem {
   /**
    * Swap the text of this TranslationItem between
    * its original and translated states.
-   *
-   * @param target   A string that is either "translation",
-   *                 "original" or "qe-annotated".
    */
-  swapText(target: "translation" | "original" | "qe-annotated") {
+  swapText(target: translationDocumentTarget) {
     swapTextForItem(this, target);
   }
 }
@@ -170,11 +170,11 @@ function parseResultNode(item, node) {
       /*
        */
     } else {
-      let translationItemChild = item.getChildById(child.id);
+      let translationRootChild = item.getChildById(child.id);
 
-      if (translationItemChild) {
-        item.translation.push(translationItemChild);
-        parseResultNode(translationItemChild, child);
+      if (translationRootChild) {
+        item.translation.push(translationRootChild);
+        parseResultNode(translationRootChild, child);
       }
     }
   }
@@ -239,18 +239,13 @@ function parseResultNode(item, node) {
  *   yielding the final result:
  *
  *     <div><b>Tu</b> me <em>manques</em></div>
- *
- *
- * @param item     A TranslationItem object
- * @param target   A string that is either "translation",
- *                 "original" or "qe-annotated".
  */
 function swapTextForItem(
-  item,
-  target: "translation" | "original" | "qe-annotated",
+  item: TranslationItem,
+  target: translationDocumentTarget,
 ) {
   // visitStack is the stack of items that we still need to visit.
-  // Let's start the process by adding the root item.
+  // Let's start the process by adding the translationRoot item.
   let visitStack = [item];
 
   while (visitStack.length) {
@@ -283,7 +278,7 @@ function swapTextForItem(
     // the content of one text node with another.
     //
     // curNode starts in the firstChild...
-    let curNode = domNode.firstChild;
+    let curNode: Node = domNode.firstChild;
 
     // ... actually, let's make curNode start at the first useful node (either
     // a non-blank text node or something else). This is not strictly necessary,
@@ -338,7 +333,7 @@ function swapTextForItem(
         // If the node is not in the expected position, let's reorder
         // it into position...
         if (
-          curNode != targetNode &&
+          curNode !== targetNode &&
           // ...unless the page has reparented this node under a totally
           // different node (or removed it). In this case, all bets are off
           // on being able to do anything correctly, so it's better not to
@@ -405,6 +400,7 @@ function swapTextForItem(
           // inplace (i.e. in the same webpage replacing the original text) and
           // enabling seemless switch between showing original and translated text
           // back and forth.
+          /*
           for (let node of curNode.parentNode.childNodes) {
             if (node.id == "QE-ANNOTATED") {
               // There should be only 1 such node. Remove the curNode from the
@@ -414,11 +410,12 @@ function swapTextForItem(
               node.parentNode.replaceChild(curNode, node);
             }
           }
+          */
         }
 
         curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
 
-        if (target == "qe-annotated") {
+        if (false /*target == "translationWithQualityEstimation"*/) {
           let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
           // Replace the text node with the qe-annotated node to maintain the
           // right order in original DOM tree of the document.
