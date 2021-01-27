@@ -201,23 +201,23 @@ export class NativeTranslateUiBroker {
   }
 
   onSelectTranslateFrom(tabId) {
-    console.log("onSelectTranslateFrom", { tabId });
+    console.debug("onSelectTranslateFrom", { tabId });
   }
 
   onSelectTranslateTo(tabId) {
-    console.log("onSelectTranslateTo", { tabId });
+    console.debug("onSelectTranslateTo", { tabId });
   }
 
   onInfoBarClosed(tabId) {
-    console.log("onInfoBarClosed", { tabId });
+    console.debug("onInfoBarClosed", { tabId });
   }
 
   onNeverTranslateThisSite(tabId) {
-    console.log("onNeverTranslateThisSite", { tabId });
+    console.debug("onNeverTranslateThisSite", { tabId });
   }
 
   onTranslateButtonPressed(tabId, from, to) {
-    console.log("onTranslateButtonPressed", { tabId, from, to });
+    console.debug("onTranslateButtonPressed", { tabId, from, to });
 
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
@@ -243,7 +243,7 @@ export class NativeTranslateUiBroker {
   }
 
   onShowOriginalButtonPressed(tabId) {
-    console.log("onShowOriginalButtonPressed", { tabId });
+    console.debug("onShowOriginalButtonPressed", { tabId });
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
         this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
@@ -258,7 +258,7 @@ export class NativeTranslateUiBroker {
   }
 
   onShowTranslatedButtonPressed(tabId) {
-    console.log("onShowTranslatedButtonPressed", { tabId });
+    console.debug("onShowTranslatedButtonPressed", { tabId });
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
         this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [

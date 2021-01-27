@@ -105,6 +105,7 @@ export class DynamicActionIcon {
       return;
     }
     const { badgeText, badgeTextColor, badgeBackgroundColor } = this;
+    /*
     console.debug(
       "Drawing dynamic action icon",
       { tabId },
@@ -114,6 +115,7 @@ export class DynamicActionIcon {
         badgeBackgroundColor,
       },
     );
+     */
     this.clear();
     this.ctx.drawImage(this.iconImg, 0, 0);
     if (badgeText) {

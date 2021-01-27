@@ -44,15 +44,15 @@ const init = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("tabId")) {
       tabId = parseInt(urlParams.get("tabId"), 10);
-      console.log("Using tabId from URL");
+      console.debug("Using tabId from URL");
     }
     if (urlParams.get("initialText")) {
       initialText = urlParams.get("initialText");
-      console.log("Using initialText from URL");
+      console.debug("Using initialText from URL");
     }
     if (urlParams.get("standalone")) {
       standalone = true;
-      console.log("Using standalone from URL");
+      console.debug("Using standalone from URL");
     }
   }
   const mainInterfaceInitialProps = {

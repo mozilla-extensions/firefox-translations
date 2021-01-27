@@ -39,7 +39,7 @@ export class GetStarted extends Component<GetStartedProps, GetStartedState> {
       async (m: { extensionPreferences?: ExtensionPreferences }) => {
         if (m.extensionPreferences) {
           const { extensionPreferences } = m;
-          console.log("Get started UI received extension preferences", {
+          console.info("Get started UI received extension preferences", {
             extensionPreferences,
           });
           await this.setState({

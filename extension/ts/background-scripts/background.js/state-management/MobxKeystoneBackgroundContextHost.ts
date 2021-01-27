@@ -129,7 +129,7 @@ export class MobxKeystoneBackgroundContextHost {
       );
       serializedActionCallToReplicate = applyActionResult.serializedActionCall;
     } catch (err) {
-      console.error("error applying action to server:", err);
+      console.error("Error applying action to server:", err);
     }
     if (serializedActionCallToReplicate) {
       this.propagateActionToContentScripts(serializedActionCallToReplicate);

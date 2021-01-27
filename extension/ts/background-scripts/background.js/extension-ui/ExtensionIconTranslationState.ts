@@ -21,9 +21,7 @@ export class ExtensionIconTranslationState {
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
       async (documentTranslationStates, previousDocumentTranslationStates) => {
-        console.log("documentTranslationStates snapshot HAS CHANGED", {
-          documentTranslationStates,
-        });
+        // console.log("documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
@@ -33,7 +31,6 @@ export class ExtensionIconTranslationState {
             (dts: ModelInstanceData<DocumentTranslationState>) =>
               dts.frameId === 0,
           );
-        console.log(Object.keys(documentTranslationStates));
 
         for (const dts of tabTopFrameStates) {
           const { tabId } = dts;
