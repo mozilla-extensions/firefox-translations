@@ -384,5 +384,5 @@ function generateQEAnnotatedHTML(translation, score) {
   } else {
     color = "red";
   }
-  return `<span data-translation-qe-score="${score}" style="color:${color}">${translation}</span>`;
+  return `<span data-translation-qe-score="${score}" style="color:${color}"> ${translation}</span>`;
 }
