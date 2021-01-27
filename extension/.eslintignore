@@ -11,6 +11,8 @@ src/wasm/
 !.eslintrc.js
 # don't lint/format package.json since npm install formats it differently by default
 package.json
+# don't lint fixtures
+test/fixtures/
 # don't lint third party modules
 node_modules/
 src/test-runner/inc/
