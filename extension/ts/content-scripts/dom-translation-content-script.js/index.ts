@@ -24,7 +24,6 @@ const init = async () => {
     "port-from-dom-translation-content-script:index",
   );
   */
-  console.debug({ document, window });
   const contentScriptFrameInfo = new ContentScriptFrameInfo();
 
   // Get window, tab and frame id
@@ -60,7 +59,7 @@ const init = async () => {
       const previousTabFrameDocumentTranslationState =
         previousDocumentTranslationStates[tabFrameReference];
 
-      console.log({ currentTabFrameDocumentTranslationState });
+      // console.log({ currentTabFrameDocumentTranslationState });
 
       // TODO: Possibly react to no current state in some other way
       if (!currentTabFrameDocumentTranslationState) {

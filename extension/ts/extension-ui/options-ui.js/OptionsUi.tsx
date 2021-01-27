@@ -51,7 +51,7 @@ export class OptionsUi extends Component<OptionsUiProps, OptionsUiState> {
       }) => {
         if (m.extensionPreferences) {
           const { extensionPreferences } = m;
-          console.log("Options UI received extension preferences", {
+          console.info("Options UI received extension preferences", {
             extensionPreferences,
           });
           await this.setState({

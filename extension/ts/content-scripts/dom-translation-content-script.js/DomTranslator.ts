@@ -85,7 +85,7 @@ export class DomTranslator {
 
     // The window might be gone by now.
     if (!this.contentWindow) {
-      console.log(
+      console.info(
         "Content window reference invalid, deleting document translation state",
       );
       this.documentTranslationStateCommunicator.clear();
@@ -322,7 +322,6 @@ export class DomTranslator {
 
   async getElementsVisibleInViewport(elements: Element[]): Promise<Node[]> {
     return new Promise(resolve => {
-      // Start observing for DOM elements that enter the viewport visibly
       let options = {
         threshold: 0.0,
       };
@@ -336,9 +335,6 @@ export class DomTranslator {
         resolve(elementsInViewport);
       };
 
-      console.info(
-        "Start observing for DOM elements that enter the viewport visibly",
-      );
       let observer = new IntersectionObserver(callback, options);
       elements.forEach(el => observer.observe(el));
     });
