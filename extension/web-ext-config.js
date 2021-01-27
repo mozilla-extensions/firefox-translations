@@ -2,6 +2,7 @@
 const path = require("path");
 
 const examplePagesToTranslate = [
+  "http://0.0.0.0:4000/es.wikipedia.org-2021-01-20-welcome-box.html",
   "https://es.wikipedia.org",
   "https://www.mozilla.org/",
   "https://www.mozilla.org/es-ES/",
