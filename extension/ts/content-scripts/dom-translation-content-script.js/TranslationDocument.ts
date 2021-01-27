@@ -12,6 +12,7 @@ import {
 
 export type translationDocumentTarget =
   | "translation"
+  | "qeAnnotatedTranslation"
   | "original";
 
 /**
@@ -27,6 +28,7 @@ export class TranslationDocument {
   public translatedTo = "";
   public translationError = false;
   private originalShown = true;
+  private qualityEstimationShown = true;
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
 
@@ -202,8 +204,19 @@ export class TranslationDocument {
    */
   showOriginal() {
     this.originalShown = true;
+    this.qualityEstimationShown = false;
     this._swapDocumentContent("original");
     // TranslationTelemetry.recordShowOriginalContent();
+  }
+
+  /**
+   * Changes the document to display the translation with quality estimation metadata
+   * content.
+   */
+  showQualityEstimation() {
+    this.originalShown = false;
+    this.qualityEstimationShown = true;
+    this._swapDocumentContent("qeAnnotatedTranslation");
   }
 
   /**
