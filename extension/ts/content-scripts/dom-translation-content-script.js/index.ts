@@ -1,4 +1,4 @@
-import { onSnapshot } from "mobx-keystone";
+import { onSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { DomTranslator } from "./DomTranslator";
 import { subscribeToExtensionState } from "../../shared-resources/state-management/subscribeToExtensionState";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
@@ -8,6 +8,7 @@ import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
+import { TranslationDocument } from "./TranslationDocument";
 
 // Workaround for https://github.com/xaviergonz/mobx-keystone/issues/183
 // We need to import some models explicitly lest they fail to be registered by mobx
@@ -53,7 +54,7 @@ const init = async () => {
     async (documentTranslationStates, previousDocumentTranslationStates) => {
       // console.debug("dom-translation-content-script.js - documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
-      const currentTabFrameDocumentTranslationState =
+      const currentTabFrameDocumentTranslationState: SnapshotOutOf<DocumentTranslationState> =
         documentTranslationStates[tabFrameReference];
 
       const previousTabFrameDocumentTranslationState =
@@ -76,6 +77,14 @@ const init = async () => {
 
       if (hasChanged("translationRequested")) {
         if (currentTabFrameDocumentTranslationState.translationRequested) {
+          /* TODO: Do not translate if already translated
+        if (
+          translationChild?.contentWindow?.translationDocument &&
+          currentTabFrameDocumentTranslationState.translateFrom !==
+            translationChild.contentWindow.translationDocument.sourceLanguage
+        ) {
+          */
+
           console.info("Translating web page");
           await translationChild.doTranslation(
             currentTabFrameDocumentTranslationState.translateFrom,
@@ -111,18 +120,34 @@ const init = async () => {
         }
       }
 
-      if (hasChanged("showOriginal")) {
-        if (
-          translationChild?.contentWindow?.translationDocument &&
-          currentTabFrameDocumentTranslationState.showOriginal !==
-            translationChild.contentWindow.translationDocument.originalShown
-        ) {
+      if (translationChild?.contentWindow?.translationDocument) {
+        const translationDocument: TranslationDocument =
+          translationChild?.contentWindow?.translationDocument;
+
+        if (hasChanged("showOriginal")) {
           if (
-            translationChild.contentWindow.translationDocument.originalShown
+            currentTabFrameDocumentTranslationState.showOriginal !==
+            translationDocument.originalShown
           ) {
-            translationChild.contentWindow.translationDocument.showTranslation();
-          } else {
-            translationChild.contentWindow.translationDocument.showOriginal();
+            if (translationDocument.originalShown) {
+              translationDocument.showTranslation();
+            } else {
+              translationDocument.showOriginal();
+            }
+          }
+        }
+
+        if (hasChanged("displayQualityEstimation")) {
+          if (
+            translationChild?.contentWindow?.translationDocument &&
+            currentTabFrameDocumentTranslationState.displayQualityEstimation !==
+              translationDocument.qualityEstimationShown
+          ) {
+            if (translationDocument.qualityEstimationShown) {
+              translationDocument.showTranslation();
+            } else {
+              translationDocument.showQualityEstimation();
+            }
           }
         }
       }

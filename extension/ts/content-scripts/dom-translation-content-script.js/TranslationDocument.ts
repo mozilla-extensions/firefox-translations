@@ -17,8 +17,9 @@ export type translationDocumentTarget =
 
 /**
  * This class represents a document that is being translated,
- * and it is responsible for parsing the document, generating
- * the data structures for translation, and managing the original
+ * and it is responsible for parsing the document,
+ * generating the data structures translation (the list of
+ * translation items and roots), and managing the original
  * and translated texts on the translation items.
  *
  * @param document  The document to be translated
@@ -27,8 +28,8 @@ export class TranslationDocument {
   public translatedFrom = "";
   public translatedTo = "";
   public translationError = false;
-  private originalShown = true;
-  private qualityEstimationShown = true;
+  public originalShown = true;
+  public qualityEstimationShown = true;
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
 
@@ -105,7 +106,7 @@ export class TranslationDocument {
     let item = new TranslationItem(node, id, isTranslationRoot);
 
     if (isTranslationRoot) {
-      // root items do not have a parent item.
+      // Translation root items do not have a parent item.
       this.translationRoots.push(item);
     } else {
       let parentItem: TranslationItem = this.nodeTranslationItemsMap.get(
@@ -150,9 +151,9 @@ export class TranslationDocument {
     let wasLastItemPlaceholder = false;
 
     for (let child of Array.from(item.nodeRef.childNodes)) {
-      if (child.nodeType == child.TEXT_NODE) {
+      if (child.nodeType === child.TEXT_NODE) {
         let x = child.nodeValue.trim();
-        if (x != "") {
+        if (x !== "") {
           item.original.push(x);
           str += x;
           wasLastItemPlaceholder = false;
@@ -228,6 +229,17 @@ export class TranslationDocument {
       this.translationRoots.forEach(translationRoot =>
         translationRoot.swapText(target),
       );
+      // TODO: Make sure that the above does not lock the main event loop
+      /*
+      // Let the event loop breath on every 100 nodes
+      // that are replaced.
+      const YIELD_INTERVAL = 100;
+      await Async.yieldingForEach(
+        this.roots,
+        root => root.swapText(target),
+        YIELD_INTERVAL
+      );
+      */
     })();
   }
 }
@@ -240,7 +252,7 @@ export class TranslationDocument {
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-function generateTranslationHtmlForItem(
+export function generateTranslationHtmlForItem(
   item: TranslationItem,
   content,
 ): string {

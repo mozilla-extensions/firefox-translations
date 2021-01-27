@@ -6,7 +6,10 @@
 
 import { BergamotTranslationRequest } from "./BergamotTranslationRequest";
 import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
-import { TranslationDocument } from "./TranslationDocument";
+import {
+  generateTranslationHtmlForItem,
+  TranslationDocument,
+} from "./TranslationDocument";
 import { TranslationItem } from "./TranslationItem";
 
 export type TranslationRequestData = [TranslationItem, string][];
@@ -267,11 +270,12 @@ function parseChunkResult(
         bergamotRequest.translationRequestData[i][0];
       // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
       const paragraph = results.text[i];
-      const translation = preprocessBergamotTranslationResult(
-        paragraph,
-        translationRoot,
-      );
-      translationRoot.parseResult(translation);
+      const {
+        translation,
+        qeAnnotatedTranslation,
+      } = preprocessBergamotTranslationResult(paragraph, translationRoot);
+      translationRoot.parseTranslationResult(translation);
+      translationRoot.parseQeAnnotatedTranslationResult(qeAnnotatedTranslation);
     } catch (e) {
       error = true;
       console.error("Translation error: ", e);
@@ -285,57 +289,67 @@ function preprocessBergamotTranslationResult(
   paragraph: BergamotRestApiParagraph,
   translationRoot: TranslationItem,
 ) {
-  const bestTranslations = getBestTranslationsFromBergamotRestApiParagraph(
+  const translationObjects = getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
     paragraph,
   );
 
-  // ToDo: Currently the rest server doesn't retain the leading/trailing
+  // TODO: Currently the rest server doesn't retain the leading/trailing
   // whitespace information of sentences. It is a bug on rest server side.
   // Once it is fixed there, we need to stop appending whitespaces.
   const separator = " ";
 
-  // Generate QE Annotated HTML for each sentence
-  const qeAnnotatedSentenceHTMLs = bestTranslations.map(
-    ({ translation, sentenceScore }) =>
-      generateQEAnnotatedHTML(translation, sentenceScore),
-  );
-  const qeAnnotatedParagraphHTML = qeAnnotatedSentenceHTMLs.join(separator);
+  // Join sentence translations
+  let translationContent = translationObjects
+    .map(({ translation }) => translation)
+    .join(separator);
 
-  // Wrap the result with identifier "QE-ANNOTATED" to make it easy to switch
-  // b/w "original" and "translation" in TranslationDocument.swapTextForItem() method
-  translationRoot.qeAnnotatedTranslation = `<div><span id=QE-ANNOTATED>${qeAnnotatedParagraphHTML}</span></div>`;
-
-  let translation = bestTranslations.join(separator);
-
-  if (translationRoot.isSimleTranslationRoot && translation.includes("&")) {
-    // If translation contains HTML entities, we need to convert them.
-    // It is because simple roots expect a plain text result.
-    let doc = new DOMParser().parseFromString(translation, "text/html");
-    translation = doc.body.firstChild.nodeValue;
-  }
-
-  // TODO: Refactor code not to rely on hacks
-  if (false) {
-    // No translation root is simple anymore because now each translationRoot will store
-    // DOM node (having QE annotations) in it's "translation" property. This needs
-    // to be done because translated text with QE annotations have to be shown inplace
-    // (i.e. on the same webpage replacing the original text) for the demo. Therefore,
-    // setting isSimleTranslationRoot to false. Once this use case changes, it can be reverted back.
-    translationRoot.isSimleTranslationRoot = false;
+  // If translation contains HTML entities, we need to convert them.
+  // It is because simple roots expect a plain text result.
+  if (
+    translationRoot.isSimleTranslationRoot &&
+    translationContent.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
+  ) {
+    let doc = new DOMParser().parseFromString(translationContent, "text/html");
+    translationContent = doc.body.firstChild.nodeValue;
   }
 
   // Show original rather than an empty or obviously invalid translation
-  if (["", "*", "* ()"].includes(translation)) {
-    translation = translationRoot.original[0];
+  if (["", "*", "* ()"].includes(translationContent)) {
+    translationContent = translationRoot.original[0];
   }
-  return translation;
+
+  // Generate QE Annotated HTML for each sentence
+  const qeAnnotatedSentenceHTMLs = translationObjects.map(
+    ({ translation, sentenceScore }) =>
+      generateQEAnnotatedHTML(translation, sentenceScore),
+  );
+  const qeAnnotatedTranslationContent = qeAnnotatedSentenceHTMLs.join(
+    separator,
+  );
+
+  let translation = translationContent;
+  if (!translationRoot.isSimleTranslationRoot) {
+    // Translations of non-simple translation roots are expected to be return in the format of
+    // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
+    translation = generateTranslationHtmlForItem(
+      translationRoot,
+      translationContent,
+    );
+  }
+
+  const qeAnnotatedTranslation = generateTranslationHtmlForItem(
+    translationRoot,
+    qeAnnotatedTranslationContent,
+  );
+
+  return { translation, qeAnnotatedTranslation };
 }
 
 /**
  * This function parses 'Paragraph' entity of the response for the
  * the best translations and returns them
  */
-function getBestTranslationsFromBergamotRestApiParagraph(
+function getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
   paragraph: BergamotRestApiParagraph,
 ) {
   let bestTranslations = [];
@@ -370,5 +384,5 @@ function generateQEAnnotatedHTML(translation, score) {
   } else {
     color = "red";
   }
-  return `<span style="color:${color}">${translation}</span>`;
+  return `<span data-translation-qe-score="${score}" style="color:${color}">${translation}</span>`;
 }
