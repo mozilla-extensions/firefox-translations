@@ -44,6 +44,7 @@ export class TranslationItem {
   public id;
   public readonly children;
   private translation;
+  public qeAnnotatedTranslation;
   public original;
 
   constructor(node: Node, id, isTranslationRoot: boolean) {
@@ -415,7 +416,7 @@ function swapTextForItem(
 
         curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
 
-        if (false /*target == "translationWithQualityEstimation"*/) {
+        if (target == "qeAnnotatedTranslation") {
           let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
           // Replace the text node with the qe-annotated node to maintain the
           // right order in original DOM tree of the document.
