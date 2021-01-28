@@ -36,6 +36,15 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
+Build Bergamot Translator for WASM:
+
+```bash
+source /path/to/emsdk_env.sh
+./build-and-import-bergamot-translator.sh
+```
+
+Repeat this last step any time there has been an update in the bergamot-translator submodule.
+
 ## Creating build artifacts
 
 To build for Firefox:
