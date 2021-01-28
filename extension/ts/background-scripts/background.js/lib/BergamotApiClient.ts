@@ -25,6 +25,29 @@ interface BergamotRestApiTranslationRequestPayload {
   text: string | string[]; // Also possible but not recommended: <object>
 }
 
+/**
+ * The API response format can be referred here: https://github.com/browsermt/mts
+ */
+export interface BergamotRestApiTranslateRequestResult {
+  text: BergamotRestApiParagraph[];
+}
+
+// Each 'Paragraph' contains a list of 'Sentence translation' list.
+// There should be only 1 such list.
+export interface BergamotRestApiParagraph {
+  0: BergamotRestApiSentence[];
+}
+
+// 'Sentence translation' list contains 'Sentence translation' objects
+// where each object contains all the information related to translation
+// of each sentence in source language.
+export interface BergamotRestApiSentence {
+  nBest: {
+    translation: string;
+    sentenceScore?: string;
+  }[];
+}
+
 export class BergamotApiClient {
   /**
    * Timeout after which we consider a ping submission failed.
@@ -50,7 +73,7 @@ export class BergamotApiClient {
 
   public sendTranslationRequest = async (
     texts: string | string[],
-  ): Promise<string> => {
+  ): Promise<BergamotRestApiTranslateRequestResult> => {
     const payload: BergamotRestApiTranslationRequestPayload = {
       text: texts,
       options: {
