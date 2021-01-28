@@ -5,7 +5,6 @@
 "use strict";
 
 import { browser } from "webextension-polyfill-ts";
-import { DetectedLanguageResults } from "../../../shared-resources/types/bergamot.types";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
@@ -24,15 +23,35 @@ const IDLE_TIMEOUT = 10 * 1000;
 
 const WORKER_URL = browser.runtime.getURL(`wasm/cld-worker.js`);
 
+export interface DetectLanguageParams {
+  text: string;
+  isHTML?: boolean;
+  language?: boolean;
+  tld?: boolean;
+  encoding?: boolean;
+}
+
+export interface DetectedLanguageResults {
+  confident: boolean;
+  language: string;
+  languages: {
+    languageCode: string;
+    percent: number;
+  }[];
+}
+
 const workerManager = {
+  // TODO: Make into a map instead to avoid the implicit assumption that the order of requests and results are the same
   detectionQueue: [],
 
-  async detectLanguage(aParams): Promise<DetectedLanguageResults> {
+  async detectLanguage(
+    params: DetectLanguageParams,
+  ): Promise<DetectedLanguageResults> {
     const worker = await this.workerReady;
 
     const result: DetectedLanguageResults = await new Promise(resolve => {
       this.detectionQueue.push({ resolve });
-      worker.postMessage(aParams);
+      worker.postMessage(params);
     });
 
     // We have our asynchronous result from the worker.
@@ -40,11 +59,17 @@ const workerManager = {
     // Determine if our input was large enough to trigger heap growth,
     // or if we're already waiting to destroy the worker when it's
     // idle. If so, schedule termination after the idle timeout.
-    if (aParams.text.length >= LARGE_STRING || this._idleTimeout != null) {
+    if (params.text.length >= LARGE_STRING || this._idleTimeout != null) {
       this.flushWorker();
     }
 
     return result;
+  },
+
+  onDetectLanguageWorkerResult(
+    detectedLanguageResults: DetectedLanguageResults,
+  ) {
+    this.detectionQueue.shift().resolve(detectedLanguageResults);
   },
 
   _worker: null,
@@ -54,11 +79,11 @@ const workerManager = {
     if (!this._workerReadyPromise) {
       this._workerReadyPromise = new Promise(resolve => {
         let worker = new Worker(WORKER_URL);
-        worker.onmessage = aMsg => {
-          if (aMsg.data == "ready") {
+        worker.onmessage = msg => {
+          if (msg.data == "ready") {
             resolve(worker);
           } else {
-            this.detectionQueue.shift().resolve(aMsg.data);
+            this.onDetectLanguageWorkerResult(msg.data);
           }
         };
         this._worker = worker;
@@ -97,14 +122,6 @@ const workerManager = {
     }
   },
 };
-
-export interface DetectLanguageParams {
-  text: string;
-  isHTML?: boolean;
-  language?: boolean;
-  tld?: boolean;
-  encoding?: boolean;
-}
 
 export const LanguageDetector = {
   /**
@@ -145,7 +162,7 @@ export const LanguageDetector = {
    *      entry with the language code 'un', indicating the percent of
    *      the text which is unknown.
    */
-  detectLanguage(
+  async detectLanguage(
     params: string | DetectLanguageParams,
   ): Promise<DetectedLanguageResults> {
     if (typeof params === "string") {

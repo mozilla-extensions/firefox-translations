@@ -8,7 +8,7 @@ import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
 import { getTranslationNodes } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
-import { DetectedLanguageResults } from "../../shared-resources/types/bergamot.types";
+import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
@@ -191,7 +191,7 @@ export class DomTranslator {
     );
   }
 
-  async doTranslation(aFrom, aTo) {
+  async doTranslation(from, to) {
     // If a TranslationDocument already exists for this document, it should
     // be used instead of creating a new one so that we can use the original
     // content of the page for the new translation instead of the newly
@@ -204,17 +204,17 @@ export class DomTranslator {
       TranslationStatus.TRANSLATING,
     );
 
-    let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
+    let translator = new BergamotTranslator(translationDocument, from, to);
 
     this.contentWindow.translationDocument = translationDocument;
-    translationDocument.translatedFrom = aFrom;
-    translationDocument.translatedTo = aTo;
+    translationDocument.translatedFrom = from;
+    translationDocument.translatedTo = to;
     translationDocument.translationError = false;
 
     try {
       console.info(
         `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
-        { aFrom, aTo },
+        { from, to },
       );
       await translator.translate();
       /*
@@ -222,8 +222,8 @@ export class DomTranslator {
       const translateResult = await translator.translate();
       result = {
         characterCount: translateResult.characterCount,
-        from: aFrom,
-        to: aTo,
+        from: from,
+        to: to,
       };
       // Record the number of characters translated.
       this.translationTelemetry.recordTranslation(
