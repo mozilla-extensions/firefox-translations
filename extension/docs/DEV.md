@@ -3,16 +3,16 @@
 
 **Contents**
 
-- [Developing this add-on](#developing-this-add-on)
-  - [Get started](#get-started)
+- [Developing the extension](#developing-the-extension)
+  - [First time setup](#first-time-setup)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
-  - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
+  - [Opening up specific extension pages](#opening-up-specific-extension-pages)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -87,34 +87,6 @@ yarn watch:native-ui
 yarn watch:chrome
 ```
 
-## Opening up specific extension pages
-
-From the background context:
-
-```javascript
-(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `main-interface/popup.html`,
-);
-```
-
-```javascript
-(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `main-interface/popup.html#/components`,
-);
-```
-
-```javascript
-(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `get-started/get-started.html`,
-);
-```
-
-```javascript
-(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
-  `options-ui/options-ui.html`,
-);
-```
-
 ## Creating a signed build of the extension for self-distribution
 
 After version bumping and setting the API_KEY and API_SECRET env vars:
@@ -153,4 +125,32 @@ Firefox native UI variant:
 ```
 yarn build:production:native-ui
 npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
+```
+
+## Opening up specific extension pages
+
+From the background context:
+
+```javascript
+(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
+  `main-interface/popup.html`,
+);
+```
+
+```javascript
+(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
+  `main-interface/popup.html#/components`,
+);
+```
+
+```javascript
+(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
+  `get-started/get-started.html`,
+);
+```
+
+```javascript
+(typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
+  `options-ui/options-ui.html`,
+);
 ```
