@@ -2,7 +2,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { captureExceptionWithExtras } from "./ErrorReporting";
 import { nanoid } from "nanoid";
-import { DetectedLanguageResults } from "./types/bergamot.types";
+import { DetectedLanguageResults } from "../background-scripts/background.js/lib/LanguageDetector";
 
 export class ContentScriptLanguageDetectorProxy {
   private backgroundContextPort: Port;
