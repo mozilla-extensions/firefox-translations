@@ -27,26 +27,24 @@ const WORKER_URL = browser.runtime.getURL(`wasm/cld-worker.js`);
 const workerManager = {
   detectionQueue: [],
 
-  detectLanguage(aParams) {
-    return this.workerReady
-      .then(worker => {
-        return new Promise(resolve => {
-          this.detectionQueue.push({ resolve });
-          worker.postMessage(aParams);
-        });
-      })
-      .then(result => {
-        // We have our asynchronous result from the worker.
-        //
-        // Determine if our input was large enough to trigger heap growth,
-        // or if we're already waiting to destroy the worker when it's
-        // idle. If so, schedule termination after the idle timeout.
-        if (aParams.text.length >= LARGE_STRING || this._idleTimeout != null) {
-          this.flushWorker();
-        }
+  async detectLanguage(aParams): Promise<DetectedLanguageResults> {
+    const worker = await this.workerReady;
 
-        return result;
-      });
+    const result: DetectedLanguageResults = await new Promise(resolve => {
+      this.detectionQueue.push({ resolve });
+      worker.postMessage(aParams);
+    });
+
+    // We have our asynchronous result from the worker.
+    //
+    // Determine if our input was large enough to trigger heap growth,
+    // or if we're already waiting to destroy the worker when it's
+    // idle. If so, schedule termination after the idle timeout.
+    if (aParams.text.length >= LARGE_STRING || this._idleTimeout != null) {
+      this.flushWorker();
+    }
+
+    return result;
   },
 
   _worker: null,
@@ -100,6 +98,14 @@ const workerManager = {
   },
 };
 
+export interface DetectLanguageParams {
+  text: string;
+  isHTML?: boolean;
+  language?: boolean;
+  tld?: boolean;
+  encoding?: boolean;
+}
+
 export const LanguageDetector = {
   /**
    * Detect the language of a given string.
@@ -124,7 +130,7 @@ export const LanguageDetector = {
    *      of the value of this property, the 'text' property must be a
    *      UTF-16 JavaScript string.
    *
-   * @returns {Promise<Object>}
+   * @returns {Promise<DetectedLanguageResults>}
    * @resolves When detection is finished, with a object containing
    * these fields:
    *  - 'language' (string with a language code)
@@ -139,11 +145,12 @@ export const LanguageDetector = {
    *      entry with the language code 'un', indicating the percent of
    *      the text which is unknown.
    */
-  detectLanguage(aParams): Promise<DetectedLanguageResults> {
-    if (typeof aParams == "string") {
-      aParams = { text: aParams };
+  detectLanguage(
+    params: string | DetectLanguageParams,
+  ): Promise<DetectedLanguageResults> {
+    if (typeof params === "string") {
+      params = { text: params };
     }
-
-    return workerManager.detectLanguage(aParams);
+    return workerManager.detectLanguage(params);
   },
 };
