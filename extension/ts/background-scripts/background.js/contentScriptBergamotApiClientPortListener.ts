@@ -1,4 +1,7 @@
-import { BergamotApiClient } from "./lib/BergamotApiClient";
+import {
+  BergamotApiClient,
+  BergamotRestApiTranslateRequestResult,
+} from "./lib/BergamotApiClient";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 const bergamotApiClient = new BergamotApiClient();
@@ -13,7 +16,9 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, requestId } = m;
-    const results = await bergamotApiClient.sendTranslationRequest(texts);
+    const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
+      texts,
+    );
     // console.log({ results });
     try {
       port.postMessage({

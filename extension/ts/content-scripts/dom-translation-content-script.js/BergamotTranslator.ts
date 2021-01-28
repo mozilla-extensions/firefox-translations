@@ -11,6 +11,10 @@ import {
   TranslationDocument,
 } from "./TranslationDocument";
 import { TranslationItem } from "./TranslationItem";
+import {
+  BergamotRestApiParagraph,
+  BergamotRestApiTranslateRequestResult,
+} from "../../background-scripts/background.js/lib/BergamotApiClient";
 
 export type TranslationRequestData = [TranslationItem, string][];
 export interface TranslationRequest {
@@ -220,29 +224,6 @@ function preprocessBergamotTranslationRequestData(
     text = text.replace(/<[^>]*>?/gm, " ");
     return [translationRoot, text];
   });
-}
-
-/**
- * The API response format can be referred here: https://github.com/browsermt/mts
- */
-interface BergamotRestApiTranslateRequestResult {
-  text: BergamotRestApiParagraph[];
-}
-
-// Each 'Paragraph' contains a list of 'Sentence translation' list.
-// There should be only 1 such list.
-interface BergamotRestApiParagraph {
-  0: BergamotRestApiSentenceList[];
-}
-
-// 'Sentence translation' list contains 'Sentence translation' objects
-// where each object contains all the information related to translation
-// of each sentence in source language.
-interface BergamotRestApiSentenceList {
-  nBest: {
-    translation: string;
-    sentenceScore?: string;
-  }[];
 }
 
 /**
