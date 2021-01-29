@@ -18,6 +18,8 @@
 
 # Developing this add-on
 
+The commands in these instructions are meant to be run in the `extension/` folder in this repo.
+
 ## Get started
 
 ```
