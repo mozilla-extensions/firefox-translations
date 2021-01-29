@@ -3,8 +3,8 @@
 
 **Contents**
 
-- [Developing the extension](#developing-the-extension)
-  - [First time setup](#first-time-setup)
+- [Developing this add-on](#developing-this-add-on)
+  - [Get started](#get-started)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
@@ -13,6 +13,7 @@
   - [Troubleshooting](#troubleshooting)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
+  - [Enabling error reporting via Sentry](#enabling-error-reporting-via-sentry)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
