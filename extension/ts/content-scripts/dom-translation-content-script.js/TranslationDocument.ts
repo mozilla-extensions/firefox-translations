@@ -4,7 +4,7 @@
 
 "use strict";
 
-import { getTranslationNodes } from "./getTranslationNodes";
+import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import {
   TranslationItem,
   TranslationItem_NodePlaceholder,
@@ -50,20 +50,18 @@ export class TranslationDocument {
     // a translation node is a node from the document which
     // contains useful content for translation, and therefore
     // must be included in the translation process.
-    const nodeList = getTranslationNodes(document.body);
+    const translationNodes: TranslationNode[] = getTranslationNodes(
+      document.body,
+    );
     // console.debug({ nodeList });
 
-    const length = nodeList.length;
-    // console.debug({ length });
-
-    for (let i = 0; i < length; i++) {
-      let node = nodeList.item(i);
-      let isTranslationRoot = nodeList.isTranslationRootAtIndex(i);
+    translationNodes.forEach((translationNode, index) => {
+      const { content, isTranslationRoot } = translationNode;
 
       // Create a TranslationItem object for this node.
       // This function will also add it to the this.translationRoots array.
-      this._createItemForNode(node, i, isTranslationRoot);
-    }
+      this._createItemForNode(content, index, isTranslationRoot);
+    });
 
     // At first all translation roots are stored in the translation roots list, and only after
     // the process has finished we're able to determine which translation roots are
