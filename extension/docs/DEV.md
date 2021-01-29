@@ -26,17 +26,6 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-Configure `.env.development` and `.env.production` with values as per https://docs.sentry.io/cli/configuration/.
-
-Hint: You can verify that the Sentry configuration is working using:
-
-```
-cp .env.development .env
-npx sentry-cli info
-cp .env.production .env
-npx sentry-cli info
-```
-
 ## Creating build artifacts
 
 To build for Firefox:
@@ -153,4 +142,17 @@ From the background context:
 (typeof browser !== "undefined" ? browser : chrome).runtime.getURL(
   `options-ui/options-ui.html`,
 );
+```
+
+## Enabling error reporting via Sentry
+
+Configure `.env.development` and `.env.production` with values as per https://docs.sentry.io/cli/configuration/.
+
+Hint: You can verify that the Sentry configuration is working using:
+
+```
+cp .env.development .env
+npx sentry-cli info
+cp .env.production .env
+npx sentry-cli info
 ```
