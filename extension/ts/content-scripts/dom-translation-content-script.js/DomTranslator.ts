@@ -6,7 +6,7 @@
 
 import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
-import { getTranslationNodes } from "./getTranslationNodes";
+import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
@@ -48,7 +48,9 @@ export class DomTranslator {
     // and since it's hosted by emscripten, and therefore can't shrink
     // its heap after it's grown, it has a performance cost.
     // So we send plain text instead.)
-    let nodeList = getTranslationNodes(document.body);
+    const translationNodes: TranslationNode[] = getTranslationNodes(
+      document.body,
+    );
     const domElementsToStringWithMaxLength = (
       elements: Node[],
       maxLength,
@@ -60,7 +62,7 @@ export class DomTranslator {
         .substr(0, maxLength);
     };
     const string = domElementsToStringWithMaxLength(
-      nodeList.translationNodes.map(tn => tn.content),
+      translationNodes.map(tn => tn.content),
       60 * 1024,
     );
 

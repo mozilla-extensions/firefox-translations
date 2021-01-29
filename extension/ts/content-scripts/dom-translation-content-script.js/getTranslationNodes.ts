@@ -1,34 +1,13 @@
 import { hasTextForTranslation } from "./hasTextForTranslation";
 
-interface TranslationNode {
+export interface TranslationNode {
   content: Node;
   isTranslationRoot: boolean;
 }
 
-interface NodeListInterface {
-  translationNodes: TranslationNode[];
-  length: number;
-  item: (i) => Node;
-  isTranslationRootAtIndex: (i) => boolean;
-}
-
-class NodeList implements NodeListInterface {
-  public readonly translationNodes: TranslationNode[];
-  constructor(translationNodes) {
-    this.translationNodes = translationNodes;
-  }
-  get length() {
-    return this.translationNodes.length;
-  }
-  item(i) {
-    return this.translationNodes[i].content;
-  }
-  isTranslationRootAtIndex(i) {
-    return this.translationNodes[i].isTranslationRoot;
-  }
-}
-
-export const getTranslationNodes = (rootElement: Element): NodeList => {
+export const getTranslationNodes = (
+  rootElement: Element,
+): TranslationNode[] => {
   const translationNodesMap = new Map();
 
   const translationNodes: TranslationNode[] = [];
@@ -103,5 +82,5 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
     }
   }
 
-  return new NodeList(translationNodes);
+  return translationNodes;
 };
