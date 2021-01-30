@@ -101,20 +101,17 @@ export class BergamotTranslator {
         .fireRequest(this.bergamotApiClient)
         .catch(err => {
           console.error("BergamotTranslator fireRequest error", err);
-          this.checkIfFinished();
         });
 
       this.chunkCompleted(results, bergamotRequest);
-      if (this.checkIfFinished()) {
+
+      if (requestChunk.finished && this.noPendingRequestsAndPartialSuccess()) {
         return {
           characterCount: this.translatedCharacterCount,
         };
       }
 
       currentIndex = requestChunk.lastIndex;
-      if (requestChunk.finished) {
-        break;
-      }
     }
 
     throw new Error(
@@ -129,6 +126,7 @@ export class BergamotTranslator {
    * method when there's no pending request left.
    */
   private chunkCompleted(results, bergamotRequest: BergamotTranslationRequest) {
+    --this.pendingRequests;
     if (parseChunkResult(results, bergamotRequest)) {
       this.partialSuccess = true;
       // Count the number of characters successfully translated.
@@ -139,14 +137,13 @@ export class BergamotTranslator {
   /**
    * Function called when a request sent to the server has completed.
    */
-  private checkIfFinished() {
+  private noPendingRequestsAndPartialSuccess() {
     // Check if all pending requests have been
-    // completed and then resolves the promise.
+    // completed.
     // If at least one chunk was successful, the
-    // promise will be resolved positively which will
-    // display the "Success" state for the infobar. Otherwise,
-    // the "Error" state will appear.
-    if (--this.pendingRequests === 0) {
+    // translation should be displayed, albeit incomplete.
+    // Otherwise, the "Error" state will appear.
+    if (this.pendingRequests === 0) {
       if (this.partialSuccess) {
         return true;
       } else {
