@@ -322,7 +322,7 @@ export class DomTranslator {
     };
   }
 
-  async getElementsVisibleInViewport(elements: Element[]): Promise<Node[]> {
+  async getElementsVisibleInViewport(elements: HTMLElement[]): Promise<Node[]> {
     return new Promise(resolve => {
       let options = {
         threshold: 0.0,

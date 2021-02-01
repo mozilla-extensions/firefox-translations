@@ -1,7 +1,7 @@
 import { hasTextForTranslation } from "./hasTextForTranslation";
 
 export interface TranslationNode {
-  content: Node;
+  content: HTMLElement;
   isTranslationRoot: boolean;
 }
 
@@ -14,12 +14,12 @@ export const getTranslationNodes = (
   const limit = 15000;
 
   // Query child elements in order to explicitly skip the root element from being a translation node
-  const childElements: HTMLCollectionOf<Element> = rootElement.getElementsByTagName(
-    "*",
+  const childElements = <HTMLCollectionOf<HTMLElement>>(
+    rootElement.getElementsByTagName("*")
   );
 
   for (let i = 0; i < limit && i < childElements.length; i++) {
-    const content: Element = childElements[i];
+    const content: HTMLElement = childElements[i];
     if (content.tagName === "html") {
       continue;
     }
