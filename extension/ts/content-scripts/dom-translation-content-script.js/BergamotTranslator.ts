@@ -16,9 +16,12 @@ import {
   BergamotRestApiTranslateRequestResult,
 } from "../../background-scripts/background.js/lib/BergamotApiClient";
 
-export type TranslationRequestData = [TranslationItem, string][];
+export interface TranslationRequestData {
+  translationRoots: TranslationItem[];
+  texts: string[];
+}
 export interface TranslationRequest {
-  data: TranslationRequestData;
+  translationRequestData: TranslationRequestData;
   finished: boolean;
   lastIndex: number;
 }
@@ -87,23 +90,28 @@ export class BergamotTranslator {
       let requestChunk = this.generateNextTranslationRequestChunk(currentIndex);
 
       // Create a real request for the server and add it to the pending requests list.
-      const translationData: TranslationRequestData = preprocessBergamotTranslationRequestData(
-        requestChunk.data,
+      const translationRequestData: TranslationRequestData =
+        requestChunk.translationRequestData;
+      translationRequestData.texts = preprocessBergamotTranslationRequestDataTexts(
+        translationRequestData.texts,
       );
       let bergamotRequest = new BergamotTranslationRequest(
-        translationData,
+        translationRequestData,
         this.sourceLanguage,
         this.targetLanguage,
       );
-      this.pendingRequests++;
 
+      this.pendingRequests++;
       const results = await bergamotRequest
         .fireRequest(this.bergamotApiClient)
         .catch(err => {
           console.error("BergamotTranslator fireRequest error", err);
         });
+      --this.pendingRequests;
 
-      this.chunkCompleted(results, bergamotRequest);
+      if (results) {
+        this.chunkCompleted(results, bergamotRequest);
+      }
 
       if (requestChunk.finished && this.noPendingRequestsAndPartialSuccess()) {
         return {
@@ -126,7 +134,6 @@ export class BergamotTranslator {
    * method when there's no pending request left.
    */
   private chunkCompleted(results, bergamotRequest: BergamotTranslationRequest) {
-    --this.pendingRequests;
     if (parseChunkResult(results, bergamotRequest)) {
       this.partialSuccess = true;
       // Count the number of characters successfully translated.
@@ -134,9 +141,6 @@ export class BergamotTranslator {
     }
   }
 
-  /**
-   * Function called when a request sent to the server has completed.
-   */
   private noPendingRequestsAndPartialSuccess() {
     // Check if all pending requests have been
     // completed.
@@ -167,7 +171,10 @@ export class BergamotTranslator {
   ): TranslationRequest {
     let currentDataSize = 0;
     let currentChunks = 0;
-    let output = [];
+    let translationRequestData: TranslationRequestData = {
+      texts: [],
+      translationRoots: [],
+    };
     let translationRootsList = this.translationDocument.translationRoots;
 
     for (let i = startIndex; i < translationRootsList.length; i++) {
@@ -186,7 +193,7 @@ export class BergamotTranslator {
         // the caller to pass back on the next call, so that the function
         // can keep working from where it stopped.
         return {
-          data: output,
+          translationRequestData,
           finished: false,
           lastIndex: i,
         };
@@ -194,21 +201,22 @@ export class BergamotTranslator {
 
       currentDataSize = newCurSize;
       currentChunks = newChunks;
-      output.push([translationRoot, text]);
+      translationRequestData.translationRoots.push(translationRoot);
+      translationRequestData.texts.push(text);
     }
 
     return {
-      data: output,
+      translationRequestData,
       finished: true,
       lastIndex: 0,
     };
   }
 }
 
-function preprocessBergamotTranslationRequestData(
-  translationRequestData: TranslationRequestData,
-): TranslationRequestData {
-  return translationRequestData.map(([translationRoot, text]) => {
+function preprocessBergamotTranslationRequestDataTexts(
+  texts: string[],
+): string[] {
+  return texts.map(text => {
     // The next line is a hack to delay dealing with the problem of
     //               <b>Do not</b> touch.
     // being translated to something like
@@ -219,7 +227,7 @@ function preprocessBergamotTranslationRequestData(
     // the translated result. So as a hack we just remove the
     // tags and hope the formatting is not too bad.
     text = text.replace(/<[^>]*>?/gm, " ");
-    return [translationRoot, text];
+    return text;
   });
 }
 
@@ -234,18 +242,20 @@ function parseChunkResult(
   bergamotRequest: BergamotTranslationRequest,
 ) {
   let len = results.text.length;
-  if (len !== bergamotRequest.translationRequestData.length) {
+  if (len !== bergamotRequest.translationRequestData.texts.length) {
     // This should never happen, but if the service returns a different number
     // of items (from the number of items submitted), we can't use this chunk
     // because all items would be paired incorrectly.
-    return false;
+    throw new Error(
+      "Translation service returned a different number of items (from the number of items submitted)",
+    );
   }
 
   let error = false;
   for (let i = 0; i < len; i++) {
     try {
       const translationRoot: TranslationItem =
-        bergamotRequest.translationRequestData[i][0];
+        bergamotRequest.translationRequestData.translationRoots[i];
       // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
       const paragraph = results.text[i];
       const {

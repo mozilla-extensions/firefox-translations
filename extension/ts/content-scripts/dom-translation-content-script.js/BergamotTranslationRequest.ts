@@ -31,19 +31,17 @@ export class BergamotTranslationRequest {
     this.translationRequestData = translationRequestData;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
-    for (let [, text] of this.translationRequestData) {
+    this.translationRequestData.texts.forEach(text => {
       this.characterCount += text.length;
-    }
+    });
   }
 
   /**
    * Initiates the request
    */
   async fireRequest(bergamotApiClient: ContentScriptBergamotApiClient) {
-    const texts = [];
-    for (let [, text] of this.translationRequestData) {
-      texts.push(text);
-    }
-    return bergamotApiClient.sendTranslationRequest(texts);
+    return bergamotApiClient.sendTranslationRequest(
+      this.translationRequestData.texts,
+    );
   }
 }
