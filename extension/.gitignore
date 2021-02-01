@@ -8,4 +8,5 @@ yarn-error.log
 node_modules/
 .env*
 !.env.example
-src/wasm/bergamot-translator-wasm.*
+src/wasm/bergamot-translator-worker.js
+src/wasm/bergamot-translator-worker.wasm
