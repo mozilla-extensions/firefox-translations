@@ -264,13 +264,13 @@ export class DomTranslator {
       );
     };
 
-    let translationDocument =
+    const translationDocument: TranslationDocument =
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    let translationRootsList = translationDocument.translationRoots;
+    const { translationRoots } = translationDocument;
 
-    const elements = translationDocument.translationRoots.map(
+    const elements = translationRoots.map(
       translationRoot => translationRoot.nodeRef,
     );
     const elementsVisibleInViewport = await this.getElementsVisibleInViewport(
@@ -280,8 +280,8 @@ export class DomTranslator {
     const texts = [];
     const textsInViewport = [];
     const textsVisibleInViewport = [];
-    for (let i = 0; i < translationRootsList.length; i++) {
-      let translationRoot = translationRootsList[i];
+    for (let i = 0; i < translationRoots.length; i++) {
+      let translationRoot = translationRoots[i];
 
       let text = translationDocument.generateTextForItem(translationRoot);
       if (!text) {
