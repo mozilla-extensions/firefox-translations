@@ -219,6 +219,12 @@ export class DomTranslator {
         { from, to },
       );
       await translator.translate();
+
+      console.info(
+        `Translated web page document (${translationDocument.translationRoots.length} translation items)`,
+        { from, to },
+      );
+
       /*
       // TODO: Restore telemetry
       const translateResult = await translator.translate();

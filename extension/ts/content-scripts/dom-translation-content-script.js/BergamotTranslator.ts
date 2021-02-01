@@ -251,7 +251,11 @@ function parseChunkResult(
     );
   }
 
-  let error = false;
+  console.info(
+    `Parsing translation chunk result with ${len} translation entries`,
+  );
+
+  let errorOccurred = false;
   for (let i = 0; i < len; i++) {
     try {
       const translationRoot: TranslationItem =
@@ -265,12 +269,17 @@ function parseChunkResult(
       translationRoot.parseTranslationResult(translation);
       translationRoot.parseQeAnnotatedTranslationResult(qeAnnotatedTranslation);
     } catch (e) {
-      error = true;
+      errorOccurred = true;
       console.error("Translation error: ", e);
     }
   }
 
-  return !error;
+  console.info(
+    `Parsed translation chunk result with ${len} translation entries`,
+    { errorOccurred },
+  );
+
+  return !errorOccurred;
 }
 
 function preprocessBergamotTranslationResult(

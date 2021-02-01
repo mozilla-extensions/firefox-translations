@@ -53,7 +53,13 @@ export class TranslationDocument {
     const translationNodes: TranslationNode[] = getTranslationNodes(
       document.body,
     );
-    // console.debug({ nodeList });
+    console.info(
+      `The document has a total of ${
+        translationNodes.length
+      } translation nodes, of which ${
+        translationNodes.filter(tn => tn.isTranslationRoot).length
+      } are translation roots`,
+    );
 
     translationNodes.forEach((translationNode, index) => {
       const { content, isTranslationRoot } = translationNode;
