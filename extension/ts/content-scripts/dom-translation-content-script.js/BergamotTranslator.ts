@@ -306,7 +306,10 @@ function preprocessBergamotTranslationResult(
     translationRoot.isSimleTranslationRoot &&
     translationContent.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
   ) {
-    let doc = new DOMParser().parseFromString(translationContent, "text/html");
+    const doc = new DOMParser().parseFromString(
+      translationContent,
+      "text/html",
+    );
     translationContent = doc.body.firstChild.nodeValue;
   }
 
@@ -349,12 +352,12 @@ function preprocessBergamotTranslationResult(
 function getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
   paragraph: BergamotRestApiParagraph,
 ) {
-  let bestTranslations = [];
+  const bestTranslations = [];
   paragraph[0].forEach(sentenceTranslationList => {
     // Depending on the request, there might be multiple 'best translations'.
     // We are fetching the best one (present in 'translation' field).
     const bestTranslation = sentenceTranslationList.nBest[0];
-    bestTranslations = [...bestTranslations, bestTranslation];
+    bestTranslations.push(bestTranslation);
   });
   return bestTranslations;
 }
