@@ -40,14 +40,14 @@ import { translationDocumentTarget } from "./TranslationDocument";
 export class TranslationItem {
   public isTranslationRoot = false;
   public isSimleTranslationRoot = false;
-  public nodeRef: ChildNode;
+  public nodeRef: HTMLElement;
   public id;
   public readonly children;
   private translation;
   private qeAnnotatedTranslation;
   public original;
 
-  constructor(node: ChildNode, id, isTranslationRoot: boolean) {
+  constructor(node: HTMLElement, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
     this.id = id;
     this.isTranslationRoot = isTranslationRoot;
