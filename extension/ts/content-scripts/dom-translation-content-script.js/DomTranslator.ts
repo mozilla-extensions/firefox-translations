@@ -312,7 +312,14 @@ export class DomTranslator {
       .join(" ")
       .split(" ").length;
 
+    const translationRootsCount = translationRoots.length;
+    const simpleTranslationRootsCount = translationRoots.filter(
+      translationRoot => translationRoot.isSimleTranslationRoot,
+    );
+
     return {
+      translationRootsCount,
+      simpleTranslationRootsCount,
       texts,
       textsInViewport,
       textsVisibleInViewport,
