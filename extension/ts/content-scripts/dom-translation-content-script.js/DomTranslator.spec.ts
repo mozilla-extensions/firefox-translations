@@ -21,6 +21,8 @@ describe("Dom Translation", function() {
   const domParser = new DOMParser();
   const fixtureNames = [
     "hola-mundo",
+    "punctuation",
+    "mid-sentence-break",
     "es.wikipedia.org-2021-01-20-welcome-box",
   ];
   const diffs = [];
