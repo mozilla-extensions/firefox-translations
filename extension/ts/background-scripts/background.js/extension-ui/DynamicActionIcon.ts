@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+"use strict";
+
 import {
   browser as crossBrowser,
   BrowserAction,
@@ -101,7 +107,7 @@ export class DynamicActionIcon {
 
   private draw(tabId) {
     // Don't interrupt loading animation
-    if (!!this.loadingIndicationIntervalId) {
+    if (this.loadingIndicationIntervalId) {
       return;
     }
     const { badgeText, badgeTextColor, badgeBackgroundColor } = this;
@@ -162,7 +168,7 @@ export class DynamicActionIcon {
   private loadingIndicationIntervalId: number;
   startLoadingIndication(tabId) {
     // Don't start if already ongoing
-    if (!!this.loadingIndicationIntervalId) {
+    if (this.loadingIndicationIntervalId) {
       return;
     }
     const start = Date.now();
@@ -193,7 +199,7 @@ export class DynamicActionIcon {
   }
 
   async stopLoadingIndication(tabId) {
-    if (!!this.loadingIndicationIntervalId) {
+    if (this.loadingIndicationIntervalId) {
       clearInterval(this.loadingIndicationIntervalId);
       delete this.loadingIndicationIntervalId;
       await this.actionApi.setBadgeText({
