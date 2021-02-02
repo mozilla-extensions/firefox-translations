@@ -1,4 +1,7 @@
-import { ExtensionPreferences, Store } from "../background-scripts/background.js/lib/Store";
+import {
+  ExtensionPreferences,
+  Store,
+} from "../background-scripts/background.js/lib/Store";
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 
@@ -22,7 +25,7 @@ export const subscribeToExtensionPreferenceChangesInBackgroundScript = async (
 export const subscribeToExtensionPreferenceChangesInContentScript = async (
   portName: string,
   callback: (extensionPreferences: ExtensionPreferences) => void,
-) => {
+): Promise<void> => {
   const port = browser.runtime.connect(browser.runtime.id, {
     name: portName,
   });

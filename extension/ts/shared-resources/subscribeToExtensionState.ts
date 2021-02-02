@@ -158,13 +158,13 @@ export async function subscribeToExtensionState() {
     runServerActionLocally(actionCall);
   });
 
-  // also listen to local actions, cancel them and send them to the server
+  // also listen to local actions, cancel them and send them to the server (background context)
   onActionMiddleware(rootStore, {
     onStart(actionCall, ctx) {
       if (!serverAction) {
-        // if the action does not come from the server cancel it silently
-        // and send it to the server
-        // it will then be replicated by the server and properly executed
+        // if the action does not come from the server (background context) cancel it silently
+        // and send it to the server (background context)
+        // it will then be replicated by the server (background context) and properly executed
         server.sendMessage(serializeActionCall(actionCall, rootStore));
         ctx.data["cancelled"] = true; // just for logging purposes
         // "cancel" the action by returning undefined
@@ -173,7 +173,7 @@ export async function subscribeToExtensionState() {
           value: undefined,
         };
       } else {
-        // just run the server action unmodified
+        // run actions that comes from the server (background context) unmodified
         return undefined;
       }
     },

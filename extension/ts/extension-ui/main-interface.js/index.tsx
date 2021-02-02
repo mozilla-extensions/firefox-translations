@@ -14,7 +14,7 @@ import { subscribeToExtensionState } from "../../shared-resources/subscribeToExt
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { Provider } from "mobx-react";
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
-import {getCurrentTab} from "../../background-scripts/background.js/lib/getCurrentTab";
+import { getCurrentTab } from "../../background-scripts/background.js/lib/getCurrentTab";
 import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 
 // Workaround for https://github.com/xaviergonz/mobx-keystone/issues/183

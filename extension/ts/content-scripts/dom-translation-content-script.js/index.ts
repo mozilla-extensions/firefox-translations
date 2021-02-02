@@ -47,12 +47,7 @@ const init = async () => {
   onSnapshot(
     extensionState.$.documentTranslationStates,
     async (documentTranslationStates, previousDocumentTranslationStates) => {
-      console.log(
-        "dom-translation-content-script.js - documentTranslationStates snapshot HAS CHANGED",
-        {
-          documentTranslationStates,
-        },
-      );
+      // console.debug("dom-translation-content-script.js - documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
       const currentTabFrameDocumentTranslationState =
         documentTranslationStates[tabFrameReference];
@@ -99,16 +94,6 @@ const init = async () => {
           TranslationStatus.UNKNOWN
         ) {
           await translationChild.attemptToDetectLanguage();
-        }
-
-        if (
-          currentTabFrameDocumentTranslationState.translationStatus ===
-          TranslationStatus.TRANSLATING
-        ) {
-          if (currentTabFrameDocumentTranslationState.cancellationRequested) {
-            console.debug("Cancellation requested");
-            console.debug("TODO: Implement");
-          }
         }
 
         if (

@@ -1,7 +1,10 @@
 import * as Sentry from "@sentry/browser";
 import { Severity } from "@sentry/types";
 import { config } from "../config";
-import { ExtensionPreferences, Store } from "../background-scripts/background.js/lib/Store";
+import {
+  ExtensionPreferences,
+  Store,
+} from "../background-scripts/background.js/lib/Store";
 import {
   communicateExtensionPreferenceChangesToContentScripts,
   subscribeToExtensionPreferenceChangesInBackgroundScript,

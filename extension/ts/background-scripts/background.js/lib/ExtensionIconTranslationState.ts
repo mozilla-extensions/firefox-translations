@@ -111,7 +111,7 @@ export class ExtensionIconTranslationState {
                 );
               }
               break;
-            case TranslationStatus.DETECTED_LANGUAGE_UNSUPPORTED:
+            case TranslationStatus.TRANSLATION_UNSUPPORTED:
               await dynamicActionIcon.stopLoadingIndication(tabId);
               dynamicActionIcon.drawBadge(
                 {
