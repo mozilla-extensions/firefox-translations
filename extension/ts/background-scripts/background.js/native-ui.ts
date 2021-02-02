@@ -111,3 +111,17 @@ async function onEveryExtensionLoad() {
   await extensionGlue.start();
 }
 onEveryExtensionLoad().then();
+
+// Open and keep the test-runner open after each extension reload when in development mode
+if (process.env.NODE_ENV !== "production") {
+  (async () => {
+    const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
+      `test-runner/index.html`,
+    );
+    await crossBrowser.tabs.create({
+      url: extensionPageForTestsUrl,
+
+      active: false,
+    });
+  })();
+}
