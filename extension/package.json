@@ -131,6 +131,11 @@
       "doctoc --title '**Contents**'",
       "git add"
     ],
+    "*.{html}": [
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "eslint --ext html",
+      "git add"
+    ],
     "*.{css,scss,json}": [
       "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
       "git add"
@@ -148,7 +153,7 @@
     "format:docs": "doctoc --title '**Contents**' docs/*.md && prettier '**/*.md' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:eslint": "npm run lint:eslint -- --fix",
     "format:fixpack": "fixpack",
-    "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm}' --trailing-comma=all --ignore-path=.eslintignore --write",
+    "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:tslint": "npm run lint:tslint -- --fix",
     "generate-manifest": "node generate-manifest.js",
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",
