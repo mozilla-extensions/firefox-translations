@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { TranslationRequestData } from "./BaseTranslator";
+import { TranslationRequestData } from "./BaseDomTranslator";
 import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 
 /**
@@ -15,7 +15,7 @@ import { ContentScriptBergamotApiClient } from "../../../shared-resources/Conten
  * @param targetLanguage    The target language for the translation.
  *
  */
-export class BergamotTranslationRequest {
+export class BergamotDomTranslatorRequest {
   public translationRequestData: TranslationRequestData;
   private sourceLanguage: string;
   private targetLanguage: string;

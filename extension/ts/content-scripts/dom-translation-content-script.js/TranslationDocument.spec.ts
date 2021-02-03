@@ -4,7 +4,7 @@
 
 import { assert } from "chai";
 import { TranslationDocument } from "./TranslationDocument";
-import { TestTranslator } from "./translators/TestTranslator";
+import { TestDomTranslator } from "./dom-translators/TestDomTranslator";
 import {
   createIframeShowingHTML,
   createElementShowingPlainText,
@@ -63,9 +63,13 @@ describe(testSuiteName, function() {
       const testDoc = domParser.parseFromString(docHtml, "text/html");
       const translationDocument = new TranslationDocument(testDoc);
 
-      const translator = new TestTranslator(translationDocument, from, to);
+      const domTranslator = new TestDomTranslator(
+        translationDocument,
+        from,
+        to,
+      );
 
-      await translator.translate();
+      await domTranslator.translate();
       translationDocument.showTranslation();
       const actualTranslatedDocHtml = prettyHTML(documentToHTML(testDoc));
 

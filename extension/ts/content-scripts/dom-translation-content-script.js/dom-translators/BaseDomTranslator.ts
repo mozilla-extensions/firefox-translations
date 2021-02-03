@@ -7,7 +7,7 @@ export interface TranslationRequestData {
   translatedStrings?: string[];
 }
 
-export class BaseTranslator {
+export class BaseDomTranslator {
   public readonly translationDocument: TranslationDocument;
   public readonly sourceLanguage: string;
   public readonly targetLanguage: string;

@@ -1,6 +1,6 @@
-import { BaseTranslator, TranslationRequestData } from "./BaseTranslator";
+import { BaseDomTranslator, TranslationRequestData } from "./BaseDomTranslator";
 
-export class TestTranslator extends BaseTranslator {
+export class TestDomTranslator extends BaseDomTranslator {
   private texts = {
     es: `Hola mundo
 <div id=n0><b id=n1>Hola</b>mundo</div>
@@ -76,7 +76,7 @@ Contact`.split("\n"),
         const textIndex = sourceLanguageTexts.indexOf(sourceText);
         if (textIndex === -1) {
           console.warn(
-            `TestTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`,
+            `TestDomTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`,
             { sourceLanguageTexts },
             sourceLanguageTexts[7],
             sourceText,
@@ -87,7 +87,7 @@ Contact`.split("\n"),
         const translation = targetLanguageTexts[textIndex];
         if (!translation) {
           console.warn(
-            `TestTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`,
+            `TestDomTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`,
           );
         }
         translationRoot.parseTranslationResult(translation);

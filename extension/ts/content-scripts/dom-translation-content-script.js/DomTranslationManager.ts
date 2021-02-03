@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TranslationDocument } from "./TranslationDocument";
-import { BergamotTranslator } from "./translators/BergamotTranslator";
+import { BergamotDomTranslator } from "./dom-translators/BergamotDomTranslator";
 import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
@@ -204,7 +204,11 @@ export class DomTranslationManager {
       TranslationStatus.TRANSLATING,
     );
 
-    let translator = new BergamotTranslator(translationDocument, from, to);
+    let domTranslator = new BergamotDomTranslator(
+      translationDocument,
+      from,
+      to,
+    );
 
     this.contentWindow.translationDocument = translationDocument;
     translationDocument.translatedFrom = from;
@@ -216,7 +220,7 @@ export class DomTranslationManager {
         `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
         { from, to },
       );
-      await translator.translate();
+      await domTranslator.translate();
 
       console.info(
         `Translated web page document (${translationDocument.translationRoots.length} translation items)`,
@@ -225,7 +229,7 @@ export class DomTranslationManager {
 
       /*
       // TODO: Restore telemetry
-      const translateResult = await translator.translate();
+      const translateResult = await domTranslator.translate();
       result = {
         characterCount: translateResult.characterCount,
         from: from,

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { BergamotTranslationRequest } from "./BergamotTranslationRequest";
+import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 import {
   generateMarkupToTranslateForItem,
@@ -13,7 +13,7 @@ import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
-import { BaseTranslator, TranslationRequestData } from "./BaseTranslator";
+import { BaseDomTranslator, TranslationRequestData } from "./BaseDomTranslator";
 
 export interface TranslationRequest {
   translationRequestData: TranslationRequestData;
@@ -37,7 +37,7 @@ export const MAX_REQUESTS = 15;
 /**
  * Translates a webpage using Bergamot's Translation backend.
  */
-export class BergamotTranslator extends BaseTranslator {
+export class BergamotDomTranslator extends BaseDomTranslator {
   public pendingRequests: number;
   public partialSuccess: boolean;
   private bergamotApiClient: ContentScriptBergamotApiClient;
@@ -85,7 +85,7 @@ export class BergamotTranslator extends BaseTranslator {
         translationRequestData.stringsToTranslate,
       );
       console.log("translationRequestData post strip", translationRequestData);
-      let bergamotRequest = new BergamotTranslationRequest(
+      let bergamotRequest = new BergamotDomTranslatorRequest(
         translationRequestData,
         this.sourceLanguage,
         this.targetLanguage,
@@ -95,7 +95,7 @@ export class BergamotTranslator extends BaseTranslator {
       const results = await bergamotRequest
         .fireRequest(this.bergamotApiClient)
         .catch(err => {
-          console.error("BergamotTranslator fireRequest error", err);
+          console.error("BergamotDomTranslator fireRequest error", err);
         });
       --this.pendingRequests;
 
@@ -113,7 +113,7 @@ export class BergamotTranslator extends BaseTranslator {
     }
 
     throw new Error(
-      "BergamotTranslator ended up processing all translation requests without detecting that the translation finished",
+      "BergamotDomTranslator ended up processing all translation requests without detecting that the translation finished",
     );
   }
 
@@ -123,7 +123,10 @@ export class BergamotTranslator extends BaseTranslator {
    * function to resolve the promise returned by the public `translate()`
    * method when there's no pending request left.
    */
-  private chunkCompleted(results, bergamotRequest: BergamotTranslationRequest) {
+  private chunkCompleted(
+    results,
+    bergamotRequest: BergamotDomTranslatorRequest,
+  ) {
     if (parseChunkResult(results, bergamotRequest)) {
       this.partialSuccess = true;
       // Count the number of characters successfully translated.
@@ -142,7 +145,7 @@ export class BergamotTranslator extends BaseTranslator {
         return true;
       } else {
         throw new Error(
-          "BergamotTranslator ended up with no more pending requests and zero successful requests",
+          "BergamotDomTranslator ended up with no more pending requests and zero successful requests",
         );
       }
     }
@@ -227,7 +230,7 @@ export function stripTagsFromTexts(texts: string[]): string[] {
  */
 function parseChunkResult(
   results: BergamotRestApiTranslateRequestResult,
-  bergamotRequest: BergamotTranslationRequest,
+  bergamotRequest: BergamotDomTranslatorRequest,
 ) {
   let len = results.text.length;
   if (
