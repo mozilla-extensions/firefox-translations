@@ -5,7 +5,7 @@ export class TestTranslator extends BaseTranslator {
     es: `Hola mundo
 <div id=n0><b id=n1>Hola</b>mundo</div>
 <div id=n0><b id=n1>Bienvenidos</b>a Wikipedia,</div>
-<div id=n2><br>artículos<b id=n3>en español</b>.</div>
+<div id=n4><br>artículos<b id=n5>en español</b>.</div>
 <div id=n0>la enciclopedia de contenido libre<br>que<b id=n1>todos pueden editar</b></div>
 <div id=n0><b id=n1>Bienvenidos</b>a Wikipedia,</div>
 <div id=n2>la enciclopedia de contenido libre<br>que<b id=n3>todos pueden editar</b>.</div>
@@ -17,16 +17,16 @@ Primeros pasos
 Ayuda
 Contacto`.split("\n"),
     en: `Hello world
-<div id=n0><b id=n1>Hello</b> world</div>
-<div id=n0><b id=n1>Welcome</b> to Wikipedia,</div>
-<div id=n2><br>articles <b id=n3>in Spanish</b> .</div>
-<div id=n0>the free content encyclopedia<br> that <b id=n1>everyone can edit</b></div>
-<div id=n0><b id=n1>Welcome</b> to Wikipedia,</div>
-<div id=n2>the free content encyclopedia<br> that <b id=n3>everyone can edit</b> .</div>
-Search 1 654 526 items
-<div id=n5><br>articles <b id=n6>in Spanish</b> .</div>
+<div id=n0><b id=n1>Hello</b>world</div>
+<div id=n0><b id=n1>Welcome</b>to Wikipedia,</div>
+<div id=n4><br>articles <b id=n5>in Spanish</b>.</div>
+<div id=n0>the encyclopedia of free content<br> that <b id=n1>everyone can edit</b></div>
+<div id=n0><b id=n1>Welcome</b>to Wikipedia,</div>
+<div id=n2>the encyclopedia of free content<br> that <b id=n3>everyone can edit</b>.</div>
+Search in 1 654 526 articles
+<div id=n5><br>articles<b id=n6>in Spanish</b>.</div>
 Coffee
-How to collaborate?
+How do you collaborate?
 First steps
 Help
 Contact`.split("\n"),
@@ -52,12 +52,44 @@ Contact`.split("\n"),
       translationRequestData.texts.push(text);
     });
 
+    const normalizeWhitespace = (text: string) => {
+      return decodeURIComponent(
+        encodeURIComponent(text)
+          .split("%C2%A0")
+          .join("%20"),
+      );
+    };
+
+    const sourceLanguageTexts = this.texts[this.sourceLanguage].map(
+      normalizeWhitespace,
+    );
+    const targetLanguageTexts = this.texts[this.targetLanguage].map(
+      normalizeWhitespace,
+    );
+
     // Translate and parse translation results
     translationRequestData.translationRoots.forEach(
       (translationRoot, index) => {
-        const sourceText = translationRequestData.texts[index];
-        const textIndex = this.texts[this.sourceLanguage].indexOf(sourceText);
-        const translation = this.texts[this.targetLanguage][textIndex];
+        const sourceText = normalizeWhitespace(
+          translationRequestData.texts[index],
+        );
+        const textIndex = sourceLanguageTexts.indexOf(sourceText);
+        if (textIndex === -1) {
+          console.warn(
+            `TestTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`,
+            { sourceLanguageTexts },
+            sourceLanguageTexts[7],
+            sourceText,
+            encodeURIComponent(sourceLanguageTexts[7]),
+            encodeURIComponent(sourceText),
+          );
+        }
+        const translation = targetLanguageTexts[textIndex];
+        if (!translation) {
+          console.warn(
+            `TestTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`,
+          );
+        }
         translationRoot.parseTranslationResult(translation);
       },
     );
