@@ -8,7 +8,7 @@ import {
   TranslationItem_NodePlaceholder,
 } from "./TranslationItem";
 
-export type translationDocumentTarget =
+export type TranslationDocumentTarget =
   | "translation"
   | "qeAnnotatedTranslation"
   | "original";
@@ -31,7 +31,7 @@ export class TranslationDocument {
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
   // Set temporarily to true during development to visually inspect which nodes have been processed and in which way
-  public paintProcessedNodes: boolean = true;
+  public paintProcessedNodes: boolean = false;
 
   constructor(document: Document) {
     this.nodeTranslationItemsMap = new Map();
@@ -235,7 +235,7 @@ export class TranslationDocument {
    * Swap the document with the resulting translation,
    * or back with the original content.
    */
-  _swapDocumentContent(target: translationDocumentTarget) {
+  _swapDocumentContent(target: TranslationDocumentTarget) {
     (async () => {
       this.translationRoots.forEach(translationRoot =>
         translationRoot.swapText(target, this.paintProcessedNodes),

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { translationDocumentTarget } from "./TranslationDocument";
+import { TranslationDocumentTarget } from "./TranslationDocument";
 
 /**
  * This class represents an item for translation. It's basically our
@@ -129,7 +129,7 @@ export class TranslationItem {
    */
   getChildById(id) {
     for (let child of this.children) {
-      if ("n" + child.id == id) {
+      if ("n" + child.id === id) {
         return child;
       }
     }
@@ -140,7 +140,7 @@ export class TranslationItem {
    * Swap the text of this TranslationItem between
    * its original and translated states.
    */
-  swapText(target: translationDocumentTarget, paintProcessedNodes: boolean) {
+  swapText(target: TranslationDocumentTarget, paintProcessedNodes: boolean) {
     swapTextForItem(this, target, paintProcessedNodes);
   }
 }
@@ -265,7 +265,7 @@ function parseResultNode(
  */
 function swapTextForItem(
   item: TranslationItem,
-  target: translationDocumentTarget,
+  target: TranslationDocumentTarget,
   paintProcessedNodes: boolean,
 ) {
   // visitStack is the stack of items that we still need to visit.
@@ -273,7 +273,7 @@ function swapTextForItem(
   let visitStack = [item];
 
   if (paintProcessedNodes) {
-    item.nodeRef.style.border = "1px solid blue";
+    item.nodeRef.style.border = "1px solid maroon";
   }
   while (visitStack.length) {
     let curItem = visitStack.shift();
@@ -317,6 +317,9 @@ function swapTextForItem(
     //
     // curNode starts in the firstChild...
     let curNode: ChildNode = domNode.firstChild;
+    if (paintProcessedNodes && curNode instanceof HTMLElement) {
+      curNode.style.border = "1px solid blue";
+    }
 
     // ... actually, let's make curNode start at the first useful node (either
     // a non-blank text node or something else). This is not strictly necessary,

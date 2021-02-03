@@ -21,7 +21,7 @@ const createHeader = (level, text) => {
   return header;
 };
 
-const testSuiteName = "DomTranslationManager";
+const testSuiteName = "TranslationDocument";
 
 describe(testSuiteName, function() {
   const outputDiv = document.getElementById("output");
