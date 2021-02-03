@@ -7,12 +7,13 @@ import { TranslationDocument } from "./TranslationDocument";
 import { TestTranslator } from "./translators/TestTranslator";
 import {
   createIframeShowingHTML,
-  createElementShowingHTML,
+  createElementShowingPlainText,
   documentToHTML,
   drawDiffUi,
   fetchFixtureHtml,
   prettyHTML,
   unifiedDiff,
+  translationDocumentStringRepresentations,
 } from "../../shared-resources/test-utils";
 
 const createHeader = (level, text) => {
@@ -83,41 +84,34 @@ describe(testSuiteName, function() {
       );
       fragment.append(createHeader(3, "Original"));
       fragment.append(createIframeShowingHTML(originalDocHtml));
-      fragment.append(createElementShowingHTML(originalDocHtml));
+      fragment.append(createElementShowingPlainText(originalDocHtml));
       fragment.append(createHeader(3, "Translation"));
       fragment.append(createIframeShowingHTML(actualTranslatedDocHtml));
-      fragment.append(createElementShowingHTML(actualTranslatedDocHtml));
+      fragment.append(createElementShowingPlainText(actualTranslatedDocHtml));
 
-      const originals = [];
-      const textsToTranslate = [];
-      const translations = [];
-      translationDocument.translationRoots.forEach(translationRoot => {
-        originals.push(translationRoot.original);
-        const textToTranslate = translationDocument.generateMarkupToTranslate(
-          translationRoot,
-        );
-        textsToTranslate.push(textToTranslate);
-        allTextsToTranslate.push(textToTranslate);
-        translations.push(translationRoot.translation);
-      });
-      const debug = {
-        originals,
-        textsToTranslate,
-        translations,
-      };
-      console.debug({ debug });
-      fragment.append(createElementShowingHTML(JSON.stringify(debug, null, 2)));
+      const stringRepresentations = translationDocumentStringRepresentations(
+        translationDocument,
+      );
+      console.debug({ stringRepresentations });
+
+      fragment.append(
+        createElementShowingPlainText(
+          JSON.stringify(stringRepresentations, null, 2),
+        ),
+      );
 
       fragment.append(createHeader(3, '"Original" after translation'));
       fragment.append(createIframeShowingHTML(actualTranslatedOriginalDocHtml));
       fragment.append(
-        createElementShowingHTML(actualTranslatedOriginalDocHtml),
+        createElementShowingPlainText(actualTranslatedOriginalDocHtml),
       );
 
       if (actualTranslatedDocHtml !== expectedTranslatedDocHtml) {
         fragment.append(createHeader(3, "Expected"));
         fragment.append(createIframeShowingHTML(expectedTranslatedDocHtml));
-        fragment.append(createElementShowingHTML(expectedTranslatedDocHtml));
+        fragment.append(
+          createElementShowingPlainText(expectedTranslatedDocHtml),
+        );
         const diff = unifiedDiff(
           fixtureName,
           actualTranslatedDocHtml,

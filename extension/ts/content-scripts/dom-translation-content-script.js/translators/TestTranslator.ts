@@ -37,7 +37,7 @@ Contact`.split("\n"),
   }> {
     // Gather translation texts to send for translation
     let translationRequestData: TranslationRequestData = {
-      texts: [],
+      stringsToTranslate: [],
       translationRoots: [],
     };
     const { translationRoots } = this.translationDocument;
@@ -49,7 +49,7 @@ Contact`.split("\n"),
         return;
       }
       translationRequestData.translationRoots.push(translationRoot);
-      translationRequestData.texts.push(text);
+      translationRequestData.stringsToTranslate.push(text);
     });
 
     const normalizeWhitespace = (text: string) => {
@@ -71,7 +71,7 @@ Contact`.split("\n"),
     translationRequestData.translationRoots.forEach(
       (translationRoot, index) => {
         const sourceText = normalizeWhitespace(
-          translationRequestData.texts[index],
+          translationRequestData.stringsToTranslate[index],
         );
         const textIndex = sourceLanguageTexts.indexOf(sourceText);
         if (textIndex === -1) {

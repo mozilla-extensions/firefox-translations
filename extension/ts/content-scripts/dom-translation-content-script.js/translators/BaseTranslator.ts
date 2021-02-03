@@ -3,7 +3,8 @@ import { TranslationItem } from "../TranslationItem";
 
 export interface TranslationRequestData {
   translationRoots: TranslationItem[];
-  texts: string[];
+  stringsToTranslate: string[];
+  translatedStrings?: string[];
 }
 
 export class BaseTranslator {

@@ -48,6 +48,7 @@ export class TranslationItem {
   public nodeRef: HTMLElement;
   public id;
   public readonly children;
+  public translatedString;
   public translation;
   private qeAnnotatedTranslation;
   public original;
@@ -91,18 +92,20 @@ export class TranslationItem {
    * all items are finished. It remains stored too to allow back-and-forth
    * switching between the "Show Original" and "Show Translation" functions.
    *
-   * @param translation    A string with the textual result received from the server,
-   *                       which can be plain-text or a serialized HTML doc.
+   * @param translatedString    A string with the textual result received from the server,
+   *                            which can be plain-text or a serialized HTML doc.
    */
-  parseTranslationResult(translation: string) {
+  parseTranslationResult(translatedString: string) {
+    this.translatedString = translatedString;
+
     if (this.isSimleTranslationRoot) {
-      this.translation = [translation];
+      this.translation = [translatedString];
       return;
     }
 
     let domParser = new DOMParser();
 
-    let doc = domParser.parseFromString(translation, "text/html");
+    let doc = domParser.parseFromString(translatedString, "text/html");
     parseResultNode(this, doc.body.firstChild, "translation");
   }
 

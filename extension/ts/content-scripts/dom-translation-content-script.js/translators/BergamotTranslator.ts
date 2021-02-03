@@ -81,8 +81,8 @@ export class BergamotTranslator extends BaseTranslator {
       const translationRequestData: TranslationRequestData =
         requestChunk.translationRequestData;
       console.log("translationRequestData pre strip", translationRequestData);
-      translationRequestData.texts = stripTagsFromTexts(
-        translationRequestData.texts,
+      translationRequestData.stringsToTranslate = stripTagsFromTexts(
+        translationRequestData.stringsToTranslate,
       );
       console.log("translationRequestData post strip", translationRequestData);
       let bergamotRequest = new BergamotTranslationRequest(
@@ -162,7 +162,7 @@ export class BergamotTranslator extends BaseTranslator {
     let currentDataSize = 0;
     let currentChunks = 0;
     let translationRequestData: TranslationRequestData = {
-      texts: [],
+      stringsToTranslate: [],
       translationRoots: [],
     };
     const { translationRoots } = this.translationDocument;
@@ -192,7 +192,7 @@ export class BergamotTranslator extends BaseTranslator {
       currentDataSize = newCurSize;
       currentChunks = newChunks;
       translationRequestData.translationRoots.push(translationRoot);
-      translationRequestData.texts.push(text);
+      translationRequestData.stringsToTranslate.push(text);
     });
 
     return {
@@ -230,7 +230,9 @@ function parseChunkResult(
   bergamotRequest: BergamotTranslationRequest,
 ) {
   let len = results.text.length;
-  if (len !== bergamotRequest.translationRequestData.texts.length) {
+  if (
+    len !== bergamotRequest.translationRequestData.stringsToTranslate.length
+  ) {
     // This should never happen, but if the service returns a different number
     // of items (from the number of items submitted), we can't use this chunk
     // because all items would be paired incorrectly.
@@ -317,7 +319,7 @@ function preprocessBergamotTranslationResult(
 
   let translation = translationContent;
   if (!translationRoot.isSimleTranslationRoot) {
-    // Translations of non-simple translation roots are expected to be return in the format of
+    // Translations of non-simple translation roots are expected to be returned in the format of
     // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
     translation = generateMarkupToTranslateForItem(
       translationRoot,

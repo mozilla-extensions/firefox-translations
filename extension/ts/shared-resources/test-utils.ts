@@ -5,6 +5,7 @@
 import { Diff2HtmlUI } from "diff2html/lib-esm/ui/js/diff2html-ui";
 import { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
 import "diff2html/bundles/css/diff2html.min.css";
+import { TranslationDocument } from "../content-scripts/dom-translation-content-script.js/TranslationDocument";
 const Diff = require("diff");
 const prettier = require("prettier/standalone");
 const plugins = [require("prettier/parser-html")];
@@ -39,7 +40,7 @@ export const unifiedDiff = (fixtureName, actual, expected) => {
   return Diff.createPatch(`${fixtureName}`, expected, actual);
 };
 
-export const createElementShowingHTML = html => {
+export const createElementShowingPlainText = html => {
   const textarea = document.createElement("textarea");
   textarea.value = html;
   return textarea;
@@ -53,4 +54,28 @@ export const drawDiffUi = (targetElement, diffString) => {
   };
   const diff2htmlUi = new Diff2HtmlUI(targetElement, diffString, configuration);
   diff2htmlUi.draw();
+};
+
+export const translationDocumentStringRepresentations = (
+  translationDocument: TranslationDocument,
+) => {
+  const originals = [];
+  const stringsToTranslate = [];
+  const translatedStrings = [];
+  const translations = [];
+  translationDocument.translationRoots.forEach(translationRoot => {
+    originals.push(translationRoot.original);
+    translatedStrings.push(translationRoot.translatedString);
+    const textToTranslate = translationDocument.generateMarkupToTranslate(
+      translationRoot,
+    );
+    stringsToTranslate.push(textToTranslate);
+    translations.push(translationRoot.translation);
+  });
+  return {
+    originals,
+    stringsToTranslate,
+    translatedStrings,
+    translations,
+  };
 };

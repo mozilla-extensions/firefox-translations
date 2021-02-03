@@ -29,7 +29,7 @@ export class BergamotTranslationRequest {
     this.translationRequestData = translationRequestData;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
-    this.translationRequestData.texts.forEach(text => {
+    this.translationRequestData.stringsToTranslate.forEach(text => {
       this.characterCount += text.length;
     });
   }
@@ -39,7 +39,7 @@ export class BergamotTranslationRequest {
    */
   async fireRequest(bergamotApiClient: ContentScriptBergamotApiClient) {
     return bergamotApiClient.sendTranslationRequest(
-      this.translationRequestData.texts,
+      this.translationRequestData.stringsToTranslate,
     );
   }
 }
