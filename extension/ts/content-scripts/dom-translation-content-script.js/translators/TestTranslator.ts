@@ -16,7 +16,7 @@ Café
 Primeros pasos
 Ayuda
 Contacto`.split("\n"),
-    en: `Hello World
+    en: `Hello world
 <div id=n0><b id=n1>Hello</b> world</div>
 <div id=n0><b id=n1>Welcome</b> to Wikipedia,</div>
 <div id=n2><br>articles <b id=n3>in Spanish</b> .</div>
@@ -29,8 +29,7 @@ Coffee
 How to collaborate?
 First steps
 Help
-Contact
-`.split("\n"),
+Contact`.split("\n"),
   };
 
   async translate(): Promise<{
