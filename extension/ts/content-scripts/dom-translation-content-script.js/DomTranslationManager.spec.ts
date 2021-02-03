@@ -4,10 +4,7 @@
 
 import { assert } from "chai";
 import { TranslationDocument } from "./TranslationDocument";
-import {
-  BergamotTranslator,
-  stripTagsFromTexts,
-} from "./translators/BergamotTranslator";
+import { TestTranslator } from "./translators/TestTranslator";
 import {
   createIframeShowingHTML,
   createElementShowingHTML,
@@ -24,7 +21,9 @@ const createHeader = (level, text) => {
   return header;
 };
 
-describe("Dom Translation", function() {
+const testSuiteName = "DomTranslationManager";
+
+describe(testSuiteName, function() {
   const outputDiv = document.getElementById("output");
   const diffDiv = document.getElementById("diff");
   const domParser = new DOMParser();
@@ -46,7 +45,7 @@ describe("Dom Translation", function() {
   fixtureNames.forEach(fixtureName => {
     const testName = `Fixture: ${fixtureName}`;
     it(testName, async function() {
-      console.info(`Dom Translation: ${testName}`);
+      console.info(`${testSuiteName}: ${testName}`);
       const from = "es";
       const to = "en";
 
@@ -63,7 +62,7 @@ describe("Dom Translation", function() {
       const testDoc = domParser.parseFromString(docHtml, "text/html");
       const translationDocument = new TranslationDocument(testDoc);
 
-      const translator = new BergamotTranslator(translationDocument, from, to);
+      const translator = new TestTranslator(translationDocument, from, to);
 
       await translator.translate();
       translationDocument.showTranslation();
@@ -101,11 +100,9 @@ describe("Dom Translation", function() {
         allTextsToTranslate.push(textToTranslate);
         translations.push(translationRoot.translation);
       });
-      const textsToTranslateWithoutTags = stripTagsFromTexts(textsToTranslate);
       const debug = {
         originals,
         textsToTranslate,
-        textsToTranslateWithoutTags,
         translations,
       };
       console.debug({ debug });

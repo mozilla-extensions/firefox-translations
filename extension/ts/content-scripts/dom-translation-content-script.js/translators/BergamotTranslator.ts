@@ -13,11 +13,8 @@ import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
+import { BaseTranslator, TranslationRequestData } from "./BaseTranslator";
 
-export interface TranslationRequestData {
-  translationRoots: TranslationItem[];
-  texts: string[];
-}
 export interface TranslationRequest {
   translationRequestData: TranslationRequestData;
   finished: boolean;
@@ -40,13 +37,9 @@ export const MAX_REQUESTS = 15;
 /**
  * Translates a webpage using Bergamot's Translation backend.
  */
-export class BergamotTranslator {
-  private readonly translationDocument: TranslationDocument;
-  private readonly sourceLanguage: string;
-  private readonly targetLanguage: string;
-  private pendingRequests: number;
-  private partialSuccess: boolean;
-  private translatedCharacterCount: number;
+export class BergamotTranslator extends BaseTranslator {
+  public pendingRequests: number;
+  public partialSuccess: boolean;
   private bergamotApiClient: ContentScriptBergamotApiClient;
 
   /**
@@ -60,12 +53,9 @@ export class BergamotTranslator {
     sourceLanguage: string,
     targetLanguage: string,
   ) {
-    this.translationDocument = translationDocument;
-    this.sourceLanguage = sourceLanguage;
-    this.targetLanguage = targetLanguage;
+    super(translationDocument, sourceLanguage, targetLanguage);
     this.pendingRequests = 0;
     this.partialSuccess = false;
-    this.translatedCharacterCount = 0;
     this.bergamotApiClient = new ContentScriptBergamotApiClient();
   }
 
@@ -175,17 +165,15 @@ export class BergamotTranslator {
       texts: [],
       translationRoots: [],
     };
-    let translationRootsList = this.translationDocument.translationRoots;
-
-    for (let i = startIndex; i < translationRootsList.length; i++) {
-      let translationRoot = translationRootsList[i];
+    const { translationRoots } = this.translationDocument;
+    translationRoots.forEach((translationRoot, index) => {
       let text = this.translationDocument.generateTextForItem(translationRoot);
       if (!text) {
-        continue;
+        return;
       }
 
-      let newCurSize = currentDataSize + text.length;
-      let newChunks = currentChunks + 1;
+      const newCurSize = currentDataSize + text.length;
+      const newChunks = currentChunks + 1;
 
       if (newCurSize > MAX_REQUEST_DATA || newChunks > MAX_REQUEST_CHUNKS) {
         // If we've reached the API limits, let's stop accumulating data
@@ -195,7 +183,7 @@ export class BergamotTranslator {
         return {
           translationRequestData,
           finished: false,
-          lastIndex: i,
+          lastIndex: index,
         };
       }
 
@@ -203,7 +191,7 @@ export class BergamotTranslator {
       currentChunks = newChunks;
       translationRequestData.translationRoots.push(translationRoot);
       translationRequestData.texts.push(text);
-    }
+    });
 
     return {
       translationRequestData,

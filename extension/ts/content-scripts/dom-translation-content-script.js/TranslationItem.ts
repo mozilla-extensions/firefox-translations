@@ -93,7 +93,7 @@ export class TranslationItem {
    * @param translation    A string with the textual result received from the server,
    *                       which can be plain-text or a serialized HTML doc.
    */
-  parseTranslationResult(translation) {
+  parseTranslationResult(translation: string) {
     if (this.isSimleTranslationRoot) {
       this.translation = [translation];
       return;
