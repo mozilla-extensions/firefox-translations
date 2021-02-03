@@ -3,16 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { BergamotTranslationRequest } from "./BergamotTranslationRequest";
-import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
+import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 import {
   generateTranslationHtmlForItem,
   TranslationDocument,
-} from "./TranslationDocument";
-import { TranslationItem } from "./TranslationItem";
+} from "../TranslationDocument";
+import { TranslationItem } from "../TranslationItem";
 import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
-} from "../../background-scripts/background.js/lib/BergamotApiClient";
+} from "../../../background-scripts/background.js/lib/BergamotApiClient";
 
 export interface TranslationRequestData {
   translationRoots: TranslationItem[];
@@ -90,9 +90,11 @@ export class BergamotTranslator {
       // Create a real request for the server and add it to the pending requests list.
       const translationRequestData: TranslationRequestData =
         requestChunk.translationRequestData;
+      console.log("translationRequestData pre strip", translationRequestData);
       translationRequestData.texts = stripTagsFromTexts(
         translationRequestData.texts,
       );
+      console.log("translationRequestData post strip", translationRequestData);
       let bergamotRequest = new BergamotTranslationRequest(
         translationRequestData,
         this.sourceLanguage,

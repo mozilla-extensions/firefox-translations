@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TranslationRequestData } from "./BergamotTranslator";
-import { ContentScriptBergamotApiClient } from "../../shared-resources/ContentScriptBergamotApiClient";
+import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 
 /**
  * Represents a request (for 1 chunk) sent off to Bergamot's service.

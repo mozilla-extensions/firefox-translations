@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TranslationDocument } from "./TranslationDocument";
-import { BergamotTranslator } from "./BergamotTranslator";
+import { BergamotTranslator } from "./translators/BergamotTranslator";
 import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";

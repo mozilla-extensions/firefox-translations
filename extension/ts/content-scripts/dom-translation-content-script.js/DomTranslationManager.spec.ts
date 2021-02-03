@@ -4,7 +4,10 @@
 
 import { assert } from "chai";
 import { TranslationDocument } from "./TranslationDocument";
-import { BergamotTranslator, stripTagsFromTexts } from "./BergamotTranslator";
+import {
+  BergamotTranslator,
+  stripTagsFromTexts,
+} from "./translators/BergamotTranslator";
 import {
   createIframeShowingHTML,
   createElementShowingHTML,
