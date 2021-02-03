@@ -12,7 +12,7 @@ export interface TranslationNode {
 export const getTranslationNodes = (
   rootElement: Element,
 ): TranslationNode[] => {
-  const translationNodesMap = new Map();
+  const seenTranslationElements: Node[] = [];
 
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
@@ -24,21 +24,24 @@ export const getTranslationNodes = (
 
   for (let i = 0; i < limit && i < childElements.length; i++) {
     const content: HTMLElement = childElements[i];
-    if (content.tagName === "html") {
+    const tagName = content.tagName.toLowerCase();
+    if (tagName === "html") {
       continue;
     }
 
     // Skip elements that usually contain non-translatable text content.
     if (
       [
-        "SCRIPT",
-        "IFRAME",
-        "FRAMESET",
-        "FRAME",
-        "CODE",
-        "NOSCRIPT",
-        "STYLE",
-      ].includes(content.tagName)
+        "script",
+        "iframe",
+        "frameset",
+        "frame",
+        "code",
+        "noscript",
+        "style",
+        "svg",
+        "math",
+      ].includes(tagName)
     ) {
       continue;
     }
@@ -56,22 +59,32 @@ export const getTranslationNodes = (
         child.nodeType === Node.TEXT_NODE &&
         hasTextForTranslation(child.textContent)
       ) {
+        seenTranslationElements.push(content);
+
         // TODO: Verify this assumption from C to JS:
         /*
         nsIFrame* frame = content->GetPrimaryFrame();
         bool isTranslationRoot = frame && frame->IsBlockFrameOrSubclass();
         */
-        let isTranslationRoot = ["DIV"].includes(content.tagName);
+        const isBlockFrameOrSubclass = (node: HTMLElement) => {
+          return (
+            (["div", "li"].includes(content.tagName.toLowerCase()) ||
+              node.style.display === "block") &&
+            node.style.display !== "inline"
+          );
+        };
+
+        let isTranslationRoot = isBlockFrameOrSubclass(content);
 
         if (!isTranslationRoot) {
           // If an element is not a block element, it still
           // can be considered a translation root if the parent
-          // of this element didn't make into the list of nodes
+          // of this element didn't make it into the list of nodes
           // to be translated.
           let parentInList: boolean = false;
           const parent: Node = content.parentNode;
           if (parent) {
-            parentInList = translationNodesMap.has(parent);
+            parentInList = seenTranslationElements.includes(parent);
           }
           isTranslationRoot = !parentInList;
         }
