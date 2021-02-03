@@ -103,8 +103,7 @@ export class TranslationItem {
     let domParser = new DOMParser();
 
     let doc = domParser.parseFromString(translation, "text/html");
-    this.translation = [];
-    parseResultNode(this, doc.body.firstChild, this.translation);
+    parseResultNode(this, doc.body.firstChild, "translation");
   }
 
   /**
@@ -116,8 +115,7 @@ export class TranslationItem {
   parseQeAnnotatedTranslationResult(qeAnnotatedTranslation) {
     let domParser = new DOMParser();
     let doc = domParser.parseFromString(qeAnnotatedTranslation, "text/html");
-    this.qeAnnotatedTranslation = [];
-    parseResultNode(this, doc.body.firstChild, this.qeAnnotatedTranslation);
+    parseResultNode(this, doc.body.firstChild, "qeAnnotatedTranslation");
   }
 
   /**
@@ -172,34 +170,39 @@ export const TranslationItem_NodePlaceholder = {
  *
  * For text nodes we simply add it as a string.
  */
-function parseResultNode(
-  item,
-  node,
-  into: (Node | string | { toString(): string })[],
-) {
-  for (let child of node.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) {
-      into.push(child.nodeValue);
-    } else if (child.localName === "br") {
-      into.push(TranslationItem_NodePlaceholder);
-    } else if (
-      child.dataset &&
-      typeof child.dataset.translationQeScore !== "undefined"
-    ) {
-      // handle the special case of quality estimate annotated nodes
-      into.push(child);
-    } else {
-      let translationRootChild = item.getChildById(child.id);
-      if (translationRootChild) {
-        into.push(translationRootChild);
-        parseResultNode(translationRootChild, child, into);
+function parseResultNode(item, node, target: TranslationDocumentTarget) {
+  try {
+    if (!item[target]) {
+      item[target] = [];
+    }
+    const into = item[target];
+    for (let child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        into.push(child.nodeValue);
+      } else if (child.localName === "br") {
+        into.push(TranslationItem_NodePlaceholder);
+      } else if (
+        child.dataset &&
+        typeof child.dataset.translationQeScore !== "undefined"
+      ) {
+        // handle the special case of quality estimate annotated nodes
+        into.push(child);
       } else {
-        console.info(
-          "Result node's child node lacks an associated translation root child",
-          { node, child },
-        );
+        const translationRootChild = item.getChildById(child.id);
+        if (translationRootChild) {
+          into.push(translationRootChild);
+          parseResultNode(translationRootChild, child, target);
+        } else {
+          console.info(
+            "Result node's child node lacks an associated translation root child",
+            { node, child },
+          );
+        }
       }
     }
+  } catch (err) {
+    console.error(err);
+    throw err;
   }
 }
 
