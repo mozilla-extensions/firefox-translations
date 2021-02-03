@@ -31,7 +31,7 @@ export class TranslationDocument {
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
   // Set temporarily to true during development to visually inspect which nodes have been processed and in which way
-  public paintProcessedNodes: boolean = false;
+  public paintProcessedNodes: boolean = true;
 
   constructor(document: Document) {
     this.nodeTranslationItemsMap = new Map();
@@ -133,22 +133,22 @@ export class TranslationDocument {
   }
 
   /**
-   * Generate the text string that represents a TranslationItem object.
-   * Besides generating the string, it's also stored in the "original"
-   * field of the TranslationItem object, which needs to be stored for
-   * later to be used in the "Show Original" functionality.
+   * Generate the markup that represents a TranslationItem object.
+   * Besides generating the markup, it also stores a fuller representation
+   * of the TranslationItem in the "original" field of the TranslationItem object,
+   * which needs to be stored for later to be used in the "Show Original" functionality.
    * If this function had already been called for the given item (determined
-   * by the presence of the "original" array in the item), the text will
+   * by the presence of the "original" array in the item), the markup will
    * be regenerated from the "original" data instead of from the related
    * DOM nodes (because the nodes might contain translated data).
    *
    * @param item     A TranslationItem object
    *
-   * @returns        A string representation of the TranslationItem.
+   * @returns        A markup representation of the TranslationItem.
    */
-  generateTextForItem(item: TranslationItem): string {
+  generateMarkupToTranslate(item: TranslationItem): string {
     if (item.original) {
-      return regenerateTextFromOriginalHelper(item);
+      return regenerateMarkupToTranslateFromOriginal(item);
     }
 
     if (item.isSimleTranslationRoot) {
@@ -181,7 +181,7 @@ export class TranslationDocument {
         // object's child list (and just add a placeholder for it), because
         // it will be stringified separately for being a translation root.
         item.original.push(objInMap);
-        str += this.generateTextForItem(objInMap);
+        str += this.generateMarkupToTranslate(objInMap);
         wasLastItemPlaceholder = false;
       } else if (!wasLastItemPlaceholder) {
         // Otherwise, if this node doesn't contain any useful content,
@@ -197,7 +197,7 @@ export class TranslationDocument {
       }
     }
 
-    return generateTranslationHtmlForItem(item, str);
+    return generateMarkupToTranslateForItem(item, str);
   }
 
   /**
@@ -256,14 +256,14 @@ export class TranslationDocument {
 }
 
 /**
- * Generate the outer HTML representation for a given item.
+ * Generate the translation markup for a given item.
  *
  * @param   item       A TranslationItem object.
  * @param   content    The inner content for this item.
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-export function generateTranslationHtmlForItem(
+export function generateMarkupToTranslateForItem(
   item: TranslationItem,
   content,
 ): string {
@@ -274,15 +274,15 @@ export function generateTranslationHtmlForItem(
 }
 
 /**
- * Regenerate the text string that represents a TranslationItem object,
+ * Regenerate the markup that represents a TranslationItem object,
  * with data from its "original" array. The array must have already
- * been created by TranslationDocument.generateTextForItem().
+ * been created by TranslationDocument.generateMarkupToTranslate().
  *
  * @param item     A TranslationItem object
  *
- * @returns        A string representation of the TranslationItem.
+ * @returns        A markup representation of the TranslationItem.
  */
-function regenerateTextFromOriginalHelper(
+function regenerateMarkupToTranslateFromOriginal(
   item: TranslationItem & { original: any },
 ) {
   if (item.isSimleTranslationRoot) {
@@ -292,7 +292,7 @@ function regenerateTextFromOriginalHelper(
   let str = "";
   for (let child of item.original) {
     if (child instanceof TranslationItem) {
-      str += regenerateTextFromOriginalHelper(child);
+      str += regenerateMarkupToTranslateFromOriginal(child);
     } else if (child === TranslationItem_NodePlaceholder) {
       str += "<br>";
     } else {
@@ -300,5 +300,5 @@ function regenerateTextFromOriginalHelper(
     }
   }
 
-  return generateTranslationHtmlForItem(item, str);
+  return generateMarkupToTranslateForItem(item, str);
 }

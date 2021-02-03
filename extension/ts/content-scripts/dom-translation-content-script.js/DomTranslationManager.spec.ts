@@ -93,7 +93,7 @@ describe(testSuiteName, function() {
       const translations = [];
       translationDocument.translationRoots.forEach(translationRoot => {
         originals.push(translationRoot.original);
-        const textToTranslate = translationDocument.generateTextForItem(
+        const textToTranslate = translationDocument.generateMarkupToTranslate(
           translationRoot,
         );
         textsToTranslate.push(textToTranslate);

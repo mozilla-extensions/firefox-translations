@@ -43,7 +43,9 @@ Contact
     };
     const { translationRoots } = this.translationDocument;
     translationRoots.forEach(translationRoot => {
-      let text = this.translationDocument.generateTextForItem(translationRoot);
+      let text = this.translationDocument.generateMarkupToTranslate(
+        translationRoot,
+      );
       if (!text) {
         return;
       }

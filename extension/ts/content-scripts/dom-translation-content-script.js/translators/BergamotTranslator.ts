@@ -5,7 +5,7 @@
 import { BergamotTranslationRequest } from "./BergamotTranslationRequest";
 import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 import {
-  generateTranslationHtmlForItem,
+  generateMarkupToTranslateForItem,
   TranslationDocument,
 } from "../TranslationDocument";
 import { TranslationItem } from "../TranslationItem";
@@ -167,7 +167,9 @@ export class BergamotTranslator extends BaseTranslator {
     };
     const { translationRoots } = this.translationDocument;
     translationRoots.forEach((translationRoot, index) => {
-      let text = this.translationDocument.generateTextForItem(translationRoot);
+      let text = this.translationDocument.generateMarkupToTranslate(
+        translationRoot,
+      );
       if (!text) {
         return;
       }
@@ -317,13 +319,13 @@ function preprocessBergamotTranslationResult(
   if (!translationRoot.isSimleTranslationRoot) {
     // Translations of non-simple translation roots are expected to be return in the format of
     // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
-    translation = generateTranslationHtmlForItem(
+    translation = generateMarkupToTranslateForItem(
       translationRoot,
       translationContent,
     );
   }
 
-  const qeAnnotatedTranslation = generateTranslationHtmlForItem(
+  const qeAnnotatedTranslation = generateMarkupToTranslateForItem(
     translationRoot,
     qeAnnotatedTranslationContent,
   );

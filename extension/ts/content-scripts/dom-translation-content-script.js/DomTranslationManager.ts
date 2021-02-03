@@ -287,7 +287,7 @@ export class DomTranslationManager {
     for (let i = 0; i < translationRoots.length; i++) {
       let translationRoot = translationRoots[i];
 
-      let text = translationDocument.generateTextForItem(translationRoot);
+      let text = translationDocument.generateMarkupToTranslate(translationRoot);
       if (!text) {
         continue;
       }

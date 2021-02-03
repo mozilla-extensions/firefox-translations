@@ -15,7 +15,8 @@ import { translationDocumentTarget } from "./TranslationDocument";
  * the structure of that node in its original state, and the other in its
  * translated state.
  *
- * The "original" array is generated in the TranslationDocument.generateTextForItem function,
+ * The "original" array is generated in the
+ * TranslationDocument.generateMarkupToTranslate function,
  * and the "translation" array is generated when the translation results
  * are parsed.
  *
