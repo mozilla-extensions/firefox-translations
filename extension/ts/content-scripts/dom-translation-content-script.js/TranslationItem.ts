@@ -47,7 +47,7 @@ export class TranslationItem {
   public nodeRef: HTMLElement;
   public id;
   public readonly children;
-  private translation;
+  public translation;
   private qeAnnotatedTranslation;
   public original;
 

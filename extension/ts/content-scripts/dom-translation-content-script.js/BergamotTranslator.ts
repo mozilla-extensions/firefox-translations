@@ -90,7 +90,7 @@ export class BergamotTranslator {
       // Create a real request for the server and add it to the pending requests list.
       const translationRequestData: TranslationRequestData =
         requestChunk.translationRequestData;
-      translationRequestData.texts = preprocessBergamotTranslationRequestDataTexts(
+      translationRequestData.texts = stripTagsFromTexts(
         translationRequestData.texts,
       );
       let bergamotRequest = new BergamotTranslationRequest(
@@ -211,9 +211,7 @@ export class BergamotTranslator {
   }
 }
 
-function preprocessBergamotTranslationRequestDataTexts(
-  texts: string[],
-): string[] {
+export function stripTagsFromTexts(texts: string[]): string[] {
   return texts.map(text => {
     // The next line is a hack to delay dealing with the problem of
     //               <b>Do not</b> touch.

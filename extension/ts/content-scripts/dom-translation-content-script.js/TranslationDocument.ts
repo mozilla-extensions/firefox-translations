@@ -170,7 +170,7 @@ export class TranslationDocument {
         // In this case, we need to stringify this node.
         // However, if this item is a translation root, we should skip it here in this
         // object's child list (and just add a placeholder for it), because
-        // it will be stringfied separately for being a translation root.
+        // it will be stringified separately for being a translation root.
         item.original.push(objInMap);
         str += this.generateTextForItem(objInMap);
         wasLastItemPlaceholder = false;
