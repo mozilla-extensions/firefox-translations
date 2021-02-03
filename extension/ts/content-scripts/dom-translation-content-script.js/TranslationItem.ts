@@ -139,8 +139,8 @@ export class TranslationItem {
    * Swap the text of this TranslationItem between
    * its original and translated states.
    */
-  swapText(target: translationDocumentTarget) {
-    swapTextForItem(this, target);
+  swapText(target: translationDocumentTarget, paintProcessedNodes: boolean) {
+    swapTextForItem(this, target, paintProcessedNodes);
   }
 }
 
@@ -265,13 +265,21 @@ function parseResultNode(
 function swapTextForItem(
   item: TranslationItem,
   target: translationDocumentTarget,
+  paintProcessedNodes: boolean,
 ) {
   // visitStack is the stack of items that we still need to visit.
   // Let's start the process by adding the translation root item.
   let visitStack = [item];
 
+  if (paintProcessedNodes) {
+    item.nodeRef.style.border = "1px solid blue";
+  }
   while (visitStack.length) {
     let curItem = visitStack.shift();
+
+    if (paintProcessedNodes) {
+      item.nodeRef.style.border = "1px solid yellow";
+    }
 
     let domNode = curItem.nodeRef;
     if (!domNode) {
@@ -285,10 +293,17 @@ function swapTextForItem(
       // was broken in various chunks, and one of the chunks failed,
       // the items from that chunk will be missing its "translation"
       // field.
+      if (paintProcessedNodes) {
+        item.nodeRef.style.border = "1px solid red";
+      }
       continue;
     }
 
     domNode.normalize();
+
+    if (paintProcessedNodes) {
+      item.nodeRef.style.border = "1px solid green";
+    }
 
     // curNode points to the child nodes of the DOM node that we are
     // modifying. During most of the process, while the target array is

@@ -30,6 +30,8 @@ export class TranslationDocument {
   public qualityEstimationShown = true;
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
+  // Set temporarily to true during development to visually inspect which nodes have been processed and in which way
+  public paintProcessedNodes: boolean = false;
 
   constructor(document: Document) {
     this.nodeTranslationItemsMap = new Map();
@@ -62,6 +64,10 @@ export class TranslationDocument {
     translationNodes.forEach((translationNode, index) => {
       const { content, isTranslationRoot } = translationNode;
 
+      if (this.paintProcessedNodes) {
+        content.style.backgroundColor = "darkorange";
+      }
+
       // Create a TranslationItem object for this node.
       // This function will also add it to the this.translationRoots array.
       this._createItemForNode(content, index, isTranslationRoot);
@@ -86,6 +92,9 @@ export class TranslationDocument {
         translationRoot.nodeRef.childElementCount == 0
       ) {
         translationRoot.isSimleTranslationRoot = true;
+        if (this.paintProcessedNodes) {
+          translationRoot.nodeRef.style.backgroundColor = "orange";
+        }
       }
     }
   }
@@ -229,7 +238,7 @@ export class TranslationDocument {
   _swapDocumentContent(target: translationDocumentTarget) {
     (async () => {
       this.translationRoots.forEach(translationRoot =>
-        translationRoot.swapText(target),
+        translationRoot.swapText(target, this.paintProcessedNodes),
       );
       // TODO: Make sure that the above does not lock the main event loop
       /*
@@ -238,7 +247,7 @@ export class TranslationDocument {
       const YIELD_INTERVAL = 100;
       await Async.yieldingForEach(
         this.roots,
-        root => root.swapText(target),
+        root => root.swapText(target, this.paintProcessedNodes),
         YIELD_INTERVAL
       );
       */
