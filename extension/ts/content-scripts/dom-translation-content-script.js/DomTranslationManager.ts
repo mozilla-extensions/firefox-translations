@@ -11,7 +11,7 @@ import { TranslationStatus } from "../../shared-resources/models/BaseTranslation
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 
-export class DomTranslator {
+export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
   public contentWindow;
   public document;
