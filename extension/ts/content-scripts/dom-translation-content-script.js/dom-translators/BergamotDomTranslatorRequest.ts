@@ -8,6 +8,7 @@ import {
 } from "./BaseDomTranslator";
 import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 import {
+  BergamotApiClient,
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
@@ -44,7 +45,7 @@ export class BergamotDomTranslatorRequest {
    * Initiates the request
    */
   async fireRequest(
-    bergamotApiClient: ContentScriptBergamotApiClient,
+    bergamotApiClient: ContentScriptBergamotApiClient | BergamotApiClient,
   ): Promise<TranslationResponseData> {
     const results = await bergamotApiClient.sendTranslationRequest(
       this.translationRequestData.stringsToTranslate,

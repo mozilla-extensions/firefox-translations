@@ -36,6 +36,24 @@ Help
 Contact`.split("\n"),
   };
 
+  normalizeWhitespace = (text: string) => {
+    return decodeURIComponent(
+      encodeURIComponent(text)
+        .split("%C2%A0")
+        .join("%20"),
+    );
+  };
+
+  getNormalizedTexts = sourceLanguage =>
+    this.texts[sourceLanguage].map(this.normalizeWhitespace);
+
+  getTargetLanguageTexts = targetLanguage =>
+    this.texts[targetLanguage].map(this.normalizeWhitespace);
+
+  targetLanguageTexts = this.texts[this.targetLanguage].map(
+    this.normalizeWhitespace,
+  );
+
   async translate(): Promise<{
     characterCount: number;
   }> {
@@ -60,24 +78,12 @@ Contact`.split("\n"),
       return { characterCount: 0 };
     }
 
-    const normalizeWhitespace = (text: string) => {
-      return decodeURIComponent(
-        encodeURIComponent(text)
-          .split("%C2%A0")
-          .join("%20"),
-      );
-    };
-
-    const sourceLanguageTexts = this.texts[this.sourceLanguage].map(
-      normalizeWhitespace,
-    );
-    const targetLanguageTexts = this.texts[this.targetLanguage].map(
-      normalizeWhitespace,
-    );
+    const sourceLanguageTexts = this.getNormalizedTexts(this.sourceLanguage);
+    const targetLanguageTexts = this.getNormalizedTexts(this.targetLanguage);
 
     // Translate and parse translation results
     translationRoots.forEach((translationRoot, index) => {
-      const sourceText = normalizeWhitespace(
+      const sourceText = this.normalizeWhitespace(
         translationRequestData.stringsToTranslate[index],
       );
       const textIndex = sourceLanguageTexts.indexOf(sourceText);
