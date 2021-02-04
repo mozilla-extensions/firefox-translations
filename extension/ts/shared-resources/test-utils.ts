@@ -29,6 +29,12 @@ export const prettyHTML = html => {
   });
 };
 
+export const createHeader = (level, text) => {
+  const header = document.createElement(`h${level}`);
+  header.innerText = `${text}`;
+  return header;
+};
+
 export const createIframeShowingHTML = html => {
   const iframe = document.createElement("iframe");
   iframe.setAttribute("loading", "lazy");

@@ -14,19 +14,15 @@ import {
   prettyHTML,
   unifiedDiff,
   translationDocumentStringRepresentations,
+  createHeader,
 } from "../../shared-resources/test-utils";
-
-const createHeader = (level, text) => {
-  const header = document.createElement(`h${level}`);
-  header.innerText = `${text}`;
-  return header;
-};
 
 const testSuiteName = "TranslationDocument";
 
 describe(testSuiteName, function() {
   const outputDiv = document.getElementById("output");
-  const diffDiv = document.getElementById("diff");
+  const diffContainerDiv = document.getElementById("diff");
+  const diffDiv = document.createElement("div");
   const domParser = new DOMParser();
   const fixtureNames = [
     "hola-mundo",
@@ -38,7 +34,12 @@ describe(testSuiteName, function() {
   const diffs = [];
   const allTextsToTranslate = [];
 
+  before(function() {
+    outputDiv.append(createHeader(2, testSuiteName));
+  });
+
   after(function() {
+    diffContainerDiv.append(createHeader(2, testSuiteName), diffDiv);
     drawDiffUi(diffDiv, diffs.join("\n"));
     console.log(allTextsToTranslate.join("\n"));
   });
@@ -79,17 +80,16 @@ describe(testSuiteName, function() {
       );
 
       const fragment = document.createDocumentFragment();
-
-      fragment.append(createHeader(2, `Fixture: ${fixtureName}`));
+      fragment.append(createHeader(3, testName));
 
       const originalDocHtml = prettyHTML(documentToHTML(originalDoc));
       const expectedTranslatedDocHtml = prettyHTML(
         documentToHTML(expectedTranslatedDoc),
       );
-      fragment.append(createHeader(3, "Original"));
+      fragment.append(createHeader(4, "Original"));
       fragment.append(createIframeShowingHTML(originalDocHtml));
       fragment.append(createElementShowingPlainText(originalDocHtml));
-      fragment.append(createHeader(3, "Translation"));
+      fragment.append(createHeader(4, "Translation"));
       fragment.append(createIframeShowingHTML(actualTranslatedDocHtml));
       fragment.append(createElementShowingPlainText(actualTranslatedDocHtml));
 
@@ -104,14 +104,14 @@ describe(testSuiteName, function() {
         ),
       );
 
-      fragment.append(createHeader(3, '"Original" after translation'));
+      fragment.append(createHeader(4, '"Original" after translation'));
       fragment.append(createIframeShowingHTML(actualTranslatedOriginalDocHtml));
       fragment.append(
         createElementShowingPlainText(actualTranslatedOriginalDocHtml),
       );
 
       if (actualTranslatedDocHtml !== expectedTranslatedDocHtml) {
-        fragment.append(createHeader(3, "Expected"));
+        fragment.append(createHeader(4, "Expected"));
         fragment.append(createIframeShowingHTML(expectedTranslatedDocHtml));
         fragment.append(
           createElementShowingPlainText(expectedTranslatedDocHtml),

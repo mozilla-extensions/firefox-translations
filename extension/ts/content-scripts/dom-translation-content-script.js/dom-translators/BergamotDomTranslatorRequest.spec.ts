@@ -9,11 +9,30 @@ import { stripTagsFromTexts } from "./BergamotDomTranslator";
 import { TranslationRequestData } from "./BaseDomTranslator";
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 import { BergamotApiClient } from "../../../background-scripts/background.js/lib/BergamotApiClient";
+import {
+  createElementShowingPlainText,
+  createHeader,
+  drawDiffUi,
+  unifiedDiff,
+} from "../../../shared-resources/test-utils";
 
 const testSuiteName = "BergamotDomTranslatorRequest";
 
 describe(testSuiteName, function() {
+  const outputDiv = document.getElementById("output");
+  const diffContainerDiv = document.getElementById("diff");
+  const diffDiv = document.createElement("div");
   const domParser = new DOMParser();
+  const diffs = [];
+
+  before(function() {
+    outputDiv.append(createHeader(2, testSuiteName));
+  });
+
+  after(function() {
+    diffContainerDiv.append(createHeader(2, testSuiteName), diffDiv);
+    drawDiffUi(diffDiv, diffs.join("\n"));
+  });
 
   const from = "es";
   const to = "en";
@@ -51,7 +70,31 @@ describe(testSuiteName, function() {
     );
     const { translatedStrings } = translationResponseData;
 
-    console.debug({ testSourceLanguageTexts, translatedStrings, testTargetLanguageTexts });
-    assert.deepEqual(translatedStrings, testTargetLanguageTexts);
+    console.debug({
+      testSourceLanguageTexts,
+      translatedStrings,
+      testTargetLanguageTexts,
+    });
+
+    const actual = JSON.stringify(translatedStrings, null, 2);
+    const expected = JSON.stringify(testTargetLanguageTexts, null, 2);
+
+    // Visual output of test results
+    const fragment = document.createDocumentFragment();
+    fragment.append(createHeader(3, testName));
+
+    fragment.append(createHeader(4, "Actual"));
+    fragment.append(createElementShowingPlainText(actual));
+
+    if (actual !== expected) {
+      fragment.append(createHeader(4, "Expected"));
+      fragment.append(createElementShowingPlainText(expected));
+      const diff = unifiedDiff(testName, actual, expected);
+      diffs.push(diff);
+    }
+
+    outputDiv.append(fragment);
+
+    assert.deepEqual(actual, expected);
   });
 });
