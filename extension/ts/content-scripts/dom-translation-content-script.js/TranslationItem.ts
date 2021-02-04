@@ -99,6 +99,19 @@ export class TranslationItem {
     this.translatedString = translatedString;
 
     if (this.isSimleTranslationRoot) {
+      // If translation contains HTML entities, we need to convert them.
+      // It is because simple roots expect a plain text result.
+      if (
+        this.isSimleTranslationRoot &&
+        translatedString.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
+      ) {
+        const doc = new DOMParser().parseFromString(
+          translatedString,
+          "text/html",
+        );
+        translatedString = doc.body.firstChild.nodeValue;
+      }
+
       this.translation = [translatedString];
       return;
     }
@@ -115,9 +128,12 @@ export class TranslationItem {
    * This wreaks havoc.
    * @param qeAnnotatedTranslation
    */
-  parseQeAnnotatedTranslationResult(qeAnnotatedTranslation) {
+  parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedString) {
     let domParser = new DOMParser();
-    let doc = domParser.parseFromString(qeAnnotatedTranslation, "text/html");
+    let doc = domParser.parseFromString(
+      qeAnnotatedTranslatedString,
+      "text/html",
+    );
     parseResultNode(this, doc.body.firstChild, "qeAnnotatedTranslation");
   }
 

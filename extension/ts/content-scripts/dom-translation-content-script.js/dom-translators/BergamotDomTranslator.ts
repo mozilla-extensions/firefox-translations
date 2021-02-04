@@ -10,14 +10,16 @@ import {
 } from "../TranslationDocument";
 import { TranslationItem } from "../TranslationItem";
 import {
-  BergamotRestApiParagraph,
-  BergamotRestApiTranslateRequestResult,
-} from "../../../background-scripts/background.js/lib/BergamotApiClient";
-import { BaseDomTranslator, TranslationRequestData } from "./BaseDomTranslator";
+  BaseDomTranslator,
+  TranslationRequestData,
+  TranslationResponseData,
+} from "./BaseDomTranslator";
 
-export interface TranslationRequest {
+interface DomTranslationChunk {
   translationRequestData: TranslationRequestData;
-  finished: boolean;
+  translationRoots: TranslationItem[];
+  translationResponseData?: TranslationResponseData;
+  isLastChunk: boolean;
   lastIndex: number;
 }
 
@@ -38,7 +40,6 @@ export const MAX_REQUESTS = 15;
  * Translates a webpage using Bergamot's Translation backend.
  */
 export class BergamotDomTranslator extends BaseDomTranslator {
-  public pendingRequests: number;
   public partialSuccess: boolean;
   private bergamotApiClient: ContentScriptBergamotApiClient;
 
@@ -54,7 +55,6 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     targetLanguage: string,
   ) {
     super(translationDocument, sourceLanguage, targetLanguage);
-    this.pendingRequests = 0;
     this.partialSuccess = false;
     this.bergamotApiClient = new ContentScriptBergamotApiClient();
   }
@@ -70,51 +70,83 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     characterCount: number;
   }> {
     let currentIndex = 0;
+    const chunksBeingProcessed = [];
 
     // Let's split the document into various requests to be sent to
     // Bergamot's Translation API.
     for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
       // Determine the data for the next request.
-      let requestChunk = this.generateNextTranslationRequestChunk(currentIndex);
+      const domTranslationChunk = this.generateNextDomTranslationChunk(
+        currentIndex,
+      );
+
+      // Break if there was nothing left to translate
+      if (domTranslationChunk.translationRoots.length === 0) {
+        break;
+      }
 
       // Create a real request for the server and add it to the pending requests list.
       const translationRequestData: TranslationRequestData =
-        requestChunk.translationRequestData;
-      console.log("translationRequestData pre strip", translationRequestData);
+        domTranslationChunk.translationRequestData;
+
       translationRequestData.stringsToTranslate = stripTagsFromTexts(
         translationRequestData.stringsToTranslate,
       );
-      console.log("translationRequestData post strip", translationRequestData);
-      let bergamotRequest = new BergamotDomTranslatorRequest(
+
+      let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
         translationRequestData,
         this.sourceLanguage,
         this.targetLanguage,
       );
 
-      this.pendingRequests++;
-      const results = await bergamotRequest
+      // Fire all requests in parallel
+      const chunkBeingProcessed = bergamotDomTranslatorRequest
         .fireRequest(this.bergamotApiClient)
+        .then((translationResponseData: TranslationResponseData) => {
+          if (translationResponseData) {
+            this.chunkCompleted(
+              translationResponseData,
+              domTranslationChunk,
+              bergamotDomTranslatorRequest,
+            );
+          }
+        })
         .catch(err => {
           console.error("BergamotDomTranslator fireRequest error", err);
         });
-      --this.pendingRequests;
+      chunksBeingProcessed.push(chunkBeingProcessed);
 
-      if (results) {
-        this.chunkCompleted(results, bergamotRequest);
+      if (domTranslationChunk.isLastChunk) {
+        break;
       }
 
-      if (requestChunk.finished && this.noPendingRequestsAndPartialSuccess()) {
-        return {
-          characterCount: this.translatedCharacterCount,
-        };
-      }
-
-      currentIndex = requestChunk.lastIndex;
+      currentIndex = domTranslationChunk.lastIndex;
     }
 
-    throw new Error(
-      "BergamotDomTranslator ended up processing all translation requests without detecting that the translation finished",
+    // Return early with a noop if there is nothing to translate
+    if (chunksBeingProcessed.length === 0) {
+      console.info("Found nothing to translate");
+      return { characterCount: 0 };
+    }
+
+    console.info(
+      `Fired of ${chunksBeingProcessed.length} requests to the bergamot translation backend`,
     );
+
+    // Resolve promise when all requests have finished
+    await Promise.all(chunksBeingProcessed);
+
+    // If at least one chunk was successful, the
+    // translation should be displayed, albeit incomplete.
+    // Otherwise, the "Error" state will appear.
+    if (!this.partialSuccess) {
+      throw new Error(
+        "BergamotDomTranslator ended up with no more pending chunks being processed and zero successful requests",
+      );
+    }
+    return {
+      characterCount: this.translatedCharacterCount,
+    };
   }
 
   /**
@@ -124,32 +156,16 @@ export class BergamotDomTranslator extends BaseDomTranslator {
    * method when there's no pending request left.
    */
   private chunkCompleted(
-    results,
-    bergamotRequest: BergamotDomTranslatorRequest,
+    translationResponseData: TranslationResponseData,
+    domTranslationChunk: DomTranslationChunk,
+    bergamotDomTranslatorRequest: BergamotDomTranslatorRequest,
   ) {
-    if (parseChunkResult(results, bergamotRequest)) {
+    if (parseChunkResult(translationResponseData, domTranslationChunk)) {
       this.partialSuccess = true;
       // Count the number of characters successfully translated.
-      this.translatedCharacterCount += bergamotRequest.characterCount;
+      this.translatedCharacterCount +=
+        bergamotDomTranslatorRequest.characterCount;
     }
-  }
-
-  private noPendingRequestsAndPartialSuccess() {
-    // Check if all pending requests have been
-    // completed.
-    // If at least one chunk was successful, the
-    // translation should be displayed, albeit incomplete.
-    // Otherwise, the "Error" state will appear.
-    if (this.pendingRequests === 0) {
-      if (this.partialSuccess) {
-        return true;
-      } else {
-        throw new Error(
-          "BergamotDomTranslator ended up with no more pending requests and zero successful requests",
-        );
-      }
-    }
-    return false;
   }
 
   /**
@@ -159,16 +175,16 @@ export class BergamotDomTranslator extends BaseDomTranslator {
    * @param startIndex What is the index, in the translation roots list, that the
    *                   chunk should start.
    */
-  private generateNextTranslationRequestChunk(
+  private generateNextDomTranslationChunk(
     startIndex: number,
-  ): TranslationRequest {
+  ): DomTranslationChunk {
     let currentDataSize = 0;
     let currentChunks = 0;
     let translationRequestData: TranslationRequestData = {
       stringsToTranslate: [],
-      translationRoots: [],
     };
     const { translationRoots } = this.translationDocument;
+    const chunkTranslationRoots = [];
     translationRoots.forEach((translationRoot, index) => {
       let text = this.translationDocument.generateMarkupToTranslate(
         translationRoot,
@@ -187,20 +203,22 @@ export class BergamotDomTranslator extends BaseDomTranslator {
         // can keep working from where it stopped.
         return {
           translationRequestData,
-          finished: false,
+          translationRoots: chunkTranslationRoots,
+          isLastChunk: false,
           lastIndex: index,
         };
       }
 
       currentDataSize = newCurSize;
       currentChunks = newChunks;
-      translationRequestData.translationRoots.push(translationRoot);
+      chunkTranslationRoots.push(translationRoot);
       translationRequestData.stringsToTranslate.push(text);
     });
 
     return {
       translationRequestData,
-      finished: true,
+      translationRoots: chunkTranslationRoots,
+      isLastChunk: true,
       lastIndex: 0,
     };
   }
@@ -229,18 +247,19 @@ export function stripTagsFromTexts(texts: string[]): string[] {
  * @returns boolean      True if parsing of this chunk was successful.
  */
 function parseChunkResult(
-  results: BergamotRestApiTranslateRequestResult,
-  bergamotRequest: BergamotDomTranslatorRequest,
+  translationResponseData: TranslationResponseData,
+  domTranslationChunk: DomTranslationChunk,
 ) {
-  let len = results.text.length;
-  if (
-    len !== bergamotRequest.translationRequestData.stringsToTranslate.length
-  ) {
+  const len = translationResponseData.translatedStrings.length;
+  if (len === 0) {
+    throw new Error("Translation response data has no translated strings");
+  }
+  if (len !== domTranslationChunk.translationRoots.length) {
     // This should never happen, but if the service returns a different number
     // of items (from the number of items submitted), we can't use this chunk
     // because all items would be paired incorrectly.
     throw new Error(
-      "Translation service returned a different number of items (from the number of items submitted)",
+      "Translation response data has a different number of items (from the number of items submitted)",
     );
   }
 
@@ -249,23 +268,39 @@ function parseChunkResult(
   );
 
   let errorOccurred = false;
-  for (let i = 0; i < len; i++) {
-    try {
-      const translationRoot: TranslationItem =
-        bergamotRequest.translationRequestData.translationRoots[i];
-      // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
-      const paragraph = results.text[i];
-      const {
-        translation,
-        qeAnnotatedTranslation,
-      } = preprocessBergamotTranslationResult(paragraph, translationRoot);
-      translationRoot.parseTranslationResult(translation);
-      translationRoot.parseQeAnnotatedTranslationResult(qeAnnotatedTranslation);
-    } catch (e) {
-      errorOccurred = true;
-      console.error("Translation error: ", e);
-    }
-  }
+  domTranslationChunk.translationRoots.forEach(
+    (translationRoot: TranslationItem, index) => {
+      try {
+        const translationRoot: TranslationItem =
+          domTranslationChunk.translationRoots[index];
+        let translatedString = translationResponseData.translatedStrings[index];
+        let qeAnnotatedTranslatedString =
+          translationResponseData.qeAnnotatedTranslatedStrings[index];
+
+        if (!translationRoot.isSimleTranslationRoot) {
+          // Translations of non-simple translation roots are expected to be returned in the format of
+          // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
+          translatedString = generateMarkupToTranslateForItem(
+            translationRoot,
+            translatedString,
+          );
+        }
+
+        qeAnnotatedTranslatedString = generateMarkupToTranslateForItem(
+          translationRoot,
+          qeAnnotatedTranslatedString,
+        );
+
+        translationRoot.parseTranslationResult(translatedString);
+        translationRoot.parseQeAnnotatedTranslationResult(
+          qeAnnotatedTranslatedString,
+        );
+      } catch (e) {
+        errorOccurred = true;
+        console.error("Translation error: ", e);
+      }
+    },
+  );
 
   console.info(
     `Parsed translation chunk result with ${len} translation entries`,
@@ -273,109 +308,4 @@ function parseChunkResult(
   );
 
   return !errorOccurred;
-}
-
-function preprocessBergamotTranslationResult(
-  paragraph: BergamotRestApiParagraph,
-  translationRoot: TranslationItem,
-) {
-  const translationObjects = getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
-    paragraph,
-  );
-
-  // TODO: Currently the rest server doesn't retain the leading/trailing
-  // whitespace information of sentences. It is a bug on rest server side.
-  // Once it is fixed there, we need to stop appending whitespaces.
-  const separator = " ";
-
-  // Join sentence translations
-  let translationContent = translationObjects
-    .map(({ translation }) => translation)
-    .join(separator);
-
-  // If translation contains HTML entities, we need to convert them.
-  // It is because simple roots expect a plain text result.
-  if (
-    translationRoot.isSimleTranslationRoot &&
-    translationContent.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
-  ) {
-    const doc = new DOMParser().parseFromString(
-      translationContent,
-      "text/html",
-    );
-    translationContent = doc.body.firstChild.nodeValue;
-  }
-
-  // Show original rather than an empty or obviously invalid translation
-  if (["", "*", "* ()"].includes(translationContent)) {
-    translationContent = translationRoot.original[0];
-  }
-
-  // Generate QE Annotated HTML for each sentence
-  const qeAnnotatedSentenceHTMLs = translationObjects.map(
-    ({ translation, sentenceScore }) =>
-      generateQEAnnotatedHTML(translation, sentenceScore),
-  );
-  const qeAnnotatedTranslationContent = qeAnnotatedSentenceHTMLs.join(
-    separator,
-  );
-
-  let translation = translationContent;
-  if (!translationRoot.isSimleTranslationRoot) {
-    // Translations of non-simple translation roots are expected to be returned in the format of
-    // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
-    translation = generateMarkupToTranslateForItem(
-      translationRoot,
-      translationContent,
-    );
-  }
-
-  const qeAnnotatedTranslation = generateMarkupToTranslateForItem(
-    translationRoot,
-    qeAnnotatedTranslationContent,
-  );
-
-  return { translation, qeAnnotatedTranslation };
-}
-
-/**
- * This function parses 'Paragraph' entity of the response for the
- * the best translations and returns them
- */
-function getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
-  paragraph: BergamotRestApiParagraph,
-) {
-  const bestTranslations = [];
-  paragraph[0].forEach(sentenceTranslationList => {
-    // Depending on the request, there might be multiple 'best translations'.
-    // We are fetching the best one (present in 'translation' field).
-    const bestTranslation = sentenceTranslationList.nBest[0];
-    bestTranslations.push(bestTranslation);
-  });
-  return bestTranslations;
-}
-
-/**
- * This function generates the Quality Estimation annotated HTML of a string
- * based on its score.
- *
- * @param   translation    input string
- * @param   score          score of the input string
- * @returns string         QE annotated HTML of input string
- */
-function generateQEAnnotatedHTML(translation, score) {
-  // Color choices and thresholds below are chosen based on intuitiveness.
-  // They will be changed according to the UI design of Translator once it
-  // is fixed.
-  let color: string;
-  if (score >= -0.2) {
-    color = "green";
-  } else if (score >= -0.5 && score < -0.2) {
-    color = "black";
-  } else if (score >= -0.8 && score < -0.5) {
-    color = "mediumvioletred";
-  } else {
-    color = "red";
-  }
-  return `<span data-translation-qe-score="${score}" style="color:${color}"> ${translation}</span>`;
 }

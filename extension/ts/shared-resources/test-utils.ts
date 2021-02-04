@@ -6,6 +6,7 @@ import { Diff2HtmlUI } from "diff2html/lib-esm/ui/js/diff2html-ui";
 import { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
 import "diff2html/bundles/css/diff2html.min.css";
 import { TranslationDocument } from "../content-scripts/dom-translation-content-script.js/TranslationDocument";
+import { TranslationItem } from "../content-scripts/dom-translation-content-script.js/TranslationItem";
 const Diff = require("diff");
 const prettier = require("prettier/standalone");
 const plugins = [require("prettier/parser-html")];
@@ -58,7 +59,12 @@ export const drawDiffUi = (targetElement, diffString) => {
 
 export const translationDocumentStringRepresentations = (
   translationDocument: TranslationDocument,
-) => {
+): {
+  originals: (string | TranslationItem)[];
+  stringsToTranslate: string[];
+  translatedStrings: string[];
+  translations: (string | TranslationItem)[];
+} => {
   const originals = [];
   const stringsToTranslate = [];
   const translatedStrings = [];

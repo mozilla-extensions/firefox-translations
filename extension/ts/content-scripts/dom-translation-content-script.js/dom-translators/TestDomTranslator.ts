@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { BaseDomTranslator, TranslationRequestData } from "./BaseDomTranslator";
 
 export class TestDomTranslator extends BaseDomTranslator {
@@ -38,7 +42,6 @@ Contact`.split("\n"),
     // Gather translation texts to send for translation
     let translationRequestData: TranslationRequestData = {
       stringsToTranslate: [],
-      translationRoots: [],
     };
     const { translationRoots } = this.translationDocument;
     translationRoots.forEach(translationRoot => {
@@ -48,9 +51,14 @@ Contact`.split("\n"),
       if (!text) {
         return;
       }
-      translationRequestData.translationRoots.push(translationRoot);
       translationRequestData.stringsToTranslate.push(text);
     });
+
+    // Return early with a noop if there is nothing to translate
+    if (translationRoots.length === 0) {
+      console.info("Found nothing to translate");
+      return { characterCount: 0 };
+    }
 
     const normalizeWhitespace = (text: string) => {
       return decodeURIComponent(
@@ -68,31 +76,29 @@ Contact`.split("\n"),
     );
 
     // Translate and parse translation results
-    translationRequestData.translationRoots.forEach(
-      (translationRoot, index) => {
-        const sourceText = normalizeWhitespace(
-          translationRequestData.stringsToTranslate[index],
+    translationRoots.forEach((translationRoot, index) => {
+      const sourceText = normalizeWhitespace(
+        translationRequestData.stringsToTranslate[index],
+      );
+      const textIndex = sourceLanguageTexts.indexOf(sourceText);
+      if (textIndex === -1) {
+        console.warn(
+          `TestDomTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`,
+          { sourceLanguageTexts },
+          sourceLanguageTexts[7],
+          sourceText,
+          encodeURIComponent(sourceLanguageTexts[7]),
+          encodeURIComponent(sourceText),
         );
-        const textIndex = sourceLanguageTexts.indexOf(sourceText);
-        if (textIndex === -1) {
-          console.warn(
-            `TestDomTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`,
-            { sourceLanguageTexts },
-            sourceLanguageTexts[7],
-            sourceText,
-            encodeURIComponent(sourceLanguageTexts[7]),
-            encodeURIComponent(sourceText),
-          );
-        }
-        const translation = targetLanguageTexts[textIndex];
-        if (!translation) {
-          console.warn(
-            `TestDomTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`,
-          );
-        }
-        translationRoot.parseTranslationResult(translation);
-      },
-    );
+      }
+      const translation = targetLanguageTexts[textIndex];
+      if (!translation) {
+        console.warn(
+          `TestDomTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`,
+        );
+      }
+      translationRoot.parseTranslationResult(translation);
+    });
 
     return { characterCount: -1 };
   }

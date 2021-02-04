@@ -6,6 +6,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { nanoid } from "nanoid";
 import { captureExceptionWithExtras } from "./ErrorReporting";
+import { BergamotRestApiTranslateRequestResult } from "../background-scripts/background.js/lib/BergamotApiClient";
 
 export class ContentScriptBergamotApiClient {
   private backgroundContextPort: Port;
@@ -15,11 +16,16 @@ export class ContentScriptBergamotApiClient {
       name: "port-from-content-script-bergamot-api-client",
     });
   }
-  async sendTranslationRequest(texts: string[]): Promise<any[]> {
+  async sendTranslationRequest(
+    texts: string[],
+  ): Promise<BergamotRestApiTranslateRequestResult> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
       const resultsMessageListener = async (m: {
-        translationRequestResults?: any;
+        translationRequestResults?: {
+          requestId: string;
+          results: BergamotRestApiTranslateRequestResult;
+        };
       }) => {
         if (m.translationRequestResults) {
           const { translationRequestResults } = m;

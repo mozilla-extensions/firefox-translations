@@ -1,10 +1,16 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { TranslationDocument } from "../TranslationDocument";
-import { TranslationItem } from "../TranslationItem";
 
 export interface TranslationRequestData {
-  translationRoots: TranslationItem[];
   stringsToTranslate: string[];
-  translatedStrings?: string[];
+}
+
+export interface TranslationResponseData {
+  translatedStrings: string[];
+  qeAnnotatedTranslatedStrings: string[];
 }
 
 export class BaseDomTranslator {
