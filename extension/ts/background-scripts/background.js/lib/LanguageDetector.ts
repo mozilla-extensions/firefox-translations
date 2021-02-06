@@ -2,10 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
 import { browser } from "webextension-polyfill-ts";
-import { DetectedLanguageResults } from "../../../shared-resources/bergamot.types";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
@@ -24,29 +21,53 @@ const IDLE_TIMEOUT = 10 * 1000;
 
 const WORKER_URL = browser.runtime.getURL(`wasm/cld-worker.js`);
 
+export interface DetectLanguageParams {
+  text: string;
+  isHTML?: boolean;
+  language?: boolean;
+  tld?: boolean;
+  encoding?: boolean;
+}
+
+export interface DetectedLanguageResults {
+  confident: boolean;
+  language: string;
+  languages: {
+    languageCode: string;
+    percent: number;
+  }[];
+}
+
 const workerManager = {
+  // TODO: Make into a map instead to avoid the implicit assumption that the order of requests and results are the same
   detectionQueue: [],
 
-  detectLanguage(aParams) {
-    return this.workerReady
-      .then(worker => {
-        return new Promise(resolve => {
-          this.detectionQueue.push({ resolve });
-          worker.postMessage(aParams);
-        });
-      })
-      .then(result => {
-        // We have our asynchronous result from the worker.
-        //
-        // Determine if our input was large enough to trigger heap growth,
-        // or if we're already waiting to destroy the worker when it's
-        // idle. If so, schedule termination after the idle timeout.
-        if (aParams.text.length >= LARGE_STRING || this._idleTimeout != null) {
-          this.flushWorker();
-        }
+  async detectLanguage(
+    params: DetectLanguageParams,
+  ): Promise<DetectedLanguageResults> {
+    const worker = await this.workerReady;
 
-        return result;
-      });
+    const result: DetectedLanguageResults = await new Promise(resolve => {
+      this.detectionQueue.push({ resolve });
+      worker.postMessage(params);
+    });
+
+    // We have our asynchronous result from the worker.
+    //
+    // Determine if our input was large enough to trigger heap growth,
+    // or if we're already waiting to destroy the worker when it's
+    // idle. If so, schedule termination after the idle timeout.
+    if (params.text.length >= LARGE_STRING || this._idleTimeout != null) {
+      this.flushWorker();
+    }
+
+    return result;
+  },
+
+  onDetectLanguageWorkerResult(
+    detectedLanguageResults: DetectedLanguageResults,
+  ) {
+    this.detectionQueue.shift().resolve(detectedLanguageResults);
   },
 
   _worker: null,
@@ -56,11 +77,11 @@ const workerManager = {
     if (!this._workerReadyPromise) {
       this._workerReadyPromise = new Promise(resolve => {
         let worker = new Worker(WORKER_URL);
-        worker.onmessage = aMsg => {
-          if (aMsg.data == "ready") {
+        worker.onmessage = msg => {
+          if (msg.data == "ready") {
             resolve(worker);
           } else {
-            this.detectionQueue.shift().resolve(aMsg.data);
+            this.onDetectLanguageWorkerResult(msg.data);
           }
         };
         this._worker = worker;
@@ -124,7 +145,7 @@ export const LanguageDetector = {
    *      of the value of this property, the 'text' property must be a
    *      UTF-16 JavaScript string.
    *
-   * @returns {Promise<Object>}
+   * @returns {Promise<DetectedLanguageResults>}
    * @resolves When detection is finished, with a object containing
    * these fields:
    *  - 'language' (string with a language code)
@@ -139,11 +160,12 @@ export const LanguageDetector = {
    *      entry with the language code 'un', indicating the percent of
    *      the text which is unknown.
    */
-  detectLanguage(aParams): Promise<DetectedLanguageResults> {
-    if (typeof aParams == "string") {
-      aParams = { text: aParams };
+  async detectLanguage(
+    params: string | DetectLanguageParams,
+  ): Promise<DetectedLanguageResults> {
+    if (typeof params === "string") {
+      params = { text: params };
     }
-
-    return workerManager.detectLanguage(aParams);
+    return workerManager.detectLanguage(params);
   },
 };

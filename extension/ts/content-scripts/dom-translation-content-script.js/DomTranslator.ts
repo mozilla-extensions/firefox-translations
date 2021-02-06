@@ -2,58 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
 import { TranslationDocument } from "./TranslationDocument";
 import { BergamotTranslator } from "./BergamotTranslator";
-import { getTranslationNodes } from "./getTranslationNodes";
+import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
-import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import {
-  DetectedLanguageResults,
-  FrameInfo,
-} from "../../shared-resources/bergamot.types";
+import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
+import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 
-export class TranslationChild {
-  private frameInfo: FrameInfo;
+export class DomTranslator {
+  private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
   public contentWindow;
   public document;
-  private extensionState: ExtensionState;
   private languageDetector: ContentScriptLanguageDetectorProxy;
-  constructor(
-    frameInfo: FrameInfo,
-    document,
-    contentWindow,
-    extensionState: ExtensionState,
-  ) {
-    this.frameInfo = frameInfo;
+  constructor(documentTranslationStateCommunicator, document, contentWindow) {
+    this.documentTranslationStateCommunicator = documentTranslationStateCommunicator;
     this.document = document;
     this.contentWindow = contentWindow;
-    this.extensionState = extensionState;
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
-  }
-
-  /**
-   * Wrapped in setTimeout to prevent automatic batching of updates - we want status indicators
-   * to get the updated translation status immediately.
-   *
-   * @param translationStatus
-   */
-  broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationStatus"],
-            value: translationStatus,
-          },
-        ],
-      );
-    }, 0);
   }
 
   async attemptToDetectLanguage() {
@@ -62,12 +29,14 @@ export class TranslationChild {
     let url = String(this.document.location);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       console.debug("Not a HTTP(S) url, translation unavailable", { url });
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.UNAVAILABLE);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.UNAVAILABLE,
+      );
       return;
     }
 
     console.debug("Setting status to reflect detection of language ongoing");
-    this.broadcastUpdatedTranslationStatus(
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
       TranslationStatus.DETECTING_LANGUAGE,
     );
 
@@ -77,7 +46,9 @@ export class TranslationChild {
     // and since it's hosted by emscripten, and therefore can't shrink
     // its heap after it's grown, it has a performance cost.
     // So we send plain text instead.)
-    let nodeList = getTranslationNodes(document.body);
+    const translationNodes: TranslationNode[] = getTranslationNodes(
+      document.body,
+    );
     const domElementsToStringWithMaxLength = (
       elements: Node[],
       maxLength,
@@ -89,7 +60,7 @@ export class TranslationChild {
         .substr(0, maxLength);
     };
     const string = domElementsToStringWithMaxLength(
-      nodeList.translationNodes.map(tn => tn.content),
+      translationNodes.map(tn => tn.content),
       60 * 1024,
     );
 
@@ -99,7 +70,7 @@ export class TranslationChild {
         "Language detection isn't reliable on very short strings. Skipping language detection",
         { string },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.LANGUAGE_NOT_DETECTED,
       );
       return;
@@ -114,36 +85,23 @@ export class TranslationChild {
 
     // The window might be gone by now.
     if (!this.contentWindow) {
-      console.log(
+      console.info(
         "Content window reference invalid, deleting document translation state",
       );
-      setTimeout(() => {
-        this.extensionState.deleteDocumentTranslationStateByFrameInfo(
-          this.frameInfo,
-        );
-      }, 0);
+      this.documentTranslationStateCommunicator.clear();
       return;
     }
 
     // Save results in extension state
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "add",
-            path: ["detectedLanguageResults"],
-            value: detectedLanguageResults,
-          },
-        ],
-      );
-    }, 0);
+    this.documentTranslationStateCommunicator.updatedDetectedLanguageResults(
+      detectedLanguageResults,
+    );
 
     if (!detectedLanguageResults.confident) {
       console.debug(
         "Language detection results not confident enough, bailing.",
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.LANGUAGE_NOT_DETECTED,
       );
       return;
@@ -176,7 +134,7 @@ export class TranslationChild {
           acceptedTargetLanguages,
         },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
       );
       return;
@@ -188,7 +146,7 @@ export class TranslationChild {
         "Detected language is not part of the supported source languages.",
         { detectedLanguage, supportedSourceLanguages },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
@@ -204,7 +162,7 @@ export class TranslationChild {
           allPossiblySupportedTargetLanguages,
         },
       );
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
@@ -222,16 +180,18 @@ export class TranslationChild {
         defaultTargetLanguage,
         supportedTargetLanguagesGivenDefaultSourceLanguage,
       });
-      this.broadcastUpdatedTranslationStatus(
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATION_UNSUPPORTED,
       );
       return;
     }
 
-    this.broadcastUpdatedTranslationStatus(TranslationStatus.OFFER);
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+      TranslationStatus.OFFER,
+    );
   }
 
-  async doTranslation(aFrom, aTo) {
+  async doTranslation(from, to) {
     // If a TranslationDocument already exists for this document, it should
     // be used instead of creating a new one so that we can use the original
     // content of the page for the new translation instead of the newly
@@ -240,25 +200,36 @@ export class TranslationChild {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATING);
+    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+      TranslationStatus.TRANSLATING,
+    );
 
-    let translator = new BergamotTranslator(translationDocument, aFrom, aTo);
+    let translator = new BergamotTranslator(translationDocument, from, to);
 
     this.contentWindow.translationDocument = translationDocument;
-    translationDocument.translatedFrom = aFrom;
-    translationDocument.translatedTo = aTo;
+    translationDocument.translatedFrom = from;
+    translationDocument.translatedTo = to;
     translationDocument.translationError = false;
 
     try {
-      console.info("About to translate web page document", { aFrom, aTo });
+      console.info(
+        `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
+        { from, to },
+      );
       await translator.translate();
+
+      console.info(
+        `Translated web page document (${translationDocument.translationRoots.length} translation items)`,
+        { from, to },
+      );
+
       /*
       // TODO: Restore telemetry
       const translateResult = await translator.translate();
       result = {
         characterCount: translateResult.characterCount,
-        from: aFrom,
-        to: aTo,
+        from: from,
+        to: to,
       };
       // Record the number of characters translated.
       this.translationTelemetry.recordTranslation(
@@ -270,31 +241,18 @@ export class TranslationChild {
 
       console.info("Web page document translated. Showing translation...");
       translationDocument.showTranslation();
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.TRANSLATED);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATED,
+      );
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
-      this.broadcastUpdatedTranslationStatus(TranslationStatus.ERROR);
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.ERROR,
+      );
     }
 
     return;
-  }
-
-  showOriginalContent() {
-    /*
-    this.originalShown = true;
-    this.showURLBarIcon();
-    this.sendAsyncMessage("Translation:ShowOriginal");
-    this.translationTelemetry.recordShowOriginalContent();
-     */
-  }
-
-  showTranslatedContent() {
-    /*
-    this.originalShown = false;
-    this.showURLBarIcon();
-    this.sendAsyncMessage("Translation:ShowTranslation");
-     */
   }
 
   async getDocumentTranslationStatistics() {
@@ -310,14 +268,14 @@ export class TranslationChild {
       );
     };
 
-    let translationDocument =
+    const translationDocument: TranslationDocument =
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
-    let rootsList = translationDocument.roots;
+    const { translationRoots } = translationDocument;
 
-    const elements = translationDocument.roots.map(
-      translationItem => translationItem.nodeRef,
+    const elements = translationRoots.map(
+      translationRoot => translationRoot.nodeRef,
     );
     const elementsVisibleInViewport = await this.getElementsVisibleInViewport(
       elements,
@@ -326,10 +284,10 @@ export class TranslationChild {
     const texts = [];
     const textsInViewport = [];
     const textsVisibleInViewport = [];
-    for (let i = 0; i < rootsList.length; i++) {
-      let root = rootsList[i];
+    for (let i = 0; i < translationRoots.length; i++) {
+      let translationRoot = translationRoots[i];
 
-      let text = translationDocument.generateTextForItem(root);
+      let text = translationDocument.generateTextForItem(translationRoot);
       if (!text) {
         continue;
       }
@@ -339,13 +297,13 @@ export class TranslationChild {
 
       texts.push(text);
 
-      const inViewport = isElementInViewport(root.nodeRef);
+      const inViewport = isElementInViewport(translationRoot.nodeRef);
       if (inViewport) {
         textsInViewport.push(text);
       }
 
       const visibleInViewport = elementsVisibleInViewport.find(
-        el => el === root.nodeRef,
+        el => el === translationRoot.nodeRef,
       );
       if (visibleInViewport) {
         textsVisibleInViewport.push(text);
@@ -358,7 +316,14 @@ export class TranslationChild {
       .join(" ")
       .split(" ").length;
 
+    const translationRootsCount = translationRoots.length;
+    const simpleTranslationRootsCount = translationRoots.filter(
+      translationRoot => translationRoot.isSimleTranslationRoot,
+    );
+
     return {
+      translationRootsCount,
+      simpleTranslationRootsCount,
       texts,
       textsInViewport,
       textsVisibleInViewport,
@@ -368,9 +333,8 @@ export class TranslationChild {
     };
   }
 
-  async getElementsVisibleInViewport(elements: Element[]): Promise<Node[]> {
+  async getElementsVisibleInViewport(elements: HTMLElement[]): Promise<Node[]> {
     return new Promise(resolve => {
-      // Start observing for DOM elements that enter the viewport visibly
       let options = {
         threshold: 0.0,
       };
@@ -384,9 +348,6 @@ export class TranslationChild {
         resolve(elementsInViewport);
       };
 
-      console.info(
-        "Start observing for DOM elements that enter the viewport visibly",
-      );
       let observer = new IntersectionObserver(callback, options);
       elements.forEach(el => observer.observe(el));
     });

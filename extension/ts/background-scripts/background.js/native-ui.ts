@@ -1,17 +1,22 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "(extensionGlue)" }]*/
 
 import { initErrorReportingInBackgroundScript } from "../../shared-resources/ErrorReporting";
 import { browser as crossBrowser, Runtime } from "webextension-polyfill-ts";
-import { Store } from "./lib/Store";
-import { localStorageWrapper } from "./lib/localStorageWrapper";
 import Port = Runtime.Port;
-import { MobxKeystoneBackgroundContextHost } from "./lib/MobxKeystoneBackgroundContextHost";
+import { Store } from "./state-management/Store";
+import { localStorageWrapper } from "./state-management/localStorageWrapper";
+import { MobxKeystoneBackgroundContextHost } from "./state-management/MobxKeystoneBackgroundContextHost";
+import { createBackgroundContextRootStore } from "./state-management/createBackgroundContextRootStore";
+import { contentScriptBergamotApiClientPortListener } from "./contentScriptBergamotApiClientPortListener";
+import { contentScriptFrameInfoPortListener } from "./contentScriptFrameInfoPortListener";
+import { contentScriptLanguageDetectorProxyPortListener } from "./contentScriptLanguageDetectorProxyPortListener";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import { createBackgroundContextRootStore } from "./lib/createBackgroundContextRootStore";
-import { contentScriptBergamotApiClientPortListener } from "./lib/contentScriptBergamotApiClientPortListener";
-import { contentScriptFrameInfoPortListener } from "./lib/contentScriptFrameInfoPortListener";
-import { contentScriptLanguageDetectorProxyPortListener } from "./lib/contentScriptLanguageDetectorProxyPortListener";
-import { NativeTranslateUiBroker } from "./lib/NativeTranslateUiBroker";
+import { NativeTranslateUiBroker } from "./native-ui/NativeTranslateUiBroker";
+import { connectRootStoreToDevTools } from "./state-management/connectRootStoreToDevTools";
 const store = new Store(localStorageWrapper);
 
 /**
@@ -30,6 +35,15 @@ class ExtensionGlue {
   async init() {
     // Initiate the root extension state store
     this.extensionState = createBackgroundContextRootStore();
+
+    // Allow for easy introspection of extension state in development mode
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.REMOTE_DEV_SERVER_PORT
+    ) {
+      // noinspection ES6MissingAwait
+      connectRootStoreToDevTools(this.extensionState);
+    }
 
     // Make the root extension state store available to content script contexts
     const mobxKeystoneBackgroundContextHost = new MobxKeystoneBackgroundContextHost();
@@ -96,10 +110,22 @@ const runMigrations = async () => {
 
 // init the extension glue on every extension load
 async function onEveryExtensionLoad() {
-  // TODO: disable behind pref - incl pref listener to react to pref changes
-
   await extensionGlue.init();
   await runMigrations();
   await extensionGlue.start();
 }
 onEveryExtensionLoad().then();
+
+// Open and keep the test-runner open after each extension reload when in development mode
+if (process.env.NODE_ENV !== "production") {
+  (async () => {
+    const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
+      `test-runner/index.html`,
+    );
+    await crossBrowser.tabs.create({
+      url: extensionPageForTestsUrl,
+
+      active: false,
+    });
+  })();
+}

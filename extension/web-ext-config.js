@@ -2,6 +2,7 @@
 const path = require("path");
 
 const examplePagesToTranslate = [
+  "http://0.0.0.0:4000/es.wikipedia.org-2021-01-20-welcome-box.html",
   "https://es.wikipedia.org",
   "https://www.mozilla.org/",
   "https://www.mozilla.org/es-ES/",
@@ -9,8 +10,7 @@ const examplePagesToTranslate = [
   "https://www.mozilla.org/fi/",
 ];
 
-const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const { targetBrowser, ui } = require("./build-config.js");
 const sourceDir = path.join(".", "build", targetBrowser, ui);
 const artifactsDir = path.join(".", "dist", targetBrowser, ui);
 
@@ -42,7 +42,7 @@ if (targetBrowser === "firefox") {
     `about:devtools-toolbox?type=extension&id=${encodeURIComponent(
       extensionId,
     )}`,
-    "http://localhost:8181/",
+    `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
     ...examplePagesToTranslate,
     "about:debugging#/runtime/this-firefox",
   ];
@@ -52,17 +52,16 @@ if (targetBrowser === "firefox") {
     "extensions.experiments.enabled=true",
     // "browser.translation.ui.show=true",
     // "browser.translation.detectLanguage=true",
-    // "browser.translation.engine=Google",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
   defaultConfig.filename = `${extensionId}-{version}-firefox.xpi`;
 }
 
-if (targetBrowser === "chromium") {
+if (targetBrowser === "chrome") {
   defaultConfig.run.target = ["chromium"];
   defaultConfig.run.startUrl = [
     // "chrome://extensions", // Not available until https://github.com/mozilla/web-ext/issues/1979 is resolved
-    "http://localhost:8182/",
+    `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
     ...examplePagesToTranslate,
   ];
   defaultConfig.filename = `${extensionId}-{version}-chrome.zip`;

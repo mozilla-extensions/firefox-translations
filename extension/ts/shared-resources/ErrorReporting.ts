@@ -1,15 +1,19 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as Sentry from "@sentry/browser";
 import { Severity } from "@sentry/types";
 import { config } from "../config";
 import {
   ExtensionPreferences,
   Store,
-} from "../background-scripts/background.js/lib/Store";
+} from "../background-scripts/background.js/state-management/Store";
 import {
   communicateExtensionPreferenceChangesToContentScripts,
   subscribeToExtensionPreferenceChangesInBackgroundScript,
   subscribeToExtensionPreferenceChangesInContentScript,
-} from "./subscribeToExtensionPreferenceChanges";
+} from "./state-management/subscribeToExtensionPreferenceChanges";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { flatten } from "flat";

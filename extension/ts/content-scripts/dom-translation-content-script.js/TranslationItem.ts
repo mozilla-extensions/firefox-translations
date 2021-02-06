@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import { translationDocumentTarget } from "./TranslationDocument";
+
 /**
  * This class represents an item for translation. It's basically our
  * wrapper class around a node returned by getTranslationNode, with
@@ -36,24 +42,26 @@
  *  }
  */
 export class TranslationItem {
-  public isRoot = false;
-  public isSimpleRoot = false;
-  public nodeRef: Node | Element;
+  public isTranslationRoot = false;
+  public isSimleTranslationRoot = false;
+  public nodeRef: HTMLElement;
   public id;
   public readonly children;
   private translation;
+  private qeAnnotatedTranslation;
+  public original;
 
-  constructor(node: Node, id, isRoot: boolean) {
+  constructor(node: HTMLElement, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
     this.id = id;
-    this.isRoot = isRoot;
+    this.isTranslationRoot = isTranslationRoot;
     this.children = [];
   }
 
   toString() {
     let rootType = "";
-    if (this.isRoot) {
-      if (this.isSimpleRoot) {
+    if (this.isTranslationRoot) {
+      if (this.isSimleTranslationRoot) {
         rootType = " (simple root)";
       } else {
         rootType = " (non simple root)";
@@ -82,19 +90,33 @@ export class TranslationItem {
    * all items are finished. It remains stored too to allow back-and-forth
    * switching between the "Show Original" and "Show Translation" functions.
    *
-   * @param result    A string with the textual result received from the server,
-   *                  which can be plain-text or a serialized HTML doc.
+   * @param translation    A string with the textual result received from the server,
+   *                       which can be plain-text or a serialized HTML doc.
    */
-  parseResult(result) {
-    if (this.isSimpleRoot) {
-      this.translation = [result];
+  parseTranslationResult(translation) {
+    if (this.isSimleTranslationRoot) {
+      this.translation = [translation];
       return;
     }
 
     let domParser = new DOMParser();
 
-    let doc = domParser.parseFromString(result, "text/html");
-    parseResultNode(this, doc.body.firstChild);
+    let doc = domParser.parseFromString(translation, "text/html");
+    this.translation = [];
+    parseResultNode(this, doc.body.firstChild, this.translation);
+  }
+
+  /**
+   * Note: QE-annotated translation results are never plain text nodes, despite that
+   * the original translation item may be a simple translation root.
+   * This wreaks havoc.
+   * @param qeAnnotatedTranslation
+   */
+  parseQeAnnotatedTranslationResult(qeAnnotatedTranslation) {
+    let domParser = new DOMParser();
+    let doc = domParser.parseFromString(qeAnnotatedTranslation, "text/html");
+    this.qeAnnotatedTranslation = [];
+    parseResultNode(this, doc.body.firstChild, this.qeAnnotatedTranslation);
   }
 
   /**
@@ -116,11 +138,8 @@ export class TranslationItem {
   /**
    * Swap the text of this TranslationItem between
    * its original and translated states.
-   *
-   * @param target   A string that is either "translation"
-   *                 or "original".
    */
-  swapText(target) {
+  swapText(target: translationDocumentTarget) {
     swapTextForItem(this, target);
   }
 }
@@ -152,29 +171,32 @@ export const TranslationItem_NodePlaceholder = {
  *
  * For text nodes we simply add it as a string.
  */
-function parseResultNode(item, node) {
-  item.translation = [];
+function parseResultNode(
+  item,
+  node,
+  into: (Node | string | { toString(): string })[],
+) {
   for (let child of node.childNodes) {
-    if (child.nodeType == child.TEXT_NODE) {
-      item.translation.push(child.nodeValue);
-    } else if (child.localName == "br") {
-      item.translation.push(TranslationItem_NodePlaceholder);
-      /*
-       */
-    } else if (child.id == "QE-ANNOTATED") {
-      // A workaround to show translated text with Quality Estimate annotations
-      // inplace (i.e. in the same webpage replacing the original text) and
-      // enabling seemless switch between showing original and translated text
-      // back and forth.
-      item.translation.push(child);
-      /*
-       */
+    if (child.nodeType === Node.TEXT_NODE) {
+      into.push(child.nodeValue);
+    } else if (child.localName === "br") {
+      into.push(TranslationItem_NodePlaceholder);
+    } else if (
+      child.dataset &&
+      typeof child.dataset.translationQeScore !== "undefined"
+    ) {
+      // handle the special case of quality estimate annotated nodes
+      into.push(child);
     } else {
-      let translationItemChild = item.getChildById(child.id);
-
-      if (translationItemChild) {
-        item.translation.push(translationItemChild);
-        parseResultNode(translationItemChild, child);
+      let translationRootChild = item.getChildById(child.id);
+      if (translationRootChild) {
+        into.push(translationRootChild);
+        parseResultNode(translationRootChild, child, into);
+      } else {
+        console.info(
+          "Result node's child node lacks an associated translation root child",
+          { node, child },
+        );
       }
     }
   }
@@ -239,15 +261,13 @@ function parseResultNode(item, node) {
  *   yielding the final result:
  *
  *     <div><b>Tu</b> me <em>manques</em></div>
- *
- *
- * @param item     A TranslationItem object
- * @param target   A string that is either "translation"
- *                 or "original".
  */
-function swapTextForItem(item, target) {
+function swapTextForItem(
+  item: TranslationItem,
+  target: translationDocumentTarget,
+) {
   // visitStack is the stack of items that we still need to visit.
-  // Let's start the process by adding the root item.
+  // Let's start the process by adding the translation root item.
   let visitStack = [item];
 
   while (visitStack.length) {
@@ -280,7 +300,7 @@ function swapTextForItem(item, target) {
     // the content of one text node with another.
     //
     // curNode starts in the firstChild...
-    let curNode = domNode.firstChild;
+    let curNode: ChildNode = domNode.firstChild;
 
     // ... actually, let's make curNode start at the first useful node (either
     // a non-blank text node or something else). This is not strictly necessary,
@@ -315,8 +335,8 @@ function swapTextForItem(item, target) {
     // its original state).
     while (
       curNode &&
-      curNode.nodeType == curNode.TEXT_NODE &&
-      curNode.nodeValue.trim() == ""
+      curNode.nodeType === Node.TEXT_NODE &&
+      curNode.nodeValue.trim() === ""
     ) {
       curNode = curNode.nextSibling;
     }
@@ -335,12 +355,13 @@ function swapTextForItem(item, target) {
         // If the node is not in the expected position, let's reorder
         // it into position...
         if (
-          curNode != targetNode &&
+          curNode !== targetNode &&
           // ...unless the page has reparented this node under a totally
           // different node (or removed it). In this case, all bets are off
           // on being able to do anything correctly, so it's better not to
           // bring back the node to this parent.
-          targetNode.parentNode == domNode
+          // @ts-ignore
+          targetNode.parentNode === domNode
         ) {
           // We don't need to null-check curNode because insertBefore(..., null)
           // does what we need in that case: reorder this node to the end
@@ -366,8 +387,8 @@ function swapTextForItem(item, target) {
 
         while (
           curNode &&
-          (curNode.nodeType != curNode.TEXT_NODE ||
-            curNode.nodeValue.trim() == "")
+          (curNode.nodeType !== Node.TEXT_NODE ||
+            curNode.nodeValue.trim() === "")
         ) {
           curNode = curNode.nextSibling;
         }
@@ -375,7 +396,7 @@ function swapTextForItem(item, target) {
         // Finally, if it's a text item, we just need to find the next
         // text node to use. Text nodes don't need to be reordered, so
         // the first one found can be used.
-        while (curNode && curNode.nodeType != curNode.TEXT_NODE) {
+        while (curNode && curNode.nodeType !== Node.TEXT_NODE) {
           curNode = curNode.nextSibling;
         }
 
@@ -390,28 +411,30 @@ function swapTextForItem(item, target) {
           );
         }
 
-        /*
-         */
-        // A workaround to show translated text with Quality Estimate annotations
-        // inplace (i.e. in the same webpage replacing the original text) and
-        // enabling seemless switch between showing original and translated text
-        // back and forth.
-        if (target == "original") {
-          // A trailing and a leading space must be preserved because
-          // they are meaningful in HTML.
-          let preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
-          let endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
-          curNode.nodeValue = preSpace + targetItem + endSpace;
+        // A trailing and a leading space must be preserved because
+        // they are meaningful in HTML.
+        let preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
+        let endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
 
-          for (let node of curNode.parentNode.childNodes) {
-            if (node.id == "QE-ANNOTATED") {
+        curNode.nodeValue = preSpace + targetItem + endSpace;
+        if (["original", "translation"].includes(target)) {
+          // Workaround necessary when switching "back" from QE display
+          // since quality estimated annotated nodes
+          // replaced the simple text nodes of the original document
+          // @ts-ignore
+          for (let child of curNode.parentNode.childNodes) {
+            if (
+              child.dataset &&
+              typeof child.dataset.translationQeScore !== "undefined"
+            ) {
               // There should be only 1 such node. Remove the curNode from the
               // parent's children and replace the qe-annotated node with it to
               // maintain the right order in original DOM tree of the document.
               curNode = curNode.parentNode.removeChild(curNode);
-              node.parentNode.replaceChild(curNode, node);
+              child.parentNode.replaceChild(curNode, child);
             }
           }
+
           curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
         } else {
           let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
@@ -420,8 +443,6 @@ function swapTextForItem(item, target) {
           curNode.parentNode.replaceChild(targetItem, curNode);
           curNode = nextSibling;
         }
-        /*
-         */
       }
     }
 
@@ -440,8 +461,8 @@ function getNextSiblingSkippingEmptyTextNodes(startSibling) {
   let item = startSibling.nextSibling;
   while (
     item &&
-    item.nodeType == item.TEXT_NODE &&
-    item.nodeValue.trim() == ""
+    item.nodeType === Node.TEXT_NODE &&
+    item.nodeValue.trim() === ""
   ) {
     item = item.nextSibling;
   }
@@ -451,7 +472,7 @@ function getNextSiblingSkippingEmptyTextNodes(startSibling) {
 function clearRemainingNonEmptyTextNodesFromElement(startSibling) {
   let item = startSibling;
   while (item) {
-    if (item.nodeType == item.TEXT_NODE && item.nodeValue != "") {
+    if (item.nodeType === Node.TEXT_NODE && item.nodeValue !== "") {
       item.nodeValue = "";
     }
     item = item.nextSibling;

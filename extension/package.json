@@ -65,6 +65,7 @@
     "fixpack": "^2.3.1",
     "husky": "^4.3.0",
     "jshint": "^2.9.5",
+    "light-server": "^2.9.1",
     "lint-staged": "^10.5.1",
     "minimist": "^1.2.0",
     "mocha": "^5.2.0",
@@ -89,9 +90,10 @@
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.8.3",
     "typescript-json-schema": "^0.42.0",
-    "web-ext": "^4.3.0",
+    "web-ext": "^5.5.0",
     "webext-experiment-utils": "github:mozilla/webext-experiment-utils#v0.2.0",
     "webpack": "^4.1.0",
+    "webpack-bundle-analyzer": "^4.1.0",
     "webpack-cli": "^3.1.1",
     "yamljs": "^0.3.0"
   },
@@ -129,6 +131,11 @@
       "doctoc --title '**Contents**'",
       "git add"
     ],
+    "*.{html}": [
+      "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
+      "eslint --ext html",
+      "git add"
+    ],
     "*.{css,scss,json}": [
       "prettier --trailing-comma=all --ignore-path=.eslintignore --write",
       "git add"
@@ -137,14 +144,16 @@
   "private": true,
   "scripts": {
     "build:development": "webpack && web-ext build",
-    "build:production": "NODE_ENV=production webpack --mode=production && web-ext build",
-    "clean": "trash build/${TARGET_BROWSER}/",
+    "build:production": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=firefox UI=extension-ui web-ext build",
+    "build:production:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=chrome UI=extension-ui web-ext build",
+    "build:production:native-ui": "TARGET_BROWSER=firefox UI=native-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=firefox UI=native-ui web-ext build",
+    "clean": "trash build/${TARGET_BROWSER}/${UI}/",
     "clean:test": "trash test/build",
     "format": "npm-run-all -s -n format:prettier format:docs format:eslint format:tslint format:fixpack",
     "format:docs": "doctoc --title '**Contents**' docs/*.md && prettier '**/*.md' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:eslint": "npm run lint:eslint -- --fix",
     "format:fixpack": "fixpack",
-    "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm}' --trailing-comma=all --ignore-path=.eslintignore --write",
+    "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:tslint": "npm run lint:tslint -- --fix",
     "generate-manifest": "node generate-manifest.js",
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",
@@ -157,18 +166,17 @@
     "lint:tslint": "tslint -t stylish ts/**/*.ts ts/**/*.tsx",
     "lint:web-ext-lint": "web-ext lint",
     "prebuild:development": "npm-run-all clean generate-manifest",
-    "prebuild:production": "NODE_ENV=production npm-run-all clean generate-manifest",
-    "prestart": "npm run build:development",
+    "prebuild:production": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production npm-run-all clean generate-manifest",
+    "prebuild:production:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production npm-run-all clean generate-manifest",
+    "prebuild:production:native-ui": "TARGET_BROWSER=firefox UI=native-ui NODE_ENV=production npm-run-all clean generate-manifest",
     "pretest:unit:mocha": "NODE_ENV=test npx webpack --entry ./test/unit/all-tests.ts --output-path test/unit/build --output-filename all-tests.js --target node",
-    "remotedev": "remotedev --port=8181",
-    "remotedev:chrome": "remotedev --port=8182",
-    "start": "TARGET_BROWSER=firefox web-ext run",
-    "start:chrome": "TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 web-ext run -t chromium",
+    "serve-fixtures": "light-server -s test/fixtures/ -w \"test/fixtures/**\"",
     "test": "npm-run-all -n test:unit",
     "test:unit": "npm-run-all -n clean:test test:unit:mocha",
     "test:unit:mocha": "DOTENV_CONFIG_PATH=.env.development mocha -r source-map-support/register -r ./test/unit/browser-polyfills.ts -r dotenv/config --globals global test/unit/build/all-tests.js",
-    "watch": "TARGET_BROWSER=firefox npm-run-all build:development && TARGET_BROWSER=firefox concurrently 'webpack --watch' 'web-ext run'",
-    "watch:chrome": "TARGET_BROWSER=chrome npm-run-all build:development && TARGET_BROWSER=chrome REMOTE_DEV_SERVER_PORT=8182 concurrently 'webpack --watch' 'web-ext run -t chromium'",
+    "watch": "TARGET_BROWSER=firefox UI=extension-ui REMOTE_DEV_SERVER_PORT=8181 npm-run-all build:development && TARGET_BROWSER=firefox UI=extension-ui REMOTE_DEV_SERVER_PORT=8181 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8181' 'yarn serve-fixtures'",
+    "watch:chrome": "TARGET_BROWSER=chrome UI=extension-ui REMOTE_DEV_SERVER_PORT=8182 npm-run-all build:development && TARGET_BROWSER=chrome UI=extension-ui REMOTE_DEV_SERVER_PORT=8182 concurrently 'webpack --watch' 'web-ext run -t chromium' 'remotedev --port=8182' 'yarn serve-fixtures'",
+    "watch:native-ui": "TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 npm-run-all build:development && TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8183' 'yarn serve-fixtures'",
     "webpack:stats": "webpack --profile --json --mode=production > stats.json"
   }
 }

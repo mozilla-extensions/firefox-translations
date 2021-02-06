@@ -18,7 +18,6 @@ export class Translator {
     const nbestTranslations = this.bergamotApiClient.parseNbestTranslationsFromResponse(
       translationResults,
     );
-    console.log({ nbestTranslations });
     return nbestTranslations[0];
   }
 }

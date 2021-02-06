@@ -1,4 +1,8 @@
-import { FrameInfo } from "../../../shared-resources/bergamot.types";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import { FrameInfo } from "../../shared-resources/types/bergamot.types";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 

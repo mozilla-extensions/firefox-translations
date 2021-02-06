@@ -3,44 +3,44 @@
 
 **Contents**
 
-- [Developing this add-on](#developing-this-add-on)
-  - [Get started](#get-started)
+- [Developing this extension](#developing-this-extension)
+  - [First time setup](#first-time-setup)
   - [Creating build artifacts](#creating-build-artifacts)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
-  - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Troubleshooting](#troubleshooting)
+  - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
+  - [Opening up specific extension pages](#opening-up-specific-extension-pages)
+  - [Enabling error reporting via Sentry](#enabling-error-reporting-via-sentry)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Developing this add-on
+# Developing this extension
 
-## Get started
+The commands in these instructions are meant to be run in the `extension/` folder in this repo.
 
-```
+## First time setup
+
+1. Install dependencies using [yarn](https://yarnpkg.com/getting-started/install):
+
+```bash
 yarn install
+```
+
+2. Initialize the build-specific configuration files:
+
+```bash
 cp .env.example .env.development
 cp .env.example .env.production
-```
-
-Configure `.env.development` and `.env.production` with values as per https://docs.sentry.io/cli/configuration/.
-
-Hint: You can verify that the Sentry configuration is working using:
-
-```
-cp .env.development .env
-npx sentry-cli info
-cp .env.production .env
-npx sentry-cli info
 ```
 
 ## Creating build artifacts
 
 To build for Firefox:
 
-```
+```bash
 yarn build:production
 ```
 
@@ -48,58 +48,84 @@ The build artifact will be created under `dist/firefox/extension-ui`.
 
 For Chrome:
 
-```
-TARGET_BROWSER=chrome yarn build:production
+```bash
+yarn build:production:chrome
 ```
 
 The build artifact will be created under `dist/chrome/extension-ui`.
 
 To build the Firefox native UI variant:
 
-```
-UI=native-ui yarn build:production
+```bash
+yarn build:production:native-ui
 ```
 
 The build artifact will be created under `dist/firefox/native-ui`.
 
 ## Development mode
 
-To build for, launch the browser, install the extension and start Webpack in watch mode.
+This will build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
+
+If you haven't already, download and install [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/) before running the below commands.
 
 Note that you also temporarily need a REST server running locally. See [INSTALL.md](./INSTALL.md).
 
 ### Firefox
 
-First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8181)) in a separate terminal session:
-
-```
-yarn remotedev
-```
-
-Then:
-
-```
+```bash
 yarn watch
 ```
 
 Or, for the Firefox native UI variant:
 
-```
-UI=native-ui yarn watch
+```bash
+yarn watch:native-ui
 ```
 
 ### Chrome
 
-First launch the remote dev server (enables the state management dev tools at [http://localhost:8182](http://localhost:8182)) in a separate terminal session:
-
-```
-yarn remotedev:chrome
-```
-
-Then:
-
-```
+```bash
 yarn watch:chrome
+```
+
+## Creating a signed build of the extension for self-distribution
+
+After version bumping and setting the API_KEY and API_SECRET env vars:
+
+```bash
+yarn build:production && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
+```
+
+Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
+
+## Troubleshooting
+
+1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
+2. Click Console
+
+To clear the current output, click the Trash can icon in the top left.
+
+## Analyze webpack bundle size
+
+Firefox:
+
+```bash
+yarn build:production
+npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
+```
+
+Chrome:
+
+```bash
+yarn build:production:chrome
+npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
+```
+
+Firefox native UI variant:
+
+```bash
+yarn build:production:native-ui
+npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
 ```
 
 ## Opening up specific extension pages
@@ -130,19 +156,15 @@ From the background context:
 );
 ```
 
-## Creating a signed build of the extension for self-distribution
+## Enabling error reporting via Sentry
 
-After version bumping and setting the API_KEY and API_SECRET env vars:
+Configure `.env.development` and `.env.production` with values as per https://docs.sentry.io/cli/configuration/.
 
+Hint: You can verify that the Sentry configuration is working using:
+
+```bash
+cp .env.development .env
+npx sentry-cli info
+cp .env.production .env
+npx sentry-cli info
 ```
-yarn build:production && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
-```
-
-Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
-
-## Troubleshooting
-
-1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
-2. Click Console
-
-To clear the current output, click the Trash can icon in the top left.

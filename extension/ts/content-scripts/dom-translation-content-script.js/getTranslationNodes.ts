@@ -1,44 +1,29 @@
-interface TranslationNode {
-  content: Node;
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import { hasTextForTranslation } from "./hasTextForTranslation";
+
+export interface TranslationNode {
+  content: HTMLElement;
   isTranslationRoot: boolean;
 }
 
-interface NodeListInterface {
-  translationNodes: TranslationNode[];
-  length: number;
-  item: (i) => Node;
-  isTranslationRootAtIndex: (i) => boolean;
-}
-
-class NodeList implements NodeListInterface {
-  public readonly translationNodes: TranslationNode[];
-  constructor(translationNodes) {
-    this.translationNodes = translationNodes;
-  }
-  get length() {
-    return this.translationNodes.length;
-  }
-  item(i) {
-    return this.translationNodes[i].content;
-  }
-  isTranslationRootAtIndex(i) {
-    return this.translationNodes[i].isTranslationRoot;
-  }
-}
-
-export const getTranslationNodes = (rootElement: Element): NodeList => {
+export const getTranslationNodes = (
+  rootElement: Element,
+): TranslationNode[] => {
   const translationNodesMap = new Map();
 
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
 
-  // Query child elements in order to explicitly skip the root tag from being a translation node
-  const childElements: HTMLCollectionOf<Element> = rootElement.getElementsByTagName(
-    "*",
+  // Query child elements in order to explicitly skip the root element from being a translation node
+  const childElements = <HTMLCollectionOf<HTMLElement>>(
+    rootElement.getElementsByTagName("*")
   );
 
   for (let i = 0; i < limit && i < childElements.length; i++) {
-    const content: Element = childElements[i];
+    const content: HTMLElement = childElements[i];
     if (content.tagName === "html") {
       continue;
     }
@@ -68,8 +53,8 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
     ) {
       // console.log({child});
       if (
-        child.nodeType ===
-        Node.TEXT_NODE /* && child->GetAsText()->HasTextForTranslation() */
+        child.nodeType === Node.TEXT_NODE &&
+        hasTextForTranslation(child.textContent)
       ) {
         // TODO: Verify this assumption from C to JS:
         /*
@@ -101,5 +86,5 @@ export const getTranslationNodes = (rootElement: Element): NodeList => {
     }
   }
 
-  return new NodeList(translationNodes);
+  return translationNodes;
 };

@@ -1,20 +1,17 @@
-import { initErrorReportingInContentScript } from "../../shared-resources//ErrorReporting";
-
+import { initErrorReportingInContentScript } from "../../shared-resources/ErrorReporting";
 import "typeface-inter";
-import "../../shared-resources//tailwind.css";
-
+import "../../shared-resources/tailwind.css";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { HashRouter as Router } from "react-router-dom";
-
-import { ErrorBoundary } from "../../shared-resources/ErrorBoundary";
+import { Provider } from "mobx-react";
 import { App } from "./App";
 import { DisplayError } from "./DisplayError";
-import { subscribeToExtensionState } from "../../shared-resources/subscribeToExtensionState";
+import { ErrorBoundary } from "../../shared-resources/ErrorBoundary";
+import { subscribeToExtensionState } from "../../shared-resources/state-management/subscribeToExtensionState";
+import { getCurrentTab } from "../../shared-resources/getCurrentTab";
 import { ExtensionState } from "../../shared-resources/models/ExtensionState";
-import { Provider } from "mobx-react";
 import { DocumentTranslationState } from "../../shared-resources/models/DocumentTranslationState";
-import { getCurrentTab } from "../../background-scripts/background.js/lib/getCurrentTab";
 import { TranslateOwnTextTranslationState } from "../../shared-resources/models/TranslateOwnTextTranslationState";
 
 // Workaround for https://github.com/xaviergonz/mobx-keystone/issues/183
@@ -47,15 +44,15 @@ const init = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("tabId")) {
       tabId = parseInt(urlParams.get("tabId"), 10);
-      console.log("Using tabId from URL");
+      console.debug("Using tabId from URL");
     }
     if (urlParams.get("initialText")) {
       initialText = urlParams.get("initialText");
-      console.log("Using initialText from URL");
+      console.debug("Using initialText from URL");
     }
     if (urlParams.get("standalone")) {
       standalone = true;
-      console.log("Using standalone from URL");
+      console.debug("Using standalone from URL");
     }
   }
   const mainInterfaceInitialProps = {

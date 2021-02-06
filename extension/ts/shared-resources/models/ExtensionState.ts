@@ -1,17 +1,19 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import {
   applyPatches,
   Model,
   model,
   modelAction,
   Patch,
-  prop,
   prop_mapObject,
 } from "mobx-keystone";
 import { DocumentTranslationState } from "./DocumentTranslationState";
 import { FragmentTranslationState } from "./FragmentTranslationState";
 import { TranslateOwnTextTranslationState } from "./TranslateOwnTextTranslationState";
-import { computed } from "mobx";
-import { FrameInfo } from "../bergamot.types";
+import { FrameInfo } from "../types/bergamot.types";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;

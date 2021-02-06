@@ -1,8 +1,11 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import {
   ActionTrackingResult,
-  applySerializedActionAndSyncNewModelIds,
   applySerializedActionAndTrackNewModelIds,
   getSnapshot,
   ModelAutoTypeCheckingMode,
@@ -130,7 +133,7 @@ export class MobxKeystoneBackgroundContextHost {
       );
       serializedActionCallToReplicate = applyActionResult.serializedActionCall;
     } catch (err) {
-      console.error("error applying action to server:", err);
+      console.error("Error applying action to server:", err);
     }
     if (serializedActionCallToReplicate) {
       this.propagateActionToContentScripts(serializedActionCallToReplicate);

@@ -2,18 +2,35 @@
 
 const path = require("path");
 
+const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
-const targetBrowser = process.env.TARGET_BROWSER || "firefox";
-const ui = process.env.UI === "native-ui" ? "native-ui" : "extension-ui";
+const { targetBrowser, ui } = require("./build-config.js");
 const destPath = path.join(__dirname, "build", targetBrowser, ui);
 
 const dotEnvPath =
   process.env.NODE_ENV === "production"
     ? "./.env.production"
     : "./.env.development";
+
+// Set entry points based on build variant
+const entry = {
+  background: `./ts/background-scripts/background.js/${ui}.ts`,
+  "dom-translation-content-script":
+    "./ts/content-scripts/dom-translation-content-script.js/index.ts",
+};
+if (ui === "extension-ui") {
+  entry["options-ui"] = "./ts/extension-ui/options-ui.js/index.tsx";
+  entry["get-started"] = "./ts/extension-ui/get-started.js/index.tsx";
+  entry["main-interface"] = "./ts/extension-ui/main-interface.js/index.tsx";
+}
+if (process.env.NODE_ENV !== "production") {
+  entry.tests = "./ts/tests.js/index.ts";
+}
 
 // Make env vars available in the current scope
 require("dotenv").config({ path: dotEnvPath });
@@ -23,15 +40,31 @@ const fs = require("fs");
 fs.createReadStream(dotEnvPath).pipe(fs.createWriteStream("./.env"));
 
 const plugins = [
-  // Make env vars available in the scope of webpack plugins/loaders
+  // Make .env vars available in the scope of webpack plugins/loaders and the build itself
   new Dotenv({
     path: dotEnvPath,
+    safe: true,
   }),
   // Copy non-webpack-monitored files under "src" to the build directory
   new CopyPlugin({
     patterns: [{ from: "src", to: destPath }],
   }),
 ];
+
+//
+if (process.env.NODE_ENV === "production") {
+  // Generate a stats file associated with each build
+  plugins.push(
+    new BundleAnalyzerPlugin({
+      analyzerMode: "disabled",
+      generateStatsFile: true,
+      statsFilename: `../${ui}.stats.json`,
+    }),
+  );
+} else {
+  // Make the remote dev server port environment variable available
+  plugins.push(new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]));
+}
 
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
 if (
@@ -47,15 +80,7 @@ if (
 }
 
 module.exports = {
-  entry: {
-    background: `./ts/background-scripts/background.js/${ui}.ts`,
-    "dom-translation-content-script":
-      "./ts/content-scripts/dom-translation-content-script.js/index.ts",
-    "get-started": "./ts/extension-ui/get-started.js/index.tsx",
-    "main-interface": "./ts/extension-ui/main-interface.js/index.tsx",
-    "options-ui": "./ts/extension-ui/options-ui.js/index.tsx",
-    tests: "./ts/tests.js/index.ts",
-  },
+  entry,
   output: {
     path: destPath,
     filename: "[name].js",
@@ -113,4 +138,15 @@ module.exports = {
   plugins,
   mode: "development",
   devtool: "source-map",
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          name: "commons",
+          chunks: "initial",
+          minChunks: 2,
+        },
+      },
+    },
+  },
 };

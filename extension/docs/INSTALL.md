@@ -43,7 +43,7 @@ A pre-compiled native binary is only available for Mac OSX. For Windows and Linu
 
 ### Mac OSX
 
-```
+```bash
 git clone https://github.com/browsermt/macos-server.git
 cd macos-server
 ./server/rest-server -c inboundModel/config.yml -p 8787 --log-level debug -w 5000
@@ -51,7 +51,7 @@ cd macos-server
 
 ### Linux
 
-```
+```bash
 git clone https://github.com/browsermt/macos-server.git
 cd macos-server
 docker run --rm -p 8787:8787 -v "$PWD/inboundModel":/opt/app/marian/model mariannmt/marian-rest-server /opt/app/marian/bin/rest-server -c model/config.yml -p 8787 --log-level debug -w 5000
@@ -59,7 +59,7 @@ docker run --rm -p 8787:8787 -v "$PWD/inboundModel":/opt/app/marian/model marian
 
 ### Windows
 
-```
+```bash
 git clone https://github.com/browsermt/macos-server.git
 cd macos-server
 docker run --rm -p 8787:8787 -v %cd%/inboundModel:/opt/app/marian/model mariannmt/marian-rest-server /opt/app/marian/bin/rest-server -c model/config.yml -p 8787 --log-level debug -w 5000

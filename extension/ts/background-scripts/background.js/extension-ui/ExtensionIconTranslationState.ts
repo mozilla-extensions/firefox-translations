@@ -1,7 +1,11 @@
-import { DynamicActionIcon } from "./DynamicActionIcon";
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import { browser } from "webextension-polyfill-ts";
-import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
+import { DynamicActionIcon } from "./DynamicActionIcon";
 import { ModelInstanceData, onSnapshot } from "mobx-keystone";
+import { ExtensionState } from "../../../shared-resources/models/ExtensionState";
 import { DocumentTranslationState } from "../../../shared-resources/models/DocumentTranslationState";
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 
@@ -21,9 +25,7 @@ export class ExtensionIconTranslationState {
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
       async (documentTranslationStates, previousDocumentTranslationStates) => {
-        console.log("documentTranslationStates snapshot HAS CHANGED", {
-          documentTranslationStates,
-        });
+        // console.log("documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
@@ -33,7 +35,6 @@ export class ExtensionIconTranslationState {
             (dts: ModelInstanceData<DocumentTranslationState>) =>
               dts.frameId === 0,
           );
-        console.log(Object.keys(documentTranslationStates));
 
         for (const dts of tabTopFrameStates) {
           const { tabId } = dts;

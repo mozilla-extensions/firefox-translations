@@ -2,13 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
-import { getTranslationNodes } from "./getTranslationNodes";
+import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import {
   TranslationItem,
   TranslationItem_NodePlaceholder,
 } from "./TranslationItem";
+
+export type translationDocumentTarget =
+  | "translation"
+  | "qeAnnotatedTranslation"
+  | "original";
 
 /**
  * This class represents a document that is being translated,
@@ -23,19 +26,20 @@ export class TranslationDocument {
   public translatedFrom = "";
   public translatedTo = "";
   public translationError = false;
-  private originalShown = true;
-  private itemsMap;
-  public readonly roots: TranslationItem[];
+  public originalShown = true;
+  public qualityEstimationShown = true;
+  private nodeTranslationItemsMap: Map<Node, TranslationItem>;
+  public readonly translationRoots: TranslationItem[];
 
   constructor(document: Document) {
-    this.itemsMap = new Map();
-    this.roots = [];
+    this.nodeTranslationItemsMap = new Map();
+    this.translationRoots = [];
     this._init(document);
   }
 
   /**
    * Initializes the object and populates
-   * the roots lists.
+   * the translation roots lists.
    *
    * @param document  The document to be translated
    */
@@ -44,26 +48,30 @@ export class TranslationDocument {
     // a translation node is a node from the document which
     // contains useful content for translation, and therefore
     // must be included in the translation process.
-    const nodeList = getTranslationNodes(document.body);
-    // console.debug({ nodeList });
+    const translationNodes: TranslationNode[] = getTranslationNodes(
+      document.body,
+    );
+    console.info(
+      `The document has a total of ${
+        translationNodes.length
+      } translation nodes, of which ${
+        translationNodes.filter(tn => tn.isTranslationRoot).length
+      } are translation roots`,
+    );
 
-    const length = nodeList.length;
-    // console.debug({ length });
-
-    for (let i = 0; i < length; i++) {
-      let node = nodeList.item(i);
-      let isRoot = nodeList.isTranslationRootAtIndex(i);
+    translationNodes.forEach((translationNode, index) => {
+      const { content, isTranslationRoot } = translationNode;
 
       // Create a TranslationItem object for this node.
-      // This function will also add it to the this.roots array.
-      this._createItemForNode(node, i, isRoot);
-    }
+      // This function will also add it to the this.translationRoots array.
+      this._createItemForNode(content, index, isTranslationRoot);
+    });
 
-    // At first all roots are stored in the roots list, and only after
-    // the process has finished we're able to determine which roots are
+    // At first all translation roots are stored in the translation roots list, and only after
+    // the process has finished we're able to determine which translation roots are
     // simple, and which ones are not.
 
-    // A simple root is defined by a root with no children items, which
+    // A simple root is defined by a translation root with no children items, which
     // basically represents an element from a page with only text content
     // inside.
 
@@ -71,57 +79,47 @@ export class TranslationDocument {
     // simple root as plain-text in the translation process and with that
     // we are able to reduce their data payload sent to the translation service.
 
-    for (let root of this.roots) {
+    for (let translationRoot of this.translationRoots) {
       if (
-        !root.children.length &&
-        root.nodeRef instanceof Element &&
-        root.nodeRef.childElementCount == 0
+        !translationRoot.children.length &&
+        translationRoot.nodeRef instanceof Element &&
+        translationRoot.nodeRef.childElementCount == 0
       ) {
-        root.isSimpleRoot = true;
+        translationRoot.isSimleTranslationRoot = true;
       }
     }
   }
-
-  /*
-   */
-  getOwnerDocument() {
-    for (let root of this.roots) {
-      if (root.nodeRef.ownerDocument) {
-        return root.nodeRef.ownerDocument;
-      }
-    }
-  }
-  /*
-   */
 
   /**
    * Creates a TranslationItem object, which should be called
    * for each node returned by getTranslationNodes.
    *
-   * @param node        The DOM node for this item.
-   * @param id          A unique, numeric id for this item.
-   * @param isRoot      A boolean saying whether this item is a root.
+   * @param node                The DOM node for this item.
+   * @param id                  A unique, numeric id for this item.
+   * @param isTranslationRoot   A boolean saying whether this item is a translation root.
    *
    * @returns           A TranslationItem object.
    */
-  _createItemForNode(node, id, isRoot: boolean): TranslationItem {
-    if (this.itemsMap.has(node)) {
-      return this.itemsMap.get(node);
+  _createItemForNode(node, id, isTranslationRoot: boolean): TranslationItem {
+    if (this.nodeTranslationItemsMap.has(node)) {
+      return this.nodeTranslationItemsMap.get(node);
     }
 
-    let item = new TranslationItem(node, id, isRoot);
+    let item = new TranslationItem(node, id, isTranslationRoot);
 
-    if (isRoot) {
-      // Root items do not have a parent item.
-      this.roots.push(item);
+    if (isTranslationRoot) {
+      // Translation root items do not have a parent item.
+      this.translationRoots.push(item);
     } else {
-      let parentItem = this.itemsMap.get(node.parentNode);
+      let parentItem: TranslationItem = this.nodeTranslationItemsMap.get(
+        node.parentNode,
+      );
       if (parentItem) {
         parentItem.children.push(item);
       }
     }
 
-    this.itemsMap.set(node, item);
+    this.nodeTranslationItemsMap.set(node, item);
     return item;
   }
 
@@ -139,12 +137,12 @@ export class TranslationDocument {
    *
    * @returns        A string representation of the TranslationItem.
    */
-  generateTextForItem(item: TranslationItem & { original?: any }): string {
+  generateTextForItem(item: TranslationItem): string {
     if (item.original) {
       return regenerateTextFromOriginalHelper(item);
     }
 
-    if (item.isSimpleRoot) {
+    if (item.isSimleTranslationRoot) {
       let text = item.nodeRef.firstChild.nodeValue.trim();
       item.original = [text];
       return text;
@@ -155,9 +153,9 @@ export class TranslationDocument {
     let wasLastItemPlaceholder = false;
 
     for (let child of Array.from(item.nodeRef.childNodes)) {
-      if (child.nodeType == child.TEXT_NODE) {
+      if (child.nodeType === child.TEXT_NODE) {
         let x = child.nodeValue.trim();
-        if (x != "") {
+        if (x !== "") {
           item.original.push(x);
           str += x;
           wasLastItemPlaceholder = false;
@@ -165,20 +163,20 @@ export class TranslationDocument {
         continue;
       }
 
-      let objInMap = this.itemsMap.get(child);
-      if (objInMap && !objInMap.isRoot) {
-        // If this childNode is present in the itemsMap, it means
+      let objInMap = this.nodeTranslationItemsMap.get(child);
+      if (objInMap && !objInMap.isTranslationRoot) {
+        // If this childNode is present in the nodeTranslationItemsMap, it means
         // it's a translation node: it has useful content for translation.
         // In this case, we need to stringify this node.
-        // However, if this item is a root, we should skip it here in this
+        // However, if this item is a translation root, we should skip it here in this
         // object's child list (and just add a placeholder for it), because
-        // it will be stringfied separately for being a root.
+        // it will be stringfied separately for being a translation root.
         item.original.push(objInMap);
         str += this.generateTextForItem(objInMap);
         wasLastItemPlaceholder = false;
       } else if (!wasLastItemPlaceholder) {
         // Otherwise, if this node doesn't contain any useful content,
-        // or if it is a root itself, we can replace it with a placeholder node.
+        // or if it is a translation root itself, we can replace it with a placeholder node.
         // We can't simply eliminate this node from our string representation
         // because that could change the HTML structure (e.g., it would
         // probably merge two separate text nodes).
@@ -199,6 +197,7 @@ export class TranslationDocument {
    */
   showTranslation() {
     this.originalShown = false;
+    this.qualityEstimationShown = false;
     this._swapDocumentContent("translation");
   }
 
@@ -208,19 +207,41 @@ export class TranslationDocument {
    */
   showOriginal() {
     this.originalShown = true;
+    this.qualityEstimationShown = false;
     this._swapDocumentContent("original");
+    // TranslationTelemetry.recordShowOriginalContent();
+  }
+
+  /**
+   * Changes the document to display the translation with quality estimation metadata
+   * content.
+   */
+  showQualityEstimation() {
+    this.originalShown = false;
+    this.qualityEstimationShown = true;
+    this._swapDocumentContent("qeAnnotatedTranslation");
   }
 
   /**
    * Swap the document with the resulting translation,
    * or back with the original content.
-   *
-   * @param target   A string that is either "translation"
-   *                 or "original".
    */
-  _swapDocumentContent(target: "translation" | "original") {
+  _swapDocumentContent(target: translationDocumentTarget) {
     (async () => {
-      this.roots.forEach(root => root.swapText(target));
+      this.translationRoots.forEach(translationRoot =>
+        translationRoot.swapText(target),
+      );
+      // TODO: Make sure that the above does not lock the main event loop
+      /*
+      // Let the event loop breath on every 100 nodes
+      // that are replaced.
+      const YIELD_INTERVAL = 100;
+      await Async.yieldingForEach(
+        this.roots,
+        root => root.swapText(target),
+        YIELD_INTERVAL
+      );
+      */
     })();
   }
 }
@@ -233,11 +254,11 @@ export class TranslationDocument {
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-function generateTranslationHtmlForItem(
+export function generateTranslationHtmlForItem(
   item: TranslationItem,
   content,
 ): string {
-  let localName = item.isRoot ? "div" : "b";
+  let localName = item.isTranslationRoot ? "div" : "b";
   return (
     "<" + localName + " id=n" + item.id + ">" + content + "</" + localName + ">"
   );
@@ -253,9 +274,9 @@ function generateTranslationHtmlForItem(
  * @returns        A string representation of the TranslationItem.
  */
 function regenerateTextFromOriginalHelper(
-  item: TranslationItem & { original?: any },
+  item: TranslationItem & { original: any },
 ) {
-  if (item.isSimpleRoot) {
+  if (item.isSimleTranslationRoot) {
     return item.original[0];
   }
 

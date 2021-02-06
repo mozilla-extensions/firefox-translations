@@ -17,7 +17,6 @@ import { ExtensionState } from "../../../shared-resources/models/ExtensionState"
 import { DocumentTranslationState } from "../../../shared-resources/models/DocumentTranslationState";
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 import { ActionItem, ActionItems } from "../components/ActionItems/ActionItems";
-import { DetectedLanguageResults } from "../../../shared-resources/bergamot.types";
 import { ReactNode } from "react";
 import { MainInterfaceInitialProps } from "../index";
 

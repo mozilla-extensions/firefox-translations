@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MouseEvent } from "react";
-import { GeneralErrorMessage } from "../../shared-resources//GeneralErrorMessage";
+import { GeneralErrorMessage } from "../../shared-resources/GeneralErrorMessage";
 
 export class DisplayError extends React.Component<
   {
