@@ -119,6 +119,7 @@ export class TranslationItem {
     let domParser = new DOMParser();
 
     let doc = domParser.parseFromString(translatedString, "text/html");
+    this.translation = [];
     parseResultNode(this, doc.body.firstChild, "translation");
   }
 
@@ -126,14 +127,15 @@ export class TranslationItem {
    * Note: QE-annotated translation results are never plain text nodes, despite that
    * the original translation item may be a simple translation root.
    * This wreaks havoc.
-   * @param qeAnnotatedTranslation
+   * @param qeAnnotatedTranslatedString
    */
-  parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedString) {
+  parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedString: string) {
     let domParser = new DOMParser();
     let doc = domParser.parseFromString(
       qeAnnotatedTranslatedString,
       "text/html",
     );
+    this.qeAnnotatedTranslation = [];
     parseResultNode(this, doc.body.firstChild, "qeAnnotatedTranslation");
   }
 
@@ -144,7 +146,7 @@ export class TranslationItem {
    * @returns         A TranslationItem with the given id, or null if
    *                  it was not found.
    */
-  getChildById(id) {
+  getChildById(id: string) {
     for (let child of this.children) {
       if ("n" + child.id === id) {
         return child;
@@ -189,12 +191,14 @@ export const TranslationItem_NodePlaceholder = {
  *
  * For text nodes we simply add it as a string.
  */
-function parseResultNode(item, node, target: TranslationDocumentTarget) {
+function parseResultNode(
+  item: TranslationItem,
+  node: Node,
+  target: TranslationDocumentTarget,
+) {
   try {
-    if (!item[target]) {
-      item[target] = [];
-    }
     const into = item[target];
+    // @ts-ignore
     for (let child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
         into.push(child.nodeValue);
