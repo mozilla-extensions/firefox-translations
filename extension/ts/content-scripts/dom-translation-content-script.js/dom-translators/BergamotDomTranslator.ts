@@ -89,10 +89,6 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       const translationRequestData: TranslationRequestData =
         domTranslationChunk.translationRequestData;
 
-      translationRequestData.stringsToTranslate = stripTagsFromTexts(
-        translationRequestData.stringsToTranslate,
-      );
-
       let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
         translationRequestData,
         this.sourceLanguage,
@@ -222,22 +218,6 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       lastIndex: 0,
     };
   }
-}
-
-export function stripTagsFromTexts(texts: string[]): string[] {
-  return texts.map(text => {
-    // The next line is a hack to delay dealing with the problem of
-    //               <b>Do not</b> touch.
-    // being translated to something like
-    //           <b>Ne</b> touche <b>pas</b>.
-    // The server can only deal with pure text. The client has no
-    // knowledge of semantics. So it can not remove the tags and
-    // replace them as it doesn't know how to insert them in to
-    // the translated result. So as a hack we just remove the
-    // tags and hope the formatting is not too bad.
-    text = text.replace(/<[^>]*>?/gm, " ");
-    return text;
-  });
 }
 
 /**

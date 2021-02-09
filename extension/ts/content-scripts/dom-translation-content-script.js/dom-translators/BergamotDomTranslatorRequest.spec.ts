@@ -5,7 +5,6 @@
 import { assert } from "chai";
 import { TestDomTranslator } from "./TestDomTranslator";
 import { TranslationDocument } from "../TranslationDocument";
-import { stripTagsFromTexts } from "./BergamotDomTranslator";
 import { TranslationRequestData } from "./BaseDomTranslator";
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 import { BergamotApiClient } from "../../../background-scripts/background.js/lib/BergamotApiClient";
@@ -54,9 +53,6 @@ describe(testSuiteName, function() {
     const translationRequestData: TranslationRequestData = {
       stringsToTranslate: testSourceLanguageTexts,
     };
-    translationRequestData.stringsToTranslate = stripTagsFromTexts(
-      translationRequestData.stringsToTranslate,
-    );
 
     let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
       translationRequestData,

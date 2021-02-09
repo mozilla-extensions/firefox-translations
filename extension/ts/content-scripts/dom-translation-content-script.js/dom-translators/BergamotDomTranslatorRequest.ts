@@ -47,10 +47,28 @@ export class BergamotDomTranslatorRequest {
   async fireRequest(
     bergamotApiClient: ContentScriptBergamotApiClient | BergamotApiClient,
   ): Promise<TranslationResponseData> {
-    const results = await bergamotApiClient.sendTranslationRequest(
+    // The server can only deal with pure text, so we strip tags from the
+    // strings to translate
+    const plainStringsToTranslate = this.stripTagsFromTexts(
       this.translationRequestData.stringsToTranslate,
     );
-    return this.parseResults(results);
+
+    const results = await bergamotApiClient.sendTranslationRequest(
+      plainStringsToTranslate,
+    );
+
+    const translationResponseData: TranslationResponseData = this.parseResults(
+      results,
+    );
+
+    return translationResponseData;
+  }
+
+  stripTagsFromTexts(texts: string[]): string[] {
+    return texts.map(text => {
+      text = text.replace(/<[^>]*>?/gm, " ");
+      return text;
+    });
   }
 
   parseResults(
