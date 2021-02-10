@@ -163,10 +163,15 @@ export class TranslationDocument {
 
     for (let child of Array.from(item.nodeRef.childNodes)) {
       if (child.nodeType === child.TEXT_NODE) {
-        let x = child.nodeValue.trim();
-        if (x !== "") {
-          item.original.push(x);
-          str += x;
+        let x = child.nodeValue;
+        const hasLeadingWhitespace = x.length !== x.trimStart().length;
+        const hasTrailingWhitespace = x.length !== x.trimEnd().length;
+        if (x.trim() !== "") {
+          const xWithNormalizedWhitespace = `${
+            hasLeadingWhitespace ? " " : ""
+          }${x.trim()}${hasTrailingWhitespace ? " " : ""}`;
+          item.original.push(xWithNormalizedWhitespace);
+          str += xWithNormalizedWhitespace;
           wasLastItemPlaceholder = false;
         }
         continue;

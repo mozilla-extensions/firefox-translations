@@ -148,7 +148,8 @@ export class TranslationItem {
    */
   getChildById(id: string) {
     for (let child of this.children) {
-      if ("n" + child.id === id) {
+      const childId = "n" + child.id;
+      if (childId === id) {
         return child;
       }
     }
@@ -214,10 +215,11 @@ function parseResultNode(
         const translationRootChild = item.getChildById(child.id);
         if (translationRootChild) {
           into.push(translationRootChild);
+          translationRootChild[target] = [];
           parseResultNode(translationRootChild, child, target);
         } else {
-          console.info(
-            "Result node's child node lacks an associated translation root child",
+          console.warn(
+            `Result node's child node (child.id: ${child.id}) lacks an associated translation root child`,
             { node, child },
           );
         }
@@ -458,8 +460,8 @@ function swapTextForItem(
 
         // A trailing and a leading space must be preserved because
         // they are meaningful in HTML.
-        let preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
-        let endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
+        const preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
+        const endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
 
         curNode.nodeValue = preSpace + targetItem + endSpace;
         if (["original", "translation"].includes(target)) {

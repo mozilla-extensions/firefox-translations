@@ -12,6 +12,7 @@ import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
+import { detag, project } from "./detagAndProject";
 
 /**
  * Represents a request (for 1 chunk) sent off to Bergamot's translation backend.
@@ -47,10 +48,14 @@ export class BergamotDomTranslatorRequest {
   async fireRequest(
     bergamotApiClient: ContentScriptBergamotApiClient | BergamotApiClient,
   ): Promise<TranslationResponseData> {
-    // The server can only deal with pure text, so we strip tags from the
-    // strings to translate
-    const plainStringsToTranslate = this.stripTagsFromTexts(
-      this.translationRequestData.stringsToTranslate,
+    // The server can only deal with pure text, so we detag the strings to
+    // translate and later project the tags back into the result
+    const detaggedStrings = this.translationRequestData.stringsToTranslate.map(
+      detag,
+    );
+
+    const plainStringsToTranslate = detaggedStrings.map(
+      detaggedString => detaggedString.plainString,
     );
 
     const results = await bergamotApiClient.sendTranslationRequest(
@@ -61,14 +66,14 @@ export class BergamotDomTranslatorRequest {
       results,
     );
 
-    return translationResponseData;
-  }
+    // project
+    // TODO: use alignment info returned from the translation engine when it becomes available
+    translationResponseData.translatedStrings = translationResponseData.translatedStrings.map(
+      (translatedString: string, index: number) =>
+        project(detaggedStrings[index], translatedString),
+    );
 
-  stripTagsFromTexts(texts: string[]): string[] {
-    return texts.map(text => {
-      text = text.replace(/<[^>]*>?/gm, " ");
-      return text;
-    });
+    return translationResponseData;
   }
 
   parseResults(

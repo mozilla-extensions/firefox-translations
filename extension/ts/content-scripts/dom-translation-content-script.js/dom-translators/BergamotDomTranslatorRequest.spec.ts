@@ -9,10 +9,9 @@ import { TranslationRequestData } from "./BaseDomTranslator";
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 import { BergamotApiClient } from "../../../background-scripts/background.js/lib/BergamotApiClient";
 import {
-  createElementShowingPlainText,
   createHeader,
   drawDiffUi,
-  unifiedDiff,
+  visuallyAssertDeepEqual,
 } from "../../../shared-resources/test-utils";
 
 const testSuiteName = "BergamotDomTranslatorRequest";
@@ -40,7 +39,7 @@ describe(testSuiteName, function() {
   it(testName, async function() {
     console.info(`${testSuiteName}: ${testName}`);
 
-    const testDoc = domParser.parseFromString("<html/>", "text/html");
+    const testDoc = domParser.parseFromString("</>", "text/html");
     const translationDocument = new TranslationDocument(testDoc);
     const testDomTranslator = new TestDomTranslator(
       translationDocument,
@@ -72,25 +71,17 @@ describe(testSuiteName, function() {
       testTargetLanguageTexts,
     });
 
-    const actual = JSON.stringify(translatedStrings, null, 2);
-    const expected = JSON.stringify(testTargetLanguageTexts, null, 2);
-
     // Visual output of test results
     const fragment = document.createDocumentFragment();
-    fragment.append(createHeader(3, testName));
-
-    fragment.append(createHeader(4, "Actual"));
-    fragment.append(createElementShowingPlainText(actual));
-
-    if (actual !== expected) {
-      fragment.append(createHeader(4, "Expected"));
-      fragment.append(createElementShowingPlainText(expected));
-      const diff = unifiedDiff(testName, actual, expected);
-      diffs.push(diff);
-    }
-
+    visuallyAssertDeepEqual(
+      translatedStrings,
+      testTargetLanguageTexts,
+      `${testName}`,
+      fragment,
+      diffs,
+    );
     outputDiv.append(fragment);
 
-    assert.deepEqual(actual, expected);
+    assert.deepEqual(translatedStrings, testTargetLanguageTexts);
   });
 });

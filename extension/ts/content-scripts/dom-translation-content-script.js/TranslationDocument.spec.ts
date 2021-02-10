@@ -41,7 +41,15 @@ describe(testSuiteName, function() {
   after(function() {
     diffContainerDiv.append(createHeader(2, testSuiteName), diffDiv);
     drawDiffUi(diffDiv, diffs.join("\n"));
-    console.log(allTextsToTranslate.join("\n"));
+    outputDiv.append(
+      createHeader(
+        2,
+        "All texts attempted to be translated by tests (should be available in TestDomTranslator)",
+      ),
+      createElementShowingPlainText(
+        JSON.stringify([...new Set(allTextsToTranslate)], null, 2),
+      ),
+    );
   });
 
   fixtureNames.forEach(fixtureName => {
@@ -97,6 +105,8 @@ describe(testSuiteName, function() {
         translationDocument,
       );
       console.debug({ stringRepresentations });
+
+      allTextsToTranslate.push(...stringRepresentations.stringsToTranslate);
 
       fragment.append(
         createElementShowingPlainText(

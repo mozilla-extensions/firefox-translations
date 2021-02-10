@@ -7,6 +7,7 @@ import { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
 import "diff2html/bundles/css/diff2html.min.css";
 import { TranslationDocument } from "../content-scripts/dom-translation-content-script.js/TranslationDocument";
 import { TranslationItem } from "../content-scripts/dom-translation-content-script.js/TranslationItem";
+import { assert } from "chai";
 const Diff = require("diff");
 const prettier = require("prettier/standalone");
 const plugins = [require("prettier/parser-html")];
@@ -90,4 +91,27 @@ export const translationDocumentStringRepresentations = (
     translatedStrings,
     translations,
   };
+};
+
+export const visuallyAssertDeepEqual = (
+  actual,
+  expected,
+  header,
+  fragment,
+  diffs,
+) => {
+  const actualJson = JSON.stringify(actual, null, 2);
+  const expectedJson = JSON.stringify(expected, null, 2);
+
+  fragment.append(createHeader(3, header));
+
+  fragment.append(createHeader(4, "Actual"));
+  fragment.append(createElementShowingPlainText(actualJson));
+
+  if (actualJson !== expectedJson) {
+    fragment.append(createHeader(4, "Expected"));
+    fragment.append(createElementShowingPlainText(expectedJson));
+    const diff = unifiedDiff(header, actualJson, expectedJson);
+    diffs.push(diff);
+  }
 };
