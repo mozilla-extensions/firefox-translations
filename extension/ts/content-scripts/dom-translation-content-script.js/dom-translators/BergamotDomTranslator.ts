@@ -126,7 +126,7 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     }
 
     console.info(
-      `Fired of ${chunksBeingProcessed.length} requests to the bergamot translation backend`,
+      `Fired off ${chunksBeingProcessed.length} requests to the bergamot translation backend`,
     );
 
     // Resolve promise when all requests have finished
@@ -181,12 +181,13 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     };
     const { translationRoots } = this.translationDocument;
     const chunkTranslationRoots = [];
-    translationRoots.forEach((translationRoot, index) => {
+    for (let index = startIndex; index < translationRoots.length; index++) {
+      const translationRoot = translationRoots[index];
       let text = this.translationDocument.generateMarkupToTranslate(
         translationRoot,
       );
       if (!text) {
-        return;
+        continue;
       }
 
       const newCurSize = currentDataSize + text.length;
@@ -209,7 +210,7 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       currentChunks = newChunks;
       chunkTranslationRoots.push(translationRoot);
       translationRequestData.stringsToTranslate.push(text);
-    });
+    }
 
     return {
       translationRequestData,
@@ -256,15 +257,6 @@ function parseChunkResult(
         let translatedString = translationResponseData.translatedStrings[index];
         let qeAnnotatedTranslatedString =
           translationResponseData.qeAnnotatedTranslatedStrings[index];
-
-        if (!translationRoot.isSimleTranslationRoot) {
-          // Translations of non-simple translation roots are expected to be returned in the format of
-          // <div id="n1">Hello <b id="n2">World</b> of Mozilla.</div>
-          translatedString = generateMarkupToTranslateForItem(
-            translationRoot,
-            translatedString,
-          );
-        }
 
         qeAnnotatedTranslatedString = generateMarkupToTranslateForItem(
           translationRoot,

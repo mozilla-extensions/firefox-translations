@@ -68,10 +68,12 @@ export class BergamotDomTranslatorRequest {
 
     // project
     // TODO: use alignment info returned from the translation engine when it becomes available
-    translationResponseData.translatedStrings = translationResponseData.translatedStrings.map(
+    const projectedStrings = translationResponseData.translatedStrings.map(
       (translatedString: string, index: number) =>
         project(detaggedStrings[index], translatedString),
     );
+
+    translationResponseData.translatedStrings = projectedStrings;
 
     return translationResponseData;
   }

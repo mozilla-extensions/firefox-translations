@@ -219,8 +219,8 @@ function parseResultNode(
           parseResultNode(translationRootChild, child, target);
         } else {
           console.warn(
-            `Result node's child node (child.id: ${child.id}) lacks an associated translation root child`,
-            { node, child },
+            `Result node's (belonging to translation item with id ${item.id}) child node (child.id: ${child.id}) lacks an associated translation root child`,
+            { item, node, child },
           );
         }
       }
