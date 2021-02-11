@@ -36,6 +36,16 @@ function serializeNodeIntoTokens(node: Node): NodeToken[] {
     // @ts-ignore
     for (let child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
+        const textChunk = child.nodeValue.trim();
+        // If this is only whitespace, only add such a token and then visit the next node
+        if (textChunk === "") {
+          tokens.push({
+            type: "whitespace",
+            textRepresentation: " ",
+          });
+          continue;
+        }
+        // Otherwise, parse the text content and add whitespace + word tokens as necessary
         const leadingSpace = /^\s+/.exec(child.nodeValue);
         const trailingSpace = /\s+$/.exec(child.nodeValue);
         if (leadingSpace !== null) {
@@ -44,12 +54,16 @@ function serializeNodeIntoTokens(node: Node): NodeToken[] {
             textRepresentation: leadingSpace[0],
           });
         }
-        const words = child.nodeValue.trim().split(" ");
+        const words = textChunk.split(" ");
         words.forEach((word, wordIndex) => {
-          tokens.push({
-            type: "word",
-            textRepresentation: word,
-          });
+          // Don't add empty words
+          if (word !== "") {
+            tokens.push({
+              type: "word",
+              textRepresentation: word,
+            });
+          }
+          // Add whitespace tokens for spaces in between words, eg not after the last word
           if (wordIndex !== words.length - 1) {
             tokens.push({
               type: "whitespace",
@@ -100,10 +114,16 @@ export const project = (
     return translatedString;
   }
 
-  // inject the tags naively in the translated string assuming a 1:1
+  // If the last token is a tag, we pop it off the token array and re-add it
+  // last so that the last tag gets any additional translation content injected into it
+  const lastToken: NodeToken = detaggedString.tokens.slice(-1)[0];
+  if (lastToken.type === "tag") {
+    detaggedString.tokens.pop();
+  }
+
+  // Inject the tags naively in the translated string assuming a 1:1
   // relationship between original text nodes and words in the translated string
   const translatedStringWords = translatedString.split(" ");
-
   let projectedString = "";
   let currentTextTokenOrdinal = 0;
   let remainingTranslatedStringWords = [...translatedStringWords];
@@ -112,16 +132,34 @@ export const project = (
       const correspondingTranslatedWord = remainingTranslatedStringWords.shift();
       // If we have run out of translated words, don't attempt to add to the projected string
       if (correspondingTranslatedWord !== undefined) {
-        // Inject the translated word with the same kind of trailing and leading spaces that the original text had
+        // Inject the translated word
         projectedString += correspondingTranslatedWord;
       }
       currentTextTokenOrdinal++;
+    } else if (token.type === "whitespace") {
+      // Don't pad whitespace onto each other when there are no more words
+      if (remainingTranslatedStringWords.length === 0) {
+        return;
+      }
+      projectedString += token.textRepresentation;
     } else {
       projectedString += token.textRepresentation;
     }
   });
+
   // Add any remaining translated words to the end
-  projectedString += remainingTranslatedStringWords.join(" ");
+  if (remainingTranslatedStringWords.length > 0) {
+    // Add a whitespace to the end first in case there was none, or else two words will be joined together
+    if (lastToken.type !== "whitespace") {
+      projectedString += " ";
+    }
+    projectedString += remainingTranslatedStringWords.join(" ");
+  }
+
+  // If the last token is a tag, see above
+  if (lastToken.type === "tag") {
+    projectedString += lastToken.textRepresentation;
+  }
 
   // console.debug({translatedStringWords, projectedString});
 
