@@ -36,7 +36,7 @@ const defaultConfig = {
 
 if (targetBrowser === "firefox") {
   defaultConfig.run.firefox =
-    process.env.FIREFOX_BINARY || "firefoxdeveloperedition";
+    process.env.FIREFOX_BINARY || "nightly";
   defaultConfig.run.target = ["firefox-desktop"];
   defaultConfig.run.startUrl = [
     `about:devtools-toolbox?type=extension&id=${encodeURIComponent(
@@ -50,6 +50,9 @@ if (targetBrowser === "firefox") {
     "browser.aboutConfig.showWarning=false",
     "browser.proton.enabled=true",
     "extensions.experiments.enabled=true",
+    "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled=true",
+    "javascript.options.wasm_simd=true",
+    "javascript.options.wasm_simd_wormhole=true",
     // "browser.translation.ui.show=true",
     // "browser.translation.detectLanguage=true",
     "browser.ctrlTab.recentlyUsedOrder=false",

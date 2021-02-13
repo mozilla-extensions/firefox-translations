@@ -9,22 +9,16 @@ addOnPreMain(function() {
       model.delete();
     }
 
-    // Instantiate the TranslationModelConfiguration
-    const modelConfig = new Module.TranslationModelConfiguration(
-      "dummy_modelFilePath",
-      "dummy_sourceVocabPath",
-      "dummy_targetVocabPath",
-    );
-    console.debug("Model Path:", modelConfig.getModelFilePath());
+    // Set the Model Configuration as YAML formatted string.
+    // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
+    // This example captures the most relevant options: model file, vocabulary files and shortlist file
+    const modelConfig = "{\"models\":[\"/model.esen.npz\"],\"vocabs\":[\"/vocab.esen.spm\",\"/vocab.esen.spm\"],\"beam-size\":1,\"shortlist\":[\"/lex.esen.s2t\"]}";//
 
     // Instantiate the TranslationModel
     model = new Module.TranslationModel(modelConfig);
 
     const alignmentIsSupported = model.isAlignmentSupported();
     console.debug("Alignment:", alignmentIsSupported);
-
-    // Clean up the instances
-    modelConfig.delete();
 
     return { alignmentIsSupported };
   };
