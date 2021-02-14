@@ -3,7 +3,17 @@
 addOnPreMain(function() {
   let model;
 
+  const log = (message) => {
+    postMessage({
+      type: "log",
+      message,
+    })
+  }
+
   const loadModel = () => {
+    log(`loadModel()`);
+    let start = Date.now();
+
     // Delete previous instance if another model was loaded
     if (model) {
       model.delete();
@@ -16,9 +26,13 @@ addOnPreMain(function() {
 
     // Instantiate the TranslationModel
     model = new Module.TranslationModel(modelConfig);
+    log(`Model loaded in ${(Date.now() - start) / 1000} secs`);
 
+    start = Date.now();
     const alignmentIsSupported = model.isAlignmentSupported();
     console.debug("Alignment:", alignmentIsSupported);
+
+    log(`model.isAlignmentSupported() returned in ${(Date.now() - start) / 1000} secs`);
 
     return { alignmentIsSupported };
   };
@@ -27,6 +41,7 @@ addOnPreMain(function() {
    * @param texts string[]
    */
   const translate = texts => {
+    log(`translate()`);
     if (!model) {
       throw new Error("Translate attempted before model was loaded");
     }
@@ -41,19 +56,23 @@ addOnPreMain(function() {
     texts.forEach(text => input.push_back(text));
 
     // Access input (just for debugging)
+    /*
     console.debug("Input size=", input.size());
     for (let i = 0; i < input.size(); i++) {
       console.debug(" val:" + input.get(i));
     }
+    */
 
     // translate the input; the result is a vector<TranslationResult>
     const result = model.translate(input, request);
 
     // Access input after translation (just for debugging)
+    /*
     console.debug("Input size after translate API call =", input.size());
     for (let i = 0; i < input.size(); i++) {
       console.debug(" val:" + input.get(i));
     }
+    */
 
     // Access original and translated text from each entry of vector<TranslationResult>
     console.debug("Result size=", result.size());
@@ -96,12 +115,24 @@ addOnPreMain(function() {
         loadModelResults,
       });
     } else if (data.type === "translate") {
-      const translationResults = translate(data.translateParams.texts);
-      postMessage({
-        type: "translationResults",
-        requestId,
-        translationResults,
-      });
+      try {
+        console.log("Messages to translate: ", data.translateParams.texts);
+        let wordCount = 0;
+        data.translateParams.texts.forEach(text => {
+          wordCount += text.split(" ").length;
+        })
+        const start = Date.now();
+        const translationResults = translate(data.translateParams.texts);
+        const secs = (Date.now() - start) / 1000;
+        log(`Translation of ${data.translateParams.texts.length} texts (wordCount ${wordCount}) took ${secs} secs (${Math.round(wordCount / secs)} words per second)`);
+        postMessage({
+          type: "translationResults",
+          requestId,
+          translationResults,
+        });
+      } catch (error) {
+        log(`Error/exception caught in worker: `, error.toString());
+      }
     } else {
       throw new Error(
         `Unexpected message type: "${data.type}. Request id: ${data.requestId}"`,
@@ -111,4 +142,5 @@ addOnPreMain(function() {
 
   // Send a message indicating that the worker is ready to receive WASM-related messages
   postMessage("ready");
+  log("The worker is ready to receive translation-related messages")
 });

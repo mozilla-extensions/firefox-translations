@@ -87,9 +87,15 @@ interface TranslationResultsWorkerMessage extends WorkerMessage {
   translationResults: TranslationResults;
 }
 
+interface LogWorkerMessage extends WorkerMessage {
+  type: "log";
+  message: string;
+}
+
 type IncomingWorkerMessage =
   | LoadModelResultsWorkerMessage
-  | TranslationResultsWorkerMessage;
+  | TranslationResultsWorkerMessage
+  | LogWorkerMessage;
 
 class WorkerManager {
   private pendingRequests: Map<
@@ -179,6 +185,8 @@ class WorkerManager {
             this.onLoadModelResults(msg.data);
           } else if (msg.data.type === "translationResults") {
             this.onTranslateWorkerResult(msg.data);
+          } else if (msg.data.type === "log") {
+            console.log(`Relayed log message from worker: ${msg.data.message}`);
           } else {
             throw new Error("Unknown worker message payload");
           }
