@@ -25,11 +25,11 @@ export interface TranslationRequest {
 }
 
 // The maximum amount of net data allowed per request on Bergamot's API.
-export const MAX_REQUEST_DATA = 5000; // XXX This is the Bing value
+export const MAX_REQUEST_DATA = 500000;
 
 // The maximum number of chunks allowed to be translated in a single
 // request.
-export const MAX_REQUEST_CHUNKS = 128; // TODO: Determine the real value for this
+export const MAX_REQUEST_CHUNKS = 12800;
 
 // Self-imposed limit of 1920 requests. This means that a page that would need
 // to be broken in more than 1920 requests won't be fully translated.
