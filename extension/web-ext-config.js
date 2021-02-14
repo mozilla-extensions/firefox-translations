@@ -35,8 +35,7 @@ const defaultConfig = {
 };
 
 if (targetBrowser === "firefox") {
-  defaultConfig.run.firefox =
-    process.env.FIREFOX_BINARY || "nightly";
+  defaultConfig.run.firefox = process.env.FIREFOX_BINARY || "nightly";
   defaultConfig.run.target = ["firefox-desktop"];
   defaultConfig.run.startUrl = [
     `about:devtools-toolbox?type=extension&id=${encodeURIComponent(
