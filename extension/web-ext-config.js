@@ -61,6 +61,7 @@ if (targetBrowser === "firefox") {
 
 if (targetBrowser === "chrome") {
   defaultConfig.run.target = ["chromium"];
+  defaultConfig.run.args = ["--js-flags=--experimental-wasm-simd"];
   defaultConfig.run.startUrl = [
     // "chrome://extensions", // Not available until https://github.com/mozilla/web-ext/issues/1979 is resolved
     `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
