@@ -158,7 +158,7 @@ addOnPreMain(function() {
         console.log("Messages to translate: ", data.translateParams.texts);
         let wordCount = 0;
         data.translateParams.texts.forEach(text => {
-          wordCount += text.split(" ").length;
+          wordCount += text.trim().split(" ").filter(word => word.trim() !== "").length;
         })
         const start = Date.now();
         const translationResults = translate(data.translateParams.texts);
