@@ -22,7 +22,25 @@ addOnPreMain(function() {
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
-    const modelConfig = "{\"models\":[\"/model.esen.npz\"],\"vocabs\":[\"/vocab.esen.spm\",\"/vocab.esen.spm\"],\"beam-size\":1,\"shortlist\":[\"/lex.esen.s2t\"]}";//
+    const modelConfig = `models:
+  - /model.esen.npz
+vocabs:
+  - /vocab.esen.spm
+  - /vocab.esen.spm
+beam-size: 1
+normalize: 1.0
+word-penalty: 0
+mini-batch: 32
+maxi-batch: 100
+maxi-batch-sort: src
+workspace: 128
+max-length-factor: 2.0
+skip-cost: true
+shortlist:
+    - /lex.esen.s2t
+    - 50
+    - 50
+`;
 
     // Instantiate the TranslationModel
     model = new Module.TranslationModel(modelConfig);
