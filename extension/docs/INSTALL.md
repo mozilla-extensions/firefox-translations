@@ -4,12 +4,9 @@
 **Contents**
 
 - [Installation instructions](#installation-instructions)
-  - [Firefox](#firefox)
-  - [Chrome](#chrome)
-  - [Bergamot REST API server (temporary requirement)](#bergamot-rest-api-server-temporary-requirement)
-    - [Mac OSX](#mac-osx)
-    - [Linux](#linux)
-    - [Windows](#windows)
+  - [Firefox - Extension UI](#firefox---extension-ui)
+  - [Chrome - Extension UI](#chrome---extension-ui)
+  - [Firefox - Native UI](#firefox---native-ui)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -18,9 +15,10 @@
 This document outlines how to get a pre-released version of the extension running locally.
 
 There are three flavors:
-* **Firefox - Extension UI** - Firefox version of the extension
-* **Chrome - Extension UI** - Chrome version of the extension
-* **Firefox - Native UI** - Firefox-only version which uses native browser UI elements
+
+- **Firefox - Extension UI** - Firefox version of the extension
+- **Chrome - Extension UI** - Chrome version of the extension
+- **Firefox - Native UI** - Firefox-only version which uses native browser UI elements
 
 ## Firefox - Extension UI
 
@@ -41,7 +39,7 @@ There are three flavors:
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
 - Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-chrome.zip)
 - Unpack the zip file locally
-- Start Chrome Canary with the following extra argument: `--js-flags="--experimental-wasm-simd"`, eg `/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary  --js-flags="--experimental-wasm-simd"`
+- Start Chrome Canary with the following extra argument: `--js-flags="--experimental-wasm-simd"`, eg `/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --js-flags="--experimental-wasm-simd"`
 - Enter `chrome://extensions` in Chrome's address bar and press enter
 - Flip the Developer mode switch up on the right so that the toolbar with the `Load unpacked`, `Pack extension` and `Update` buttons are shown
 - Click `Load unpacked`
