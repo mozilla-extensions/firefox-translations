@@ -10,8 +10,8 @@ addOnPreMain(function() {
     })
   }
 
-  const loadModel = () => {
-    log(`loadModel()`);
+  const loadModel = (from, to) => {
+    log(`loadModel(${from}, ${to})`);
     let start = Date.now();
 
     // Delete previous instance if another model was loaded
@@ -19,14 +19,19 @@ addOnPreMain(function() {
       model.delete();
     }
 
+    const languagePair = `${from}${to}`;
+
+    // Vocab files are re-used in both translation directions
+    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
     const modelConfig = `models:
-  - /model.esen.npz
+  - /model.${languagePair}.npz
 vocabs:
-  - /vocab.esen.spm
-  - /vocab.esen.spm
+  - /vocab.${vocabLanguagePair}.spm
+  - /vocab.${vocabLanguagePair}.spm
 beam-size: 1
 normalize: 1.0
 word-penalty: 0
@@ -37,7 +42,7 @@ workspace: 128
 max-length-factor: 2.0
 skip-cost: true
 shortlist:
-    - /lex.esen.s2t
+    - /lex.${languagePair}.s2t
     - 50
     - 50
 `;
@@ -165,7 +170,7 @@ shortlist:
     }
     const requestId = data.requestId;
     if (data.type === "loadModel") {
-      const loadModelResults = loadModel();
+      const loadModelResults = loadModel(data.loadModelParams.from, data.loadModelParams.to);
       postMessage({
         type: "loadModelResults",
         requestId,

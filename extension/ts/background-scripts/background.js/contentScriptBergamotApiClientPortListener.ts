@@ -22,10 +22,12 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }
   port.onMessage.addListener(async function(m: {
     texts: [];
+    from: string;
+    to: string;
     requestId: string;
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
-    const { texts, requestId } = m;
+    const { texts, from, to, requestId } = m;
     /*
     const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
       texts,
@@ -33,8 +35,8 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
      */
     const translatorApiResults: TranslationResults = await BergamotTranslatorAPI.translate(
       texts,
-      "_",
-      "_",
+      from,
+      to,
     );
     const paragraphs: BergamotRestApiParagraph[] = translatorApiResults.translatedTexts.map(
       text => {

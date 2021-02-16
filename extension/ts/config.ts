@@ -4,7 +4,7 @@ export const config = {
   supportedLanguagePairs: [
     // "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
     // ISO 639-1 codes
-    // Language pairs not available on http://statmt.org/bergamot/models/ as of Nov 27, 2020 are commented out
+    // Language pairs that are not available are commented out
     ["en", "de"],
     // ["en","fr"],
     ["en", "es"],

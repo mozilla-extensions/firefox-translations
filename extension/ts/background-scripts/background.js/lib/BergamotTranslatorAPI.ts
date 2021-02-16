@@ -27,27 +27,9 @@ interface WorkerMessage {
   requestId: string;
 }
 
-// TODO: Update to reflect final interface
-// (The temporary interface below is loosely based on a combination of marian-decoder cli and yaml config options)
-export interface TranslationConfigurationParams {
-  modelBinaries?: string[];
-  vocabs?: string[];
-  shortlists?: string[];
-  beamSize?: number;
-  normalize?: number;
-  wordPenalty?: number;
-  miniBatch?: number;
-  maxiBatch?: number;
-  maxiBatchSort?: string;
-  workspace?: number;
-  maxLengthFactor?: number;
-  skipCost?: true;
-  cpuThreads?: number;
-  gemmPrecision?: "int8" | "int8shift" | "int8shiftAlphaAll";
-}
-
 export interface LoadModelParams {
-  translationConfigurationParams: TranslationConfigurationParams;
+  from: string;
+  to: string;
 }
 
 interface LoadModelRequestWorkerMessage extends WorkerMessage {
@@ -230,21 +212,21 @@ class WorkerManager {
 
 const workerManager = new WorkerManager();
 
+let loadedLanguagePair: string;
 export const BergamotTranslatorAPI = {
-  availableLanguagePairs: [],
   async translate(
     texts: string[],
     from: string,
     to: string,
   ): Promise<TranslationResults> {
     const languagePair = `${from}${to}`;
-    if (!this.availableLanguagePairs[languagePair]) {
+    if (loadedLanguagePair !== languagePair) {
       const loadModelParams = {
-        translationConfigurationParams: {},
+        from,
+        to,
       };
-      this.availableLanguagePairs[languagePair] = await workerManager.loadModel(
-        loadModelParams,
-      );
+      await workerManager.loadModel(loadModelParams);
+      loadedLanguagePair = languagePair;
     }
     const translateParams: TranslateParams = {
       texts,
