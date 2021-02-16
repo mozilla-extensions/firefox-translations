@@ -96,13 +96,29 @@ describe("getTranslationNodes", function() {
   </ul>
 </div>
 
-<!-- Test that nodes with only punctuation, whitespace
+<!-- Test that root nodes with only punctuation, whitespace
      or numbers are ignored -->
 <div id="testcase9"
      expected="li[root] li[root]">
   <ul>
     <li>lorem</li>
     <li>ipsum</li>
+    <li>-.,;'/!@#$%^*()</li>
+    <li>0123456789</li>
+    <li>
+          </li>
+  </ul>
+</div>
+
+<!-- Test that only root nodes with only punctuation, whitespace
+     or numbers are ignored -->
+<div id="testcase9b"
+     expected="li[root] li[root] li[root]">
+  <ul>
+    <li>lorem <b>0123456789</b></li>
+    <li>ipsum <b>-.,;'/!@#$%^*()</b></li>
+    <li>dolor <b>
+          </b></li>
     <li>-.,;'/!@#$%^*()</li>
     <li>0123456789</li>
     <li>
@@ -187,6 +203,12 @@ describe("getTranslationNodes", function() {
     <!-- Comment -->
     <p>Lorem Ipsum</p>
   </div>
+</div>
+
+<!-- Test a more complex case -->
+<div id="testcase18"
+     expected="li[root] i a">
+  <li><b><a href="https://es.wikipedia.org/wiki/1620" title="1620">1620</a></b> <i>(hace 400 años)</i>: En Estados Unidos, se firma el <b><a href="https://es.wikipedia.org/wiki/Pacto_del_Mayflower" title="Pacto del Mayflower">Pacto del Mayflower</a></b>, que establece un Gobierno.</li>
 </div>`;
 
   const testcasesDoc = domParser.parseFromString(testcasesHtml, "text/html");
