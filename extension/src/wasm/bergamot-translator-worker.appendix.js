@@ -35,12 +35,14 @@ vocabs:
 beam-size: 1
 normalize: 1.0
 word-penalty: 0
-mini-batch: 32
-maxi-batch: 100
-maxi-batch-sort: src
+max-input-sentence-tokens: 128
+max-input-tokens: 1024
 workspace: 128
 max-length-factor: 2.0
 skip-cost: true
+cpu-threads: 1
+quiet: true
+quiet-translation: true
 shortlist:
     - /lex.${languagePair}.s2t
     - 50
