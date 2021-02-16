@@ -238,6 +238,45 @@ describe("getTranslationNodes", function() {
     });
   });
 
+  it("Limit", async function() {
+    const body = document.createElement("body");
+
+    for (let i = 0; i < 11; i++) {
+      const text = document.createTextNode("a");
+      const node = document.createElement("b");
+      node.appendChild(text);
+      body.appendChild(node);
+    }
+
+    const translationRoots = getTranslationNodes(body, [], 10);
+    assert.equal(
+      translationRoots.length,
+      10,
+      "Translation nodes were limited to 10 nodes.",
+    );
+  });
+
+  it("Limit - nested", async function() {
+    const testDoc = domParser.parseFromString(
+      `<html>
+<ul>
+    <li>Foo<a><b>Bar</b></a><div>Lorem</div></li>
+    <li>Foo<a><b>Bar</b></a><div>Lorem</div></li>
+    <li>Foo<a><b>Bar</b></a><div>Lorem</div></li>
+    <li>Foo<a><b>Bar</b></a><div>Lorem</div></li>
+</ul>
+</html>`,
+      "text/html",
+    );
+
+    const translationRoots = getTranslationNodes(testDoc.body, [], 10);
+    assert.equal(
+      translationRoots.length,
+      10,
+      "Translation nodes were limited to 10 nodes.",
+    );
+  });
+
   /*
   var testiframe = document.getElementById("testiframe");
   var iframediv = testiframe.contentDocument.querySelector("div");

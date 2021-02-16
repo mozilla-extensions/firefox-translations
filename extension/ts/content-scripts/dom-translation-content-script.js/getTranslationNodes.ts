@@ -62,9 +62,9 @@ const isBlockFrameOrSubclass = (element: HTMLElement) => {
 export const getTranslationNodes = (
   rootElement: HTMLElement,
   seenTranslationNodes: Node[] = [],
+  limit = 15000,
 ): TranslationNode[] => {
   const translationNodes: TranslationNode[] = [];
-  const limit = 15000;
 
   // Query child elements in order to explicitly skip the root element from being classified as a translation node
   const childElements = <HTMLCollectionOf<HTMLElement>>rootElement.children;
@@ -160,6 +160,7 @@ export const getTranslationNodes = (
       const childTranslationNodes = getTranslationNodes(
         childElement,
         seenTranslationNodes,
+        limit - translationNodes.length,
       );
       translationNodes.push(...childTranslationNodes);
     }
