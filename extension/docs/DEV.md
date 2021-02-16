@@ -75,9 +75,7 @@ The build artifact will be created under `dist/firefox/native-ui`.
 
 This will build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
 
-If you haven't already, download and install [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/) before running the below commands.
-
-Note that you also temporarily need a REST server running locally. See [INSTALL.md](./INSTALL.md).
+If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) before running the below commands.
 
 ### Firefox
 
