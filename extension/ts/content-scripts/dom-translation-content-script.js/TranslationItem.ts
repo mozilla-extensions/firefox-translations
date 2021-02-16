@@ -4,6 +4,11 @@
 
 import { TranslationDocumentTarget } from "./TranslationDocument";
 
+export type TranslationItemStructureElement =
+  | string
+  | TranslationItem
+  | TranslationItem_NodePlaceholder;
+
 /**
  * This class represents an item for translation. It's basically our
  * wrapper class around a node returned by getTranslationNode, with
@@ -47,17 +52,16 @@ export class TranslationItem {
   public isSimleTranslationRoot = false;
   public nodeRef: HTMLElement;
   public id;
-  public readonly children;
+  public children: TranslationItem[] = [];
   public translatedString;
-  public translation;
+  public translation: TranslationItemStructureElement[];
   private qeAnnotatedTranslation;
-  public original;
+  public original: TranslationItemStructureElement[];
 
   constructor(node: HTMLElement, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
     this.id = id;
     this.isTranslationRoot = isTranslationRoot;
-    this.children = [];
   }
 
   toString() {
@@ -172,11 +176,11 @@ export class TranslationItem {
  * translation request. It's necessary to keep them to use it as a mark
  * for correct positioning and splitting of text nodes.
  */
-export const TranslationItem_NodePlaceholder = {
-  toString() {
+export class TranslationItem_NodePlaceholder {
+  static toString() {
     return "[object TranslationItem_NodePlaceholder]";
-  },
-};
+  }
+}
 
 /**
  * Helper function to parse a HTML doc result.
@@ -204,7 +208,7 @@ function parseResultNode(
       if (child.nodeType === Node.TEXT_NODE) {
         into.push(child.nodeValue);
       } else if (child.localName === "br") {
-        into.push(TranslationItem_NodePlaceholder);
+        into.push(new TranslationItem_NodePlaceholder());
       } else if (
         child.dataset &&
         typeof child.dataset.translationQeScore !== "undefined"
@@ -424,7 +428,7 @@ function swapTextForItem(
         if (curNode) {
           curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
         }
-      } else if (targetItem === TranslationItem_NodePlaceholder) {
+      } else if (targetItem instanceof TranslationItem_NodePlaceholder) {
         // If the current item is a placeholder node, we need to move
         // our pointer "past" it, jumping from one side of a block of
         // elements + empty text nodes to the other side. Even if

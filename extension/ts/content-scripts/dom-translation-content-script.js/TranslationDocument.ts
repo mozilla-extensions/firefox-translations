@@ -6,6 +6,7 @@ import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import {
   TranslationItem,
   TranslationItem_NodePlaceholder,
+  TranslationItemStructureElement,
 } from "./TranslationItem";
 
 export type TranslationDocumentTarget =
@@ -147,18 +148,27 @@ export class TranslationDocument {
    * @returns        A markup representation of the TranslationItem.
    */
   generateMarkupToTranslate(item: TranslationItem): string {
-    if (item.original) {
-      return regenerateMarkupToTranslateFromOriginal(item);
+    if (!item.original) {
+      item.original = this.generateOriginalStructureElements(item);
     }
+    return regenerateMarkupToTranslateFromOriginal(item);
+  }
+
+  /**
+   * Generates a fuller representation of the TranslationItem
+   * @param item
+   */
+  generateOriginalStructureElements(
+    item: TranslationItem,
+  ): TranslationItemStructureElement[] {
+    const original: TranslationItemStructureElement[] = [];
 
     if (item.isSimleTranslationRoot) {
       let text = item.nodeRef.firstChild.nodeValue.trim();
-      item.original = [text];
-      return text;
+      original.push(text);
+      return original;
     }
 
-    let str = "";
-    item.original = [];
     let wasLastItemPlaceholder = false;
 
     for (let child of Array.from(item.nodeRef.childNodes)) {
@@ -170,8 +180,7 @@ export class TranslationDocument {
           const xWithNormalizedWhitespace = `${
             hasLeadingWhitespace ? " " : ""
           }${x.trim()}${hasTrailingWhitespace ? " " : ""}`;
-          item.original.push(xWithNormalizedWhitespace);
-          str += xWithNormalizedWhitespace;
+          original.push(xWithNormalizedWhitespace);
           wasLastItemPlaceholder = false;
         }
         continue;
@@ -185,8 +194,8 @@ export class TranslationDocument {
         // However, if this item is a translation root, we should skip it here in this
         // object's child list (and just add a placeholder for it), because
         // it will be stringified separately for being a translation root.
-        item.original.push(objInMap);
-        str += this.generateMarkupToTranslate(objInMap);
+        original.push(objInMap);
+        objInMap.original = this.generateOriginalStructureElements(objInMap);
         wasLastItemPlaceholder = false;
       } else if (!wasLastItemPlaceholder) {
         // Otherwise, if this node doesn't contain any useful content,
@@ -196,13 +205,11 @@ export class TranslationDocument {
         // probably merge two separate text nodes).
         // It's not necessary to add more than one placeholder in sequence;
         // we can optimize them away.
-        item.original.push(TranslationItem_NodePlaceholder);
-        str += "<br>";
+        original.push(new TranslationItem_NodePlaceholder());
         wasLastItemPlaceholder = true;
       }
     }
-
-    return generateMarkupToTranslateForItem(item, str);
+    return original;
   }
 
   /**
@@ -298,7 +305,7 @@ function regenerateMarkupToTranslateFromOriginal(
   for (let child of item.original) {
     if (child instanceof TranslationItem) {
       str += regenerateMarkupToTranslateFromOriginal(child);
-    } else if (child === TranslationItem_NodePlaceholder) {
+    } else if (child instanceof TranslationItem_NodePlaceholder) {
       str += "<br>";
     } else {
       str += child;
