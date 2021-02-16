@@ -15,7 +15,11 @@ export class ContentScriptBergamotApiClient {
       name: "port-from-content-script-bergamot-api-client",
     });
   }
-  async sendTranslationRequest(texts: string[]): Promise<any[]> {
+  async sendTranslationRequest(
+    texts: string[],
+    from: string,
+    to: string,
+  ): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
       const resultsMessageListener = async (m: {
@@ -41,6 +45,8 @@ export class ContentScriptBergamotApiClient {
       // console.debug("ContentScriptBergamotApiClient: Sending translation request", {texts});
       this.backgroundContextPort.postMessage({
         texts,
+        from,
+        to,
         requestId,
       });
     });

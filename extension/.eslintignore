@@ -7,6 +7,7 @@ yarn-error.log
 *.map
 package-lock.json
 src/wasm/
+!src/wasm/bergamot-translator-worker.appendix.js
 # makes sure that eslintrc.js gets linted/formatted
 !.eslintrc.js
 # don't lint/format package.json since npm install formats it differently by default

@@ -40,6 +40,8 @@ export class BergamotTranslationRequest {
   async fireRequest(bergamotApiClient: ContentScriptBergamotApiClient) {
     return bergamotApiClient.sendTranslationRequest(
       this.translationRequestData.texts,
+      this.sourceLanguage,
+      this.targetLanguage,
     );
   }
 }
