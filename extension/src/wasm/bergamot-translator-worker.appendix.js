@@ -47,6 +47,8 @@ shortlist:
     - 50
 `;
 
+    console.log("modelConfig: ", modelConfig);
+
     // Instantiate the TranslationModel
     model = new Module.TranslationModel(modelConfig);
     log(`Model loaded in ${(Date.now() - start) / 1000} secs`);
