@@ -28,6 +28,7 @@ There are three flavors:
   - `javascript.options.wasm_simd`
   - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/untagged-41617d38f820c50109b8/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
@@ -56,6 +57,7 @@ There are three flavors:
   - `javascript.options.wasm_simd`
   - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/untagged-41617d38f820c50109b8/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
