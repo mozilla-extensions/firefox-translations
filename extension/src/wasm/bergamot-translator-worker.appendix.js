@@ -86,7 +86,7 @@ shortlist:
       translationResults.originalTexts.push(text);
 
       // Temporary naive sentence splitter
-      const sentences = text.split(".");
+      const sentences = text.split(". ");
       // console.debug({ sentences });
       sentences.forEach((sentence) => {
         if (sentence.trim() === "") {
@@ -146,7 +146,7 @@ shortlist:
     // console.debug({ originalSentencesByOriginalTextIndex, translatedSentencesByOriginalTextIndex });
 
     translatedSentencesByOriginalTextIndex.forEach((translatedSentences, originalTextIndex) => {
-      translationResults.translatedTexts[originalTextIndex] = translatedSentences.join(".");
+      translationResults.translatedTexts[originalTextIndex] = translatedSentences.join(". ");
     });
 
     // console.debug("translationResults.translatedTexts", translationResults.translatedTexts);
