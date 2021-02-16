@@ -17,6 +17,14 @@ describe("getTranslationNodes", function() {
   </div>
 </div>
 
+<!-- Test that an inline paragraph element inside a root is a root -->
+<div id="testcase1c"
+     expected="div[root] p[root]">
+  <div>
+    lorem ipsum <p>dolor</p> sit amet
+  </div>
+</div>
+
 <!-- Test that a usually inline element becomes a root if it is
      displayed as a block -->
 <div id="testcase2"

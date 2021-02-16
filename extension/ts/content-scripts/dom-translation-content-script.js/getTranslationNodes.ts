@@ -16,8 +16,44 @@ const isBlockFrameOrSubclass = (element: HTMLElement) => {
   frame->IsBlockFrameOrSubclass();
   */
   const nodeTagName = element.tagName.toLowerCase();
+  const blockLevelElementTagNames = [
+    "address",
+    "article",
+    "aside",
+    "blockquote",
+    "canvas",
+    "dd",
+    "div",
+    "dl",
+    "dt",
+    "fieldset",
+    "figcaption",
+    "figure",
+    "footer",
+    "form",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "header",
+    "hr",
+    "li",
+    "main",
+    "nav",
+    "noscript",
+    "ol",
+    "p",
+    "pre",
+    "section",
+    "table",
+    "tfoot",
+    "ul",
+    "video",
+  ];
   const result =
-    (["div", "li"].includes(nodeTagName) ||
+    (blockLevelElementTagNames.includes(nodeTagName) ||
       element.style.display === "block") &&
     element.style.display !== "inline";
   return result;
