@@ -29,6 +29,7 @@ describe(testSuiteName, function() {
     "hola-mundo-markup",
     "punctuation",
     "mid-sentence-break",
+    "nested-inline-tags",
     "es.wikipedia.org-2021-01-20-welcome-box",
   ];
   const diffs = [];

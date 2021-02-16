@@ -121,11 +121,22 @@ export class TranslationDocument {
       // Translation root items do not have a parent item.
       this.translationRoots.push(item);
     } else {
-      let parentItem: TranslationItem = this.nodeTranslationItemsMap.get(
-        node.parentNode,
-      );
-      if (parentItem) {
-        parentItem.children.push(item);
+      // Other translation nodes have at least one ancestor which is a translation root
+      let ancestorTranslationItem: TranslationItem;
+      for (
+        let ancestor: Node = node.parentNode;
+        ancestor;
+        ancestor = ancestor.parentNode
+      ) {
+        ancestorTranslationItem = this.nodeTranslationItemsMap.get(ancestor);
+        if (ancestorTranslationItem) {
+          ancestorTranslationItem.children.push(item);
+          break;
+        } else {
+          // make intermediate ancestors link to the descendent translation item
+          // so that it gets picked up on in generateOriginalStructureElements
+          this.nodeTranslationItemsMap.set(ancestor, item);
+        }
       }
     }
 
