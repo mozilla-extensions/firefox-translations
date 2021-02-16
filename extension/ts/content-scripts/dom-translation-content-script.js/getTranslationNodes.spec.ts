@@ -179,17 +179,11 @@ describe("getTranslationNodes", function() {
   testcases.forEach(testcaseNode => {
     const testName = `Testcase: ${testcaseNode.id}`;
     it(testName, async function() {
-      console.info(`getTranslationNodes: ${testName}`);
-      const translationNodes = getTranslationNodes(testcaseNode);
+      console.info(`getTranslationNodes: ${testName}`, testcaseNode.outerHTML);
+      const translationNodes = getTranslationNodes(<HTMLElement>testcaseNode);
 
       const expectedResult = testcaseNode.getAttribute("expected");
       const expectedLength = expectedResult.split(" ").length;
-
-      assert.equal(
-        translationNodes.length,
-        expectedLength,
-        "Correct number of translation nodes for testcase " + testcaseNode.id,
-      );
 
       const resultList = [];
       for (let i = 0; i < translationNodes.length; i++) {
@@ -203,13 +197,27 @@ describe("getTranslationNodes", function() {
       assert.equal(
         resultList.length,
         translationNodes.length,
-        "Correct number of translation nodes for testcase " + testcaseNode.id,
+        `Correct number of translation nodes for testcase ${testcaseNode.id}`,
+      );
+
+      assert.equal(
+        translationNodes.length,
+        expectedLength,
+        `Correct number of translation nodes for testcase ${
+          testcaseNode.id
+        } (current result: "${resultList.join(
+          " ",
+        )}", expected result: "${expectedResult}")`,
       );
 
       assert.equal(
         resultList.join(" "),
         expectedResult,
-        "Correct list of translation nodes for testcase " + testcaseNode.id,
+        `Correct list of translation nodes for testcase ${
+          testcaseNode.id
+        } (current result: "${resultList.join(
+          " ",
+        )}", expected result: "${expectedResult}")`,
       );
     });
   });

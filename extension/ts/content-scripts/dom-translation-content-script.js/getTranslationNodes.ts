@@ -9,23 +9,40 @@ export interface TranslationNode {
   isTranslationRoot: boolean;
 }
 
-export const getTranslationNodes = (
-  rootElement: Element,
-): TranslationNode[] => {
-  const seenTranslationElements: Node[] = [];
+const isBlockFrameOrSubclass = (element: HTMLElement) => {
+  // TODO: Make this generalize like the corresponding C code invoked by:
+  /*
+  nsIFrame* frame = childElement->GetPrimaryFrame();
+  frame->IsBlockFrameOrSubclass();
+  */
+  const nodeTagName = element.tagName.toLowerCase();
+  const result =
+    (["div", "li"].includes(nodeTagName) ||
+      element.style.display === "block") &&
+    element.style.display !== "inline";
+  return result;
+};
 
+export const getTranslationNodes = (
+  rootElement: HTMLElement,
+  seenTranslationNodes: Node[] = [],
+): TranslationNode[] => {
   const translationNodes: TranslationNode[] = [];
   const limit = 15000;
 
-  // Query child elements in order to explicitly skip the root element from being a translation node
-  const childElements = <HTMLCollectionOf<HTMLElement>>(
-    rootElement.getElementsByTagName("*")
-  );
-
+  // Query child elements in order to explicitly skip the root element from being classified as a translation node
+  const childElements = <HTMLCollectionOf<HTMLElement>>rootElement.children;
   for (let i = 0; i < limit && i < childElements.length; i++) {
-    const content: HTMLElement = childElements[i];
-    const tagName = content.tagName.toLowerCase();
-    if (tagName === "html") {
+    const childElement: HTMLElement = childElements[i];
+
+    const tagName = childElement.tagName.toLowerCase();
+    const isElementNode = childElement.nodeType === Node.ELEMENT_NODE;
+    const isTextNode = childElement.nodeType === Node.TEXT_NODE;
+
+    if (isTextNode) {
+      console.warn(
+        `We are not supposed to run into text nodes here. childElement.textContent: "${childElement.textContent}"`,
+      );
       continue;
     }
 
@@ -46,56 +63,66 @@ export const getTranslationNodes = (
       continue;
     }
 
+    const nodeHasTextForTranslation = hasTextForTranslation(
+      childElement.textContent,
+    );
+
+    // Only empty or non-translatable content in this part of the tree
+    if (!nodeHasTextForTranslation) {
+      continue;
+    }
+
     // An element is a translation node if it contains
     // at least one text node that has meaningful data
     // for translation
-    for (
-      let child: Node = content.firstChild;
-      child;
-      child = child.nextSibling
-    ) {
-      // console.log({child});
-      if (
-        child.nodeType === Node.TEXT_NODE &&
-        hasTextForTranslation(child.textContent)
-      ) {
-        seenTranslationElements.push(content);
+    const childChildTextNodes = Array.from(childElement.childNodes).filter(
+      (childChildNode: Node) => childChildNode.nodeType === Node.TEXT_NODE,
+    );
+    const childChildTextNodesWithTextForTranslation = childChildTextNodes
+      .map(textNode => textNode.textContent)
+      .filter(hasTextForTranslation);
+    const isTranslationNode =
+      childChildTextNodesWithTextForTranslation.length > 0;
 
-        // TODO: Verify this assumption from C to JS:
-        /*
-        nsIFrame* frame = content->GetPrimaryFrame();
-        bool isTranslationRoot = frame && frame->IsBlockFrameOrSubclass();
-        */
-        const isBlockFrameOrSubclass = (node: HTMLElement) => {
-          return (
-            (["div", "li"].includes(content.tagName.toLowerCase()) ||
-              node.style.display === "block") &&
-            node.style.display !== "inline"
-          );
-        };
+    if (isTranslationNode) {
+      // At this point, we know we have a translation node at hand, but we need
+      // to figure out it the node is a translation root or not
+      let isTranslationRoot;
 
-        let isTranslationRoot = isBlockFrameOrSubclass(content);
+      // Block elements are translation roots
+      isTranslationRoot = isBlockFrameOrSubclass(childElement);
+      seenTranslationNodes.push(childElement);
+      if (!isTranslationRoot) {
+        // If an element is not a block element, it still
+        // can be considered a translation root if the parent
+        // of this element didn't make it into the list of nodes
+        // to be translated.
+        let parentInList: boolean = false;
+        const parent: Node = childElement.parentNode;
 
-        if (!isTranslationRoot) {
-          // If an element is not a block element, it still
-          // can be considered a translation root if the parent
-          // of this element didn't make it into the list of nodes
-          // to be translated.
-          let parentInList: boolean = false;
-          const parent: Node = content.parentNode;
-          if (parent) {
-            parentInList = seenTranslationElements.includes(parent);
-          }
-          isTranslationRoot = !parentInList;
+        // TODO: walk up tree until we get to the first parent that has content for translation?
+
+        if (parent) {
+          parentInList = seenTranslationNodes.includes(parent);
         }
-
-        translationNodes.push({
-          content,
-          isTranslationRoot,
-        });
-
-        break;
+        isTranslationRoot = !parentInList;
       }
+
+      const translationNode = {
+        content: childElement,
+        isTranslationRoot,
+      };
+
+      translationNodes.push(translationNode);
+    }
+
+    // Now traverse any element children to find nested translation nodes
+    if (childElement.firstElementChild) {
+      const childTranslationNodes = getTranslationNodes(
+        childElement,
+        seenTranslationNodes,
+      );
+      translationNodes.push(...childTranslationNodes);
     }
   }
 
