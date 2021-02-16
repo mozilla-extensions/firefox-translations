@@ -127,21 +127,24 @@ export const getTranslationNodes = (
 
       // Block elements are translation roots
       isTranslationRoot = isBlockFrameOrSubclass(childElement);
+      // If an element is not a block element, it still
+      // can be considered a translation root if all ancestors
+      // of this element are not translation nodes
       seenTranslationNodes.push(childElement);
       if (!isTranslationRoot) {
-        // If an element is not a block element, it still
-        // can be considered a translation root if the parent
-        // of this element didn't make it into the list of nodes
-        // to be translated.
-        let parentInList: boolean = false;
-        const parent: Node = childElement.parentNode;
-
-        // TODO: walk up tree until we get to the first parent that has content for translation?
-
-        if (parent) {
-          parentInList = seenTranslationNodes.includes(parent);
+        // Walk up tree and check if an ancestor was a translation node
+        let ancestorWasATranslationNode: boolean = false;
+        for (
+          let ancestor: Node = childElement.parentNode;
+          ancestor;
+          ancestor = ancestor.parentNode
+        ) {
+          if (seenTranslationNodes.includes(ancestor)) {
+            ancestorWasATranslationNode = true;
+            break;
+          }
         }
-        isTranslationRoot = !parentInList;
+        isTranslationRoot = !ancestorWasATranslationNode;
       }
 
       const translationNode = {
