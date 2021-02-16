@@ -12,7 +12,7 @@
 
 # Installation instructions
 
-This document outlines how to get a pre-released version of the extension running locally.
+This document outlines how to get the v0.2.0 pre-release version of the extension running locally.
 
 There are three flavors:
 
@@ -30,14 +30,14 @@ There are three flavors:
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
+- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/untagged-41617d38f820c50109b8/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
 
 ## Chrome - Extension UI
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
-- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-chrome.zip)
+- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/untagged-41617d38f820c50109b8/bergamot-browser-extension_browser.mt-0.2.0-chrome.zip)
 - Unpack the zip file locally
 - Start Chrome Canary with the following extra argument: `--js-flags="--experimental-wasm-simd"`, eg `/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --js-flags="--experimental-wasm-simd"`
 - Enter `chrome://extensions` in Chrome's address bar and press enter
@@ -58,6 +58,6 @@ There are three flavors:
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
+- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/untagged-41617d38f820c50109b8/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
