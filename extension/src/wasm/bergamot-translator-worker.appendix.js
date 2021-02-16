@@ -28,10 +28,10 @@ addOnPreMain(function() {
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
     const modelConfig = `models:
-  - /model.${languagePair}.npz
+  - /${languagePair}/model.${languagePair}.npz
 vocabs:
-  - /vocab.${vocabLanguagePair}.spm
-  - /vocab.${vocabLanguagePair}.spm
+  - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
+  - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
 beam-size: 1
 normalize: 1.0
 word-penalty: 0
@@ -44,7 +44,7 @@ cpu-threads: 1
 quiet: true
 quiet-translation: true
 shortlist:
-    - /lex.${languagePair}.s2t
+    - /${languagePair}/lex.${languagePair}.s2t
     - 50
     - 50
 `;
