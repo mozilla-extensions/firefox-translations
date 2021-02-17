@@ -5,7 +5,8 @@
 
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
-  - [Creating build artifacts](#creating-build-artifacts)
+  - [Building Bergamot Translator WASM resources and importing them to the extension](#building-bergamot-translator-wasm-resources-and-importing-them-to-the-extension)
+  - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
@@ -36,9 +37,17 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-## Building Bergamot Translator for WASM
+## Building Bergamot Translator WASM resources and importing them to the extension
 
-First, put the model files to be included in the build into `../bergamot-translator/models/` according to the instructions [../bergamot-translator/README.md](here). Then, run the build and import script (in the `extension/` folder in this repo):
+1. Make sure all submodules are initiated:
+
+```bash
+git submodule update --init --recursive
+```
+
+2. Put the model files to be included in the build into `../bergamot-translator/models/` according to the instructions [here](../bergamot-translator/README.md).
+
+3. Run the build and import script (in the `extension/` folder in this repo):
 
 ```bash
 ./build-and-import-bergamot-translator.sh
