@@ -60,6 +60,8 @@ export class BergamotDomTranslatorRequest {
 
     const results = await bergamotApiClient.sendTranslationRequest(
       plainStringsToTranslate,
+      this.sourceLanguage,
+      this.targetLanguage,
     );
 
     const translationResponseData: TranslationResponseData = this.parseResults(

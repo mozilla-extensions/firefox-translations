@@ -5,7 +5,8 @@
 
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
-  - [Creating build artifacts](#creating-build-artifacts)
+  - [Building Bergamot Translator WASM resources and importing them to the extension](#building-bergamot-translator-wasm-resources-and-importing-them-to-the-extension)
+  - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
@@ -36,7 +37,27 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-## Creating build artifacts
+## Building Bergamot Translator WASM resources and importing them to the extension
+
+1. Make sure all submodules are initiated:
+
+```bash
+git submodule update --init --recursive
+```
+
+2. Add the model files to be included in the build according to the instructions [here](../bergamot-translator/README.md).
+
+3. Run the build and import script (in the `extension/` folder in this repo):
+
+```bash
+./build-and-import-bergamot-translator.sh
+```
+
+Repeat this process any time there has been an update in the bergamot-translator submodule.
+
+Note that changing the files to be included in the build doesn't automatically lead to repackaged files on next build unless `../bergamot-translator/build-wasm-docker/wasm/` is removed first.
+
+## Creating extension builds for distribution
 
 To build for Firefox:
 
@@ -66,9 +87,7 @@ The build artifact will be created under `dist/firefox/native-ui`.
 
 This will build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
 
-If you haven't already, download and install [Firefox Developer Edition](https://www.mozilla.org/en-US/firefox/developer/) before running the below commands.
-
-Note that you also temporarily need a REST server running locally. See [INSTALL.md](./INSTALL.md).
+If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) before running the below commands.
 
 ### Firefox
 

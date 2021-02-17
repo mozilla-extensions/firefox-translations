@@ -166,6 +166,8 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       this.state = aTranslation.uiState.infobarState;
     }
 
+    /*
+    // The welcome popup/notification is currently disabled
     const kWelcomePref = "browser.translation.ui.welcomeMessageShown";
     if (
       Services.prefs.prefHasUserValue(kWelcomePref) ||
@@ -240,6 +242,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       },
       { once: true },
     );
+     */
   }
 
   _getAnonElt(aAnonId) {

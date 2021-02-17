@@ -18,6 +18,8 @@ export class ContentScriptBergamotApiClient {
   }
   async sendTranslationRequest(
     texts: string[],
+    from: string,
+    to: string,
   ): Promise<BergamotRestApiTranslateRequestResult> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
@@ -47,6 +49,8 @@ export class ContentScriptBergamotApiClient {
       // console.debug("ContentScriptBergamotApiClient: Sending translation request", {texts});
       this.backgroundContextPort.postMessage({
         texts,
+        from,
+        to,
         requestId,
       });
     });

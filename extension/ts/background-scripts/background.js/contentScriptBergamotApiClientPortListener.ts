@@ -4,10 +4,16 @@
 
 import {
   BergamotApiClient,
+  BergamotRestApiParagraph,
+  BergamotRestApiSentence,
   BergamotRestApiTranslateRequestResult,
 } from "./lib/BergamotApiClient";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
+import {
+  BergamotTranslatorAPI,
+  TranslationResults,
+} from "./lib/BergamotTranslatorAPI";
 const bergamotApiClient = new BergamotApiClient();
 
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {
@@ -16,13 +22,35 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }
   port.onMessage.addListener(async function(m: {
     texts: [];
+    from: string;
+    to: string;
     requestId: string;
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
-    const { texts, requestId } = m;
+    const { texts, from, to, requestId } = m;
+    /*
     const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
       texts,
     );
+     */
+    const translatorApiResults: TranslationResults = await BergamotTranslatorAPI.translate(
+      texts,
+      from,
+      to,
+    );
+    const paragraphs: BergamotRestApiParagraph[] = translatorApiResults.translatedTexts.map(
+      text => {
+        const sentenceList: BergamotRestApiSentence[] = [
+          { nBest: [{ translation: text }] },
+        ];
+        return {
+          0: sentenceList,
+        };
+      },
+    );
+    const results: BergamotRestApiTranslateRequestResult = {
+      text: paragraphs,
+    };
     // console.log({ results });
     try {
       port.postMessage({

@@ -14,6 +14,8 @@ export class Translator {
   ) {
     const translationResults = await this.bergamotApiClient.sendTranslationRequest(
       [text],
+      originLanguage,
+      targetLanguage,
     );
     const nbestTranslations = this.bergamotApiClient.parseNbestTranslationsFromResponse(
       translationResults,
