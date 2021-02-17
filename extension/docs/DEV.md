@@ -39,6 +39,8 @@ cp .env.example .env.production
 Build Bergamot Translator for WASM:
 
 ```bash
+git submodule init
+git submodule update
 source /path/to/emsdk_env.sh
 ./build-and-import-bergamot-translator.sh
 ```
