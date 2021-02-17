@@ -12,7 +12,9 @@
 
 # Installation instructions
 
-This document outlines how to get a pre-released version of the extension running locally.
+This document outlines how to get the v0.2.0 pre-release version of the extension running locally.
+
+Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/tag/v0.2.0).
 
 There are three flavors:
 
@@ -28,6 +30,7 @@ There are three flavors:
   - `javascript.options.wasm_simd`
   - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
@@ -56,6 +59,7 @@ There are three flavors:
   - `javascript.options.wasm_simd`
   - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension

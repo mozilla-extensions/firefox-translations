@@ -5,7 +5,8 @@
 
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
-  - [Creating build artifacts](#creating-build-artifacts)
+  - [Building Bergamot Translator WASM resources and importing them to the extension](#building-bergamot-translator-wasm-resources-and-importing-them-to-the-extension)
+  - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
@@ -36,16 +37,27 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-Build Bergamot Translator for WASM:
+## Building Bergamot Translator WASM resources and importing them to the extension
+
+1. Make sure all submodules are initiated:
 
 ```bash
-source /path/to/emsdk_env.sh
+git submodule update --init --recursive
+```
+
+2. Add the model files to be included in the build according to the instructions [here](../bergamot-translator/README.md).
+
+3. Run the build and import script (in the `extension/` folder in this repo):
+
+```bash
 ./build-and-import-bergamot-translator.sh
 ```
 
-Repeat this last step any time there has been an update in the bergamot-translator submodule.
+Repeat this process any time there has been an update in the bergamot-translator submodule.
 
-## Creating build artifacts
+Note that changing the files to be included in the build doesn't automatically lead to repackaged files on next build unless `../bergamot-translator/build-wasm-docker/wasm/` is removed first.
+
+## Creating extension builds for distribution
 
 To build for Firefox:
 
