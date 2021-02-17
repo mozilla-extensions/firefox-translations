@@ -1,6 +1,7 @@
 set -e
 set -x
 
+git submodule update --init --recursive
 cd ../bergamot-translator/docker
 make
 cd ../build-wasm-docker
