@@ -45,17 +45,15 @@ cp .env.example .env.production
 git submodule update --init --recursive
 ```
 
-2. Add the model files to be included in the build according to the instructions [here](../bergamot-translator/README.md).
+2. Acquire build artifacts bergamot-translator, according to the instructions [here](../bergamot-translator/README.md).
 
-3. Run the build and import script (in the `extension/` folder in this repo):
+3. Put the bergamot-translator build artifacts in the `../bergamot-translator/build-wasm-docker/wasm/` folder, then run the following import script (from the `extension/` folder in this repo):
 
 ```bash
-./build-and-import-bergamot-translator.sh
+./import-bergamot-translator.sh
 ```
 
 Repeat this process any time there has been an update in the bergamot-translator submodule.
-
-Note that changing the files to be included in the build doesn't automatically lead to repackaged files on next build unless `../bergamot-translator/build-wasm-docker/wasm/` is removed first.
 
 ## Creating extension builds for distribution
 
