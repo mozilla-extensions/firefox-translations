@@ -36,16 +36,19 @@ cp .env.example .env.development
 cp .env.example .env.production
 ```
 
-Build Bergamot Translator for WASM:
+## Building Bergamot Translator for WASM
+
+First, put the model files to be included in the build into `../bergamot-translator/models/` according to the instructions [../bergamot-translator/README.md](here). Then, run the build and import script (in the `extension/` folder in this repo):
 
 ```bash
-source /path/to/emsdk_env.sh
 ./build-and-import-bergamot-translator.sh
 ```
 
-Repeat this last step any time there has been an update in the bergamot-translator submodule.
+Repeat this process any time there has been an update in the bergamot-translator submodule.
 
-## Creating build artifacts
+Note that changing the files in the `../bergamot-translator/models/` folder doesn't automatically invalidate the build, so better remove `../bergamot-translator/build-wasm-docker/` in those cases in order to trigger a full rebuild.
+
+## Creating extension builds for distribution
 
 To build for Firefox:
 
