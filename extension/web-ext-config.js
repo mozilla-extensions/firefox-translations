@@ -47,14 +47,14 @@ if (targetBrowser === "firefox") {
     "about:debugging#/runtime/this-firefox",
   ];
   defaultConfig.run.pref = [
-    "browser.aboutConfig.showWarning=false",
-    "browser.proton.enabled=true",
     "extensions.experiments.enabled=true",
+    "browser.proton.enabled=true",
     "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled=true",
     "javascript.options.wasm_simd=true",
     "javascript.options.wasm_simd_wormhole=true",
-    // "browser.translation.ui.show=true",
-    // "browser.translation.detectLanguage=true",
+    "browser.translation.ui.show=false",
+    "browser.translation.detectLanguage=false",
+    "browser.aboutConfig.showWarning=false",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
   defaultConfig.filename = `${extensionId}-{version}-firefox.xpi`;
