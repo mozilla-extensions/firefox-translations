@@ -1,12 +1,14 @@
 language: node_js
+node_js:
+  - 10
+cache: yarn
 install:
   - cd extension
   - yarn install
   - cp .env.example .env.development
   - cp .env.example .env.production
 script:
-  - bash ./build-bergamot-translator.sh
-  - cd extension
+  - bash ../build-bergamot-translator.sh
   - bash ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
   - yarn build:production
   - yarn build:production:chrome
