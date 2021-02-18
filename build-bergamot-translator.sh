@@ -5,7 +5,7 @@
 set -e
 set -x
 
-# run script from the context of the script-containing directory
+# Run script from the context of the script-containing directory
 cd "$(dirname $0)"
 
 # This file replicates the instructions found in ../bergamot-translator/README.md under "Build WASM"
