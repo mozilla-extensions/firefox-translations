@@ -39,19 +39,13 @@ cp .env.example .env.production
 
 ## Building Bergamot Translator WASM resources and importing them to the extension
 
-1. Make sure all submodules are initiated:
-
-```bash
-git submodule update --init --recursive
-```
-
-2. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
+1. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
 
 ```bash
 ../build-bergamot-translator.sh
 ```
 
-3. Upon successful build, run the following import script:
+2. Upon successful build, run the following import script:
 
 ```bash
 ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
