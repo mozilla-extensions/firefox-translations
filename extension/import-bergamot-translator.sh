@@ -13,8 +13,8 @@ else
   ARTIFACTS_DIRECTORY=../bergamot-translator/build-wasm/wasm
 fi
 
-cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" extension/src/wasm/bergamot-translator-worker.appendix.js > extension/src/wasm/bergamot-translator-worker.js
-cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" extension/src/wasm/bergamot-translator-worker.wasm
-cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.data" extension/src/wasm/bergamot-translator-worker.data
+cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" src/wasm/bergamot-translator-worker.appendix.js > src/wasm/bergamot-translator-worker.js
+cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/wasm/bergamot-translator-worker.wasm
+cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.data" src/wasm/bergamot-translator-worker.data
 
 exit 0
