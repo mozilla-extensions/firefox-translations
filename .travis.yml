@@ -1,0 +1,13 @@
+language: node_js
+install:
+  - cd extension
+  - yarn install
+  - cp .env.example .env.development
+  - cp .env.example .env.production
+script:
+  - bash ./build-bergamot-translator.sh
+  - cd extension
+  - bash ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
+  - yarn build:production
+  - yarn build:production:chrome
+  - yarn build:production:native-ui
