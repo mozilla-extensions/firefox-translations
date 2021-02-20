@@ -42,7 +42,7 @@ cp .env.example .env.production
 1. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
 
 ```bash
-../build-bergamot-translator.sh
+../bergamot-translator/build-wasm.sh
 ```
 
 2. Upon successful build, run the following import script:
