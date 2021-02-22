@@ -24,7 +24,7 @@ The commands in these instructions are meant to be run in the `extension/` folde
 
 ## First time setup
 
-1. Install dependencies using [yarn](https://yarnpkg.com/getting-started/install):
+1. Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
 
 ```bash
 yarn install
