@@ -3,6 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { config } from "../../../config";
+import {
+  BergamotTranslatorAPI,
+  TranslationResults,
+} from "./BergamotTranslatorAPI";
 
 const MS_IN_A_MINUTE = 60 * 1000;
 
@@ -76,6 +80,45 @@ export class BergamotApiClient {
   };
 
   public sendTranslationRequest = async (
+    texts: string | string[],
+    from: string,
+    to: string,
+  ): Promise<BergamotRestApiTranslateRequestResult> => {
+    return this.sendTranslationRequestViaWASMAPI(texts, from, to);
+    // TODO: Possibly make it configurable to build/configure the extension to use the REST API - eg for performance testing / research
+    // return this.sendTranslationRequestViaRestAPI(texts, from, to);
+  };
+
+  public sendTranslationRequestViaWASMAPI = async (
+    texts: string | string[],
+    from: string,
+    to: string,
+  ): Promise<BergamotRestApiTranslateRequestResult> => {
+    if (typeof texts === "string") {
+      texts = [texts];
+    }
+    const translatorApiResults: TranslationResults = await BergamotTranslatorAPI.translate(
+      texts,
+      from,
+      to,
+    );
+    const paragraphs: BergamotRestApiParagraph[] = translatorApiResults.translatedTexts.map(
+      text => {
+        const sentenceList: BergamotRestApiSentence[] = [
+          { nBest: [{ translation: text }] },
+        ];
+        return {
+          0: sentenceList,
+        };
+      },
+    );
+    const results: BergamotRestApiTranslateRequestResult = {
+      text: paragraphs,
+    };
+    return results;
+  };
+
+  public sendTranslationRequestViaRestAPI = async (
     texts: string | string[],
   ): Promise<BergamotRestApiTranslateRequestResult> => {
     const payload: BergamotRestApiTranslationRequestPayload = {
