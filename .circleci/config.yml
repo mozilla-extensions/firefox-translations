@@ -1,0 +1,19 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: 'emscripten/emsdk:2.0.9'
+    resource_class: xlarge
+
+    working_directory: ~/checkout
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build Bergamot Translator WASM artifacts
+          command: bash bergamot-translator/build-wasm.sh
+
+      - store_artifacts:
+          path: "bergamot-translator/build-wasm/wasm"
+          destination: "bergamot-translator/build-wasm/wasm"
