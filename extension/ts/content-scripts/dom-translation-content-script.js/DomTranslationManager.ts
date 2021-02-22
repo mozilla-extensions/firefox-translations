@@ -10,6 +10,7 @@ import { DetectedLanguageResults } from "../../background-scripts/background.js/
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
+import { detag } from "./dom-translators/detagAndProject";
 
 export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
@@ -260,59 +261,33 @@ export class DomTranslationManager {
   }
 
   async getDocumentTranslationStatistics() {
-    const isElementInViewport = el => {
-      const rect = el.getBoundingClientRect();
-      return (
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <=
-          (window.innerHeight || document.documentElement.clientHeight) &&
-        rect.right <=
-          (window.innerWidth || document.documentElement.clientWidth)
-      );
-    };
-
     const translationDocument: TranslationDocument =
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
     const { translationRoots } = translationDocument;
 
-    const elements = translationRoots.map(
-      translationRoot => translationRoot.nodeRef,
-    );
-    const elementsVisibleInViewport = await this.getElementsVisibleInViewport(
-      elements,
-    );
+    const {
+      translationRootsInViewport,
+      translationRootsVisibleInViewport,
+    } = await translationDocument.determineVisibilityOfTranslationRoots();
 
-    const texts = [];
-    const textsInViewport = [];
-    const textsVisibleInViewport = [];
-    for (let i = 0; i < translationRoots.length; i++) {
-      let translationRoot = translationRoots[i];
+    const generateOriginalMarkupToTranslate = translationRoot =>
+      translationDocument.generateMarkupToTranslate(translationRoot);
+    const removeTags = originalString => {
+      const detaggedString = detag(originalString);
+      return detaggedString.plainString;
+    };
 
-      let text = translationDocument.generateMarkupToTranslate(translationRoot);
-      if (!text) {
-        continue;
-      }
-
-      // remove tags
-      text = text.replace(/<[^>]*>?/gm, " ").trim();
-
-      texts.push(text);
-
-      const inViewport = isElementInViewport(translationRoot.nodeRef);
-      if (inViewport) {
-        textsInViewport.push(text);
-      }
-
-      const visibleInViewport = elementsVisibleInViewport.find(
-        el => el === translationRoot.nodeRef,
-      );
-      if (visibleInViewport) {
-        textsVisibleInViewport.push(text);
-      }
-    }
+    const texts = translationRoots
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsInViewport = translationRootsInViewport
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsVisibleInViewport = translationRootsVisibleInViewport
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
 
     const wordCount = texts.join(" ").split(" ").length;
     const wordCountInViewport = textsInViewport.join(" ").split(" ").length;
@@ -323,7 +298,7 @@ export class DomTranslationManager {
     const translationRootsCount = translationRoots.length;
     const simpleTranslationRootsCount = translationRoots.filter(
       translationRoot => translationRoot.isSimleTranslationRoot,
-    );
+    ).length;
 
     return {
       translationRootsCount,
@@ -335,25 +310,5 @@ export class DomTranslationManager {
       wordCountInViewport,
       wordCountVisibleInViewport,
     };
-  }
-
-  async getElementsVisibleInViewport(elements: HTMLElement[]): Promise<Node[]> {
-    return new Promise(resolve => {
-      let options = {
-        threshold: 0.0,
-      };
-
-      let callback: IntersectionObserverCallback = (entries, $observer) => {
-        console.debug("InteractionObserver callback", entries.length, entries);
-        const elementsInViewport = entries
-          .filter(entry => entry.isIntersecting)
-          .map(entry => entry.target);
-        $observer.disconnect();
-        resolve(elementsInViewport);
-      };
-
-      let observer = new IntersectionObserver(callback, options);
-      elements.forEach(el => observer.observe(el));
-    });
   }
 }

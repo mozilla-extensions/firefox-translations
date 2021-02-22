@@ -276,6 +276,39 @@ export class TranslationDocument {
       */
     })();
   }
+
+  async determineVisibilityOfTranslationRoots() {
+    const { translationRoots } = this;
+
+    const elements = translationRoots.map(
+      translationRoot => translationRoot.nodeRef,
+    );
+    const elementsVisibleInViewport = await getElementsVisibleInViewport(
+      elements,
+    );
+
+    const translationRootsInViewport = [];
+    const translationRootsVisibleInViewport = [];
+    for (let i = 0; i < translationRoots.length; i++) {
+      let translationRoot = translationRoots[i];
+      const inViewport = isElementInViewport(translationRoot.nodeRef);
+      if (inViewport) {
+        translationRootsInViewport.push(translationRoot);
+      }
+      const visibleInViewport = isElementVisibleInViewport(
+        elementsVisibleInViewport,
+        translationRoot.nodeRef,
+      );
+      if (visibleInViewport) {
+        translationRootsVisibleInViewport.push(translationRoot);
+      }
+    }
+
+    return {
+      translationRootsInViewport,
+      translationRootsVisibleInViewport,
+    };
+  }
 }
 
 /**
@@ -325,3 +358,43 @@ function regenerateMarkupToTranslateFromOriginal(
 
   return generateMarkupToTranslateForItem(item, str);
 }
+
+const isElementInViewport = (el: HTMLElement): boolean => {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <=
+      (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+
+const isElementVisibleInViewport = (
+  elementsVisibleInViewport: Node[],
+  el: Node,
+): boolean => {
+  return elementsVisibleInViewport.filter($el => $el === el).length > 0;
+};
+
+const getElementsVisibleInViewport = async (
+  elements: HTMLElement[],
+): Promise<Node[]> => {
+  return new Promise(resolve => {
+    let options = {
+      threshold: 0.0,
+    };
+
+    let callback: IntersectionObserverCallback = (entries, $observer) => {
+      console.debug("InteractionObserver callback", entries.length, entries);
+      const elementsInViewport = entries
+        .filter(entry => entry.isIntersecting)
+        .map(entry => entry.target);
+      $observer.disconnect();
+      resolve(elementsInViewport);
+    };
+
+    let observer = new IntersectionObserver(callback, options);
+    elements.forEach(el => observer.observe(el));
+  });
+};
