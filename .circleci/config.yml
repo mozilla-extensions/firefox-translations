@@ -14,6 +14,10 @@ jobs:
           name: Build Bergamot Translator WASM artifacts
           command: bash bergamot-translator/build-wasm.sh
 
+      - run:
+          name: Import and concatenate Bergamot Translator WASM artifacts with bergamot-translator-worker.appendix.js
+          command: cd extension && ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
+
       - store_artifacts:
-          path: "bergamot-translator/build-wasm/wasm"
-          destination: "bergamot-translator/build-wasm/wasm"
+          path: "extension/src/wasm"
+          destination: "extension/src/wasm"
