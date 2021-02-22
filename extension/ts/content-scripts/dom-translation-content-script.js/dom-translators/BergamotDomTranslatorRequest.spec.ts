@@ -55,8 +55,8 @@ describe(testSuiteName, function() {
 
     let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
       translationRequestData,
-      this.sourceLanguage,
-      this.targetLanguage,
+      from,
+      to,
     );
 
     const bergamotApiClient = new BergamotApiClient();

@@ -4,5 +4,5 @@ mocha.setup({
   ui: "bdd",
   checkLeaks: true,
   asyncOnly: true,
-  timeout: 10000,
+  timeout: 60000,
 });
