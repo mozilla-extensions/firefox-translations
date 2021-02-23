@@ -24,7 +24,7 @@ The commands in these instructions are meant to be run in the `extension/` folde
 
 ## First time setup
 
-1. Install dependencies using [yarn](https://yarnpkg.com/getting-started/install):
+1. Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
 
 ```bash
 yarn install
@@ -39,23 +39,19 @@ cp .env.example .env.production
 
 ## Building Bergamot Translator WASM resources and importing them to the extension
 
-1. Make sure all submodules are initiated:
+1. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
 
 ```bash
-git submodule update --init --recursive
+../bergamot-translator/build-wasm.sh
 ```
 
-2. Add the model files to be included in the build according to the instructions [here](../bergamot-translator/README.md).
-
-3. Run the build and import script (in the `extension/` folder in this repo):
+2. Upon successful build, run the following import script:
 
 ```bash
-./build-and-import-bergamot-translator.sh
+./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
 ```
 
 Repeat this process any time there has been an update in the bergamot-translator submodule.
-
-Note that changing the files to be included in the build doesn't automatically lead to repackaged files on next build unless `../bergamot-translator/build-wasm-docker/wasm/` is removed first.
 
 ## Creating extension builds for distribution
 
