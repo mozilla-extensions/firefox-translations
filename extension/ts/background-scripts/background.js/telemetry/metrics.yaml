@@ -47,7 +47,7 @@ metadata:
       - glean-team@mozilla.com
     expires: never
 
-performace:
+performance:
   translation_time:
     type: event
     lifetime: ping
@@ -269,6 +269,24 @@ errors:
       - custom
     description: |
       The translation procedure has failed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+
+test:
+  test_counter:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Bergamot extension tests have tested the Glean integration.
     bugs:
       - https://bugzilla.mozilla.org/1691365
     data_reviews:

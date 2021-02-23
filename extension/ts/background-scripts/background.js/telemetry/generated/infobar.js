@@ -17,11 +17,11 @@ var infobar;
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
-    define(["@mozilla/glean/webext"], factory);
+    define(["@mozilla/glean/dist/webext"], factory);
   } else if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require("@mozilla/glean/webext"));
+    module.exports = factory(require("@mozilla/glean/dist/webext"));
   } else if (typeof root === "undefined") {
     // In Qt/QML environments we can't change the global object from Javascript.
     // We will simply assing to a global variable in this case.

@@ -10,39 +10,39 @@
 
 // Global variable to use when in Qt/QML environments,
 // where do not have access to the global object (i.e. window);
-var performace;
+var performance;
 
 // Universal Module Definition (UMD) template based on:
 // https://github.com/umdjs/umd/blob/master/templates/returnExports.js
 (function(root, factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
-    define(["@mozilla/glean/webext"], factory);
+    define(["@mozilla/glean/dist/webext"], factory);
   } else if (typeof module === "object" && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require("@mozilla/glean/webext"));
+    module.exports = factory(require("@mozilla/glean/dist/webext"));
   } else if (typeof root === "undefined") {
     // In Qt/QML environments we can't change the global object from Javascript.
     // We will simply assing to a global variable in this case.
-    performace = factory(webext.Glean);
+    performance = factory(webext.Glean);
   } else {
     // Browser globals (root is window)
     if (!root["gleanAssets"]) {
       root["gleanAssets"] = {};
     }
-    root["gleanAssets"]["performace"] = factory(root.webext);
+    root["gleanAssets"]["performance"] = factory(root.webext);
   }
 })(typeof self !== "undefined" ? self : this, function(Glean) {
   return {
     /**
-     * The time spent on web page translation.
+     * Time spent on web page translation.
      *
-     * Generated from `performace.translation_time`.
+     * Generated from `performance.translation_time`.
      */
     translationTime: new Glean._private.EventMetricType(
       {
-        category: "performace",
+        category: "performance",
         name: "translation_time",
         sendInPings: ["custom"],
         lifetime: "ping",
@@ -53,11 +53,11 @@ var performace;
     /**
      * Time spent on downloading a translation model for a language pair.
      *
-     * Generated from `performace.model_download_time`.
+     * Generated from `performance.model_download_time`.
      */
     modelDownloadTime: new Glean._private.EventMetricType(
       {
-        category: "performace",
+        category: "performance",
         name: "model_download_time",
         sendInPings: ["custom"],
         lifetime: "ping",
@@ -68,11 +68,11 @@ var performace;
     /**
      * Time spent on loading a model into memory to start translation.
      *
-     * Generated from `performace.model_load_time`.
+     * Generated from `performance.model_load_time`.
      */
     modelLoadTime: new Glean._private.EventMetricType(
       {
-        category: "performace",
+        category: "performance",
         name: "model_load_time",
         sendInPings: ["custom"],
         lifetime: "ping",
@@ -83,11 +83,11 @@ var performace;
     /**
      * Speed of translation.
      *
-     * Generated from `performace.words_per_second`.
+     * Generated from `performance.words_per_second`.
      */
     wordsPerSecond: new Glean._private.EventMetricType(
       {
-        category: "performace",
+        category: "performance",
         name: "words_per_second",
         sendInPings: ["custom"],
         lifetime: "ping",
@@ -98,11 +98,11 @@ var performace;
     /**
      * Quality esimation of translation.
      *
-     * Generated from `performace.translation_quality`.
+     * Generated from `performance.translation_quality`.
      */
     translationQuality: new Glean._private.EventMetricType(
       {
-        category: "performace",
+        category: "performance",
         name: "translation_quality",
         sendInPings: ["custom"],
         lifetime: "ping",

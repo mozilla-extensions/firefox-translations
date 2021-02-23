@@ -10,7 +10,7 @@
 
 // Global variable to use when in Qt/QML environments,
 // where do not have access to the global object (i.e. window);
-var metadata;
+var test;
 
 // Universal Module Definition (UMD) template based on:
 // https://github.com/umdjs/umd/blob/master/templates/returnExports.js
@@ -25,36 +25,24 @@ var metadata;
   } else if (typeof root === "undefined") {
     // In Qt/QML environments we can't change the global object from Javascript.
     // We will simply assing to a global variable in this case.
-    metadata = factory(webext.Glean);
+    test = factory(webext.Glean);
   } else {
     // Browser globals (root is window)
     if (!root["gleanAssets"]) {
       root["gleanAssets"] = {};
     }
-    root["gleanAssets"]["metadata"] = factory(root.webext);
+    root["gleanAssets"]["test"] = factory(root.webext);
   }
 })(typeof self !== "undefined" ? self : this, function(Glean) {
   return {
     /**
-     * Translation source language.
+     * Bergamot extension tests have tested the Glean integration.
      *
-     * Generated from `metadata.from_lang`.
+     * Generated from `test.test_counter`.
      */
-    fromLang: new Glean._private.StringMetricType({
-      category: "metadata",
-      name: "from_lang",
-      sendInPings: ["custom"],
-      lifetime: "ping",
-      disabled: false,
-    }),
-    /**
-     * Translation target language.
-     *
-     * Generated from `metadata.to_lang`.
-     */
-    toLang: new Glean._private.StringMetricType({
-      category: "metadata",
-      name: "to_lang",
+    testCounter: new Glean._private.CounterMetricType({
+      category: "test",
+      name: "test_counter",
       sendInPings: ["custom"],
       lifetime: "ping",
       disabled: false,
