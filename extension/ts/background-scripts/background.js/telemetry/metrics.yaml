@@ -1,0 +1,280 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This file defines the metrics that are recorded by the Glean SDK.
+# APIs to use these pings are automatically generated at build time using
+# the `glean_parser` PyPI package.
+
+# Metrics in this file may make use of SDK reserved ping names. See
+# https://mozilla.github.io/glean/book/dev/core/internal/reserved-ping-names.html
+# for additional information.
+
+---
+$schema: moz://mozilla.org/schemas/glean/metrics/2-0-0
+
+metadata:
+  from_lang:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Translation source language.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  to_lang:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Translation target language.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+
+performace:
+  translation_time:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on web page translation.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  model_download_time:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on downloading a translation model for a language pair.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  model_load_time:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on loading a model into memory to start translation.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  words_per_second:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Speed of translation.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  translation_quality:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Quality esimation of translation.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+
+infobar:
+  displayed:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation infobar was automatically displayed in a browser.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  closed:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation infobar was closed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  translate:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The "Translate" button was pressed on translation inforbar.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  never_translate_lang:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Never traslate language" button in the infobar options was pressed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  never_translate_site:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Never traslate site" button in the infobar options was pressed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  not_now:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Not now" button on the infobar was pressed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+
+service:
+  not_suppported:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Language pair of user and website languages is not supported.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+  lang_mismatch:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The user and website languages do not match.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
+
+errors:
+  translation:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation procedure has failed.
+    bugs:
+      - https://bugzilla.mozilla.org/1691365
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - glean-team@mozilla.com
+    expires: never
