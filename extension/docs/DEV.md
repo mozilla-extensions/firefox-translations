@@ -6,6 +6,7 @@
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
   - [Building Bergamot Translator WASM resources and importing them to the extension](#building-bergamot-translator-wasm-resources-and-importing-them-to-the-extension)
+  - [Using artifacts built elsewhere](#using-artifacts-built-elsewhere)
   - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
@@ -38,13 +39,17 @@ yarn install
 yarn bergamot-translator:build-and-import
 ```
 
+Repeat this process any time there has been an update in the bergamot-translator submodule.
+
+## Using artifacts built elsewhere
+
 To use artifacts built elsewhere (eg, CI) run the import script referencing the relative path to the directory of the downloaded artifacts, eg if you downloaded the artifacts in `extension/circle-ci-wasm-artifacts/`, run:
 
 ```bash
 ./import-bergamot-translator.sh ./circle-ci-wasm-artifacts/
 ```
 
-Repeat this process any time there has been an update in the bergamot-translator submodule.
+Note that copying the artifacts directly into `extension/src/wasm/` will not work, since the import script concatenates the contents of the `bergamot-translator-worker.js` WASM build artifact with the contents of `extension/src/wasm/bergamot-translator-worker.appendix.js` and stores the result into `extension/src/wasm/bergamot-translator-worker.js`.
 
 ## Creating extension builds for distribution
 
