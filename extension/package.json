@@ -179,6 +179,7 @@
     "predevelopment-build": "npm-run-all clean generate-manifest",
     "pretest:unit:mocha": "NODE_ENV=test npx webpack --entry ./test/unit/all-tests.ts --output-path test/unit/build --output-filename all-tests.js --target node",
     "serve-fixtures": "light-server -s test/fixtures/ -w \"test/fixtures/**\"",
+    "taskcluster:lint": "npm-run-all -n build lint",
     "taskcluster:test": "npm-run-all -n bergamot-translator:build-and-import test",
     "test": "npm-run-all -n test:func",
     "test:func": "npm-run-all -pr test:func:*",
