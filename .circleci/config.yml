@@ -33,6 +33,7 @@ jobs:
 
       - save_cache:
           paths:
+            - extension/downloaded-bergamot-translator-wasm-artifacts
             - extension/node_modules
             - extension/firefox-nightly-linux
           key: dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-{{ checksum "extension/download-bergamot-translator-wasm-artifacts.sh" }}-20210224
