@@ -2,22 +2,57 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: 'emscripten/emsdk:2.0.9'
-    resource_class: xlarge
+      - image: circleci/node:latest-browsers
+        environment:
+          FIREFOX_BIN: /home/circleci/checkout/firefox-nightly-linux/firefox-bin
 
     working_directory: ~/checkout
 
     steps:
       - checkout
 
-      - run:
-          name: Build Bergamot Translator WASM artifacts
-          command: bash bergamot-translator/build-wasm.sh
+      # Download and cache dependencies (update the cache keys to force a newer version)
+      - restore_cache:
+          keys:
+            - dependencies-and-browsers-{{ checksum "package.json" }}-20210224
 
       - run:
-          name: Import and concatenate Bergamot Translator WASM artifacts with bergamot-translator-worker.appendix.js
-          command: cd extension && ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
+          name: Install dependencies
+          command: cd extension && yarn install --frozen-lockfile
+
+      - run:
+          name:  Install Firefox
+          command: |
+            cd extension
+            yarn get-firefox:linux
+            # Prevent any tests from using the default installed version of Firefox by accident
+            sudo rm /usr/bin/firefox || true
+
+      - save_cache:
+          paths:
+            - node_modules
+            - firefox-nightly-linux
+          key: dependencies-and-browsers-{{ checksum "package.json" }}-20210224
+
+      - run:
+          name: Print which version of Firefox is installed to the build log
+          command: |
+            cd extension
+            echo "Version of Firefox installed:"
+            ./firefox-nightly-linux/firefox-bin -v
+
+      - run:
+          name: Lint
+          command: cd extension && yarn lint
+
+      - run:
+          name: Build extension
+          command: cd extension && yarn build
 
       - store_artifacts:
-          path: "extension/src/wasm"
-          destination: "extension/src/wasm"
+          path: "dist"
+          destination: "dist"
+
+      - run:
+          name: Functional tests
+          command: cd extension && yarn functional-tests
