@@ -39,7 +39,7 @@ jobs:
           key: dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-{{ checksum "extension/download-bergamot-translator-wasm-artifacts.sh" }}-20210224
 
       - run:
-          name: Print which version of Firefox is installed to the build log
+          name: Print which version of Firefox is installed
           command: |
             cd extension
             echo "Version of Firefox installed:"
@@ -58,5 +58,5 @@ jobs:
           destination: "extension/dist"
 
       - run:
-          name: Functional tests
+          name: Run tests
           command: cd extension && FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn just-test
