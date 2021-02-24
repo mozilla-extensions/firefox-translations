@@ -146,6 +146,7 @@
   },
   "private": true,
   "scripts": {
+    "bergamot-translator:build-and-import": "../bergamot-translator/build-wasm.sh && ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/",
     "build": "npm-run-all build:*",
     "build:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=chrome UI=extension-ui web-ext build",
     "build:default": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=firefox UI=extension-ui web-ext build",

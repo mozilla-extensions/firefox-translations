@@ -39,16 +39,16 @@ cp .env.example .env.production
 
 ## Building Bergamot Translator WASM resources and importing them to the extension
 
-1. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
+1. Build and import [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
 
 ```bash
-../bergamot-translator/build-wasm.sh
+yarn bergamot-translator:build-and-import
 ```
 
-2. Upon successful build, run the following import script:
+To use artifacts built elsewhere (eg, CI) run the import script referencing the relative path to the directory of the downloaded artifacts, eg if you downloaded the artifacts in `extension/circle-ci-wasm-artifacts/`, run:
 
 ```bash
-./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
+./import-bergamot-translator.sh ./circle-ci-wasm-artifacts/
 ```
 
 Repeat this process any time there has been an update in the bergamot-translator submodule.
