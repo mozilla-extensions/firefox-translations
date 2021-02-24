@@ -16,7 +16,7 @@ jobs:
 
       - run:
           name: Download and import Bergamot Translator build artifacts
-          # Note: the import step runs again as part of yarn build, which ensures that the latest .appendix.js is used despite cached artifacts
+          # Note: the import step runs again before building the extensions, which ensures that the latest .appendix.js is used despite cached artifacts
           command: cd extension && yarn bergamot-translator:download-and-import
 
       - run:
@@ -50,8 +50,21 @@ jobs:
           command: cd extension && yarn lint
 
       - run:
-          name: Build extension
-          command: cd extension && yarn build
+          name: Import Bergamot Translator build artifacts
+          # The import step runs again here to ensure that the latest .appendix.js is used despite cached artifacts
+          command: cd extension && yarn bergamot-translator:download-and-import
+
+      - run:
+          name: Build Firefox extension - Native UI variant
+          command: cd extension && yarn build:native-ui
+
+      - run:
+          name: Build Firefox extension
+          command: cd extension && yarn build:default
+
+      - run:
+          name: Build Chrome extension
+          command: cd extension && yarn build:chrome
 
       - store_artifacts:
           path: "extension/dist"
