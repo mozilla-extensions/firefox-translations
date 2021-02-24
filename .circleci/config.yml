@@ -48,8 +48,8 @@ jobs:
           command: cd extension && yarn build
 
       - store_artifacts:
-          path: "dist"
-          destination: "dist"
+          path: "extension/dist"
+          destination: "extension/dist"
 
       - run:
           name: Functional tests
