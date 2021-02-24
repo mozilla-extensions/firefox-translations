@@ -172,14 +172,10 @@
     "generate-wee:verifyWeeSchema:translateUi": "cd src/experiment-apis/translateUi && verifyWeeSchema schema.json",
     "get-firefox:linux": "[ ! -d \"./firefox-nightly-linux\" ] && get-firefox --branch nightly --platform linux --extract && mv firefox firefox-nightly-linux || true",
     "init-dotenv-config": "./init-dotenv-config.sh",
-    "just-lint": "npm-run-all lint:* lint:web-ext-lint:*",
     "just-test": "npm-run-all -n functional-tests",
-    "lint": "npm-run-all -n build just-lint",
+    "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint . --ext jsm,js,json",
     "lint:tslint": "tslint -t stylish ts/**/*.ts ts/**/*.tsx",
-    "lint:web-ext-lint:chrome": "TARGET_BROWSER=chrome UI=extension-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
-    "lint:web-ext-lint:default": "TARGET_BROWSER=firefox UI=extension-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
-    "lint:web-ext-lint:native-ui": "TARGET_BROWSER=firefox UI=native-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
     "prebuild:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
     "prebuild:default": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
     "prebuild:native-ui": "TARGET_BROWSER=firefox UI=native-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
@@ -190,6 +186,9 @@
     "watch": "TARGET_BROWSER=firefox UI=extension-ui REMOTE_DEV_SERVER_PORT=8181 npm-run-all development-build && TARGET_BROWSER=firefox UI=extension-ui REMOTE_DEV_SERVER_PORT=8181 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8181' 'yarn serve-fixtures'",
     "watch:chrome": "TARGET_BROWSER=chrome UI=extension-ui REMOTE_DEV_SERVER_PORT=8182 npm-run-all development-build && TARGET_BROWSER=chrome UI=extension-ui REMOTE_DEV_SERVER_PORT=8182 concurrently 'webpack --watch' 'web-ext run -t chromium' 'remotedev --port=8182' 'yarn serve-fixtures'",
     "watch:native-ui": "TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 npm-run-all development-build && TARGET_BROWSER=firefox UI=native-ui REMOTE_DEV_SERVER_PORT=8183 concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8183' 'yarn serve-fixtures'",
+    "web-ext-lint:chrome": "TARGET_BROWSER=chrome UI=extension-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
+    "web-ext-lint:default": "TARGET_BROWSER=firefox UI=extension-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
+    "web-ext-lint:native-ui": "TARGET_BROWSER=firefox UI=native-ui web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
     "webpack:stats": "webpack --profile --json --mode=production > stats.json"
   }
 }
