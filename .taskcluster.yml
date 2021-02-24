@@ -13,7 +13,7 @@ tasks:
           # `mozillaonline-privileged` for Mozilla China add-on,
           # `normandy-privileged` for normandy add-on
           # to enable siging on push/PR.
-          xpiSigningType: "privileged"
+          xpiSigningType: "normandy-privileged"
           # The below doesn't need changing on initial repo setup
           taskgraph:
               branch: taskgraph
