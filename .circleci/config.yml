@@ -53,4 +53,4 @@ jobs:
 
       - run:
           name: Functional tests
-          command: cd extension && yarn test
+          command: cd extension && yarn just-test
