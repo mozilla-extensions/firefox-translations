@@ -53,4 +53,4 @@ jobs:
 
       - run:
           name: Functional tests
-          command: cd extension && yarn just-test
+          command: cd extension && FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn just-test
