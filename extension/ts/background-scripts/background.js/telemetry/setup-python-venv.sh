@@ -2,7 +2,7 @@
 set -e
 
 # Create and activate a local Python 3 venv
-python3.7 -m venv venv
+python -m venv venv
 source venv/bin/activate
 
 # Install requirements

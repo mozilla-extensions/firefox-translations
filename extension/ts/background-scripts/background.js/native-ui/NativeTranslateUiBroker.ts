@@ -13,6 +13,8 @@ import { ExtensionState } from "../../../shared-resources/models/ExtensionState"
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 import Event = Events.Event;
 import { LanguageSupport } from "../../../shared-resources/LanguageSupport";
+import { translate } from "../telemetry/generated/infobar";
+import { telemetry } from "../telemetry/Telemetry";
 
 enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
@@ -222,6 +224,7 @@ export class NativeTranslateUiBroker {
 
   onTranslateButtonPressed(tabId, from, to) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
+    telemetry.record(() => translate.record(), from, to);
 
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {

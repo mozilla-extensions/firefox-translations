@@ -22,13 +22,13 @@ metadata:
     description: |
       Translation source language.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   to_lang:
     type: string
@@ -38,13 +38,13 @@ metadata:
     description: |
       Translation target language.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
 
 performance:
@@ -56,13 +56,13 @@ performance:
     description: |
       Time spent on web page translation.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   model_download_time:
     type: event
@@ -72,13 +72,13 @@ performance:
     description: |
       Time spent on downloading a translation model for a language pair.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   model_load_time:
     type: event
@@ -88,13 +88,13 @@ performance:
     description: |
       Time spent on loading a model into memory to start translation.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   words_per_second:
     type: event
@@ -104,13 +104,13 @@ performance:
     description: |
       Speed of translation.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   translation_quality:
     type: event
@@ -120,13 +120,13 @@ performance:
     description: |
       Quality esimation of translation.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
 
 infobar:
@@ -138,13 +138,13 @@ infobar:
     description: |
       The translation infobar was automatically displayed in a browser.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   closed:
     type: event
@@ -154,13 +154,13 @@ infobar:
     description: |
       The translation infobar was closed.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   translate:
     type: event
@@ -168,15 +168,15 @@ infobar:
     send_in_pings:
       - custom
     description: |
-      The "Translate" button was pressed on translation inforbar.
+      The "Translate" button was pressed on translation infobar.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   never_translate_lang:
     type: event
@@ -186,13 +186,13 @@ infobar:
     description: |
       "Never traslate language" button in the infobar options was pressed.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   never_translate_site:
     type: event
@@ -202,13 +202,13 @@ infobar:
     description: |
       "Never traslate site" button in the infobar options was pressed.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   not_now:
     type: event
@@ -218,13 +218,29 @@ infobar:
     description: |
       "Not now" button on the infobar was pressed.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
+    expires: never
+  change_lang:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "This page is in" language was changed manually.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
     expires: never
 
 service:
@@ -236,13 +252,13 @@ service:
     description: |
       Language pair of user and website languages is not supported.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
   lang_mismatch:
     type: counter
@@ -252,13 +268,13 @@ service:
     description: |
       The user and website languages do not match.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
-      - technical
+      - interaction
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
 
 errors:
@@ -270,29 +286,59 @@ errors:
     description: |
       The translation procedure has failed.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
     expires: never
-
-test:
-  test_counter:
+  marian:
     type: counter
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Bergamot extension tests have tested the Glean integration.
+      Marian code related error.
     bugs:
-      - https://bugzilla.mozilla.org/1691365
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=1691365#c0
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
     data_sensitivity:
       - technical
     notification_emails:
-      - glean-team@mozilla.com
+      - anatal-all@mozilla.com
+    expires: never
+  memory:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Memory allocation error.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: never
+  model_download:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Failed to download a model for a supported language pair.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
     expires: never

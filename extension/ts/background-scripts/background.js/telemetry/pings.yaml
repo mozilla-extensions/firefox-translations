@@ -15,8 +15,8 @@ custom:
   include_client_id: true
   send_if_empty: false
   bugs:
-    - https://bugzilla.mozilla.org/1587095
+    - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
   data_reviews:
-    - https://bugzilla.mozilla.org/show_bug.cgi?id=1587095#c6
+    - https://bugzilla.mozilla.org/show_bug.cgi?id=
   notification_emails:
-    - glean-team@mozilla.com
+    - anatal-all@mozilla.com
