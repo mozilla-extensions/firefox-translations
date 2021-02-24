@@ -12,7 +12,12 @@ jobs:
       # Download and cache dependencies (update the cache keys to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-20210224
+            - dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-{{ checksum "extension/download-bergamot-translator-wasm-artifacts.sh" }}-20210224
+
+      - run:
+          name: Download and import Bergamot Translator build artifacts
+          # Note: the import step runs again as part of yarn build, which ensures that the latest .appendix.js is used despite cached artifacts
+          command: cd extension && yarn bergamot-translator:download-and-import
 
       - run:
           name: Install dependencies
@@ -28,9 +33,9 @@ jobs:
 
       - save_cache:
           paths:
-            - node_modules
-            - firefox-nightly-linux
-          key: dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-20210224
+            - extension/node_modules
+            - extension/firefox-nightly-linux
+          key: dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-{{ checksum "extension/download-bergamot-translator-wasm-artifacts.sh" }}-20210224
 
       - run:
           name: Print which version of Firefox is installed to the build log
