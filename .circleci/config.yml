@@ -14,7 +14,7 @@ jobs:
       # Download and cache dependencies (update the cache keys to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "package.json" }}-20210224
+            - dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-20210224
 
       - run:
           name: Install dependencies
@@ -32,7 +32,7 @@ jobs:
           paths:
             - node_modules
             - firefox-nightly-linux
-          key: dependencies-and-browsers-{{ checksum "package.json" }}-20210224
+          key: dependencies-and-browsers-{{ checksum "extension/yarn.lock" }}-20210224
 
       - run:
           name: Print which version of Firefox is installed to the build log
