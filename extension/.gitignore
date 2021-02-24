@@ -11,3 +11,4 @@ node_modules/
 src/wasm/bergamot-translator-worker.data
 src/wasm/bergamot-translator-worker.js
 src/wasm/bergamot-translator-worker.wasm
+firefox-nightly-linux

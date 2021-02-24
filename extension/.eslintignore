@@ -17,3 +17,4 @@ test/fixtures/
 # don't lint/format third party modules
 node_modules/
 src/test-runner/inc/
+firefox-nightly-linux
