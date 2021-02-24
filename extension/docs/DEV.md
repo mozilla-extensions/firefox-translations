@@ -24,17 +24,10 @@ The commands in these instructions are meant to be run in the `extension/` folde
 
 ## First time setup
 
-1. Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
+Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
 
 ```bash
 yarn install
-```
-
-2. Initialize the build-specific configuration files:
-
-```bash
-cp .env.example .env.development
-cp .env.example .env.production
 ```
 
 ## Building Bergamot Translator WASM resources and importing them to the extension
