@@ -4,8 +4,8 @@
 process.on("unhandledRejection", r => console.error(r)); // eslint-disable-line no-console
 
 const assert = require("assert");
-const { ui, setupWebdriver } = require("./utils");
-const { defaultTestPreferences } = require("./config");
+const { ui, setupWebdriver } = require("../utils");
+const { defaultTestPreferences } = require("../config");
 const firefox = require("selenium-webdriver/firefox");
 const Context = firefox.Context;
 const webdriver = require("selenium-webdriver");
