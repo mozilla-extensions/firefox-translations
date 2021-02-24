@@ -112,6 +112,25 @@ yarn build:default && npx web-ext sign --api-key $API_KEY --api-secret $API_SECR
 
 Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
 
+## Run end-to-end tests
+
+```bash
+yarn functional-tests
+```
+
+Note: To troubleshoot issues with failing tests, it sometimes helps to have access to the geckodriver logs. Run the following in a separate terminal:
+
+```bash
+yarn geckodriver -vv 1> test/functional/logs/geckodriver.log 2> test/functional/logs/geckodriver.errors.log
+```
+
+Then re-run the functional tests as per below:
+
+```bash
+export GECKODRIVER_URL=http://127.0.0.1:4444
+yarn functional-tests
+```
+
 ## Troubleshooting
 
 ### Firefox
