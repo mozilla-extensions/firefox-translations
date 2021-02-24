@@ -19,3 +19,4 @@ test/fixtures/
 node_modules/
 src/test-runner/inc/
 firefox-nightly-linux
+downloaded-bergamot-translator-wasm-artifacts

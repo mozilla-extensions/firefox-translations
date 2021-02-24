@@ -5,13 +5,14 @@
 
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
+  - [Using known-to-work Bergamot Translator WASM artifacts and importing them to the extension](#using-known-to-work-bergamot-translator-wasm-artifacts-and-importing-them-to-the-extension)
   - [Building Bergamot Translator WASM artifacts and importing them to the extension](#building-bergamot-translator-wasm-artifacts-and-importing-them-to-the-extension)
-  - [Using Bergamot Translator WASM artifacts built elsewhere](#using-bergamot-translator-wasm-artifacts-built-elsewhere)
   - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
+  - [Run end-to-end tests](#run-end-to-end-tests)
   - [Troubleshooting](#troubleshooting)
     - [Firefox](#firefox-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
@@ -32,25 +33,23 @@ Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install
 yarn install
 ```
 
+## Using known-to-work Bergamot Translator WASM artifacts and importing them to the extension
+
+To use artifacts that are known to work (built by bergamot-translator's CI):
+
+```bash
+yarn bergamot-translator:download-and-import
+```
+
 ## Building Bergamot Translator WASM artifacts and importing them to the extension
 
-1. Build and import [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
+If you are actively changing files in [bergamot-translator](../bergamot-translator/README.md), run the following to build and import locally built WASM artifacts:
 
 ```bash
 yarn bergamot-translator:build-and-import
 ```
 
 Repeat this process any time there has been an update in the bergamot-translator submodule.
-
-## Using Bergamot Translator WASM artifacts built elsewhere
-
-To use artifacts built elsewhere (eg, CI) run the import script referencing the relative path to the directory of the downloaded artifacts, eg if you downloaded the artifacts in `extension/circle-ci-wasm-artifacts/`, run:
-
-```bash
-./import-bergamot-translator.sh ./circle-ci-wasm-artifacts/
-```
-
-Note that copying the artifacts directly into `extension/src/wasm/` will not work, since the import script concatenates the contents of the `bergamot-translator-worker.js` WASM build artifact with the contents of `extension/src/wasm/bergamot-translator-worker.appendix.js` and stores the result into `extension/src/wasm/bergamot-translator-worker.js`.
 
 ## Creating extension builds for distribution
 
