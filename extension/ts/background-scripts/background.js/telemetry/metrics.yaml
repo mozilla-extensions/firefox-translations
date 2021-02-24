@@ -49,12 +49,12 @@ metadata:
 
 performance:
   translation_time:
-    type: event
+    type: string
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on web page translation.
+      Time spent on web page translation (ms).
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -65,12 +65,12 @@ performance:
       - anatal-all@mozilla.com
     expires: never
   model_download_time:
-    type: event
+    type: string
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on downloading a translation model for a language pair.
+      Time spent on downloading a translation model for a language pair (ms).
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -81,12 +81,12 @@ performance:
       - anatal-all@mozilla.com
     expires: never
   model_load_time:
-    type: event
+    type: string
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on loading a model into memory to start translation.
+      Time spent on loading a model into memory to start translation (ms).
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -97,7 +97,7 @@ performance:
       - anatal-all@mozilla.com
     expires: never
   words_per_second:
-    type: event
+    type: string
     lifetime: ping
     send_in_pings:
       - custom
@@ -113,7 +113,7 @@ performance:
       - anatal-all@mozilla.com
     expires: never
   translation_quality:
-    type: event
+    type: string
     lifetime: ping
     send_in_pings:
       - custom
