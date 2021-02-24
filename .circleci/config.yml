@@ -3,8 +3,6 @@ jobs:
   build:
     docker:
       - image: circleci/node:latest-browsers
-        environment:
-          FIREFOX_BIN: /home/circleci/checkout/firefox-nightly-linux/firefox-bin
 
     working_directory: ~/checkout
 
@@ -55,4 +53,4 @@ jobs:
 
       - run:
           name: Functional tests
-          command: cd extension && yarn functional-tests
+          command: cd extension && yarn test
