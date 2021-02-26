@@ -139,7 +139,7 @@ yarn functional-tests
 
 Or, for the Firefox native UI variant:
 
-1. Go to `about:devtools-toolbox?type=extension&id=translation%40mozilla.org`
+1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40mozilla.org`
 2. Click Console
 
 To produce a clean log output for forwarding to developers / attaching to issues, first click the Trash can icon in the top left before repeating the steps that leads to the erroneous behavior.
