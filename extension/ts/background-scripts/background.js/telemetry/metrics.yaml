@@ -24,7 +24,7 @@ metadata:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -40,7 +40,7 @@ metadata:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -58,7 +58,7 @@ performance:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -74,7 +74,7 @@ performance:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -90,7 +90,7 @@ performance:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -106,7 +106,7 @@ performance:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -122,7 +122,7 @@ performance:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -140,7 +140,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -156,7 +156,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -172,7 +172,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -188,7 +188,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -204,7 +204,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -220,7 +220,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -236,7 +236,7 @@ infobar:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -254,7 +254,7 @@ service:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -270,7 +270,7 @@ service:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - interaction
     notification_emails:
@@ -288,7 +288,7 @@ errors:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -304,7 +304,7 @@ errors:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -320,7 +320,7 @@ errors:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:
@@ -336,7 +336,7 @@ errors:
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
-      - https://bugzilla.mozilla.org/show_bug.cgi?id=
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
       - technical
     notification_emails:

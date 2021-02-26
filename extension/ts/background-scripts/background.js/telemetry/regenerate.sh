@@ -18,3 +18,4 @@ echo
 glean_parser translate -o ./generated -f javascript metrics.yaml pings.yaml
 echo
 
+

@@ -6,6 +6,11 @@
 
 import { browser } from "webextension-polyfill-ts";
 import { nanoid } from "nanoid";
+import { Telemetry } from "../telemetry/Telemetry";
+import {
+  translationTime,
+  modelLoadTime,
+} from "../telemetry/generated/performance";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've loaded/processed large models/translations
@@ -225,12 +230,28 @@ export const BergamotTranslatorAPI = {
         from,
         to,
       };
+      const start = performance.now();
       await workerManager.loadModel(loadModelParams);
+      const end = performance.now();
+      Telemetry.global().record(
+        () => modelLoadTime.set(String(end - start)),
+        from,
+        to,
+      );
       loadedLanguagePair = languagePair;
     }
     const translateParams: TranslateParams = {
       texts,
     };
-    return workerManager.translate(translateParams);
+    const start = performance.now();
+    const res = await workerManager.translate(translateParams);
+    const end = performance.now();
+    Telemetry.global().record(
+      () => translationTime.set(String(end - start)),
+      from,
+      to,
+    );
+
+    return res;
   },
 };

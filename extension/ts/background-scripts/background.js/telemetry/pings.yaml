@@ -17,6 +17,6 @@ custom:
   bugs:
     - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
   data_reviews:
-    - https://bugzilla.mozilla.org/show_bug.cgi?id=
+    - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
   notification_emails:
     - anatal-all@mozilla.com

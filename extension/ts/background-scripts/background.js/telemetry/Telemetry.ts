@@ -6,9 +6,18 @@ import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { toLang, fromLang } from "./generated/metadata";
 
-class Telemetry {
+export class Telemetry {
+  private static _instance = null;
+
   constructor() {
     Glean.initialize("bergamot-extension", true, { debug: { logPings: true } });
+  }
+
+  public static global() {
+    if (Telemetry._instance == null) {
+      Telemetry._instance = new Telemetry();
+    }
+    return Telemetry._instance;
   }
 
   public setUploadEnabled(val: boolean) {
@@ -33,5 +42,3 @@ class Telemetry {
     }
   };
 }
-
-export const telemetry = new Telemetry();
