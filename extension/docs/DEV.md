@@ -45,7 +45,7 @@ cp .env.example .env.production
 git submodule update --init --recursive
 ```
 
-2. Add the model files to be included in the build according to the instructions [here](../bergamot-translator/README.md).
+2. Add the model files to be included in the build according to the instructions [here](https://github.com/browsermt/bergamot-translator/blob/main/README.md).
 
 3. Run the build and import script (in the `extension/` folder in this repo):
 
