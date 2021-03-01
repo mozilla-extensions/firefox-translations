@@ -12,7 +12,9 @@
     - [Firefox](#firefox)
     - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
-  - [Run end-to-end tests](#run-end-to-end-tests)
+  - [Run end-to-end functional tests](#run-end-to-end-functional-tests)
+    - [Locally](#locally)
+    - [Continuous Integration](#continuous-integration)
   - [Troubleshooting](#troubleshooting)
     - [Firefox](#firefox-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
@@ -111,7 +113,9 @@ yarn build:default && npx web-ext sign --api-key $API_KEY --api-secret $API_SECR
 
 Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
 
-## Run end-to-end tests
+## Run end-to-end functional tests
+
+### Locally
 
 ```bash
 yarn functional-tests
@@ -129,6 +133,10 @@ Then re-run the functional tests as per below:
 export GECKODRIVER_URL=http://127.0.0.1:4444
 yarn functional-tests
 ```
+
+### Continuous Integration
+
+End-to-end functional tests are run against each new commits/PRs. Read more about the current CI setup [here](./CI.md).
 
 ## Troubleshooting
 
