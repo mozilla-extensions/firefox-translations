@@ -149,7 +149,7 @@
   "scripts": {
     "bergamot-translator:build-and-import": "git submodule update --init --recursive && ../bergamot-translator/build-wasm.sh && ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/",
     "bergamot-translator:download-and-import": "./download-bergamot-translator-wasm-artifacts.sh && ./import-bergamot-translator.sh ./downloaded-bergamot-translator-wasm-artifacts",
-    "build": "npm-run-all bergamot-translator:download-and-import build:native-ui && mv dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi dist/firefox/native-ui/bergamot-browser-extension.xpi",
+    "build": "npm-run-all bergamot-translator:download-and-import build:native-ui && cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi ../bergamot-browser-extension.xpi",
     "build-and-test": "npm-run-all -n bergamot-translator:download-and-import build:default get-firefox:linux just-test",
     "build:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=chrome UI=extension-ui web-ext build",
     "build:default": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=firefox UI=extension-ui web-ext build",
