@@ -5,13 +5,16 @@
 
 - [Developing this extension](#developing-this-extension)
   - [First time setup](#first-time-setup)
-  - [Building Bergamot Translator WASM resources and importing them to the extension](#building-bergamot-translator-wasm-resources-and-importing-them-to-the-extension)
+  - [Using known-to-work Bergamot Translator WASM artifacts and importing them to the extension](#using-known-to-work-bergamot-translator-wasm-artifacts-and-importing-them-to-the-extension)
+  - [Building Bergamot Translator WASM artifacts and importing them to the extension](#building-bergamot-translator-wasm-artifacts-and-importing-them-to-the-extension)
   - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
     - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
+  - [Run end-to-end tests](#run-end-to-end-tests)
   - [Troubleshooting](#troubleshooting)
+    - [Firefox](#firefox-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Enabling error reporting via Sentry](#enabling-error-reporting-via-sentry)
@@ -24,31 +27,26 @@ The commands in these instructions are meant to be run in the `extension/` folde
 
 ## First time setup
 
-1. Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
+Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
 
 ```bash
 yarn install
 ```
 
-2. Initialize the build-specific configuration files:
+## Using known-to-work Bergamot Translator WASM artifacts and importing them to the extension
+
+To use artifacts that are known to work (built by bergamot-translator's CI):
 
 ```bash
-cp .env.example .env.development
-cp .env.example .env.production
+yarn bergamot-translator:download-and-import
 ```
 
-## Building Bergamot Translator WASM resources and importing them to the extension
+## Building Bergamot Translator WASM artifacts and importing them to the extension
 
-1. Build [bergamot-translator](../bergamot-translator/README.md) WASM artifacts:
-
-```bash
-../bergamot-translator/build-wasm.sh
-```
-
-2. Upon successful build, run the following import script:
+If you are actively changing files in [bergamot-translator](../bergamot-translator/README.md), run the following to build and import locally built WASM artifacts:
 
 ```bash
-./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/
+yarn bergamot-translator:build-and-import
 ```
 
 Repeat this process any time there has been an update in the bergamot-translator submodule.
@@ -58,7 +56,7 @@ Repeat this process any time there has been an update in the bergamot-translator
 To build for Firefox:
 
 ```bash
-yarn build:production
+yarn build:default
 ```
 
 The build artifact will be created under `dist/firefox/extension-ui`.
@@ -66,7 +64,7 @@ The build artifact will be created under `dist/firefox/extension-ui`.
 For Chrome:
 
 ```bash
-yarn build:production:chrome
+yarn build:chrome
 ```
 
 The build artifact will be created under `dist/chrome/extension-ui`.
@@ -74,7 +72,7 @@ The build artifact will be created under `dist/chrome/extension-ui`.
 To build the Firefox native UI variant:
 
 ```bash
-yarn build:production:native-ui
+yarn build:native-ui
 ```
 
 The build artifact will be created under `dist/firefox/native-ui`.
@@ -108,38 +106,64 @@ yarn watch:chrome
 After version bumping and setting the API_KEY and API_SECRET env vars:
 
 ```bash
-yarn build:production && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
+yarn build:default && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
 ```
 
 Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
 
+## Run end-to-end tests
+
+```bash
+yarn functional-tests
+```
+
+Note: To troubleshoot issues with failing tests, it sometimes helps to have access to the geckodriver logs. Run the following in a separate terminal:
+
+```bash
+yarn geckodriver -vv 1> test/functional/logs/geckodriver.log 2> test/functional/logs/geckodriver.errors.log
+```
+
+Then re-run the functional tests as per below:
+
+```bash
+export GECKODRIVER_URL=http://127.0.0.1:4444
+yarn functional-tests
+```
+
 ## Troubleshooting
+
+### Firefox
 
 1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
 2. Click Console
 
-To clear the current output, click the Trash can icon in the top left.
+Or, for the Firefox native UI variant:
+
+1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40mozilla.org`
+2. Click Console
+
+To produce a clean log output for forwarding to developers / attaching to issues, first click the Trash can icon in the top left before repeating the steps that leads to the erroneous behavior.
 
 ## Analyze webpack bundle size
 
 Firefox:
 
 ```bash
-yarn build:production
+yarn build:default
 npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
 ```
 
 Chrome:
 
 ```bash
-yarn build:production:chrome
+yarn build:chrome
 npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
 ```
 
 Firefox native UI variant:
 
 ```bash
-yarn build:production:native-ui
+yarn build:native-ui
 npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
 ```
 
