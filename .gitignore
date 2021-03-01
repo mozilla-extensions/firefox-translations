@@ -1,6 +1,4 @@
 .idea
 .vscode
-node_modules
-dist
 *.pyc
 bergamot-browser-extension.xpi
