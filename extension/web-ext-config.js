@@ -58,8 +58,8 @@ if (targetBrowser === "firefox") {
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
   defaultConfig.filename = firefoxNativeUi
-    ? `bergamot-browser-extension.xpi`
-    : `${extensionId}-{version}-firefox.xpi`;
+    ? `bergamot-browser-extension-{version}-firefox-native-ui.xpi`
+    : `bergamot-browser-extension-{version}-firefox-extension-ui.xpi`;
 }
 
 if (targetBrowser === "chrome") {

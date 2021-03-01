@@ -149,7 +149,7 @@
   "scripts": {
     "bergamot-translator:build-and-import": "git submodule update --init --recursive && ../bergamot-translator/build-wasm.sh && ./import-bergamot-translator.sh ../bergamot-translator/build-wasm/wasm/",
     "bergamot-translator:download-and-import": "./download-bergamot-translator-wasm-artifacts.sh && ./import-bergamot-translator.sh ./downloaded-bergamot-translator-wasm-artifacts",
-    "build": "npm-run-all bergamot-translator:download-and-import build:native-ui",
+    "build": "npm-run-all bergamot-translator:download-and-import build:native-ui && mv dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi dist/firefox/native-ui/bergamot-browser-extension.xpi",
     "build-and-test": "npm-run-all -n bergamot-translator:download-and-import build:default get-firefox:linux just-test",
     "build:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=chrome UI=extension-ui web-ext build",
     "build:default": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production webpack --mode=production && TARGET_BROWSER=firefox UI=extension-ui web-ext build",
@@ -164,7 +164,7 @@
     "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:tslint": "npm run lint:tslint -- --fix",
     "functional-tests": "npm-run-all -pr functional-tests:*",
-    "functional-tests:default": "TARGET_BROWSER=firefox UI=extension-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/firefox/extension-ui/bergamot-browser-extension_browser.mt-$npm_package_version-firefox.xpi mocha test/functional/tests/ --bail --full-trace",
+    "functional-tests:default": "TARGET_BROWSER=firefox UI=extension-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/firefox/extension-ui/bergamot-browser-extension-$npm_package_version-firefox.xpi mocha test/functional/tests/ --bail --full-trace",
     "generate-manifest": "node generate-manifest.js",
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",
     "generate-wee:documentSchema:translateUi": "cd src/experiment-apis/translateUi && documentSchema schema.json > api.md",
