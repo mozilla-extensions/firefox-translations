@@ -177,7 +177,7 @@
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint . --ext jsm,js,json",
     "lint:tslint": "tslint -t stylish ts/**/*.ts ts/**/*.tsx",
-    "make-build-artifact-available-for-dep-signing": "mkdir -p web-ext-artifacts && mkdir -p artifacts && cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi web-ext-artifacts/bergamot-browser-extension.xpi && cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi artifacts/bergamot-browser-extension.xpi && cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi build/bergamot-browser-extension.xpi && cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi dist/bergamot-browser-extension.xpi",
+    "make-build-artifact-available-for-dep-signing": "cp dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi build/bergamot-browser-extension.xpi",
     "prebuild:chrome": "TARGET_BROWSER=chrome UI=extension-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
     "prebuild:default": "TARGET_BROWSER=firefox UI=extension-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
     "prebuild:native-ui": "TARGET_BROWSER=firefox UI=native-ui NODE_ENV=production npm-run-all init-dotenv-config clean generate-manifest",
