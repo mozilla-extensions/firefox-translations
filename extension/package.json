@@ -163,7 +163,7 @@
     "format:fixpack": "fixpack",
     "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --trailing-comma=all --ignore-path=.eslintignore --write",
     "format:tslint": "npm run lint:tslint -- --fix",
-    "functional-tests": "npm-run-all -n functional-tests:*",
+    "functional-tests": "concurrently --kill-others 'npm-run-all -n functional-tests:*' 'yarn serve-fixtures --port 4001' || true",
     "functional-tests:default": "TARGET_BROWSER=firefox UI=extension-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/firefox/extension-ui/bergamot-browser-extension-$npm_package_version-firefox-extension-ui.xpi mocha test/functional/tests/ --bail --full-trace",
     "functional-tests:native-ui": "TARGET_BROWSER=firefox UI=native-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/firefox/native-ui/bergamot-browser-extension-$npm_package_version-firefox-native-ui.xpi mocha test/functional/tests/ --bail --full-trace",
     "generate-manifest": "node generate-manifest.js",

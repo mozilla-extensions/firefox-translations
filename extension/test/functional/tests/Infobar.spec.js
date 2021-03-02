@@ -42,7 +42,7 @@ if (process.env.UI === "native-ui") {
     it("The translation infobar is shown on a web-page with Spanish content", async () => {
       await navigateToURL(
         driver,
-        "http://0.0.0.0:4000/es.wikipedia.org-2021-01-20-welcome-box.html",
+        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
       );
       const infobarElement = await getInfobar(driver);
       assert(infobarElement !== null);
