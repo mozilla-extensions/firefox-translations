@@ -1,11 +1,11 @@
-/* eslint-env node */
-
-const cmd = require("selenium-webdriver/lib/command");
+import * as cmd from "selenium-webdriver/lib/command";
 import * as firefox from "selenium-webdriver/firefox";
-const webdriver = require("selenium-webdriver");
-const FxRunnerUtils = require("fx-runner/lib/utils");
-const Fs = require("fs-extra");
-const path = require("path");
+import { Builder, WebDriver } from "selenium-webdriver";
+import * as FxRunnerUtils from "fx-runner/lib/utils";
+import * as Fs from "fs-extra";
+import * as path from "path";
+
+// @ts-ignore
 const Context = firefox.Context;
 
 async function promiseActualBinary(binary) {
@@ -22,24 +22,21 @@ async function promiseActualBinary(binary) {
   }
 }
 
-module.exports.setupWebdriver = {
+export const setupWebdriver = {
   /**
    * Launches Firefox.
    *
    * @param {object} FIREFOX_PREFERENCES key-value of prefname value.
    * @returns {Promise<*>} driver A configured Firefox webdriver object
    */
-  promiseSetupDriver: async FIREFOX_PREFERENCES => {
-    const profile = new firefox.Profile();
+  promiseSetupDriver: async (FIREFOX_PREFERENCES): Promise<WebDriver> => {
+    const options = new firefox.Options();
 
     Object.keys(FIREFOX_PREFERENCES).forEach(key => {
-      profile.setPreference(key, FIREFOX_PREFERENCES[key]);
+      options.setPreference(key, FIREFOX_PREFERENCES[key]);
     });
 
-    const options = new firefox.Options();
-    options.setProfile(profile);
-
-    const builder = new webdriver.Builder()
+    const builder = new Builder()
       .forBrowser("firefox")
       .setFirefoxOptions(options);
 
@@ -56,6 +53,7 @@ module.exports.setupWebdriver = {
     const driver = await builder.build();
 
     // Firefox will have started up by now
+    // @ts-ignore
     driver.setContext(Context.CHROME);
     return driver;
   },
@@ -70,7 +68,7 @@ module.exports.setupWebdriver = {
    * @param {string} fileLocation location for extension xpi/zip
    * @returns {Promise<void>} returns extension id)
    */
-  installExtension: async (driver, fileLocation) => {
+  installExtension: async (driver, fileLocation: string = null) => {
     fileLocation =
       fileLocation || path.join(process.cwd(), process.env.EXTENSION_ARTIFACT);
 

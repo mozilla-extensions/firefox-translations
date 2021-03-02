@@ -1,15 +1,10 @@
 /* eslint-env node, mocha */
 
-// for unhandled promise rejection debugging
-process.on("unhandledRejection", r => console.error(r)); // eslint-disable-line no-console
-
 import { assert } from "chai";
-const { setupWebdriver } = require("../utils/setupWebdriver");
+import { setupWebdriver } from "../utils/setupWebdriver";
 const { getChromeElementBy } = require("../utils/getChromeElementBy");
-const {
-  ui: { extensionWidgetId },
-} = require("../utils/ui");
-const { defaultTestPreferences } = require("../config");
+import { defaultTestPreferences } from "../config";
+import { extensionWidgetId } from "../utils/extensionWidgetId";
 
 let extensionId;
 
@@ -33,7 +28,7 @@ if (process.env.UI === "extension-ui") {
     });
 
     after(async () => {
-      driver.quit();
+      await driver.quit();
     });
 
     it("the element exists", async () => {

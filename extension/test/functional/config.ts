@@ -1,7 +1,5 @@
-/* eslint-env node */
-
 // Preferences set during testing
-const defaultTestPreferences = {
+export const defaultTestPreferences = {
   // Improve debugging using `browser toolbox`.
   "devtools.chrome.enabled": true,
   "devtools.debugger.remote-enabled": true,
@@ -28,8 +26,4 @@ const defaultTestPreferences = {
    * In, particular, actual telemetry uploading is disabled:
    * ("toolkit.telemetry.server", Pref::new("https://%(server)s/dummy/telemetry/")),
    */
-};
-
-module.exports = {
-  defaultTestPreferences,
 };

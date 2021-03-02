@@ -1,12 +1,11 @@
-/* eslint-env node */
-
 const webdriver = require("selenium-webdriver");
 import * as firefox from "selenium-webdriver/firefox";
-const By = webdriver.By;
+// @ts-ignore
 const Context = firefox.Context;
+const By = webdriver.By;
 const until = webdriver.until;
 
-class getChromeElementBy {
+export class getChromeElementBy {
   static async getChromeElement(driver, method, selector) {
     driver.setContext(Context.CHROME);
     try {
@@ -36,7 +35,3 @@ class getChromeElementBy {
     return this.getChromeElement(driver, "tagName", tagName);
   }
 }
-
-module.exports = {
-  getChromeElementBy,
-};

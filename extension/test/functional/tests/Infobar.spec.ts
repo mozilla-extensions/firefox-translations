@@ -4,12 +4,10 @@
 process.on("unhandledRejection", r => console.error(r)); // eslint-disable-line no-console
 
 import { assert } from "chai";
-const { setupWebdriver } = require("../utils/setupWebdriver");
-const { getChromeElementBy } = require("../utils/getChromeElementBy");
-const {
-  nav: { navigateToURL },
-} = require("../utils/nav");
-const { defaultTestPreferences } = require("../config");
+import { setupWebdriver } from "../utils/setupWebdriver";
+import { getChromeElementBy } from "../utils/getChromeElementBy";
+import { navigateToURL } from "../utils/navigateToURL";
+import { defaultTestPreferences } from "../config";
 
 async function getInfobar(driver) {
   return getChromeElementBy.tagName(driver, "notification");
@@ -30,7 +28,7 @@ if (process.env.UI === "native-ui") {
     });
 
     after(async () => {
-      driver.quit();
+      await driver.quit();
     });
 
     it("The translation infobar is not shown on about:debugging", async () => {
