@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const cmd = require("selenium-webdriver/lib/command");
-const firefox = require("selenium-webdriver/firefox");
+import * as firefox from "selenium-webdriver/firefox";
 const webdriver = require("selenium-webdriver");
 const FxRunnerUtils = require("fx-runner/lib/utils");
 const Fs = require("fs-extra");

@@ -3,7 +3,7 @@
 // for unhandled promise rejection debugging
 process.on("unhandledRejection", r => console.error(r)); // eslint-disable-line no-console
 
-const assert = require("assert");
+import { assert } from "chai";
 const { setupWebdriver } = require("../utils/setupWebdriver");
 const { getChromeElementBy } = require("../utils/getChromeElementBy");
 const {

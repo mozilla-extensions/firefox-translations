@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-const firefox = require("selenium-webdriver/firefox");
+import * as firefox from "selenium-webdriver/firefox";
 const Context = firefox.Context;
 
 module.exports.nav = {

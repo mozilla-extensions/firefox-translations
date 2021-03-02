@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 const webdriver = require("selenium-webdriver");
-const firefox = require("selenium-webdriver/firefox");
+import * as firefox from "selenium-webdriver/firefox";
 const By = webdriver.By;
 const Context = firefox.Context;
 const until = webdriver.until;
