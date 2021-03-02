@@ -176,7 +176,6 @@
     "generate-wee:verifyWeeSchema:translateUi": "cd src/experiment-apis/translateUi && verifyWeeSchema schema.json",
     "get-firefox:linux": "[ ! -d \"./firefox-nightly-linux\" ] && get-firefox --branch nightly --platform linux --extract && mv firefox firefox-nightly-linux || true",
     "init-dotenv-config": "./init-dotenv-config.sh",
-    "just-test": "npm-run-all -n functional-tests",
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint . --ext jsm,js,json",
     "lint:tslint": "tslint -t stylish ts/**/*.ts ts/**/*.tsx",
