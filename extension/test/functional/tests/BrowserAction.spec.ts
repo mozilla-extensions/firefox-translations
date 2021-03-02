@@ -2,15 +2,16 @@
 
 import { assert } from "chai";
 import { setupWebdriver } from "../utils/setupWebdriver";
-const { getChromeElementBy } = require("../utils/getChromeElementBy");
 import { defaultTestPreferences } from "../config";
 import { extensionWidgetId } from "../utils/extensionWidgetId";
+import { getChromeElement } from "../utils/getChromeElement";
+import { By } from "selenium-webdriver";
 
 let extensionId;
 
 async function promiseBrowserActionIcon(driver) {
   const browserActionId = `${extensionWidgetId(extensionId)}-browser-action`;
-  return getChromeElementBy.id(driver, browserActionId);
+  return getChromeElement(driver, By.id, browserActionId);
 }
 
 if (process.env.UI === "extension-ui") {
@@ -33,11 +34,12 @@ if (process.env.UI === "extension-ui") {
 
     it("the element exists", async () => {
       const button = await promiseBrowserActionIcon(driver);
-      assert(button !== null);
+      assert.notStrictEqual(button, null, "Element exists");
     });
 
     it("responds to click", async () => {
       const button = await promiseBrowserActionIcon(driver);
+      assert.notStrictEqual(button, null);
       button.click();
       // TODO: Add some actual assertion here, verifying that the main interface is shown
       assert(true);

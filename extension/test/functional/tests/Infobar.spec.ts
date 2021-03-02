@@ -1,16 +1,22 @@
 /* eslint-env node, mocha */
 
-// for unhandled promise rejection debugging
-process.on("unhandledRejection", r => console.error(r)); // eslint-disable-line no-console
-
 import { assert } from "chai";
 import { setupWebdriver } from "../utils/setupWebdriver";
-import { getChromeElementBy } from "../utils/getChromeElementBy";
+import { getChromeElement } from "../utils/getChromeElement";
 import { navigateToURL } from "../utils/navigateToURL";
 import { defaultTestPreferences } from "../config";
+import { By } from "selenium-webdriver";
 
 async function getInfobar(driver) {
-  return getChromeElementBy.tagName(driver, "notification");
+  return getChromeElement(driver, By.css, "notification");
+}
+
+async function getInfobarTranslateButton(driver) {
+  return getChromeElement(
+    driver,
+    By.css,
+    "notification hbox.translate-offer-box button.notification-button.primary",
+  );
 }
 
 if (process.env.UI === "native-ui") {
@@ -46,22 +52,22 @@ if (process.env.UI === "native-ui") {
       assert(infobarElement !== null);
       const valueAttribute = await infobarElement.getAttribute("value");
       assert.equal(valueAttribute, "translation");
+      const translateButtonElement = await getInfobarTranslateButton(driver);
+      assert(translateButtonElement !== null);
     });
 
-    /*
-    it("the translate button exists", async () => {
-      const notice = await getInfobar(driver);
-      assert(notice !== null);
-      const button = await promiseBrowserTranslationInfobar(driver);
-      assert(typeof button === "object");
+    it("Translation via the infobar on a web-page with Spanish content works", async () => {
+      await navigateToURL(
+        driver,
+        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
+      );
+      const infobarElement = await getInfobar(driver);
+      assert(infobarElement !== null);
+      const valueAttribute = await infobarElement.getAttribute("value");
+      assert.equal(valueAttribute, "translation");
+      const translateButtonElement = await getInfobarTranslateButton(driver);
+      assert(translateButtonElement !== null);
+      translateButtonElement.click();
     });
-
-    it("responds to click", async () => {
-      const button = await promiseBrowserTranslationInfobar(driver);
-      button.click();
-      // TODO: Add some actual assertion here, verifying that the main interface is shown
-      assert(true);
-    });
-     */
   });
 }
