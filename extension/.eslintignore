@@ -2,6 +2,7 @@
 dist/
 build/
 test/unit/build/
+test/functional/logs/
 stats.json
 yarn-error.log
 *.map
@@ -17,3 +18,5 @@ test/fixtures/
 # don't lint/format third party modules
 node_modules/
 src/test-runner/inc/
+firefox-nightly-linux
+downloaded-bergamot-translator-wasm-artifacts

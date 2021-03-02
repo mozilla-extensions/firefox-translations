@@ -16,10 +16,10 @@ const sourceDir = path.join(".", "build", targetBrowser, ui);
 const artifactsDir = path.join(".", "dist", targetBrowser, ui);
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
-const extensionId =
-  targetBrowser === "firefox" && ui === "native-ui"
-    ? "translation@mozilla.org"
-    : "bergamot-browser-extension@browser.mt";
+const firefoxNativeUi = targetBrowser === "firefox" && ui === "native-ui";
+const extensionId = firefoxNativeUi
+  ? "bergamot-browser-extension@mozilla.org"
+  : "bergamot-browser-extension@browser.mt";
 
 const defaultConfig = {
   // Global options:
@@ -57,7 +57,9 @@ if (targetBrowser === "firefox") {
     "browser.aboutConfig.showWarning=false",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
-  defaultConfig.filename = `${extensionId}-{version}-firefox.xpi`;
+  defaultConfig.filename = firefoxNativeUi
+    ? `bergamot-browser-extension-{version}-firefox-native-ui.xpi`
+    : `bergamot-browser-extension-{version}-firefox-extension-ui.xpi`;
 }
 
 if (targetBrowser === "chrome") {
