@@ -1,6 +1,4 @@
-import * as firefox from "selenium-webdriver/firefox";
-// @ts-ignore
-const Context = firefox.Context;
+import { Context } from "./setupWebdriver";
 
 export const navigateToURL = async (driver, url) => {
   const previousContext = driver.getContext();

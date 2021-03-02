@@ -1,18 +1,14 @@
 import * as cmd from "selenium-webdriver/lib/command";
-import * as firefox from "selenium-webdriver/firefox";
-import { Builder, WebDriver } from "selenium-webdriver";
-import * as FxRunnerUtils from "fx-runner/lib/utils";
-import * as Fs from "fs-extra";
-import * as path from "path";
+import { Options } from "selenium-webdriver/firefox";
+import { Builder, WebDriver as OriginalWebDriver } from "selenium-webdriver";
+import { normalizeBinary } from "fx-runner/lib/utils";
+import * as fs from "fs";
+import { resolve, join } from "path";
 
-// @ts-ignore
-const Context = firefox.Context;
-
-async function promiseActualBinary(binary) {
+async function pathToFirefoxBinary(binary) {
   try {
-    let normalizedBinary = await FxRunnerUtils.normalizeBinary(binary);
-    normalizedBinary = path.resolve(normalizedBinary);
-    await Fs.stat(normalizedBinary);
+    const normalizedBinary = resolve(await normalizeBinary(binary));
+    await fs.promises.stat(normalizedBinary);
     return normalizedBinary;
   } catch (ex) {
     if (ex.code === "ENOENT") {
@@ -22,6 +18,25 @@ async function promiseActualBinary(binary) {
   }
 }
 
+export interface WebDriver extends OriginalWebDriver {
+  setContext: (string) => void;
+}
+
+/**
+ * Enum of available command contexts.
+ *
+ * Command contexts are specific to Marionette, and may be used with the
+ * {@link #context=} method. Contexts allow you to direct all subsequent
+ * commands to either "content" (default) or "chrome". The latter gives
+ * you elevated security permissions.
+ *
+ * @enum {string}
+ */
+export const Context = {
+  CONTENT: "content",
+  CHROME: "chrome",
+};
+
 export const setupWebdriver = {
   /**
    * Launches Firefox.
@@ -30,7 +45,7 @@ export const setupWebdriver = {
    * @returns {Promise<*>} driver A configured Firefox webdriver object
    */
   promiseSetupDriver: async (FIREFOX_PREFERENCES): Promise<WebDriver> => {
-    const options = new firefox.Options();
+    const options = new Options();
 
     Object.keys(FIREFOX_PREFERENCES).forEach(key => {
       options.setPreference(key, FIREFOX_PREFERENCES[key]);
@@ -46,14 +61,13 @@ export const setupWebdriver = {
       builder.usingServer(process.env.GECKODRIVER_URL);
     }
 
-    const binaryLocation = await promiseActualBinary(
+    const binaryLocation = await pathToFirefoxBinary(
       process.env.FIREFOX_BINARY || "firefox",
     );
     await options.setBinary(binaryLocation);
-    const driver = await builder.build();
+    const driver: WebDriver = <WebDriver>await builder.build();
 
     // Firefox will have started up by now
-    // @ts-ignore
     driver.setContext(Context.CHROME);
     return driver;
   },
@@ -70,7 +84,7 @@ export const setupWebdriver = {
    */
   installExtension: async (driver, fileLocation: string = null) => {
     fileLocation =
-      fileLocation || path.join(process.cwd(), process.env.EXTENSION_ARTIFACT);
+      fileLocation || join(process.cwd(), process.env.EXTENSION_ARTIFACT);
 
     const executor = driver.getExecutor();
     executor.defineCommand(

@@ -1,12 +1,11 @@
+import { Context, WebDriver } from "./setupWebdriver";
+
 const webdriver = require("selenium-webdriver");
-import * as firefox from "selenium-webdriver/firefox";
-// @ts-ignore
-const Context = firefox.Context;
 const By = webdriver.By;
 const until = webdriver.until;
 
 export class getChromeElementBy {
-  static async getChromeElement(driver, method, selector) {
+  static async getChromeElement(driver: WebDriver, method, selector) {
     driver.setContext(Context.CHROME);
     try {
       return await driver.wait(
@@ -23,15 +22,15 @@ export class getChromeElementBy {
     }
   }
 
-  static async id(driver, id) {
+  static async id(driver: WebDriver, id) {
     return this.getChromeElement(driver, "id", id);
   }
 
-  static async className(driver, className) {
+  static async className(driver: WebDriver, className) {
     return this.getChromeElement(driver, "className", className);
   }
 
-  static async tagName(driver, tagName) {
+  static async tagName(driver: WebDriver, tagName) {
     return this.getChromeElement(driver, "tagName", tagName);
   }
 }

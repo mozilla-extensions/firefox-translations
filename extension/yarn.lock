@@ -1245,6 +1245,11 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
+"@types/selenium-webdriver@^4.0.11":
+  version "4.0.11"
+  resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-4.0.11.tgz#740d1b3a47badec6784015ee8f3e89d3cb5fd985"
+  integrity sha512-VHv3kVxdploPZRa5Epsrgae9f8Wp0B+TVj3L93Yv0nB2RCRGRTKuhz/vRUZR4yItLqzdIxsxALe3qT3yqTAJTg==
+
 "@types/yauzl@2.9.1":
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@types/yauzl/-/yauzl-2.9.1.tgz#d10f69f9f522eef3cf98e30afb684a1e1ec923af"
