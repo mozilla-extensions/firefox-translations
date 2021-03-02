@@ -13,7 +13,7 @@ export class Telemetry {
     Glean.initialize("bergamot-extension", true, { debug: { logPings: true } });
   }
 
-  public static global() {
+  public static get global() {
     if (Telemetry._instance == null) {
       Telemetry._instance = new Telemetry();
     }
@@ -24,16 +24,12 @@ export class Telemetry {
     Glean.setUploadEnabled(val);
   }
 
-  public record = (
-    metric_func: Function,
-    lang_from: string,
-    lang_to: string,
-  ) => {
+  public record = (metricFunc: Function, langFrom: string, langTo: string) => {
     try {
-      toLang.set(lang_to);
-      fromLang.set(lang_from);
+      toLang.set(langTo);
+      fromLang.set(langFrom);
 
-      metric_func();
+      metricFunc();
 
       custom.submit();
     } catch (err) {

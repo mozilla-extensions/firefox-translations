@@ -28,7 +28,6 @@
     "react-virtualized": "^9.21.2",
     "remotedev": "^0.2.9",
     "typeface-inter": "^1.1.13",
-    "web-ext-types": "^3.2.1",
     "webext-patterns": "^0.9.0",
     "webextension-polyfill-ts": "^0.17.0"
   },

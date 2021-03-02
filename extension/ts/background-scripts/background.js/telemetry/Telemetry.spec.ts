@@ -13,7 +13,7 @@ describe(testSuite, function() {
     console.info(`${testSuite}: ${testName}`);
     Telemetry.global().setUploadEnabled(false);
 
-    Telemetry.global().record(() => translate.record(), "es", "en");
+    Telemetry.global.record(() => translate.record(), "es", "en");
 
     const events = await translate.testGetValue();
     assert.equal(1, events.length);

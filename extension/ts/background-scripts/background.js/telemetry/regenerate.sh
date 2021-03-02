@@ -15,7 +15,6 @@ source venv/bin/activate
 echo "* Generating glean JS code"
 echo
 
-glean_parser translate -o ./generated -f javascript metrics.yaml pings.yaml
+glean_parser translate -o ./generated -f typescript metrics.yaml pings.yaml
 echo
-
 

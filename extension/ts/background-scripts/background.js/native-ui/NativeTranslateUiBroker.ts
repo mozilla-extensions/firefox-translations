@@ -13,7 +13,15 @@ import { ExtensionState } from "../../../shared-resources/models/ExtensionState"
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 import Event = Events.Event;
 import { LanguageSupport } from "../../../shared-resources/LanguageSupport";
-import { translate } from "../telemetry/generated/infobar";
+import {
+  translate,
+  changeLang,
+  closed,
+  displayed,
+  neverTranslateLang,
+  neverTranslateSite,
+  notNow,
+} from "../telemetry/generated/infobar";
 import { Telemetry } from "../telemetry/Telemetry";
 
 enum NativeTranslateUiStateInfobarState {
@@ -208,6 +216,8 @@ export class NativeTranslateUiBroker {
 
   onSelectTranslateFrom(tabId) {
     console.debug("onSelectTranslateFrom", { tabId });
+    // todo: pass languages
+    Telemetry.global.record(() => changeLang.record(), "", "");
   }
 
   onSelectTranslateTo(tabId) {
@@ -216,15 +226,19 @@ export class NativeTranslateUiBroker {
 
   onInfoBarClosed(tabId) {
     console.debug("onInfoBarClosed", { tabId });
+    // todo: pass languages
+    Telemetry.global.record(() => closed.record(), "", "");
   }
 
   onNeverTranslateThisSite(tabId) {
     console.debug("onNeverTranslateThisSite", { tabId });
+    // todo: pass languages
+    Telemetry.global.record(() => neverTranslateSite.record(), "", "");
   }
 
   onTranslateButtonPressed(tabId, from, to) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
-    Telemetry.global().record(() => translate.record(), from, to);
+    Telemetry.global.record(() => translate.record(), from, to);
 
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
