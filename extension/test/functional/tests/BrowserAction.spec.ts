@@ -51,7 +51,7 @@ if (process.env.UI === "extension-ui") {
       // TODO: Add some actual assertion here, verifying that the main interface is shown
       assert(true);
       // In the meantime, allow some time for the popup to render, then take a screenshot
-      await driver.sleep(1000);
+      await driver.sleep(1500);
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
   });

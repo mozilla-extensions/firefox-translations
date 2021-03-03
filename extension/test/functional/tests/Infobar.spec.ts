@@ -15,7 +15,11 @@ import {
 import { takeScreenshot } from "../utils/takeScreenshot";
 
 async function lookForInfobar(driver, nthTab) {
-  return lookForBrowserElement(driver, By.css, `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification`);
+  return lookForBrowserElement(
+    driver,
+    By.css,
+    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification`,
+  );
 }
 
 async function lookForInfobarTranslateButton(driver, nthTab) {
@@ -45,10 +49,19 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
 
 let tabsCurrentlyOpened = 1;
 
+const fixtureUrl = "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html";
+const maxToleratedModelLoadingDurationInSeconds = 20;
+const maxToleratedTranslationDurationInSeconds = 100;
+
 if (process.env.UI === "native-ui") {
   describe("Infobar interactions", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
-    this.timeout((15 + 60) * 1000);
+    this.timeout(
+      (15 +
+        maxToleratedModelLoadingDurationInSeconds +
+        maxToleratedTranslationDurationInSeconds * 5) *
+        1000,
+    );
 
     let driver;
 
@@ -70,7 +83,7 @@ if (process.env.UI === "native-ui") {
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    const assertInfobarIsShown = async (nthTab) => {
+    const assertInfobarIsShown = async nthTab => {
       const infobarElement = await lookForInfobar(driver, nthTab);
       assertElementExists(infobarElement, "infobarElement");
       const valueAttribute = await infobarElement.getAttribute("value");
@@ -79,26 +92,25 @@ if (process.env.UI === "native-ui") {
 
     it("The translation infobar is shown on a web-page with Spanish content", async () => {
       // ... this test continues the session from the previous test
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+      await navigateToURL(driver, fixtureUrl);
       await assertInfobarIsShown(tabsCurrentlyOpened);
       const translateButtonElement = await lookForInfobarTranslateButton(
-        driver, tabsCurrentlyOpened
+        driver,
+        tabsCurrentlyOpened,
       );
       assertElementExists(translateButtonElement, "translateButtonElement");
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    const translateViaInfobar = async (nthTab) => {
+    const translateViaInfobar = async nthTab => {
       const originalPageElement = await lookForFixturePageOriginalContent(
         driver,
       );
       assertElementExists(originalPageElement, "originalPageElement");
       await assertInfobarIsShown(tabsCurrentlyOpened);
       const translateButtonElement = await lookForInfobarTranslateButton(
-        driver, nthTab
+        driver,
+        nthTab,
       );
       assertElementExists(translateButtonElement, "translateButtonElement");
       await translateButtonElement.click();
@@ -107,7 +119,9 @@ if (process.env.UI === "native-ui") {
     const assertTranslationSucceeded = async () => {
       const translatedPageElement = await lookForFixturePageTranslatedContent(
         driver,
-        30 * 1000,
+        (maxToleratedModelLoadingDurationInSeconds +
+          maxToleratedTranslationDurationInSeconds) *
+          1000,
       );
       assertElementExists(translatedPageElement, "translatedPageElement");
     };
@@ -121,20 +135,14 @@ if (process.env.UI === "native-ui") {
 
     it("Translation via the infobar works after navigating to another page", async () => {
       // ... this test continues the session from the previous test
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+      await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
       await assertTranslationSucceeded();
       await takeScreenshot(
         driver,
         `${this.ctx.test.fullTitle()} - After navigation 1`,
       );
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+      await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
       await assertTranslationSucceeded();
       await takeScreenshot(
@@ -147,18 +155,12 @@ if (process.env.UI === "native-ui") {
       // ... this test continues the session from the previous test
       await driver.switchTo().newWindow("tab");
       tabsCurrentlyOpened++;
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+      await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
       const originalWindow = await driver.getWindowHandle();
       await driver.switchTo().newWindow("tab");
       tabsCurrentlyOpened++;
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+      await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
       await assertTranslationSucceeded();
       await takeScreenshot(driver, `${this.ctx.test.fullTitle()} - Tab 2`);
