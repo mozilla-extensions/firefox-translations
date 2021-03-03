@@ -6,6 +6,7 @@ import { extensionWidgetId } from "../utils/extensionWidgetId";
 import { lookForBrowserElement } from "../utils/lookForElement";
 import { By } from "selenium-webdriver";
 import { assertElementExists } from "../utils/assertElement";
+import { takeScreenshot } from "../utils/takeScreenshot";
 
 let extensionId;
 
@@ -49,6 +50,9 @@ if (process.env.UI === "extension-ui") {
       await browserActionButtonElement.click();
       // TODO: Add some actual assertion here, verifying that the main interface is shown
       assert(true);
+      // In the meantime, allow some time for the popup to render, then take a screenshot
+      await driver.sleep(1000);
+      await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
   });
 }

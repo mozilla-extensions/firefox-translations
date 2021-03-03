@@ -12,6 +12,7 @@ import {
   assertElementDoesNotExist,
   assertElementExists,
 } from "../utils/assertElement";
+import { takeScreenshot } from "../utils/takeScreenshot";
 
 async function lookForInfobar(driver) {
   return lookForBrowserElement(driver, By.css, "notification");
@@ -64,6 +65,7 @@ if (process.env.UI === "native-ui") {
       await navigateToURL(driver, "about:debugging");
       const infobarElement = await lookForInfobar(driver);
       assertElementDoesNotExist(infobarElement, "infobarElement");
+      await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
     it("The translation infobar is shown on a web-page with Spanish content", async () => {
@@ -79,6 +81,7 @@ if (process.env.UI === "native-ui") {
         driver,
       );
       assertElementExists(translateButtonElement, "translateButtonElement");
+      await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
     it("Translation via the infobar works", async () => {
@@ -104,6 +107,7 @@ if (process.env.UI === "native-ui") {
         60 * 1000,
       );
       assertElementExists(translatedPageElement, "translatedPageElement");
+      await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
   });
 }
