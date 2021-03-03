@@ -10,7 +10,7 @@ export const lookForBrowserElement = async (
   byArg,
   timeoutMs: number = 1000,
 ) => {
-  driver.setContext(Context.CHROME);
+  await driver.setContext(Context.CHROME);
   return lookForElement(driver, byMethod, byArg, timeoutMs);
 };
 
@@ -20,7 +20,7 @@ export const lookForPageElement = async (
   byArg,
   timeoutMs: number = 1000,
 ) => {
-  driver.setContext(Context.CONTENT);
+  await driver.setContext(Context.CONTENT);
   return lookForElement(driver, byMethod, byArg, timeoutMs);
 };
 

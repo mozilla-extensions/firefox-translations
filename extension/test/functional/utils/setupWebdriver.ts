@@ -69,7 +69,7 @@ export const launchFirefox = async (): Promise<WebDriver> => {
   const driver: WebDriver = <WebDriver>await builder.build();
 
   // Firefox will have started up by now
-  driver.setContext(Context.CHROME);
+  await driver.setContext(Context.CHROME);
   return driver;
 };
 
