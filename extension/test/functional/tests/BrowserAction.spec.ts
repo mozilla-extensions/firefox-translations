@@ -6,10 +6,11 @@ import { defaultTestPreferences } from "../config";
 import { extensionWidgetId } from "../utils/extensionWidgetId";
 import { lookForBrowserElement } from "../utils/lookForElement";
 import { By } from "selenium-webdriver";
+import { assertElementExists } from "../utils/assertElement";
 
 let extensionId;
 
-async function promiseBrowserActionIcon(driver) {
+async function lookForBrowserActionIcon(driver) {
   const browserActionId = `${extensionWidgetId(extensionId)}-browser-action`;
   return lookForBrowserElement(driver, By.id, browserActionId);
 }
@@ -33,14 +34,20 @@ if (process.env.UI === "extension-ui") {
     });
 
     it("the element exists", async () => {
-      const button = await promiseBrowserActionIcon(driver);
-      assert.notStrictEqual(button, null, "Element exists");
+      const browserActionButtonElement = await lookForBrowserActionIcon(driver);
+      assertElementExists(
+        browserActionButtonElement,
+        "browserActionButtonElement",
+      );
     });
 
     it("responds to click", async () => {
-      const button = await promiseBrowserActionIcon(driver);
-      assert.notStrictEqual(button, null);
-      button.click();
+      const browserActionButtonElement = await lookForBrowserActionIcon(driver);
+      assertElementExists(
+        browserActionButtonElement,
+        "browserActionButtonElement",
+      );
+      await browserActionButtonElement.click();
       // TODO: Add some actual assertion here, verifying that the main interface is shown
       assert(true);
     });

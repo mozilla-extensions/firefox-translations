@@ -9,6 +9,10 @@ import {
 import { navigateToURL } from "../utils/navigateToURL";
 import { defaultTestPreferences } from "../config";
 import { By } from "selenium-webdriver";
+import {
+  assertElementDoesNotExist,
+  assertElementExists,
+} from "../utils/assertElement";
 
 async function lookForInfobar(driver) {
   return lookForBrowserElement(driver, By.css, "notification");
@@ -22,12 +26,25 @@ async function lookForInfobarTranslateButton(driver) {
   );
 }
 
-async function lookForFixturePageContentHeader(driver, timeout) {
-  return lookForPageElement(driver, By.css, "foo", timeout);
+async function lookForFixturePageOriginalContent(driver) {
+  return lookForPageElement(
+    driver,
+    By.xpath,
+    "//*[contains(text(),'Bienvenidos')]",
+  );
+}
+
+async function lookForFixturePageTranslatedContent(driver, timeout) {
+  return lookForPageElement(
+    driver,
+    By.xpath,
+    "//*[contains(text(),'Welcome')]",
+    timeout,
+  );
 }
 
 if (process.env.UI === "native-ui") {
-  describe("Infobar interaction", function() {
+  describe("Infobar interactions", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout((15 + 60) * 1000);
 
@@ -47,7 +64,7 @@ if (process.env.UI === "native-ui") {
     it("The translation infobar is not shown on eg about:debugging", async () => {
       await navigateToURL(driver, "about:debugging");
       const infobarElement = await lookForInfobar(driver);
-      assert.strictEqual(infobarElement, null, "Element does not exist");
+      assertElementDoesNotExist(infobarElement, "infobarElement");
     });
 
     it("The translation infobar is shown on a web-page with Spanish content", async () => {
@@ -56,43 +73,38 @@ if (process.env.UI === "native-ui") {
         "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
       );
       const infobarElement = await lookForInfobar(driver);
-      assert.notStrictEqual(infobarElement, null, "Element exists");
+      assertElementExists(infobarElement, "infobarElement");
       const valueAttribute = await infobarElement.getAttribute("value");
       assert.equal(valueAttribute, "translation");
       const translateButtonElement = await lookForInfobarTranslateButton(
         driver,
       );
-      assert.notStrictEqual(translateButtonElement, null, "Element exists");
+      assertElementExists(translateButtonElement, "translateButtonElement");
     });
 
-    it("Translation via the infobar on a web-page with Spanish content works", async () => {
+    it("Translation via the infobar works", async () => {
       await navigateToURL(
         driver,
         "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
       );
-      const notYetTranslatedPageElement = lookForFixturePageContentHeader(
+      const originalPageElement = await lookForFixturePageOriginalContent(
         driver,
-        1000,
       );
-      assert.notStrictEqual(
-        notYetTranslatedPageElement,
-        null,
-        "Element exists",
-      );
+      assertElementExists(originalPageElement, "originalPageElement");
       const infobarElement = await lookForInfobar(driver);
-      assert.notStrictEqual(infobarElement, null, "Element exists");
+      assertElementExists(infobarElement, "infobarElement");
       const valueAttribute = await infobarElement.getAttribute("value");
       assert.equal(valueAttribute, "translation");
       const translateButtonElement = await lookForInfobarTranslateButton(
         driver,
       );
-      assert.notStrictEqual(translateButtonElement, null, "Element exists");
-      translateButtonElement.click();
-      const translatedPageElement = lookForFixturePageContentHeader(
+      assertElementExists(translateButtonElement, "translateButtonElement");
+      await translateButtonElement.click();
+      const translatedPageElement = await lookForFixturePageTranslatedContent(
         driver,
         60 * 1000,
       );
-      assert.notStrictEqual(translatedPageElement, null, "Element exists");
+      assertElementExists(translatedPageElement, "translatedPageElement");
     });
   });
 }
