@@ -34,7 +34,7 @@ async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(
     driver,
     By.xpath,
-    "//*[contains(text(),'Bienvenidos')]",
+    "//*[contains(text(),'Una estrategia republicana para obstaculizar')]",
   );
 }
 
@@ -42,14 +42,14 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
   return lookForPageElement(
     driver,
     By.xpath,
-    "//*[contains(text(),'Welcome')]",
+    "//*[contains(text(),'A Republican strategy to hinder')]",
     timeout,
   );
 }
 
 let tabsCurrentlyOpened = 1;
 
-const fixtureUrl = "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html";
+const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
 const maxToleratedModelLoadingDurationInSeconds = 20;
 const maxToleratedTranslationDurationInSeconds = 100;
 
