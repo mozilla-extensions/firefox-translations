@@ -142,18 +142,7 @@ If you want to intervene in a test (eg. to double-check something), follow this 
 
 **Obtaining Geckodriver logs**
 
-To troubleshoot issues with failing tests when only cryptic error messages are available, it sometimes helps to have access to the geckodriver logs. Run the following in a separate terminal:
-
-```bash
-yarn geckodriver -vv 1> test/functional/logs/geckodriver.log 2> test/functional/logs/geckodriver.errors.log
-```
-
-Then re-run the functional tests as per below:
-
-```bash
-export GECKODRIVER_URL=http://127.0.0.1:4444
-yarn functional-tests
-```
+To troubleshoot issues with failing tests when only cryptic error messages are available, check the geckodriver logs, located in `test/functional/results/logs/`.
 
 ## Troubleshooting
 
