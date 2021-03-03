@@ -1,13 +1,12 @@
 /* eslint-env node, mocha */
 
 import { assert } from "chai";
-import { setupWebdriver } from "../utils/setupWebdriver";
+import { installExtension, launchFirefox } from "../utils/setupWebdriver";
 import {
   lookForBrowserElement,
   lookForPageElement,
 } from "../utils/lookForElement";
 import { navigateToURL } from "../utils/navigateToURL";
-import { defaultTestPreferences } from "../config";
 import { By } from "selenium-webdriver";
 import {
   assertElementDoesNotExist,
@@ -51,8 +50,8 @@ if (process.env.UI === "native-ui") {
     let driver;
 
     before(async () => {
-      driver = await setupWebdriver.launchBrowser(defaultTestPreferences);
-      await setupWebdriver.installExtension(driver);
+      driver = await launchFirefox();
+      await installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);
     });

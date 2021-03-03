@@ -1,8 +1,7 @@
 /* eslint-env node, mocha */
 
 import { assert } from "chai";
-import { setupWebdriver } from "../utils/setupWebdriver";
-import { defaultTestPreferences } from "../config";
+import { installExtension, launchFirefox } from "../utils/setupWebdriver";
 import { extensionWidgetId } from "../utils/extensionWidgetId";
 import { lookForBrowserElement } from "../utils/lookForElement";
 import { By } from "selenium-webdriver";
@@ -23,8 +22,8 @@ if (process.env.UI === "extension-ui") {
     let driver;
 
     before(async () => {
-      driver = await setupWebdriver.launchBrowser(defaultTestPreferences);
-      extensionId = await setupWebdriver.installExtension(driver);
+      driver = await launchFirefox();
+      extensionId = await installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);
     });

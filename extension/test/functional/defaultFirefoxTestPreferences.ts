@@ -1,5 +1,5 @@
 // Preferences set during testing
-export const defaultTestPreferences = {
+export const defaultFirefoxTestPreferences = {
   // Improve debugging using `browser toolbox`.
   "devtools.chrome.enabled": true,
   "devtools.debugger.remote-enabled": true,
