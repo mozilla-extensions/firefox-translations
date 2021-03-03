@@ -68,15 +68,20 @@ if (process.env.UI === "native-ui") {
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    it("The translation infobar is shown on a web-page with Spanish content", async () => {
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+    const assertInfobarIsShown = async () => {
       const infobarElement = await lookForInfobar(driver);
       assertElementExists(infobarElement, "infobarElement");
       const valueAttribute = await infobarElement.getAttribute("value");
       assert.equal(valueAttribute, "translation");
+    };
+
+    it("The translation infobar is shown on a web-page with Spanish content", async () => {
+      // ... this test continues the session from the previous test
+      await navigateToURL(
+        driver,
+        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
+      );
+      await assertInfobarIsShown();
       const translateButtonElement = await lookForInfobarTranslateButton(
         driver,
       );
@@ -84,30 +89,56 @@ if (process.env.UI === "native-ui") {
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    it("Translation via the infobar works", async () => {
-      await navigateToURL(
-        driver,
-        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
-      );
+    const translateViaInfobar = async () => {
       const originalPageElement = await lookForFixturePageOriginalContent(
         driver,
       );
       assertElementExists(originalPageElement, "originalPageElement");
-      const infobarElement = await lookForInfobar(driver);
-      assertElementExists(infobarElement, "infobarElement");
-      const valueAttribute = await infobarElement.getAttribute("value");
-      assert.equal(valueAttribute, "translation");
+      await assertInfobarIsShown();
       const translateButtonElement = await lookForInfobarTranslateButton(
         driver,
       );
       assertElementExists(translateButtonElement, "translateButtonElement");
       await translateButtonElement.click();
+    };
+
+    const assertTranslationSucceeded = async () => {
       const translatedPageElement = await lookForFixturePageTranslatedContent(
         driver,
-        60 * 1000,
+        30 * 1000,
       );
       assertElementExists(translatedPageElement, "translatedPageElement");
+    };
+
+    it("Translation via the infobar works", async () => {
+      // ... this test continues the session from the previous test
+      await translateViaInfobar();
+      await assertTranslationSucceeded();
       await takeScreenshot(driver, this.ctx.test.fullTitle());
+    });
+
+    it("Translation via the infobar works after navigating to another page", async () => {
+      // ... this test continues the session from the previous test
+      await navigateToURL(
+        driver,
+        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
+      );
+      await translateViaInfobar();
+      await assertTranslationSucceeded();
+      await takeScreenshot(
+        driver,
+        `${this.ctx.test.fullTitle()} - After navigation 1`,
+      );
+      await navigateToURL(
+        driver,
+        "http://0.0.0.0:4001/es.wikipedia.org-2021-01-20-welcome-box.html",
+      );
+      await translateViaInfobar();
+      await assertTranslationSucceeded();
+      await takeScreenshot(
+        driver,
+        `${this.ctx.test.fullTitle()} - After navigation 2`,
+      );
     });
   });
 }
