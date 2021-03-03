@@ -40,14 +40,29 @@ export const lookForElement = async (
   byArg,
   timeoutMs: number = 1000,
 ): Promise<null | WebElementPromise> => {
+  const stackTrace = new Error().stack;
   try {
     return await driver.wait(until.elementLocated(byMethod(byArg)), timeoutMs);
   } catch (e) {
     if (e.message.indexOf("Waiting for element to be located") > -1) {
       return null;
     }
+    if (
+      e.message.indexOf(
+        "Tried to run command without establishing a connection",
+      ) > -1
+    ) {
+      console.info(
+        "Webdriver/Geckodriver has crashed recently and is not currently available. Original error details: ",
+        e,
+      );
+      console.debug("Full stacktrace: ", stackTrace);
+      throw new Error(
+        "Webdriver/Geckodriver has crashed recently and is not currently available",
+      );
+    }
     // propagate unexpected errors
-    console.error("Unexpected error in getChromeElement:", e);
-    throw e;
+    console.error("Unexpected error in lookForElement:", e);
+    throw new Error("Unexpected error in lookForElement occured");
   }
 };

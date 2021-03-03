@@ -34,7 +34,7 @@ if (process.env.UI === "native-ui") {
     let driver;
 
     before(async () => {
-      driver = await setupWebdriver.promiseSetupDriver(defaultTestPreferences);
+      driver = await setupWebdriver.launchBrowser(defaultTestPreferences);
       await setupWebdriver.installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);

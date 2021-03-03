@@ -16,7 +16,7 @@
     - [Locally](#locally)
     - [Continuous Integration](#continuous-integration)
     - [Troubleshooting functional tests](#troubleshooting-functional-tests)
-  - [Troubleshooting](#troubleshooting)
+  - [Troubleshooting the extension when it is running](#troubleshooting-the-extension-when-it-is-running)
     - [Firefox](#firefox-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
@@ -144,7 +144,7 @@ If you want to intervene in a test (eg. to double-check something), follow this 
 
 To troubleshoot issues with failing tests when only cryptic error messages are available, check the geckodriver logs, located in `test/functional/results/logs/`.
 
-## Troubleshooting
+## Troubleshooting the extension when it is running
 
 ### Firefox
 

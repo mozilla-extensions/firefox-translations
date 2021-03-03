@@ -22,7 +22,7 @@ if (process.env.UI === "extension-ui") {
     let driver;
 
     before(async () => {
-      driver = await setupWebdriver.promiseSetupDriver(defaultTestPreferences);
+      driver = await setupWebdriver.launchBrowser(defaultTestPreferences);
       extensionId = await setupWebdriver.installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);

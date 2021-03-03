@@ -44,7 +44,13 @@ export const setupWebdriver = {
    * @param {object} FIREFOX_PREFERENCES key-value of prefname value.
    * @returns {Promise<*>} driver A configured Firefox webdriver object
    */
-  promiseSetupDriver: async (FIREFOX_PREFERENCES): Promise<WebDriver> => {
+  launchBrowser: async (FIREFOX_PREFERENCES): Promise<WebDriver> => {
+    // Selenium/Webdriver/Geckodriver sometimes throws exceptions that can't be caught.
+    // We catch them here so that they show up in stderr without terminating the node process
+    process.on("unhandledRejection", r =>
+      console.error("unhandledRejection", r),
+    );
+
     const options = new Options();
 
     Object.keys(FIREFOX_PREFERENCES).forEach(key => {
