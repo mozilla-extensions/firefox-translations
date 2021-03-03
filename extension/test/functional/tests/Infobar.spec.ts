@@ -133,7 +133,7 @@ if (process.env.UI === "native-ui") {
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    it("Translation via the infobar works after navigating to another page", async () => {
+    it("Translation via the infobar works after further navigations", async () => {
       // ... this test continues the session from the previous test
       await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
