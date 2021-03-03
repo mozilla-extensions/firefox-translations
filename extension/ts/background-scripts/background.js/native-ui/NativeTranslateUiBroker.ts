@@ -23,6 +23,8 @@ import {
   notNow,
 } from "../telemetry/generated/infobar";
 import { Telemetry } from "../telemetry/Telemetry";
+import { custom } from "../telemetry/generated/pings";
+import { fromLang, toLang } from "../telemetry/generated/metadata";
 
 enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
@@ -132,6 +134,12 @@ export class NativeTranslateUiBroker {
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
 
+      Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
+      Telemetry.global.record(
+        () => toLang.set(defaultTargetLanguage),
+        "toLang",
+      );
+
       return {
         acceptedTargetLanguages,
         detectedLanguage,
@@ -216,29 +224,39 @@ export class NativeTranslateUiBroker {
 
   onSelectTranslateFrom(tabId) {
     console.debug("onSelectTranslateFrom", { tabId });
-    // todo: pass languages
-    Telemetry.global.record(() => changeLang.record(), "", "");
+    Telemetry.global.record(() => changeLang.record(), "onSelectTranslateFrom");
+    Telemetry.global.submit();
+    // todo: pass lang or move to another place
+    // Telemetry.global.record(() => fromLang.set(langFrom));
   }
 
   onSelectTranslateTo(tabId) {
     console.debug("onSelectTranslateTo", { tabId });
+    Telemetry.global.submit();
+    // todo: pass lang or move to another place
+    // Telemetry.global.record(() => toLang.set(langTo));
   }
 
   onInfoBarClosed(tabId) {
     console.debug("onInfoBarClosed", { tabId });
-    // todo: pass languages
-    Telemetry.global.record(() => closed.record(), "", "");
+    Telemetry.global.record(() => closed.record(), "onInfoBarClosed");
+    Telemetry.global.submit();
   }
 
   onNeverTranslateThisSite(tabId) {
     console.debug("onNeverTranslateThisSite", { tabId });
-    // todo: pass languages
-    Telemetry.global.record(() => neverTranslateSite.record(), "", "");
+    Telemetry.global.record(
+      () => neverTranslateSite.record(),
+      "onNeverTranslateThisSite",
+    );
   }
 
   onTranslateButtonPressed(tabId, from, to) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
-    Telemetry.global.record(() => translate.record(), from, to);
+    Telemetry.global.record(
+      () => translate.record(),
+      "onTranslateButtonPressed",
+    );
 
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
@@ -294,6 +312,9 @@ export class NativeTranslateUiBroker {
   }
 
   async stop() {
+    // todo: doesn't seem to be working
+    Telemetry.global.submit();
+
     await browserWithExperimentAPIs.experiments.translateUi.stop();
     this.eventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[

@@ -233,10 +233,10 @@ export const BergamotTranslatorAPI = {
       const start = performance.now();
       await workerManager.loadModel(loadModelParams);
       const end = performance.now();
+      // todo: replace to timespan when it is supported
       Telemetry.global.record(
         () => modelLoadTime.set(String(end - start)),
-        from,
-        to,
+        "loadModelTime",
       );
       loadedLanguagePair = languagePair;
     }
@@ -246,10 +246,10 @@ export const BergamotTranslatorAPI = {
     const start = performance.now();
     const res = await workerManager.translate(translateParams);
     const end = performance.now();
+    // todo: replace to timespan when it is supported
     Telemetry.global.record(
       () => translationTime.set(String(end - start)),
-      from,
-      to,
+      "translateTime",
     );
 
     return res;
