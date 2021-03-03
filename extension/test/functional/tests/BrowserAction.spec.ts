@@ -4,14 +4,14 @@ import { assert } from "chai";
 import { setupWebdriver } from "../utils/setupWebdriver";
 import { defaultTestPreferences } from "../config";
 import { extensionWidgetId } from "../utils/extensionWidgetId";
-import { getChromeElement } from "../utils/getChromeElement";
+import { lookForBrowserElement } from "../utils/lookForElement";
 import { By } from "selenium-webdriver";
 
 let extensionId;
 
 async function promiseBrowserActionIcon(driver) {
   const browserActionId = `${extensionWidgetId(extensionId)}-browser-action`;
-  return getChromeElement(driver, By.id, browserActionId);
+  return lookForBrowserElement(driver, By.id, browserActionId);
 }
 
 if (process.env.UI === "extension-ui") {
