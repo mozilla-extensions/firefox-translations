@@ -118,7 +118,7 @@ performance:
     send_in_pings:
       - custom
     description: |
-      Quality esimation of translation.
+      Quality estimation of translation.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -184,7 +184,7 @@ infobar:
     send_in_pings:
       - custom
     description: |
-      "Never traslate language" button in the infobar options was pressed.
+      "Never translate language" button in the infobar options was pressed.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -200,7 +200,7 @@ infobar:
     send_in_pings:
       - custom
     description: |
-      "Never traslate site" button in the infobar options was pressed.
+      "Never translate site" button in the infobar options was pressed.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -333,6 +333,56 @@ errors:
       - custom
     description: |
       Failed to download a model for a supported language pair.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: never
+
+test:
+  counter_test:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test counter.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: never
+  event_test:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test event.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: never
+  string_test:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test string.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:

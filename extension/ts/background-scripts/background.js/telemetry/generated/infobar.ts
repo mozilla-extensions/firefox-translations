@@ -57,7 +57,7 @@ export const translate = new EventMetricType(
 );
 
 /**
- * "Never traslate language" button in the infobar options was pressed.
+ * "Never translate language" button in the infobar options was pressed.
  *
  * Generated from `infobar.never_translate_lang`.
  */
@@ -73,7 +73,7 @@ export const neverTranslateLang = new EventMetricType(
 );
 
 /**
- * "Never traslate site" button in the infobar options was pressed.
+ * "Never translate site" button in the infobar options was pressed.
  *
  * Generated from `infobar.never_translate_site`.
  */

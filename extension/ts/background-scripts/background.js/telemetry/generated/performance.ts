@@ -61,7 +61,7 @@ export const wordsPerSecond = new StringMetricType({
 });
 
 /**
- * Quality esimation of translation.
+ * Quality estimation of translation.
  *
  * Generated from `performance.translation_quality`.
  */
