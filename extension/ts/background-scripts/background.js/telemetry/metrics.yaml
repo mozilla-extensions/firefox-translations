@@ -1,0 +1,394 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# This file defines the metrics that are recorded by the Glean SDK.
+# APIs to use these pings are automatically generated at build time using
+# the `glean_parser` PyPI package.
+
+# Metrics in this file may make use of SDK reserved ping names. See
+# https://mozilla.github.io/glean/book/dev/core/internal/reserved-ping-names.html
+# for additional information.
+
+---
+$schema: moz://mozilla.org/schemas/glean/metrics/2-0-0
+
+metadata:
+  from_lang:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Translation source language.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  to_lang:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Translation target language.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+
+performance:
+  translation_time:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on web page translation (ms).
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  model_download_time:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on downloading a translation model for a language pair (ms).
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  model_load_time:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on loading a model into memory to start translation (ms).
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  words_per_second:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Speed of translation.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  translation_quality:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Quality estimation of translation.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+
+infobar:
+  displayed:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation infobar was automatically displayed in a browser.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  closed:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation infobar was closed.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  translate:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The "Translate" button was pressed on translation infobar.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  never_translate_lang:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Never translate language" button in the infobar options was pressed.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  never_translate_site:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Never translate site" button in the infobar options was pressed.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  not_now:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "Not now" button on the infobar was pressed.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  change_lang:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      "This page is in" language was changed manually.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+
+service:
+  not_suppported:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Language pair of user and website languages is not supported.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  lang_mismatch:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The user and website languages do not match.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - interaction
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+
+errors:
+  translation:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      The translation procedure has failed.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  marian:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Marian code related error.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  memory:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Memory allocation error.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  model_download:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Failed to download a model for a supported language pair.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+
+test:
+  counter_test:
+    type: counter
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test counter.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  event_test:
+    type: event
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test event.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  string_test:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Test string.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
