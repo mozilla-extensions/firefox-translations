@@ -15,9 +15,20 @@ const examplePagesToTranslate = [
   "https://www.mozilla.org/fi/",
 ];
 
-const { targetBrowser, ui } = require("./build-config.js");
-const sourceDir = path.join(".", "build", targetBrowser, ui);
-const artifactsDir = path.join(".", "dist", targetBrowser, ui);
+const {
+  buildPath,
+  targetEnvironment,
+  targetBrowser,
+  ui,
+} = require("./build-config.js");
+const sourceDir = buildPath;
+const artifactsDir = path.join(
+  ".",
+  "dist",
+  targetEnvironment,
+  targetBrowser,
+  ui,
+);
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
 const firefoxNativeUi = targetBrowser === "firefox" && ui === "native-ui";

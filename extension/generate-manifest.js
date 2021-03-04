@@ -3,8 +3,12 @@
 const fs = require("fs");
 const path = require("path");
 const packageJson = require("./package.json");
-const { targetBrowser, ui } = require("./build-config.js");
-const destPath = path.join(__dirname, "build", targetBrowser, ui);
+const {
+  buildPath,
+  targetEnvironment,
+  targetBrowser,
+  ui,
+} = require("./build-config.js");
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
 const extensionId =
@@ -17,7 +21,7 @@ async function generateManifest({ dotEnvPath }) {
   const manifest = {
     manifest_version: 2,
     name: `Bergamot Translate${
-      process.env.NODE_ENV !== "production" ? " (DEV)" : ""
+      targetEnvironment !== "production" ? " (DEV)" : ""
     }`,
     description: "__MSG_extensionDescription__",
     version: `${packageJson.version}`,
@@ -95,8 +99,8 @@ async function generateManifest({ dotEnvPath }) {
     manifest.content_security_policy =
       "script-src 'self' 'unsafe-eval'; object-src 'self';";
   }
-  const targetPath = path.join(destPath, "manifest.json");
-  await fs.promises.mkdir(destPath, { recursive: true });
+  const targetPath = path.join(buildPath, "manifest.json");
+  await fs.promises.mkdir(buildPath, { recursive: true });
   await fs.promises.writeFile(targetPath, JSON.stringify(manifest, null, 2));
 }
 

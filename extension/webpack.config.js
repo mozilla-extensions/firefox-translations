@@ -1,7 +1,5 @@
 /* global process, require, module, __dirname */
 
-const path = require("path");
-
 const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
 const CopyPlugin = require("copy-webpack-plugin");
@@ -9,8 +7,7 @@ const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 
-const { targetBrowser, ui } = require("./build-config.js");
-const destPath = path.join(__dirname, "build", targetBrowser, ui);
+const { buildPath, ui } = require("./build-config.js");
 
 const dotEnvPath =
   process.env.NODE_ENV === "production"
@@ -47,7 +44,7 @@ const plugins = [
   }),
   // Copy non-webpack-monitored files under "src" to the build directory
   new CopyPlugin({
-    patterns: [{ from: "src", to: destPath }],
+    patterns: [{ from: "src", to: buildPath }],
   }),
 ];
 
@@ -74,7 +71,7 @@ if (
 ) {
   plugins.push(
     new SentryWebpackPlugin({
-      include: destPath,
+      include: buildPath,
     }),
   );
 }
@@ -82,7 +79,7 @@ if (
 module.exports = {
   entry,
   output: {
-    path: destPath,
+    path: buildPath,
     filename: "[name].js",
     sourceMapFilename: "[name].js.map",
     pathinfo: true,
