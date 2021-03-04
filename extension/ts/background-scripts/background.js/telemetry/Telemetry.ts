@@ -10,7 +10,9 @@ export class Telemetry {
   private _metricsToSubmit;
 
   constructor() {
-    Glean.initialize("bergamot-extension", true, { debug: { logPings: true } });
+    Glean.initialize("org.mozilla.bergamot_translator", true, {
+      debug: { logPings: true },
+    });
     this._metricsToSubmit = 0;
     console.debug("Telemetry: initialization completed.");
   }
