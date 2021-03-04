@@ -166,7 +166,7 @@
     "format:tslint": "npm run lint:tslint -- --fix",
     "functional-tests": "npm-run-all -pr functional-tests:*",
     "functional-tests:default": "TARGET_BROWSER=firefox UI=extension-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/firefox/extension-ui/bergamot-browser-extension-$npm_package_version-firefox-extension-ui.xpi mocha test/functional/tests/ --bail --full-trace",
-    "generate-glean": "ts/background-scripts/background.js/telemetry/regenerate.sh",
+    "generate-glean": "ts/background-scripts/background.js/telemetry/regenerate.sh && npm-run-all format",
     "generate-manifest": "node generate-manifest.js",
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",
     "generate-wee:documentSchema:translateUi": "cd src/experiment-apis/translateUi && documentSchema schema.json > api.md",
