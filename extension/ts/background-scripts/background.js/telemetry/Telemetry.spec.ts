@@ -7,7 +7,8 @@ import { Telemetry } from "./Telemetry";
 import { counterTest, eventTest, stringTest } from "./generated/test";
 
 const testSuite = "Telemetry";
-describe(testSuite, function() {
+// todo: enable when glean.js supports test tools to not upload pings
+describe.skip(testSuite, function() {
   const testName = "telemetry test:metrics_collected";
   it(testName, async function() {
     console.info(`${testSuite}: ${testName}`);
