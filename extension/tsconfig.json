@@ -12,8 +12,7 @@
     "jsx": "react",
     "lib": ["es2017", "dom"],
     "esModuleInterop": true,
-    "allowJs": true,
-    "typeRoots": ["node_modules/web-ext-types", "node_modules/@types"]
+    "allowJs": true
   },
   "include": ["ts/**/*.ts", "ts/**/*.tsx"]
 }
