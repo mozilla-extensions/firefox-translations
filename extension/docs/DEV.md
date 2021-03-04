@@ -12,8 +12,11 @@
     - [Firefox](#firefox)
     - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
-  - [Run end-to-end tests](#run-end-to-end-tests)
-  - [Troubleshooting](#troubleshooting)
+  - [Run end-to-end functional tests](#run-end-to-end-functional-tests)
+    - [Locally](#locally)
+    - [Continuous Integration](#continuous-integration)
+    - [Troubleshooting functional tests](#troubleshooting-functional-tests)
+  - [Troubleshooting the extension when it is running](#troubleshooting-the-extension-when-it-is-running)
     - [Firefox](#firefox-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
@@ -111,26 +114,37 @@ yarn build:default && npx web-ext sign --api-key $API_KEY --api-secret $API_SECR
 
 Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
 
-## Run end-to-end tests
+## Run end-to-end functional tests
+
+### Locally
 
 ```bash
 yarn functional-tests
 ```
 
-Note: To troubleshoot issues with failing tests, it sometimes helps to have access to the geckodriver logs. Run the following in a separate terminal:
+### Continuous Integration
 
-```bash
-yarn geckodriver -vv 1> test/functional/logs/geckodriver.log 2> test/functional/logs/geckodriver.errors.log
-```
+End-to-end functional tests are run against each new commits/PRs. Read more about the current CI setup [here](./CI.md).
 
-Then re-run the functional tests as per below:
+### Troubleshooting functional tests
 
-```bash
-export GECKODRIVER_URL=http://127.0.0.1:4444
-yarn functional-tests
-```
+**Basic principles**
 
-## Troubleshooting
+Functional tests are run using the built extension artifacts found in `dist/`. To test new non-test-related code changes, remember to re-run the relevant build command.
+
+**Intervening**
+
+If you want to intervene in a test (eg. to double-check something), follow this pattern:
+
+1. Add a long delay, eg `await driver.sleep(60 * 60 * 1000);` to the test at the place you want to intervene.
+2. Make sure to temporarily also increase the timeout for the test you are running.
+3. Run the tests and intervene manually as desired.
+
+**Obtaining Geckodriver logs**
+
+To troubleshoot issues with failing tests when only cryptic error messages are available, check the geckodriver logs, located in `test/functional/results/logs/`.
+
+## Troubleshooting the extension when it is running
 
 ### Firefox
 
