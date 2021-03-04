@@ -13,6 +13,18 @@ import { ExtensionState } from "../../../shared-resources/models/ExtensionState"
 import { TranslationStatus } from "../../../shared-resources/models/BaseTranslationState";
 import Event = Events.Event;
 import { LanguageSupport } from "../../../shared-resources/LanguageSupport";
+import {
+  translate,
+  changeLang,
+  closed,
+  displayed,
+  neverTranslateLang,
+  neverTranslateSite,
+  notNow,
+} from "../telemetry/generated/infobar";
+import { Telemetry } from "../telemetry/Telemetry";
+import { custom } from "../telemetry/generated/pings";
+import { fromLang, toLang } from "../telemetry/generated/metadata";
 
 enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
@@ -122,6 +134,13 @@ export class NativeTranslateUiBroker {
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
 
+      // these metrics can be recorded multiples times here, it's ok
+      Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
+      Telemetry.global.record(
+        () => toLang.set(defaultTargetLanguage),
+        "toLang",
+      );
+
       return {
         acceptedTargetLanguages,
         detectedLanguage,
@@ -206,22 +225,35 @@ export class NativeTranslateUiBroker {
 
   onSelectTranslateFrom(tabId) {
     console.debug("onSelectTranslateFrom", { tabId });
+    Telemetry.global.record(() => changeLang.record(), "onSelectTranslateFrom");
+    Telemetry.global.submit();
   }
 
   onSelectTranslateTo(tabId) {
     console.debug("onSelectTranslateTo", { tabId });
+    Telemetry.global.submit();
   }
 
   onInfoBarClosed(tabId) {
     console.debug("onInfoBarClosed", { tabId });
+    Telemetry.global.record(() => closed.record(), "onInfoBarClosed");
+    Telemetry.global.submit();
   }
 
   onNeverTranslateThisSite(tabId) {
     console.debug("onNeverTranslateThisSite", { tabId });
+    Telemetry.global.record(
+      () => neverTranslateSite.record(),
+      "onNeverTranslateThisSite",
+    );
   }
 
   onTranslateButtonPressed(tabId, from, to) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
+    Telemetry.global.record(
+      () => translate.record(),
+      "onTranslateButtonPressed",
+    );
 
     this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
@@ -277,6 +309,8 @@ export class NativeTranslateUiBroker {
   }
 
   async stop() {
+    Telemetry.global.submit();
+
     await browserWithExperimentAPIs.experiments.translateUi.stop();
     this.eventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[
