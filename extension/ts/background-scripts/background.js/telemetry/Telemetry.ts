@@ -12,7 +12,7 @@ export class Telemetry {
   constructor() {
     Glean.initialize("bergamot-extension", true, { debug: { logPings: true } });
     this._metricsToSubmit = 0;
-    // console.debug("Telemetry: initialization completed.");
+    console.debug("Telemetry: initialization completed.");
   }
 
   /**
@@ -43,7 +43,7 @@ export class Telemetry {
       metricFunc();
       this._metricsToSubmit += 1;
       console.debug(
-        `Telemetry: metric recorded, name: ${name}, total: ${this._metricsToSubmit}`,
+        `Telemetry: metric recorded, name: ${name}, total not submitted: ${this._metricsToSubmit}`,
       );
     } catch (err) {
       // telemetry error shouldn't crash the app

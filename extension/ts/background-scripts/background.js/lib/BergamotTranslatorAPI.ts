@@ -10,6 +10,7 @@ import { Telemetry } from "../telemetry/Telemetry";
 import {
   translationTime,
   modelLoadTime,
+  wordsPerSecond,
 } from "../telemetry/generated/performance";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
@@ -245,12 +246,27 @@ export const BergamotTranslatorAPI = {
     };
     const start = performance.now();
     const res = await workerManager.translate(translateParams);
+
     const end = performance.now();
     // todo: replace to timespan when it is supported
+    const timeSpentMs = end - start;
     Telemetry.global.record(
-      () => translationTime.set(String(end - start)),
+      () => translationTime.set(String(timeSpentMs)),
       "translateTime",
     );
+
+    // we might want to pass this info from wasm if it exists
+    const wordsNumber = translateParams.texts
+      .map(x => x.split(" ").length)
+      .reduce((a, b) => a + b, 0);
+    const speed = Math.floor((wordsNumber / timeSpentMs) * 1000);
+    // todo: replace to quantity when it is supported
+    Telemetry.global.record(
+      () => wordsPerSecond.set(String(speed)),
+      "translateSpeed",
+    );
+
+    Telemetry.global.submit();
 
     return res;
   },

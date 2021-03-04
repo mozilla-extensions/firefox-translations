@@ -134,6 +134,7 @@ export class NativeTranslateUiBroker {
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
 
+      // these metrics can be recorded multiples times here, it's ok
       Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
       Telemetry.global.record(
         () => toLang.set(defaultTargetLanguage),
@@ -226,15 +227,11 @@ export class NativeTranslateUiBroker {
     console.debug("onSelectTranslateFrom", { tabId });
     Telemetry.global.record(() => changeLang.record(), "onSelectTranslateFrom");
     Telemetry.global.submit();
-    // todo: pass lang or move to another place
-    // Telemetry.global.record(() => fromLang.set(langFrom));
   }
 
   onSelectTranslateTo(tabId) {
     console.debug("onSelectTranslateTo", { tabId });
     Telemetry.global.submit();
-    // todo: pass lang or move to another place
-    // Telemetry.global.record(() => toLang.set(langTo));
   }
 
   onInfoBarClosed(tabId) {
@@ -312,7 +309,6 @@ export class NativeTranslateUiBroker {
   }
 
   async stop() {
-    // todo: doesn't seem to be working
     Telemetry.global.submit();
 
     await browserWithExperimentAPIs.experiments.translateUi.stop();
