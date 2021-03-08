@@ -64,9 +64,6 @@ export class TestDomTranslator extends BaseDomTranslator {
     characterCount: number;
   }> {
     // Gather translation texts to send for translation
-    let translationRequestData: TranslationRequestData = {
-      markupsToTranslate: this.translationDocument.getMarkupsToTranslate(),
-    };
     const { translationRoots } = this.translationDocument;
 
     // Return early with a noop if there is nothing to translate
@@ -80,9 +77,10 @@ export class TestDomTranslator extends BaseDomTranslator {
 
     // Translate and parse translation results
     translationRoots.forEach((translationRoot, index) => {
-      const sourceText = this.normalizeWhitespace(
-        translationRequestData.markupsToTranslate[index],
+      const markupToTranslate = this.translationDocument.generateMarkupToTranslate(
+        translationRoot,
       );
+      const sourceText = this.normalizeWhitespace(markupToTranslate);
       const textIndex = sourceLanguageTexts.indexOf(sourceText);
       let translatedMarkup;
       if (textIndex === -1) {

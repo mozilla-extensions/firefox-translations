@@ -181,11 +181,12 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     };
     const { translationRoots } = this.translationDocument;
     const chunkTranslationRoots = [];
-    const markupsToTranslate = this.translationDocument.getMarkupsToTranslate();
 
     for (let index = startIndex; index < translationRoots.length; index++) {
       const translationRoot = translationRoots[index];
-      const markupToTranslate = markupsToTranslate[index];
+      const markupToTranslate = this.translationDocument.generateMarkupToTranslate(
+        translationRoot,
+      );
 
       const newCurSize = currentDataSize + markupToTranslate.length;
       const newChunks = currentChunks + 1;
