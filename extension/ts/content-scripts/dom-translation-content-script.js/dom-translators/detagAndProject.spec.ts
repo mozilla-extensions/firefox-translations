@@ -112,7 +112,7 @@ describe(testSuiteName, function() {
       },
       {
         input: "<br><b>foo</b> bar one<br>",
-        expectedPlainString: "foo bar one",
+        expectedPlainString: " foo bar one ",
         translation: "bar foo uno dos tres",
         expectedProjectedString: "<br><b>bar</b> foo uno dos tres<br>",
       },
@@ -150,7 +150,7 @@ describe(testSuiteName, function() {
       },
       {
         input: '<div id="n0"><br>artículos<b id="n1"> en español</b>.</div>',
-        expectedPlainString: "artículos en español.",
+        expectedPlainString: " artículos en español.",
         translation: "articles in Spanish.",
         expectedProjectedString:
           '<div id="n0"><br>articles<b id="n1"> in Spanish.</b></div>',
@@ -159,11 +159,20 @@ describe(testSuiteName, function() {
         input:
           "<div id=n0><br><b id=n1>(hace 400 años)</b>: En Estados Unidos, se firma el <b id=n2>Pacto del Mayflower</b>, que establece un Gobierno.</div>",
         expectedPlainString:
-          "(hace 400 años): En Estados Unidos, se firma el Pacto del Mayflower, que establece un Gobierno.",
+          " (hace 400 años): En Estados Unidos, se firma el Pacto del Mayflower, que establece un Gobierno.",
         translation:
           "(400 years ago): In the United States, the Mayflower Pact, which establishes a government, is signed.",
         expectedProjectedString:
           '<div id="n0"><br><b id="n1">(400 years ago):</b> In the United States, the Mayflower Pact, <b id="n2">which establishes a</b> government, is signed.</div>',
+      },
+      {
+        input:
+          "<div id=n2> la enciclopedia de contenido libre<br>que <b id=n3>todos pueden editar</b>. </div>",
+        expectedPlainString:
+          " la enciclopedia de contenido libre que todos pueden editar. ",
+        translation: "the free content encyclopedia that everyone can edit.",
+        expectedProjectedString:
+          '<div id="n2"> the free content encyclopedia that<br>everyone <b id="n3">can edit.</b></div>',
       },
     ];
 

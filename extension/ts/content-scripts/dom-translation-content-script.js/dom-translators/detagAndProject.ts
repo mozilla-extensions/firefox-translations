@@ -6,8 +6,13 @@ interface DetaggedString {
 
 interface NodeToken {
   type: "word" | "tag" | "whitespace";
+  tagName?: string;
   textRepresentation: string;
 }
+
+const isTagTokenWithImpliedWhitespace = (token: NodeToken) => {
+  return token.type === "tag" && token.tagName === "br";
+};
 
 export const detag = (originalString: string): DetaggedString => {
   // console.info("detag", { originalString });
@@ -21,7 +26,14 @@ export const detag = (originalString: string): DetaggedString => {
   const tokens = serializeNodeIntoTokens(originalStringDoc.body);
   // console.debug({ tokens });
 
-  const plainString = originalStringDoc.body.textContent;
+  const plainString = tokens
+    .map(token => {
+      if (token.type === "tag") {
+        return isTagTokenWithImpliedWhitespace(token) ? " " : "";
+      }
+      return token.textRepresentation;
+    })
+    .join("");
 
   return {
     originalString,
@@ -80,8 +92,10 @@ function serializeNodeIntoTokens(node: Node): NodeToken[] {
       } else {
         const startTagMatch = /^<[^>]*>/gm.exec(child.outerHTML);
         const endTagMatch = /<\/[^>]*>$/gm.exec(child.outerHTML);
+        const tagName = child.tagName.toLowerCase();
         tokens.push({
           type: "tag",
+          tagName,
           textRepresentation: startTagMatch[0],
         });
         const childTokens = serializeNodeIntoTokens(child);
@@ -89,6 +103,7 @@ function serializeNodeIntoTokens(node: Node): NodeToken[] {
         if (endTagMatch) {
           tokens.push({
             type: "tag",
+            tagName,
             textRepresentation: endTagMatch[0],
           });
         }
@@ -152,6 +167,9 @@ export const project = (
           whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
           return token.textRepresentation;
         } else if (token.type === "tag") {
+          if (isTagTokenWithImpliedWhitespace(token)) {
+            whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
+          }
           return token.textRepresentation;
         }
         throw new Error(`Unexpected token type: ${token.type}`);
