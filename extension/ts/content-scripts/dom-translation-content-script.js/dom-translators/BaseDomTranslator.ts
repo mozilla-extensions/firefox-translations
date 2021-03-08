@@ -5,12 +5,12 @@
 import { TranslationDocument } from "../TranslationDocument";
 
 export interface TranslationRequestData {
-  stringsToTranslate: string[];
+  markupsToTranslate: string[];
 }
 
 export interface TranslationResponseData {
-  translatedStrings: string[];
-  qeAnnotatedTranslatedStrings: string[];
+  translatedMarkups: string[];
+  qeAnnotatedTranslatedMarkups: string[];
 }
 
 export class BaseDomTranslator {

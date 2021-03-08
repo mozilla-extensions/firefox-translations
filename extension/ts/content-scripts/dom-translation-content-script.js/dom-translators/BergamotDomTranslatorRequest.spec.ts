@@ -5,10 +5,14 @@
 import { assert } from "chai";
 import { TestDomTranslator } from "./TestDomTranslator";
 import { TranslationDocument } from "../TranslationDocument";
-import { TranslationRequestData } from "./BaseDomTranslator";
+import {
+  TranslationRequestData,
+  TranslationResponseData,
+} from "./BaseDomTranslator";
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 import { BergamotApiClient } from "../../../background-scripts/background.js/lib/BergamotApiClient";
 import {
+  createElementShowingPlainText,
   createHeader,
   drawDiffUi,
   visuallyAssertDeepEqual,
@@ -50,7 +54,7 @@ describe(testSuiteName, function() {
     const testTargetLanguageTexts = testDomTranslator.getNormalizedTexts(to);
 
     const translationRequestData: TranslationRequestData = {
-      stringsToTranslate: testSourceLanguageTexts,
+      markupsToTranslate: testSourceLanguageTexts,
     };
 
     let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
@@ -60,21 +64,46 @@ describe(testSuiteName, function() {
     );
 
     const bergamotApiClient = new BergamotApiClient();
-    const translationResponseData = await bergamotDomTranslatorRequest.fireRequest(
-      bergamotApiClient,
-    );
-    const { translatedStrings } = translationResponseData;
+    const translationResponseData: TranslationResponseData & {
+      translatedPlainTextStrings: string[];
+      plainStringsToTranslate: string[];
+    } = await bergamotDomTranslatorRequest.fireRequest(bergamotApiClient);
+    const {
+      plainStringsToTranslate,
+      translatedMarkups,
+      translatedPlainTextStrings,
+    } = translationResponseData;
 
     console.debug({
       testSourceLanguageTexts,
-      translatedStrings,
+      plainStringsToTranslate,
+      translatedPlainTextStrings,
+      translatedMarkups,
       testTargetLanguageTexts,
     });
 
     // Visual output of test results
     const fragment = document.createDocumentFragment();
+    fragment.append(createHeader(4, "Original"));
+    fragment.append(
+      createElementShowingPlainText(
+        JSON.stringify(testSourceLanguageTexts, null, 2),
+      ),
+    );
+    fragment.append(createHeader(4, "Original plain text strings"));
+    fragment.append(
+      createElementShowingPlainText(
+        JSON.stringify(plainStringsToTranslate, null, 2),
+      ),
+    );
+    fragment.append(createHeader(4, "Translated plain text strings"));
+    fragment.append(
+      createElementShowingPlainText(
+        JSON.stringify(translatedPlainTextStrings, null, 2),
+      ),
+    );
     visuallyAssertDeepEqual(
-      translatedStrings,
+      translatedMarkups,
       testTargetLanguageTexts,
       `${testName}`,
       fragment,
@@ -82,6 +111,6 @@ describe(testSuiteName, function() {
     );
     outputDiv.append(fragment);
 
-    assert.deepEqual(translatedStrings, testTargetLanguageTexts);
+    assert.deepEqual(translatedMarkups, testTargetLanguageTexts);
   });
 });

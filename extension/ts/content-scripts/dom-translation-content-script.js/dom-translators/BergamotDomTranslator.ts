@@ -177,20 +177,17 @@ export class BergamotDomTranslator extends BaseDomTranslator {
     let currentDataSize = 0;
     let currentChunks = 0;
     let translationRequestData: TranslationRequestData = {
-      stringsToTranslate: [],
+      markupsToTranslate: [],
     };
     const { translationRoots } = this.translationDocument;
     const chunkTranslationRoots = [];
+    const markupsToTranslate = this.translationDocument.getMarkupsToTranslate();
+
     for (let index = startIndex; index < translationRoots.length; index++) {
       const translationRoot = translationRoots[index];
-      let text = this.translationDocument.generateMarkupToTranslate(
-        translationRoot,
-      );
-      if (!text) {
-        continue;
-      }
+      const markupToTranslate = markupsToTranslate[index];
 
-      const newCurSize = currentDataSize + text.length;
+      const newCurSize = currentDataSize + markupToTranslate.length;
       const newChunks = currentChunks + 1;
 
       if (newCurSize > MAX_REQUEST_DATA || newChunks > MAX_REQUEST_CHUNKS) {
@@ -209,7 +206,7 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       currentDataSize = newCurSize;
       currentChunks = newChunks;
       chunkTranslationRoots.push(translationRoot);
-      translationRequestData.stringsToTranslate.push(text);
+      translationRequestData.markupsToTranslate.push(markupToTranslate);
     }
 
     return {
@@ -231,7 +228,7 @@ function parseChunkResult(
   translationResponseData: TranslationResponseData,
   domTranslationChunk: DomTranslationChunk,
 ) {
-  const len = translationResponseData.translatedStrings.length;
+  const len = translationResponseData.translatedMarkups.length;
   if (len === 0) {
     throw new Error("Translation response data has no translated strings");
   }
@@ -254,18 +251,18 @@ function parseChunkResult(
       try {
         const translationRoot: TranslationItem =
           domTranslationChunk.translationRoots[index];
-        let translatedString = translationResponseData.translatedStrings[index];
-        let qeAnnotatedTranslatedString =
-          translationResponseData.qeAnnotatedTranslatedStrings[index];
+        let translatedMarkup = translationResponseData.translatedMarkups[index];
+        let qeAnnotatedTranslatedMarkup =
+          translationResponseData.qeAnnotatedTranslatedMarkups[index];
 
-        qeAnnotatedTranslatedString = generateMarkupToTranslateForItem(
+        qeAnnotatedTranslatedMarkup = generateMarkupToTranslateForItem(
           translationRoot,
-          qeAnnotatedTranslatedString,
+          qeAnnotatedTranslatedMarkup,
         );
 
-        translationRoot.parseTranslationResult(translatedString);
+        translationRoot.parseTranslationResult(translatedMarkup);
         translationRoot.parseQeAnnotatedTranslationResult(
-          qeAnnotatedTranslatedString,
+          qeAnnotatedTranslatedMarkup,
         );
       } catch (e) {
         errorOccurred = true;

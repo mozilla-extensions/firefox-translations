@@ -12,7 +12,7 @@ import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
-import { detag, project } from "./detagAndProject";
+import { detag, DetaggedString, project } from "./detagAndProject";
 
 /**
  * Represents a request (for 1 chunk) sent off to Bergamot's translation backend.
@@ -37,7 +37,7 @@ export class BergamotDomTranslatorRequest {
     this.translationRequestData = translationRequestData;
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
-    this.translationRequestData.stringsToTranslate.forEach(text => {
+    this.translationRequestData.markupsToTranslate.forEach(text => {
       this.characterCount += text.length;
     });
   }
@@ -47,10 +47,15 @@ export class BergamotDomTranslatorRequest {
    */
   async fireRequest(
     bergamotApiClient: ContentScriptBergamotApiClient | BergamotApiClient,
-  ): Promise<TranslationResponseData> {
+  ): Promise<
+    TranslationResponseData & {
+      translatedPlainTextStrings: string[];
+      plainStringsToTranslate: string[];
+    }
+  > {
     // The server can only deal with pure text, so we detag the strings to
     // translate and later project the tags back into the result
-    const detaggedStrings = this.translationRequestData.stringsToTranslate.map(
+    const detaggedStrings: DetaggedString[] = this.translationRequestData.markupsToTranslate.map(
       detag,
     );
 
@@ -64,27 +69,18 @@ export class BergamotDomTranslatorRequest {
       this.targetLanguage,
     );
 
-    const translationResponseData: TranslationResponseData = this.parseResults(
-      results,
-    );
-
-    // project
-    // TODO: use alignment info returned from the translation engine when it becomes available
-    const projectedStrings = translationResponseData.translatedStrings.map(
-      (translatedString: string, index: number) =>
-        project(detaggedStrings[index], translatedString),
-    );
-
-    translationResponseData.translatedStrings = projectedStrings;
-
-    return translationResponseData;
+    return {
+      ...this.parseResults(results, detaggedStrings),
+      plainStringsToTranslate,
+    };
   }
 
   parseResults(
     results: BergamotRestApiTranslateRequestResult,
-  ): TranslationResponseData {
+    detaggedStrings: DetaggedString[],
+  ): TranslationResponseData & { translatedPlainTextStrings: string[] } {
     const len = results.text.length;
-    if (len !== this.translationRequestData.stringsToTranslate.length) {
+    if (len !== this.translationRequestData.markupsToTranslate.length) {
       // This should never happen, but if the service returns a different number
       // of items (from the number of items submitted), we can't use this chunk
       // because all items would be paired incorrectly.
@@ -93,8 +89,9 @@ export class BergamotDomTranslatorRequest {
       );
     }
 
-    const translatedStrings = [];
-    const qeAnnotatedTranslatedStrings = [];
+    const translatedMarkups = [];
+    const translatedPlainTextStrings = [];
+    const qeAnnotatedTranslatedMarkups = [];
 
     // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
     results.text.forEach((paragraph: BergamotRestApiParagraph, index) => {
@@ -108,34 +105,46 @@ export class BergamotDomTranslatorRequest {
       const separator = " ";
 
       // Join sentence translations
-      let translatedString = translationObjects
+      let translatedPlainTextString = translationObjects
         .map(({ translation }) => translation)
         .join(separator);
 
-      // Show original rather than an empty or obviously invalid translation
-      if (["", "*", "* ()"].includes(translatedString)) {
-        translatedString = this.translationRequestData.stringsToTranslate[
+      let translatedMarkup;
+
+      // Use original rather than an empty or obviously invalid translation
+      // TODO: Address this upstream
+      if (["", "*", "* ()"].includes(translatedPlainTextString)) {
+        translatedMarkup = this.translationRequestData.markupsToTranslate[
           index
         ];
+      } else {
+        // Project original tags/markup onto translated plain text string
+        // TODO: Use alignment info returned from the translation engine when it becomes available
+        translatedMarkup = project(
+          detaggedStrings[index],
+          translatedPlainTextString,
+        );
       }
 
-      translatedStrings.push(translatedString);
+      translatedMarkups.push(translatedMarkup);
+      translatedPlainTextStrings.push(translatedPlainTextString);
 
       // Generate QE Annotated HTML for each sentence
       const qeAnnotatedSentenceHTMLs = translationObjects.map(
         ({ translation, sentenceScore }) =>
           generateQEAnnotatedHTML(translation, sentenceScore),
       );
-      const qeAnnotatedTranslatedString = qeAnnotatedSentenceHTMLs.join(
+      const qeAnnotatedTranslatedMarkup = qeAnnotatedSentenceHTMLs.join(
         separator,
       );
 
-      qeAnnotatedTranslatedStrings.push(qeAnnotatedTranslatedString);
+      qeAnnotatedTranslatedMarkups.push(qeAnnotatedTranslatedMarkup);
     });
 
     return {
-      translatedStrings,
-      qeAnnotatedTranslatedStrings,
+      translatedMarkups,
+      translatedPlainTextStrings,
+      qeAnnotatedTranslatedMarkups,
     };
   }
 }

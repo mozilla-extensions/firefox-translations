@@ -27,7 +27,8 @@ describe(testSuiteName, function() {
   const fixtureNames = [
     "hola-mundo",
     "hola-mundo-markup",
-    "punctuation",
+    "punctuation-1",
+    "punctuation-2",
     "mid-sentence-break",
     "nested-inline-tags",
     "es.wikipedia.org-2021-01-20-welcome-box",

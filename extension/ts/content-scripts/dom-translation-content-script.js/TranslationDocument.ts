@@ -144,6 +144,15 @@ export class TranslationDocument {
     return item;
   }
 
+  getMarkupsToTranslate(): string[] {
+    const markupsToTranslate = [];
+    this.translationRoots.forEach(translationRoot => {
+      let markupToTranslate = this.generateMarkupToTranslate(translationRoot);
+      markupsToTranslate.push(markupToTranslate);
+    });
+    return markupsToTranslate;
+  }
+
   /**
    * Generate the markup that represents a TranslationItem object.
    * Besides generating the markup, it also stores a fuller representation

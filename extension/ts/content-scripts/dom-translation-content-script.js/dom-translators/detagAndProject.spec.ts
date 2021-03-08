@@ -180,9 +180,9 @@ describe(testSuiteName, function() {
         expectedPlainString:
           " (hace 50 años): Fallece Chandrasekhara Raman, físico indio (n. 1888; en la imagen), premio Nobel de física en 1930.",
         translation:
-          "(50 years ago): Chandrasekhara Raman, Indian physicist, dies (n 1888; in pictures), Nobel laureate in 1930.",
+          "(50 years ago): Chandrasekhara Raman, Indian physicist, dies (n 1888; in pictures), Nobel laureate in 1930..",
         expectedProjectedString:
-          '<div id="n0"><br><b id="n1">(50 years ago):</b> Chandrasekhara Raman, <b id="n2">Indian physicist,</b> dies (n 1888; in pictures), <b id="n3">Nobel laureate in</b> 1930.</div>',
+          '<div id="n0"><br><b id="n1">(50 years ago):</b> Chandrasekhara Raman, <b id="n2">Indian physicist,</b> dies (n 1888; in pictures), <b id="n3">Nobel laureate in</b> 1930..</div>',
       },
     ];
 

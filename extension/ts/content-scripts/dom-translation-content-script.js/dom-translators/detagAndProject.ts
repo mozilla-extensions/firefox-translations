@@ -1,4 +1,4 @@
-interface DetaggedString {
+export interface DetaggedString {
   originalString: string;
   tokens: NodeToken[];
   plainString: string;
