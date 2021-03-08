@@ -174,12 +174,24 @@ describe(testSuiteName, function() {
         expectedProjectedString:
           '<div id="n2"> the free content encyclopedia that<br>everyone <b id="n3">can edit.</b></div>',
       },
+      {
+        input:
+          "<div id=n0><br><b id=n1>(hace 50 años)</b>: Fallece <b id=n2>Chandrasekhara Raman</b>, físico indio (n. 1888; <b id=n3>en la imagen</b>), premio Nobel de física en 1930.</div>",
+        expectedPlainString:
+          " (hace 50 años): Fallece Chandrasekhara Raman, físico indio (n. 1888; en la imagen), premio Nobel de física en 1930.",
+        translation:
+          "(50 years ago): Chandrasekhara Raman, Indian physicist, dies (n 1888; in pictures), Nobel laureate in 1930.",
+        expectedProjectedString:
+          '<div id="n0"><br><b id="n1">(50 years ago):</b> Chandrasekhara Raman, <b id="n2">Indian physicist,</b> dies (n 1888; in pictures), <b id="n3">Nobel laureate in</b> 1930.</div>',
+      },
     ];
 
     const plainStrings = [];
+    const translations = [];
     const projectedStrings = [];
     const expectedPlainStrings = [];
     const expectedProjectedStrings = [];
+    const expectedProjectedThenDetaggedStrings = [];
 
     fixtures.forEach(
       ({
@@ -200,8 +212,16 @@ describe(testSuiteName, function() {
         });
         plainStrings.push(detaggedString.plainString);
         expectedPlainStrings.push(expectedPlainString);
+        translations.push(translation);
         projectedStrings.push(projectedString);
         expectedProjectedStrings.push(expectedProjectedString);
+        const { plainString: expectedProjectedThenDetaggedString } = detag(
+          expectedProjectedString,
+        );
+        // Trim the expected projected then detagged string since the engine always returns trimmed translations
+        expectedProjectedThenDetaggedStrings.push(
+          expectedProjectedThenDetaggedString.trim(),
+        );
       },
     );
 
@@ -218,6 +238,14 @@ describe(testSuiteName, function() {
       projectedStrings,
       expectedProjectedStrings,
       `${testName}: Projected strings`,
+      fragment,
+      diffs,
+    );
+    // Sanity check that makes sure that we get the translated plain string back if we detag the projected string
+    visuallyAssertDeepEqual(
+      translations,
+      expectedProjectedThenDetaggedStrings,
+      `${testName}: Projected then detagged strings match the translated plain strings`,
       fragment,
       diffs,
     );
