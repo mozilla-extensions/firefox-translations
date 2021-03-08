@@ -4,6 +4,7 @@ const path = require("path");
 const examplePagesToTranslate = [
   "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21/original.html",
   "http://0.0.0.0:4000/es.wikipedia.org-2021-01-20-welcome-box/original.html",
+  "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21-events-on-nov-21-box/original.html",
   "https://es.wikipedia.org",
   "http://localhost:8000/bergamot.html",
   "https://www.mozilla.org/",

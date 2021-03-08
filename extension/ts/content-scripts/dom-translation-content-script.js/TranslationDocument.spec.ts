@@ -116,12 +116,6 @@ describe(testSuiteName, function() {
         ),
       );
 
-      fragment.append(createHeader(4, '"Original" after translation'));
-      fragment.append(createIframeShowingHTML(actualTranslatedOriginalDocHtml));
-      fragment.append(
-        createElementShowingPlainText(actualTranslatedOriginalDocHtml),
-      );
-
       if (actualTranslatedDocHtml !== expectedTranslatedDocHtml) {
         fragment.append(createHeader(4, "Expected"));
         fragment.append(createIframeShowingHTML(expectedTranslatedDocHtml));
@@ -129,9 +123,30 @@ describe(testSuiteName, function() {
           createElementShowingPlainText(expectedTranslatedDocHtml),
         );
         const diff = unifiedDiff(
-          fixtureName,
+          `${fixtureName} - Translation`,
           actualTranslatedDocHtml,
           expectedTranslatedDocHtml,
+        );
+        diffs.push(diff);
+      }
+
+      if (actualTranslatedOriginalDocHtml !== originalDocHtml) {
+        fragment.append(
+          createHeader(
+            4,
+            '"Original" after translation is different than the original markup',
+          ),
+        );
+        fragment.append(
+          createIframeShowingHTML(actualTranslatedOriginalDocHtml),
+        );
+        fragment.append(
+          createElementShowingPlainText(actualTranslatedOriginalDocHtml),
+        );
+        const diff = unifiedDiff(
+          `${fixtureName} - Original after translation`,
+          actualTranslatedOriginalDocHtml,
+          originalDocHtml,
         );
         diffs.push(diff);
       }
@@ -139,6 +154,7 @@ describe(testSuiteName, function() {
       outputDiv.append(fragment);
 
       assert.equal(actualTranslatedDocHtml, expectedTranslatedDocHtml);
+      assert.equal(actualTranslatedOriginalDocHtml, originalDocHtml);
     });
   });
 });

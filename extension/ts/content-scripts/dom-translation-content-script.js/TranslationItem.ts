@@ -462,12 +462,16 @@ function swapTextForItem(
           );
         }
 
-        // A trailing and a leading space must be preserved because
-        // they are meaningful in HTML.
-        const preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
-        const endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
+        if (target === "translation") {
+          // A trailing and a leading space must be preserved because
+          // they are meaningful in HTML.
+          const preSpace = /^\s/.test(curNode.nodeValue) ? " " : "";
+          const endSpace = /\s$/.test(curNode.nodeValue) ? " " : "";
+          curNode.nodeValue = preSpace + targetItem + endSpace;
+        } else {
+          curNode.nodeValue = targetItem;
+        }
 
-        curNode.nodeValue = preSpace + targetItem + endSpace;
         if (["original", "translation"].includes(target)) {
           // Workaround necessary when switching "back" from QE display
           // since quality estimated annotated nodes
