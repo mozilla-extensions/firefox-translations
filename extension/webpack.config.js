@@ -129,6 +129,11 @@ module.exports = {
         enforce: "pre",
         test: /\.js$/,
         loader: "source-map-loader",
+        exclude: [
+          // the diff2html module emits errors in form of "Cannot find source file ... .ts"
+          // but works in general, just source maps needs disabling:
+          /node_modules\/diff2html/,
+        ],
       },
     ],
   },
