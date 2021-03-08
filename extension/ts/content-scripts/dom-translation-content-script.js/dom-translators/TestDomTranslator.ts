@@ -29,7 +29,7 @@ export class TestDomTranslator extends BaseDomTranslator {
       '<div id="n0"><b id="n1">Welcome</b> to Wikipedia,</div>',
       '<div id="n2"> the encyclopedia of free content<br>that <b id="n3">everyone can edit.</b></div>',
       '<div id="n4"><br> articles <b id="n5">in Spanish.</b></div>',
-      '<div id="n0"><br><b id="n1">(50 years ago):</b> Chandrasekhara Raman, <b id="n2">Indian physicist</b> dies (n 1888; in pictures), <b id="n3">Nobel laureate in</b> 1930..</div>',
+      '<div id="n0"><br><b id="n1">(50 years ago):</b> Chandrasekhara Raman, <b id="n2">Indian physicist</b> dies (n 1888; in pictures), <b id="n3">Nobel laureate in</b> 1930.</div>',
       '<div id="n0"> the encyclopedia of free content<br>that <b id="n1">can all edit</b></div>',
       '<div id="n0"><br><b id="n1">(400 years ago):</b> In the United States, the Mayflower Pact, <b id="n2">which establishes a</b> government, is signed.</div>',
       "Search in 1 654 526 articles",

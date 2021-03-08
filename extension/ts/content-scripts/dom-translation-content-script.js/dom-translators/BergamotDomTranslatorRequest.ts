@@ -95,6 +95,7 @@ export class BergamotDomTranslatorRequest {
 
     // The 'text' field of results is a list of 'Paragraph'. Parse each 'Paragraph' entry
     results.text.forEach((paragraph: BergamotRestApiParagraph, index) => {
+      const detaggedString = detaggedStrings[index];
       const translationObjects = getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
         paragraph,
       );
@@ -109,6 +110,20 @@ export class BergamotDomTranslatorRequest {
         .map(({ translation }) => translation)
         .join(separator);
 
+      // Work around issue with doubled periods returned at the end of the translated string
+      const originalEndedWithASinglePeriod = /([^\.])\.(\s+)?$/gm.exec(
+        detaggedString.plainString,
+      );
+      const translationEndsWithTwoPeriods = /([^\.])\.\.(\s+)?$/gm.exec(
+        translatedPlainTextString,
+      );
+      if (originalEndedWithASinglePeriod && translationEndsWithTwoPeriods) {
+        translatedPlainTextString = translatedPlainTextString.replace(
+          /([^\.])\.\.(\s+)?$/gm,
+          "$1.$2",
+        );
+      }
+
       let translatedMarkup;
 
       // Use original rather than an empty or obviously invalid translation
@@ -120,10 +135,7 @@ export class BergamotDomTranslatorRequest {
       } else {
         // Project original tags/markup onto translated plain text string
         // TODO: Use alignment info returned from the translation engine when it becomes available
-        translatedMarkup = project(
-          detaggedStrings[index],
-          translatedPlainTextString,
-        );
+        translatedMarkup = project(detaggedString, translatedPlainTextString);
       }
 
       translatedMarkups.push(translatedMarkup);
