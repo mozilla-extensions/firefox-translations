@@ -84,7 +84,7 @@ export class TestDomTranslator extends BaseDomTranslator {
         translationRequestData.markupsToTranslate[index],
       );
       const textIndex = sourceLanguageTexts.indexOf(sourceText);
-      let translation;
+      let translatedMarkup;
       if (textIndex === -1) {
         const warning = `TestDomTranslator: Source translation text not found for "${sourceText}" (${this.sourceLanguage}->${this.targetLanguage}):`;
         console.warn(
@@ -95,16 +95,16 @@ export class TestDomTranslator extends BaseDomTranslator {
           encodeURIComponent(sourceLanguageTexts[7]),
           encodeURIComponent(sourceText),
         );
-        translation = warning;
+        translatedMarkup = warning;
       } else {
-        translation = targetLanguageTexts[textIndex];
-        if (!translation) {
+        translatedMarkup = targetLanguageTexts[textIndex];
+        if (!translatedMarkup) {
           const warning = `TestDomTranslator: Target translation text missing for "${sourceText}" at index ${textIndex} (${this.sourceLanguage}->${this.targetLanguage})`;
           console.warn(warning);
-          translation = warning;
+          translatedMarkup = warning;
         }
       }
-      translationRoot.parseTranslationResult(translation);
+      translationRoot.parseTranslationResult(translatedMarkup);
     });
 
     return { characterCount: -1 };

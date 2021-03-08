@@ -53,7 +53,7 @@ export class TranslationItem {
   public nodeRef: HTMLElement;
   public id;
   public children: TranslationItem[] = [];
-  public translatedString;
+  public translatedMarkup;
   public translation: TranslationItemStructureElement[];
   private qeAnnotatedTranslation;
   public original: TranslationItemStructureElement[];
@@ -96,33 +96,33 @@ export class TranslationItem {
    * all items are finished. It remains stored too to allow back-and-forth
    * switching between the "Show Original" and "Show Translation" functions.
    *
-   * @param translatedString    A string with the textual result received from the server,
+   * @param translatedMarkup    A string with the textual result received from the translation engine,
    *                            which can be plain-text or a serialized HTML doc.
    */
-  parseTranslationResult(translatedString: string) {
-    this.translatedString = translatedString;
+  parseTranslationResult(translatedMarkup: string) {
+    this.translatedMarkup = translatedMarkup;
 
     if (this.isSimleTranslationRoot) {
       // If translation contains HTML entities, we need to convert them.
       // It is because simple roots expect a plain text result.
       if (
         this.isSimleTranslationRoot &&
-        translatedString.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
+        translatedMarkup.match(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-f]{1,6});/gi)
       ) {
         const doc = new DOMParser().parseFromString(
-          translatedString,
+          translatedMarkup,
           "text/html",
         );
-        translatedString = doc.body.firstChild.nodeValue;
+        translatedMarkup = doc.body.firstChild.nodeValue;
       }
 
-      this.translation = [translatedString];
+      this.translation = [translatedMarkup];
       return;
     }
 
     let domParser = new DOMParser();
 
-    let doc = domParser.parseFromString(translatedString, "text/html");
+    let doc = domParser.parseFromString(translatedMarkup, "text/html");
     this.translation = [];
     parseResultNode(this, doc.body.firstChild, "translation");
   }
@@ -131,12 +131,12 @@ export class TranslationItem {
    * Note: QE-annotated translation results are never plain text nodes, despite that
    * the original translation item may be a simple translation root.
    * This wreaks havoc.
-   * @param qeAnnotatedTranslatedString
+   * @param qeAnnotatedTranslatedMarkup
    */
-  parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedString: string) {
+  parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedMarkup: string) {
     let domParser = new DOMParser();
     let doc = domParser.parseFromString(
-      qeAnnotatedTranslatedString,
+      qeAnnotatedTranslatedMarkup,
       "text/html",
     );
     this.qeAnnotatedTranslation = [];
@@ -322,7 +322,7 @@ function swapTextForItem(
 
     if (!curItem[target]) {
       // Translation not found for this item. This could be due to
-      // an error in the server response. For example, if a translation
+      // an error in the translation engine response. For example, if a translation
       // was broken in various chunks, and one of the chunks failed,
       // the items from that chunk will be missing its "translation"
       // field.
@@ -357,7 +357,7 @@ function swapTextForItem(
     // a non-blank text node or something else). This is not strictly necessary,
     // as the reordering algorithm would correctly handle this case. However,
     // this better aligns the resulting translation with the DOM content of the
-    // page, avoiding cases that would need to be unecessarily reordered.
+    // page, avoiding cases that would need to be unnecessarily reordered.
     //
     // An example of how this helps:
     //
@@ -487,7 +487,7 @@ function swapTextForItem(
           }
 
           curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
-        } else {
+        } else if (target === "qeAnnotatedTranslation") {
           let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
           // Replace the text node with the qe-annotated node to maintain the
           // right order in original DOM tree of the document.

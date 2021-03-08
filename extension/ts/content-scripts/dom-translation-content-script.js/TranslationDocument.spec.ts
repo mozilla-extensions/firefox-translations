@@ -108,7 +108,7 @@ describe(testSuiteName, function() {
       );
       console.debug({ stringRepresentations });
 
-      allTextsToTranslate.push(...stringRepresentations.stringsToTranslate);
+      allTextsToTranslate.push(...stringRepresentations.markupsToTranslate);
 
       fragment.append(
         createElementShowingPlainText(

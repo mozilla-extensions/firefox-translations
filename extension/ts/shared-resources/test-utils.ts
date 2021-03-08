@@ -68,27 +68,23 @@ export const translationDocumentStringRepresentations = (
   translationDocument: TranslationDocument,
 ): {
   originals: (string | TranslationItem)[];
-  stringsToTranslate: string[];
-  translatedStrings: string[];
+  markupsToTranslate: string[];
+  translatedMarkups: string[];
   translations: (string | TranslationItem)[];
 } => {
   const originals = [];
-  const stringsToTranslate = [];
-  const translatedStrings = [];
+  const markupsToTranslate = translationDocument.getMarkupsToTranslate();
+  const translatedMarkups = [];
   const translations = [];
   translationDocument.translationRoots.forEach(translationRoot => {
     originals.push(translationRoot.original);
-    translatedStrings.push(translationRoot.translatedString);
-    const textToTranslate = translationDocument.generateMarkupToTranslate(
-      translationRoot,
-    );
-    stringsToTranslate.push(textToTranslate);
+    translatedMarkups.push(translationRoot.translatedMarkup);
     translations.push(translationRoot.translation);
   });
   return {
     originals,
-    stringsToTranslate,
-    translatedStrings,
+    markupsToTranslate,
+    translatedMarkups,
     translations,
   };
 };
