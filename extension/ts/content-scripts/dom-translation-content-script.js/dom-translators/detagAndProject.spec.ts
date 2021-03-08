@@ -155,6 +155,16 @@ describe(testSuiteName, function() {
         expectedProjectedString:
           '<div id="n0"><br>articles<b id="n1"> in Spanish.</b></div>',
       },
+      {
+        input:
+          "<div id=n0><br><b id=n1>(hace 400 años)</b>: En Estados Unidos, se firma el <b id=n2>Pacto del Mayflower</b>, que establece un Gobierno.</div>",
+        expectedPlainString:
+          "(hace 400 años): En Estados Unidos, se firma el Pacto del Mayflower, que establece un Gobierno.",
+        translation:
+          "(400 years ago): In the United States, the Mayflower Pact, which establishes a government, is signed.",
+        expectedProjectedString:
+          '<div id="n0"><br><b id="n1">(400 years ago):</b> In the United States, the Mayflower Pact, <b id="n2">which establishes a</b> government, is signed.</div>',
+      },
     ];
 
     const plainStrings = [];

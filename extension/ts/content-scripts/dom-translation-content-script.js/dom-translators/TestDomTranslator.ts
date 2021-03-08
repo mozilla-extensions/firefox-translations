@@ -29,7 +29,7 @@ export class TestDomTranslator extends BaseDomTranslator {
       '<div id="n2"> the free content encyclopedia that<br>everyone <b id="n3">can edit.</b></div>',
       '<div id="n4"><br> articles <b id="n5">in Spanish.</b></div>',
       '<div id="n0"> the free content encyclopedia that<br>can <b id="n1">all edit</b></div>',
-      '<div id="n0"><br><b id="n1">(400 years ago):</b>In the United States, the Mayflower Pact, <b id="n2">which establishes a</b>government, is signed.</div>',
+      '<div id="n0"><br><b id="n1">(400 years ago):</b> In the United States, the Mayflower Pact, <b id="n2">which establishes a</b> government, is signed.</div>',
       "Search in 1 654 526 articles",
       '<div id="n5"><br> articles <b id="n6">in Spanish.</b></div>',
       "Coffee",
