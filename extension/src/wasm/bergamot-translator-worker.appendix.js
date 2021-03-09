@@ -3,12 +3,12 @@
 addOnPreMain(function() {
   let model;
 
-  const log = (message) => {
+  const log = message => {
     postMessage({
       type: "log",
       message,
-    })
-  }
+    });
+  };
 
   const loadModel = (from, to) => {
     log(`loadModel(${from}, ${to})`);
@@ -59,7 +59,10 @@ shortlist:
     const alignmentIsSupported = model.isAlignmentSupported();
     console.debug("Alignment:", alignmentIsSupported);
 
-    log(`model.isAlignmentSupported() returned in ${(Date.now() - start) / 1000} secs`);
+    log(
+      `model.isAlignmentSupported() returned in ${(Date.now() - start) /
+        1000} secs`,
+    );
 
     return { alignmentIsSupported };
   };
@@ -91,7 +94,6 @@ shortlist:
     let sentenceOrdinal = 0;
     const sentencesToTranslate = [];
     texts.forEach((text, originalTextIndex) => {
-
       translationResults.originalTexts.push(text);
 
       // Temporary naive sentence splitter
@@ -102,15 +104,20 @@ shortlist:
         if (trimmedSentence === "") {
           return;
         }
-        originalTextIndexSentenceOrdinalMap.set(sentenceOrdinal, originalTextIndex);
-        const originalSentenceEndedWithAPeriod = (sentenceIndex > 0) || (sentences.length === 1 && text.trim().indexOf(". ") > 0);
-        const sentenceToTranslate = `${trimmedSentence}${originalSentenceEndedWithAPeriod ? "." : ""}`;
+        originalTextIndexSentenceOrdinalMap.set(
+          sentenceOrdinal,
+          originalTextIndex,
+        );
+        const originalSentenceEndedWithAPeriod =
+          sentenceIndex > 0 ||
+          (sentences.length === 1 && text.trim().indexOf(". ") > 0);
+        const sentenceToTranslate = `${trimmedSentence}${
+          originalSentenceEndedWithAPeriod ? "." : ""
+        }`;
         // console.debug({text, trimmedSentence, sentences, sentenceIndex, originalSentenceEndedWithAPeriod, sentenceToTranslate});
         sentencesToTranslate.push(sentenceToTranslate);
-        sentenceOrdinal++
+        sentenceOrdinal++;
       });
-
-
     });
 
     sentencesToTranslate.forEach(sentence => {
@@ -140,27 +147,41 @@ shortlist:
     console.debug("Result size=", result.size());
     const originalSentencesByOriginalTextIndex = [];
     const translatedSentencesByOriginalTextIndex = [];
-    for (let sentenceOrdinal = 0; sentenceOrdinal < result.size(); sentenceOrdinal++) {
-      const originalText = result.get(sentenceOrdinal).getOriginalText();
-      const translatedText = result.get(sentenceOrdinal).getTranslatedText();
-      // console.debug(" original={" + originalText + "}, translation={" + translatedText + "}", { sentenceOrdinal },);
-      const originalTextIndex = originalTextIndexSentenceOrdinalMap.get(sentenceOrdinal);
+    for (
+      let $sentenceOrdinal = 0;
+      $sentenceOrdinal < result.size();
+      $sentenceOrdinal++
+    ) {
+      const originalText = result.get($sentenceOrdinal).getOriginalText();
+      const translatedText = result.get($sentenceOrdinal).getTranslatedText();
+      // console.debug(" original={" + originalText + "}, translation={" + translatedText + "}", { $sentenceOrdinal },);
+      const originalTextIndex = originalTextIndexSentenceOrdinalMap.get(
+        $sentenceOrdinal,
+      );
       // console.debug({ originalTextIndex });
       if (!originalSentencesByOriginalTextIndex[originalTextIndex]) {
         originalSentencesByOriginalTextIndex[originalTextIndex] = [];
       }
-      originalSentencesByOriginalTextIndex[originalTextIndex].push(originalText);
+      originalSentencesByOriginalTextIndex[originalTextIndex].push(
+        originalText,
+      );
       if (!translatedSentencesByOriginalTextIndex[originalTextIndex]) {
         translatedSentencesByOriginalTextIndex[originalTextIndex] = [];
       }
-      translatedSentencesByOriginalTextIndex[originalTextIndex].push(translatedText);
+      translatedSentencesByOriginalTextIndex[originalTextIndex].push(
+        translatedText,
+      );
     }
 
     // console.debug({ originalSentencesByOriginalTextIndex, translatedSentencesByOriginalTextIndex });
 
-    translatedSentencesByOriginalTextIndex.forEach((translatedSentences, originalTextIndex) => {
-      translationResults.translatedTexts[originalTextIndex] = translatedSentences.join(" ");
-    });
+    translatedSentencesByOriginalTextIndex.forEach(
+      (translatedSentences, originalTextIndex) => {
+        translationResults.translatedTexts[
+          originalTextIndex
+        ] = translatedSentences.join(" ");
+      },
+    );
 
     // console.debug("translationResults.translatedTexts", translationResults.translatedTexts);
 
@@ -178,7 +199,10 @@ shortlist:
     }
     const requestId = data.requestId;
     if (data.type === "loadModel") {
-      const loadModelResults = loadModel(data.loadModelParams.from, data.loadModelParams.to);
+      const loadModelResults = loadModel(
+        data.loadModelParams.from,
+        data.loadModelParams.to,
+      );
       postMessage({
         type: "loadModelResults",
         requestId,
@@ -189,12 +213,21 @@ shortlist:
         console.log("Messages to translate: ", data.translateParams.texts);
         let wordCount = 0;
         data.translateParams.texts.forEach(text => {
-          wordCount += text.trim().split(" ").filter(word => word.trim() !== "").length;
-        })
+          wordCount += text
+            .trim()
+            .split(" ")
+            .filter(word => word.trim() !== "").length;
+        });
         const start = Date.now();
         const translationResults = translate(data.translateParams.texts);
         const secs = (Date.now() - start) / 1000;
-        log(`Translation of ${data.translateParams.texts.length} texts (wordCount ${wordCount}) took ${secs} secs (${Math.round(wordCount / secs)} words per second)`);
+        log(
+          `Translation of ${
+            data.translateParams.texts.length
+          } texts (wordCount ${wordCount}) took ${secs} secs (${Math.round(
+            wordCount / secs,
+          )} words per second)`,
+        );
         postMessage({
           type: "translationResults",
           requestId,
@@ -212,5 +245,5 @@ shortlist:
 
   // Send a message indicating that the worker is ready to receive WASM-related messages
   postMessage("ready");
-  log("The worker is ready to receive translation-related messages")
+  log("The worker is ready to receive translation-related messages");
 });
