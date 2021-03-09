@@ -2,6 +2,8 @@
 
 addOnPreMain(function() {
   let model;
+  let modelFrom;
+  let modelTo;
 
   const log = message => {
     postMessage({
@@ -12,22 +14,26 @@ addOnPreMain(function() {
 
   const loadModel = (from, to) => {
     log(`loadModel(${from}, ${to})`);
-    let start = Date.now();
-
-    // Delete previous instance if another model was loaded
-    if (model) {
-      model.delete();
-    }
 
     const languagePair = `${from}${to}`;
 
-    // Vocab files are re-used in both translation directions
-    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+    // Load new model if not the same from/to language pair is already loaded
+    const loadedLanguagePair = `${modelFrom}${modelTo}`;
+    if (loadedLanguagePair !== languagePair) {
+      const start = Date.now();
 
-    // Set the Model Configuration as YAML formatted string.
-    // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
-    // This example captures the most relevant options: model file, vocabulary files and shortlist file
-    const modelConfig = `models:
+      // Delete previous instance if another model was loaded
+      if (model) {
+        model.delete();
+      }
+
+      // Vocab files are re-used in both translation directions
+      const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+
+      // Set the Model Configuration as YAML formatted string.
+      // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
+      // This example captures the most relevant options: model file, vocabulary files and shortlist file
+      const modelConfig = `models:
   - /${languagePair}/model.${languagePair}.npz
 vocabs:
   - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
@@ -49,13 +55,20 @@ shortlist:
     - 50
 `;
 
-    console.log("modelConfig: ", modelConfig);
+      console.log("modelConfig: ", modelConfig);
 
-    // Instantiate the TranslationModel
-    model = new Module.TranslationModel(modelConfig);
-    log(`Model loaded in ${(Date.now() - start) / 1000} secs`);
+      // Instantiate the TranslationModel
+      model = new Module.TranslationModel(modelConfig);
+      modelFrom = from;
+      modelTo = to;
+      log(
+        `Model ${languagePair} loaded in ${(Date.now() - start) / 1000} secs`,
+      );
+    } else {
+      log(`Model ${languagePair} already loaded`);
+    }
 
-    start = Date.now();
+    const start = Date.now();
     const alignmentIsSupported = model.isAlignmentSupported();
     console.debug("Alignment:", alignmentIsSupported);
 

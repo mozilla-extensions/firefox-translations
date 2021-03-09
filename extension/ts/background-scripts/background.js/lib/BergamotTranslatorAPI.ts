@@ -54,6 +54,7 @@ interface LoadModelResultsWorkerMessage extends WorkerMessage {
 
 export interface TranslateParams {
   texts: string[];
+  loadModelParams: LoadModelParams;
 }
 
 interface TranslateRequestWorkerMessage extends WorkerMessage {
@@ -85,6 +86,10 @@ type IncomingWorkerMessage =
   | TranslationResultsWorkerMessage
   | LogWorkerMessage;
 
+/**
+ * Class responsible for instantiating and communicating between this script
+ * and the translation worker process.
+ */
 class WorkerManager {
   private pendingRequests: Map<
     string,
@@ -92,16 +97,13 @@ class WorkerManager {
   > = new Map();
   // private estimatedHeapGrowth: number;
 
-  async loadModel(loadModelParams: LoadModelParams): Promise<LoadModelResults> {
+  async loadModel(
+    loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage,
+  ): Promise<LoadModelResults> {
     const worker = await this.workerReady;
     const loadModelResults: LoadModelResults = await new Promise(resolve => {
-      const requestId = nanoid();
+      const { requestId } = loadModelRequestWorkerMessage;
       this.pendingRequests.set(requestId, { resolve });
-      const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
-        type: "loadModel",
-        requestId,
-        loadModelParams,
-      };
       worker.postMessage(loadModelRequestWorkerMessage);
     });
     // TODO: Update estimatedHeapGrowth
@@ -110,18 +112,13 @@ class WorkerManager {
   }
 
   async translate(
-    translateParams: TranslateParams,
+    translateRequestWorkerMessage: TranslateRequestWorkerMessage,
   ): Promise<TranslationResults> {
     const worker = await this.workerReady;
     const translationResults: TranslationResults = await new Promise(
       resolve => {
-        const requestId = nanoid();
+        const { requestId } = translateRequestWorkerMessage;
         this.pendingRequests.set(requestId, { resolve });
-        const translateRequestWorkerMessage: TranslateRequestWorkerMessage = {
-          type: "translate",
-          requestId,
-          translateParams,
-        };
         worker.postMessage(translateRequestWorkerMessage);
       },
     );
@@ -218,34 +215,70 @@ class WorkerManager {
 
 const workerManager = new WorkerManager();
 
-let loadedLanguagePair: string;
-export const BergamotTranslatorAPI = {
-  async translate(
-    texts: string[],
-    from: string,
-    to: string,
-  ): Promise<TranslationResults> {
+/**
+ * Class responsible for sending translations requests to the translation worker process
+ * in a compatible and somewhat efficient order.
+ */
+class TranslationRequestManager {
+  private processing: boolean;
+  private loadedLanguagePair: string;
+  private queuedRequests: TranslateRequestWorkerMessage[] = [];
+  private queuedRequestsByRequestId: Map<
+    string,
+    PendingRequest<TranslationResults>
+  > = new Map();
+
+  async processQueue() {
+    if (this.processing) {
+      return;
+    }
+    this.processing = true;
+    while (this.queuedRequests.length > 0) {
+      console.info(
+        `Processing translation request queue of ${this.queuedRequests.length} requests`,
+      );
+      await this.processNextItemInQueue();
+    }
+    this.processing = false;
+    Telemetry.global.submit();
+  }
+
+  async processNextItemInQueue() {
+    // Shift the next request off the queue
+    const translateRequestWorkerMessage = this.queuedRequests.shift();
+    const { translateParams, requestId } = translateRequestWorkerMessage;
+
+    const { loadModelParams } = translateParams;
+    const { from, to } = loadModelParams;
     const languagePair = `${from}${to}`;
-    if (loadedLanguagePair !== languagePair) {
-      const loadModelParams = {
-        from,
-        to,
+
+    // First check if we need to load a model
+    if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {
+      const loadModelStart = performance.now();
+
+      const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
+        type: "loadModel",
+        requestId,
+        loadModelParams,
       };
-      const start = performance.now();
-      await workerManager.loadModel(loadModelParams);
-      const end = performance.now();
+      await workerManager.loadModel(loadModelRequestWorkerMessage);
+      this.loadedLanguagePair = languagePair;
+
+      const loadModelEnd = performance.now();
       // todo: replace to timespan when it is supported
       Telemetry.global.record(
-        () => modelLoadTime.set(String(end - start)),
+        () => modelLoadTime.set(String(loadModelEnd - loadModelStart)),
         "loadModelTime",
       );
-      loadedLanguagePair = languagePair;
     }
-    const translateParams: TranslateParams = {
-      texts,
-    };
+
+    // Send the translation request
     const start = performance.now();
-    const res = await workerManager.translate(translateParams);
+
+    const translationResults = await workerManager.translate(
+      translateRequestWorkerMessage,
+    );
+    this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
 
     const end = performance.now();
     // todo: replace to timespan when it is supported
@@ -265,9 +298,54 @@ export const BergamotTranslatorAPI = {
       () => wordsPerSecond.set(String(speed)),
       "translateSpeed",
     );
+  }
 
-    Telemetry.global.submit();
+  async translate(
+    texts: string[],
+    from: string,
+    to: string,
+  ): Promise<TranslationResults> {
+    const loadModelParams = {
+      from,
+      to,
+    };
+    const translateParams: TranslateParams = {
+      texts,
+      loadModelParams,
+    };
+    const requestPromise: Promise<TranslationResults> = new Promise(resolve => {
+      const requestId = nanoid();
+      this.queuedRequestsByRequestId.set(requestId, { resolve });
+      const translateRequestWorkerMessage: TranslateRequestWorkerMessage = {
+        type: "translate",
+        requestId,
+        translateParams,
+      };
+      if (this.processing) {
+        console.info(
+          `Queued translation request to be processed after ${this
+            .queuedRequests.length + 1} already queued requests`,
+        );
+      } else {
+        console.info(`Queued translation request`);
+      }
+      this.queuedRequests.push(translateRequestWorkerMessage);
+    });
+    // Kick off queue processing async
+    this.processQueue().then(_r => void 0);
+    // Return the promise that resolves when the in-scope translation request resolves
+    return requestPromise;
+  }
+}
 
-    return res;
+const translationRequestManager = new TranslationRequestManager();
+
+export const BergamotTranslatorAPI = {
+  async translate(
+    texts: string[],
+    from: string,
+    to: string,
+  ): Promise<TranslationResults> {
+    return await translationRequestManager.translate(texts, from, to);
   },
 };
