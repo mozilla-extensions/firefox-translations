@@ -23,10 +23,8 @@ export const MAX_REQUEST_DATA = 500000;
 // request.
 export const MAX_REQUEST_CHUNKS = 12800;
 
-// Self-imposed limit of 1920 requests. This means that a page that would need
-// to be broken in more than 1920 requests won't be fully translated.
-// The maximum amount of data that we will translate for a single page
-// is MAX_REQUESTS * MAX_REQUEST_DATA.
+// Self-imposed limit of requests. This means that a page that would need
+// to be broken in more than this amount of requests won't be fully translated.
 export const MAX_REQUESTS = 15;
 
 /**

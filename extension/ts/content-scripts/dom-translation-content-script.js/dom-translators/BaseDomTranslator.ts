@@ -42,7 +42,6 @@ export interface DomTranslationChunk {
   translationRoots: TranslationItem[];
   translationResponseData?: TranslationResponseData;
   isLastChunk: boolean;
-  lastIndex: number;
 }
 
 type TranslationParseChunkResultFunction = (
@@ -67,6 +66,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   private parseChunkResult: TranslationParseChunkResultFunction;
   private translationApiLimits: TranslationApiLimits;
   private domTranslatorRequestFactory: DomTranslatorRequestFactory;
+  private translationRootsPickedUpForTranslation: TranslationItem[];
 
   /**
    * @param translationDocument  The TranslationDocument object that represents
@@ -110,11 +110,25 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     const chunksBeingProcessed = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
+    const { translationRoots } = this.translationDocument;
+    const {
+      translationRootsInViewport,
+      translationRootsVisibleInViewport,
+    } = await this.translationDocument.determineVisibilityOfTranslationRoots();
+    this.translationRootsPickedUpForTranslation = [];
+
     // Split the document into various requests to be sent to the translation API
-    for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
+    for (
+      let currentRequestOrdinal = 0;
+      currentRequestOrdinal < MAX_REQUESTS;
+      currentRequestOrdinal++
+    ) {
       // Determine the data for the next request.
       const domTranslationChunk = this.generateNextDomTranslationChunk(
-        currentIndex,
+        currentRequestOrdinal,
+        translationRoots,
+        translationRootsInViewport,
+        translationRootsVisibleInViewport,
       );
 
       // Break if there was nothing left to translate
@@ -132,7 +146,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
         this.targetLanguage,
       );
 
-      // Fire all requests in parallel
+      // Fire off the requests in parallel to existing requests
       const chunkBeingProcessed = domTranslatorRequest
         .fireRequest(this.translationApiClient)
         .then((translationResponseData: TranslationResponseData) => {
@@ -142,18 +156,24 @@ export class BaseDomTranslator extends MinimalDomTranslator {
               domTranslationChunk,
               domTranslatorRequest,
             );
+          } else {
+            throw new Error(
+              "The return translationResonseData was false/empty",
+            );
           }
         })
         .catch(err => {
           console.error("DomTranslator fireRequest error", err);
         });
       chunksBeingProcessed.push(chunkBeingProcessed);
+      console.info(
+        `Fired off request with ${domTranslationChunk.translationRoots.length} translation roots to the translation backend`,
+        { domTranslationChunk },
+      );
 
       if (domTranslationChunk.isLastChunk) {
         break;
       }
-
-      currentIndex = domTranslationChunk.lastIndex;
     }
 
     // Return early with a noop if there is nothing to translate
@@ -208,24 +228,46 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   /**
    * This function will determine what is the data to be used for
    * the Nth request we are generating, based on the input params.
-   *
-   * @param startIndex What is the index, in the translation roots list, that the
-   *                   chunk should start.
    */
   private generateNextDomTranslationChunk(
-    startIndex: number,
+    currentRequestOrdinal: number,
+    translationRoots: TranslationItem[],
+    translationRootsInViewport: TranslationItem[],
+    translationRootsVisibleInViewport: TranslationItem[],
   ): DomTranslationChunk {
     let currentDataSize = 0;
     let currentChunks = 0;
     let translationRequestData: TranslationRequestData = {
       markupsToTranslate: [],
     };
-    const { translationRoots } = this.translationDocument;
     const chunkTranslationRoots = [];
     const { MAX_REQUEST_DATA, MAX_REQUEST_CHUNKS } = this.translationApiLimits;
 
-    for (let index = startIndex; index < translationRoots.length; index++) {
-      const translationRoot = translationRoots[index];
+    let translationRootsToConsider = translationRoots;
+
+    // Don't consider translation roots that are already picked up for translation
+    const notYetPickedUp = ($translationRoots: TranslationItem[]) =>
+      $translationRoots.filter(
+        value => !this.translationRootsPickedUpForTranslation.includes(value),
+      );
+
+    // Prioritize the translation roots visible in viewport
+    translationRootsToConsider = notYetPickedUp(
+      translationRootsVisibleInViewport,
+    );
+
+    // Then prioritize the translation roots located above the fold (in the viewport but not necessarily visible)
+    if (translationRootsToConsider.length === 0) {
+      translationRootsToConsider = notYetPickedUp(translationRootsInViewport);
+    }
+
+    // Then prioritize the remaining translation roots
+    if (translationRootsToConsider.length === 0) {
+      translationRootsToConsider = notYetPickedUp(translationRoots);
+    }
+
+    for (let i = 0; i < translationRootsToConsider.length; i++) {
+      const translationRoot = translationRootsToConsider[i];
       const markupToTranslate = this.translationDocument.generateMarkupToTranslate(
         translationRoot,
       );
@@ -247,21 +289,23 @@ export class BaseDomTranslator extends MinimalDomTranslator {
           translationRequestData,
           translationRoots: chunkTranslationRoots,
           isLastChunk: false,
-          lastIndex: index,
         };
       }
 
       currentDataSize = newCurSize;
       currentChunks = newChunks;
       chunkTranslationRoots.push(translationRoot);
+      this.translationRootsPickedUpForTranslation.push(translationRoot);
       translationRequestData.markupsToTranslate.push(markupToTranslate);
     }
+
+    const remainingTranslationRoots = notYetPickedUp(translationRoots);
+    const isLastChunk = remainingTranslationRoots.length === 0;
 
     return {
       translationRequestData,
       translationRoots: chunkTranslationRoots,
-      isLastChunk: true,
-      lastIndex: 0,
+      isLastChunk,
     };
   }
 }

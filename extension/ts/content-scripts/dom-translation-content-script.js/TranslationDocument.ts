@@ -308,6 +308,15 @@ export class TranslationDocument {
       }
     }
 
+    if (this.paintProcessedNodes) {
+      translationRootsInViewport.forEach(translationRoot => {
+        translationRoot.nodeRef.style.color = "purple";
+      });
+      translationRootsVisibleInViewport.forEach(translationRoot => {
+        translationRoot.nodeRef.style.color = "maroon";
+      });
+    }
+
     return {
       translationRootsInViewport,
       translationRootsVisibleInViewport,
