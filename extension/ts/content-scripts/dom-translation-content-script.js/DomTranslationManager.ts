@@ -272,7 +272,7 @@ export class DomTranslationManager {
     const { translationRoots } = translationDocument;
 
     const {
-      translationRootsInViewport,
+      translationRootsVisible,
       translationRootsVisibleInViewport,
     } = await translationDocument.determineVisibilityOfTranslationRoots();
 
@@ -286,7 +286,7 @@ export class DomTranslationManager {
     const texts = translationRoots
       .map(generateOriginalMarkupToTranslate)
       .map(removeTags);
-    const textsInViewport = translationRootsInViewport
+    const textsVisible = translationRootsVisible
       .map(generateOriginalMarkupToTranslate)
       .map(removeTags);
     const textsVisibleInViewport = translationRootsVisibleInViewport
@@ -294,7 +294,7 @@ export class DomTranslationManager {
       .map(removeTags);
 
     const wordCount = texts.join(" ").split(" ").length;
-    const wordCountInViewport = textsInViewport.join(" ").split(" ").length;
+    const wordCountVisible = textsVisible.join(" ").split(" ").length;
     const wordCountVisibleInViewport = textsVisibleInViewport
       .join(" ")
       .split(" ").length;
@@ -308,10 +308,10 @@ export class DomTranslationManager {
       translationRootsCount,
       simpleTranslationRootsCount,
       texts,
-      textsInViewport,
+      textsVisible,
       textsVisibleInViewport,
       wordCount,
-      wordCountInViewport,
+      wordCountVisible,
       wordCountVisibleInViewport,
     };
   }

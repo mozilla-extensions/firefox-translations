@@ -291,13 +291,13 @@ export class TranslationDocument {
       elements,
     );
 
-    const translationRootsInViewport = [];
+    const translationRootsVisible = [];
     const translationRootsVisibleInViewport = [];
     for (let i = 0; i < translationRoots.length; i++) {
       let translationRoot = translationRoots[i];
-      const inViewport = isElementInViewport(translationRoot.nodeRef);
-      if (inViewport) {
-        translationRootsInViewport.push(translationRoot);
+      const visible = isElementVisible(translationRoot.nodeRef);
+      if (visible) {
+        translationRootsVisible.push(translationRoot);
       }
       const visibleInViewport = isElementVisibleInViewport(
         elementsVisibleInViewport,
@@ -309,7 +309,7 @@ export class TranslationDocument {
     }
 
     if (this.paintProcessedNodes) {
-      translationRootsInViewport.forEach(translationRoot => {
+      translationRootsVisible.forEach(translationRoot => {
         translationRoot.nodeRef.style.color = "purple";
       });
       translationRootsVisibleInViewport.forEach(translationRoot => {
@@ -318,7 +318,7 @@ export class TranslationDocument {
     }
 
     return {
-      translationRootsInViewport,
+      translationRootsVisible,
       translationRootsVisibleInViewport,
     };
   }
@@ -372,15 +372,10 @@ function regenerateMarkupToTranslateFromOriginal(
   return generateMarkupToTranslateForItem(item, str);
 }
 
-const isElementInViewport = (el: HTMLElement): boolean => {
+const isElementVisible = (el: HTMLElement): boolean => {
   const rect = el.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <=
-      (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-  );
+  // Elements that are not visible will have a zero width/height bounding client rect
+  return rect.width > 0 && rect.height > 0;
 };
 
 const isElementVisibleInViewport = (

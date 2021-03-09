@@ -112,7 +112,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
 
     const { translationRoots } = this.translationDocument;
     const {
-      translationRootsInViewport,
+      translationRootsVisible,
       translationRootsVisibleInViewport,
     } = await this.translationDocument.determineVisibilityOfTranslationRoots();
     this.translationRootsPickedUpForTranslation = [];
@@ -127,7 +127,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       const domTranslationChunk = this.generateNextDomTranslationChunk(
         currentRequestOrdinal,
         translationRoots,
-        translationRootsInViewport,
+        translationRootsVisible,
         translationRootsVisibleInViewport,
       );
 
@@ -232,7 +232,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   private generateNextDomTranslationChunk(
     currentRequestOrdinal: number,
     translationRoots: TranslationItem[],
-    translationRootsInViewport: TranslationItem[],
+    translationRootsVisible: TranslationItem[],
     translationRootsVisibleInViewport: TranslationItem[],
   ): DomTranslationChunk {
     let currentDataSize = 0;
@@ -256,9 +256,9 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       translationRootsVisibleInViewport,
     );
 
-    // Then prioritize the translation roots located above the fold (in the viewport but not necessarily visible)
+    // Then prioritize the translation roots that are visible
     if (translationRootsToConsider.length === 0) {
-      translationRootsToConsider = notYetPickedUp(translationRootsInViewport);
+      translationRootsToConsider = notYetPickedUp(translationRootsVisible);
     }
 
     // Then prioritize the remaining translation roots

@@ -13,7 +13,7 @@ export class DocumentTranslationState extends ExtendedModel(
     frameId: prop<number>(),
     showOriginal: prop<boolean>({ setterAction: true }),
     url: prop<string>(),
-    wordCountInViewport: prop<number>(),
+    wordCountVisible: prop<number>(),
     wordCountVisibleInViewport: prop<number>(),
   },
 ) {}

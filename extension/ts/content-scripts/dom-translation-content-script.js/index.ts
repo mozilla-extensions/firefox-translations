@@ -167,7 +167,7 @@ const init = async () => {
         translationStatus: TranslationStatus.UNKNOWN,
         url: window.location.href,
         wordCount: documentTranslationStatistics.wordCount,
-        wordCountInViewport: documentTranslationStatistics.wordCountInViewport,
+        wordCountVisible: documentTranslationStatistics.wordCountVisible,
         wordCountVisibleInViewport:
           documentTranslationStatistics.wordCountVisibleInViewport,
       }),
