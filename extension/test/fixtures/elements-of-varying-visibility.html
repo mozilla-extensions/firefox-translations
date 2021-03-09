@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>elements-of-varying-visibility</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    div {
+      border: 2px solid blue;
+    }
+
+    div.not-initially-visible {
+      display: none;
+    }
+
+    a:hover + div.not-initially-visible {
+      display: block;
+    }
+
+    div.above-the-fold {
+      position: absolute;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    div.below-the-fold {
+      position: absolute;
+      top: 150vh;
+      height: 100vh;
+      width: 100vw;
+    }
+  </style>
+</head>
+<body>
+<div class="above-the-fold">
+  <a id="anchor-above-the-fold">Above the fold</a>
+  <div
+    id="div-above-the-fold-not-initially-visible"
+    class="not-initially-visible"
+  >
+    Above the fold, not initially visible
+  </div>
+</div>
+<div class="below-the-fold">
+  <a id="anchor-below-the-fold">Below the fold</a>
+  <div
+    id="div-below-the-fold-not-initially-visible"
+    class="not-initially-visible"
+  >
+    Below the fold, not initially visible
+  </div>
+</div>
+</body>
+</html>
