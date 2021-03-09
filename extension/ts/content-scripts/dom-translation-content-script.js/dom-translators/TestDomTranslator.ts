@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { BaseDomTranslator, TranslationRequestData } from "./BaseDomTranslator";
+import { MinimalDomTranslator } from "./MinimalDomTranslator";
 
-export class TestDomTranslator extends BaseDomTranslator {
+export class TestDomTranslator extends MinimalDomTranslator {
   private texts = {
     es: [
       "Hola mundo",
