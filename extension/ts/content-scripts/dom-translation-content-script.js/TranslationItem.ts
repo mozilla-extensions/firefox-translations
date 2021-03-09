@@ -308,7 +308,7 @@ function swapTextForItem(
     item.nodeRef.style.border = "1px solid maroon";
   }
   while (visitStack.length) {
-    let curItem = visitStack.shift();
+    let curItem: TranslationItem = visitStack.shift();
 
     if (paintProcessedNodes) {
       item.nodeRef.style.border = "1px solid yellow";
@@ -327,7 +327,7 @@ function swapTextForItem(
       // the items from that chunk will be missing its "translation"
       // field.
       if (paintProcessedNodes) {
-        item.nodeRef.style.border = "1px solid red";
+        curItem.nodeRef.style.border = "1px solid red";
       }
       continue;
     }
@@ -335,7 +335,7 @@ function swapTextForItem(
     domNode.normalize();
 
     if (paintProcessedNodes) {
-      item.nodeRef.style.border = "1px solid green";
+      curItem.nodeRef.style.border = "1px solid green";
     }
 
     // curNode points to the child nodes of the DOM node that we are
@@ -509,6 +509,10 @@ function swapTextForItem(
 
     // And remove any garbage "" nodes left after clearing.
     domNode.normalize();
+
+    if (paintProcessedNodes) {
+      curItem.nodeRef.style.border = "2px solid green";
+    }
   }
 }
 

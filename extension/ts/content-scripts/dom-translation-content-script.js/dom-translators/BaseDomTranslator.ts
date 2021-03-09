@@ -108,13 +108,10 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   }> {
     let currentIndex = 0;
     const chunksBeingProcessed = [];
+    const { MAX_REQUESTS } = this.translationApiLimits;
 
     // Split the document into various requests to be sent to the translation API
-    for (
-      let requestCount = 0;
-      requestCount < this.translationApiLimits.MAX_REQUESTS;
-      requestCount++
-    ) {
+    for (let requestCount = 0; requestCount < MAX_REQUESTS; requestCount++) {
       // Determine the data for the next request.
       const domTranslationChunk = this.generateNextDomTranslationChunk(
         currentIndex,
@@ -220,6 +217,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     };
     const { translationRoots } = this.translationDocument;
     const chunkTranslationRoots = [];
+    const { MAX_REQUEST_DATA, MAX_REQUEST_CHUNKS } = this.translationApiLimits;
 
     for (let index = startIndex; index < translationRoots.length; index++) {
       const translationRoot = translationRoots[index];
@@ -230,14 +228,16 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       const newCurSize = currentDataSize + markupToTranslate.length;
       const newChunks = currentChunks + 1;
 
-      if (
-        newCurSize > this.translationApiLimits.MAX_REQUEST_DATA ||
-        newChunks > this.translationApiLimits.MAX_REQUEST_CHUNKS
-      ) {
+      if (newCurSize > MAX_REQUEST_DATA || newChunks > MAX_REQUEST_CHUNKS) {
         // If we've reached the API limits, let's stop accumulating data
         // for this request and return. We return information useful for
         // the caller to pass back on the next call, so that the function
         // can keep working from where it stopped.
+        console.warn("We have reached the translation API limits", {
+          newCurSize,
+          newChunks,
+          translationApiLimits: this.translationApiLimits,
+        });
         return {
           translationRequestData,
           translationRoots: chunkTranslationRoots,

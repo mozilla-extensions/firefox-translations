@@ -386,7 +386,7 @@ const getElementsVisibleInViewport = async (
     };
 
     let callback: IntersectionObserverCallback = (entries, $observer) => {
-      console.debug("InteractionObserver callback", entries.length, entries);
+      // console.debug("InteractionObserver callback", entries.length, entries);
       const elementsInViewport = entries
         .filter(entry => entry.isIntersecting)
         .map(entry => entry.target);
