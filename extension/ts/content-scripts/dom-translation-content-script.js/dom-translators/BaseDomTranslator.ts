@@ -51,7 +51,7 @@ type TranslationParseChunkResultFunction = (
 
 interface TranslationApiLimits {
   MAX_REQUEST_DATA: number;
-  MAX_REQUEST_CHUNKS: number;
+  MAX_REQUEST_TEXTS: number;
   MAX_REQUESTS: number;
 }
 
@@ -241,9 +241,9 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       markupsToTranslate: [],
     };
     const chunkTranslationRoots = [];
-    const { MAX_REQUEST_DATA, MAX_REQUEST_CHUNKS } = this.translationApiLimits;
+    const { MAX_REQUEST_DATA, MAX_REQUEST_TEXTS } = this.translationApiLimits;
 
-    let translationRootsToConsider = translationRoots;
+    let translationRootsToConsider;
 
     // Don't consider translation roots that are already picked up for translation
     const notYetPickedUp = ($translationRoots: TranslationItem[]) =>
@@ -275,7 +275,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       const newCurSize = currentDataSize + markupToTranslate.length;
       const newChunks = currentChunks + 1;
 
-      if (newCurSize > MAX_REQUEST_DATA || newChunks > MAX_REQUEST_CHUNKS) {
+      if (newCurSize > MAX_REQUEST_DATA || newChunks > MAX_REQUEST_TEXTS) {
         // If we've reached the API limits, let's stop accumulating data
         // for this request and return. We return information useful for
         // the caller to pass back on the next call, so that the function

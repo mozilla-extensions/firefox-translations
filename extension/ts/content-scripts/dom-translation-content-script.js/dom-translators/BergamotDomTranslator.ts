@@ -19,9 +19,8 @@ import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 // The maximum amount of net data allowed per request on Bergamot's API.
 export const MAX_REQUEST_DATA = 500000;
 
-// The maximum number of chunks allowed to be translated in a single
-// request.
-export const MAX_REQUEST_CHUNKS = 12800;
+// The maximum number of texts allowed to be translated in a single request.
+export const MAX_REQUEST_TEXTS = 12800;
 
 // Self-imposed limit of requests. This means that a page that would need
 // to be broken in more than this amount of requests won't be fully translated.
@@ -48,7 +47,7 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       targetLanguage,
       new ContentScriptBergamotApiClient(),
       parseChunkResult,
-      { MAX_REQUEST_DATA, MAX_REQUEST_CHUNKS, MAX_REQUESTS },
+      { MAX_REQUEST_DATA, MAX_REQUEST_TEXTS, MAX_REQUESTS },
       (
         translationRequestData: TranslationRequestData,
         sourceLanguage: string,
