@@ -197,6 +197,11 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       this.partialSuccess = true;
       // Count the number of characters successfully translated.
       this.translatedCharacterCount += domTranslatorRequest.characterCount;
+      // Show translated chunks as they arrive
+      console.info(
+        "Part of the web page document translated. Showing translations that have completed so far...",
+      );
+      this.translationDocument.showTranslation();
     }
   }
 

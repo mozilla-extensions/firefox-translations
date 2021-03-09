@@ -224,8 +224,18 @@ export class DomTranslationManager {
       await domTranslator.translate();
 
       console.info(
-        `Translated web page document (${translationDocument.translationRoots.length} translation items)`,
+        `Translation of web page document completed (translated ${
+          translationDocument.translationRoots.filter(
+            translationRoot =>
+              translationRoot.currentDisplayMode === "translation",
+          ).length
+        } out of ${
+          translationDocument.translationRoots.length
+        } translation items)`,
         { from, to },
+      );
+      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
+        TranslationStatus.TRANSLATED,
       );
 
       /*
@@ -243,12 +253,6 @@ export class DomTranslationManager {
         result.characterCount,
       );
        */
-
-      console.info("Web page document translated. Showing translation...");
-      translationDocument.showTranslation();
-      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
-        TranslationStatus.TRANSLATED,
-      );
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;

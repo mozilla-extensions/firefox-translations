@@ -57,6 +57,7 @@ export class TranslationItem {
   public translation: TranslationItemStructureElement[];
   private qeAnnotatedTranslation;
   public original: TranslationItemStructureElement[];
+  public currentDisplayMode: TranslationDocumentTarget;
 
   constructor(node: HTMLElement, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
@@ -322,10 +323,10 @@ function swapTextForItem(
 
     if (!curItem[target]) {
       // Translation not found for this item. This could be due to
-      // an error in the translation engine response. For example, if a translation
-      // was broken in various chunks, and one of the chunks failed,
-      // the items from that chunk will be missing its "translation"
-      // field.
+      // the translation not yet being available from the translation engine
+      // For example, if a translation was broken in various
+      // chunks, and not all of them has completed, the items from that
+      // chunk will be missing its "translation" field.
       if (paintProcessedNodes) {
         curItem.nodeRef.style.border = "1px solid red";
       }
@@ -509,6 +510,9 @@ function swapTextForItem(
 
     // And remove any garbage "" nodes left after clearing.
     domNode.normalize();
+
+    // Mark the translation item as displayed in the requested target
+    curItem.currentDisplayMode = target;
 
     if (paintProcessedNodes) {
       curItem.nodeRef.style.border = "2px solid green";

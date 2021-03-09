@@ -260,9 +260,13 @@ export class TranslationDocument {
    */
   _swapDocumentContent(target: TranslationDocumentTarget) {
     (async () => {
-      this.translationRoots.forEach(translationRoot =>
-        translationRoot.swapText(target, this.paintProcessedNodes),
-      );
+      this.translationRoots
+        .filter(
+          translationRoot => translationRoot.currentDisplayMode !== target,
+        )
+        .forEach(translationRoot =>
+          translationRoot.swapText(target, this.paintProcessedNodes),
+        );
       // TODO: Make sure that the above does not lock the main event loop
       /*
       // Let the event loop breath on every 100 nodes
