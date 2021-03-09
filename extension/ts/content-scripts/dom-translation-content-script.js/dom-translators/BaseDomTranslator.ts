@@ -280,11 +280,14 @@ export class BaseDomTranslator extends MinimalDomTranslator {
         // for this request and return. We return information useful for
         // the caller to pass back on the next call, so that the function
         // can keep working from where it stopped.
-        console.warn("We have reached the translation API limits", {
-          newCurSize,
-          newChunks,
-          translationApiLimits: this.translationApiLimits,
-        });
+        console.info(
+          "We have reached the specified translation API limits and will process remaining translation roots in a separate request",
+          {
+            newCurSize,
+            newChunks,
+            translationApiLimits: this.translationApiLimits,
+          },
+        );
         return {
           translationRequestData,
           translationRoots: chunkTranslationRoots,

@@ -20,7 +20,7 @@ import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 export const MAX_REQUEST_DATA = 500000;
 
 // The maximum number of texts allowed to be translated in a single request.
-export const MAX_REQUEST_TEXTS = 12800;
+export const MAX_REQUEST_TEXTS = 100;
 
 // Self-imposed limit of requests. This means that a page that would need
 // to be broken in more than this amount of requests won't be fully translated.
