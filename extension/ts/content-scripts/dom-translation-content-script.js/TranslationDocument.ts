@@ -260,9 +260,13 @@ export class TranslationDocument {
    */
   _swapDocumentContent(target: TranslationDocumentTarget) {
     (async () => {
-      this.translationRoots.forEach(translationRoot =>
-        translationRoot.swapText(target, this.paintProcessedNodes),
-      );
+      this.translationRoots
+        .filter(
+          translationRoot => translationRoot.currentDisplayMode !== target,
+        )
+        .forEach(translationRoot =>
+          translationRoot.swapText(target, this.paintProcessedNodes),
+        );
       // TODO: Make sure that the above does not lock the main event loop
       /*
       // Let the event loop breath on every 100 nodes
@@ -275,6 +279,48 @@ export class TranslationDocument {
       );
       */
     })();
+  }
+
+  async determineVisibilityOfTranslationRoots() {
+    const { translationRoots } = this;
+
+    const elements = translationRoots.map(
+      translationRoot => translationRoot.nodeRef,
+    );
+    const elementsVisibleInViewport = await getElementsVisibleInViewport(
+      elements,
+    );
+
+    const translationRootsVisible = [];
+    const translationRootsVisibleInViewport = [];
+    for (let i = 0; i < translationRoots.length; i++) {
+      let translationRoot = translationRoots[i];
+      const visible = isElementVisible(translationRoot.nodeRef);
+      if (visible) {
+        translationRootsVisible.push(translationRoot);
+      }
+      const visibleInViewport = isElementVisibleInViewport(
+        elementsVisibleInViewport,
+        translationRoot.nodeRef,
+      );
+      if (visibleInViewport) {
+        translationRootsVisibleInViewport.push(translationRoot);
+      }
+    }
+
+    if (this.paintProcessedNodes) {
+      translationRootsVisible.forEach(translationRoot => {
+        translationRoot.nodeRef.style.color = "purple";
+      });
+      translationRootsVisibleInViewport.forEach(translationRoot => {
+        translationRoot.nodeRef.style.color = "maroon";
+      });
+    }
+
+    return {
+      translationRootsVisible,
+      translationRootsVisibleInViewport,
+    };
   }
 }
 
@@ -325,3 +371,38 @@ function regenerateMarkupToTranslateFromOriginal(
 
   return generateMarkupToTranslateForItem(item, str);
 }
+
+const isElementVisible = (el: HTMLElement): boolean => {
+  const rect = el.getBoundingClientRect();
+  // Elements that are not visible will have a zero width/height bounding client rect
+  return rect.width > 0 && rect.height > 0;
+};
+
+const isElementVisibleInViewport = (
+  elementsVisibleInViewport: Node[],
+  el: Node,
+): boolean => {
+  return elementsVisibleInViewport.filter($el => $el === el).length > 0;
+};
+
+const getElementsVisibleInViewport = async (
+  elements: HTMLElement[],
+): Promise<Node[]> => {
+  return new Promise(resolve => {
+    let options = {
+      threshold: 0.0,
+    };
+
+    let callback: IntersectionObserverCallback = (entries, $observer) => {
+      // console.debug("InteractionObserver callback", entries.length, entries);
+      const elementsInViewport = entries
+        .filter(entry => entry.isIntersecting)
+        .map(entry => entry.target);
+      $observer.disconnect();
+      resolve(elementsInViewport);
+    };
+
+    let observer = new IntersectionObserver(callback, options);
+    elements.forEach(el => observer.observe(el));
+  });
+};

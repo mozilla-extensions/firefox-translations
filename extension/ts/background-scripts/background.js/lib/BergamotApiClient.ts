@@ -7,6 +7,7 @@ import {
   BergamotTranslatorAPI,
   TranslationResults,
 } from "./BergamotTranslatorAPI";
+import { TranslationApiClient } from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 const MS_IN_A_MINUTE = 60 * 1000;
 
@@ -56,7 +57,7 @@ export interface BergamotRestApiSentence {
   }[];
 }
 
-export class BergamotApiClient {
+export class BergamotApiClient implements TranslationApiClient {
   /**
    * Timeout after which we consider a ping submission failed.
    */

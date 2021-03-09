@@ -3,12 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import {
+  DomTranslatorRequest,
+  TranslationApiClient,
   TranslationRequestData,
   TranslationResponseData,
 } from "./BaseDomTranslator";
-import { ContentScriptBergamotApiClient } from "../../../shared-resources/ContentScriptBergamotApiClient";
 import {
-  BergamotApiClient,
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
 } from "../../../background-scripts/background.js/lib/BergamotApiClient";
@@ -23,7 +23,7 @@ import { detag, DetaggedString, project } from "./detagAndProject";
  * @param characterCount           A counter for tracking the amount of characters translated.
  *
  */
-export class BergamotDomTranslatorRequest {
+export class BergamotDomTranslatorRequest implements DomTranslatorRequest {
   public translationRequestData: TranslationRequestData;
   private sourceLanguage: string;
   private targetLanguage: string;
@@ -46,7 +46,7 @@ export class BergamotDomTranslatorRequest {
    * Initiates the request
    */
   async fireRequest(
-    bergamotApiClient: ContentScriptBergamotApiClient | BergamotApiClient,
+    bergamotApiClient: TranslationApiClient,
   ): Promise<
     TranslationResponseData & {
       translatedPlainTextStrings: string[];

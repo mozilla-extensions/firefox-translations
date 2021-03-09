@@ -57,6 +57,7 @@ export class TranslationItem {
   public translation: TranslationItemStructureElement[];
   private qeAnnotatedTranslation;
   public original: TranslationItemStructureElement[];
+  public currentDisplayMode: TranslationDocumentTarget;
 
   constructor(node: HTMLElement, id, isTranslationRoot: boolean) {
     this.nodeRef = node;
@@ -308,7 +309,7 @@ function swapTextForItem(
     item.nodeRef.style.border = "1px solid maroon";
   }
   while (visitStack.length) {
-    let curItem = visitStack.shift();
+    let curItem: TranslationItem = visitStack.shift();
 
     if (paintProcessedNodes) {
       item.nodeRef.style.border = "1px solid yellow";
@@ -322,12 +323,12 @@ function swapTextForItem(
 
     if (!curItem[target]) {
       // Translation not found for this item. This could be due to
-      // an error in the translation engine response. For example, if a translation
-      // was broken in various chunks, and one of the chunks failed,
-      // the items from that chunk will be missing its "translation"
-      // field.
+      // the translation not yet being available from the translation engine
+      // For example, if a translation was broken in various
+      // chunks, and not all of them has completed, the items from that
+      // chunk will be missing its "translation" field.
       if (paintProcessedNodes) {
-        item.nodeRef.style.border = "1px solid red";
+        curItem.nodeRef.style.border = "1px solid red";
       }
       continue;
     }
@@ -335,7 +336,7 @@ function swapTextForItem(
     domNode.normalize();
 
     if (paintProcessedNodes) {
-      item.nodeRef.style.border = "1px solid green";
+      curItem.nodeRef.style.border = "1px solid green";
     }
 
     // curNode points to the child nodes of the DOM node that we are
@@ -509,6 +510,13 @@ function swapTextForItem(
 
     // And remove any garbage "" nodes left after clearing.
     domNode.normalize();
+
+    // Mark the translation item as displayed in the requested target
+    curItem.currentDisplayMode = target;
+
+    if (paintProcessedNodes) {
+      curItem.nodeRef.style.border = "2px solid green";
+    }
   }
 }
 
