@@ -28,29 +28,11 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, from, to, requestId } = m;
-    /*
     const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
-      texts,
-    );
-     */
-    const translatorApiResults: TranslationResults = await BergamotTranslatorAPI.translate(
       texts,
       from,
       to,
     );
-    const paragraphs: BergamotRestApiParagraph[] = translatorApiResults.translatedTexts.map(
-      text => {
-        const sentenceList: BergamotRestApiSentence[] = [
-          { nBest: [{ translation: text }] },
-        ];
-        return {
-          0: sentenceList,
-        };
-      },
-    );
-    const results: BergamotRestApiTranslateRequestResult = {
-      text: paragraphs,
-    };
     // console.log({ results });
     try {
       port.postMessage({

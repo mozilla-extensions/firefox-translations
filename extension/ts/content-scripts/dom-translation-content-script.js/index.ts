@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { onSnapshot, SnapshotOutOf } from "mobx-keystone";
-import { DomTranslator } from "./DomTranslator";
+import { DomTranslationManager } from "./DomTranslationManager";
 import { subscribeToExtensionState } from "../../shared-resources/state-management/subscribeToExtensionState";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 import { FrameInfo } from "../../shared-resources/types/bergamot.types";
@@ -40,13 +40,13 @@ const init = async () => {
     extensionState,
   );
 
-  const translationChild = new DomTranslator(
+  const domTranslationManager = new DomTranslationManager(
     documentTranslationStateCommunicator,
     document,
     window,
   );
 
-  const documentTranslationStatistics = await translationChild.getDocumentTranslationStatistics();
+  const documentTranslationStatistics = await domTranslationManager.getDocumentTranslationStatistics();
   console.log({ documentTranslationStatistics });
 
   // TODO: Prevent multiple translations from occurring simultaneously + enable cancellations of existing translation jobs
@@ -82,14 +82,14 @@ const init = async () => {
         if (currentTabFrameDocumentTranslationState.translationRequested) {
           /* TODO: Do not translate if already translated
         if (
-          translationChild?.contentWindow?.translationDocument &&
+          domTranslationManager?.contentWindow?.translationDocument &&
           currentTabFrameDocumentTranslationState.translateFrom !==
-            translationChild.contentWindow.translationDocument.sourceLanguage
+            domTranslationManager.contentWindow.translationDocument.sourceLanguage
         ) {
           */
 
           console.info("Translating web page");
-          await translationChild.doTranslation(
+          await domTranslationManager.doTranslation(
             currentTabFrameDocumentTranslationState.translateFrom,
             currentTabFrameDocumentTranslationState.translateTo,
           );
@@ -109,7 +109,7 @@ const init = async () => {
           currentTabFrameDocumentTranslationState.translationStatus ===
           TranslationStatus.UNKNOWN
         ) {
-          await translationChild.attemptToDetectLanguage();
+          await domTranslationManager.attemptToDetectLanguage();
         }
 
         if (
@@ -123,9 +123,9 @@ const init = async () => {
         }
       }
 
-      if (translationChild?.contentWindow?.translationDocument) {
+      if (domTranslationManager?.contentWindow?.translationDocument) {
         const translationDocument: TranslationDocument =
-          translationChild?.contentWindow?.translationDocument;
+          domTranslationManager?.contentWindow?.translationDocument;
 
         if (hasChanged("showOriginal")) {
           if (
@@ -142,7 +142,7 @@ const init = async () => {
 
         if (hasChanged("displayQualityEstimation")) {
           if (
-            translationChild?.contentWindow?.translationDocument &&
+            domTranslationManager?.contentWindow?.translationDocument &&
             currentTabFrameDocumentTranslationState.displayQualityEstimation !==
               translationDocument.qualityEstimationShown
           ) {

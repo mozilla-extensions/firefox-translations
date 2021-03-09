@@ -95,14 +95,18 @@ shortlist:
       translationResults.originalTexts.push(text);
 
       // Temporary naive sentence splitter
-      const sentences = text.split(". ");
+      const sentences = text.trim().split(". ");
       // console.debug({ sentences });
-      sentences.forEach((sentence) => {
-        if (sentence.trim() === "") {
+      sentences.forEach((sentence, sentenceIndex) => {
+        const trimmedSentence = sentence.trim();
+        if (trimmedSentence === "") {
           return;
         }
         originalTextIndexSentenceOrdinalMap.set(sentenceOrdinal, originalTextIndex);
-        sentencesToTranslate.push(sentence);
+        const originalSentenceEndedWithAPeriod = (sentenceIndex > 0) || (sentences.length === 1 && text.trim().indexOf(". ") > 0);
+        const sentenceToTranslate = `${trimmedSentence}${originalSentenceEndedWithAPeriod ? "." : ""}`;
+        // console.debug({text, trimmedSentence, sentences, sentenceIndex, originalSentenceEndedWithAPeriod, sentenceToTranslate});
+        sentencesToTranslate.push(sentenceToTranslate);
         sentenceOrdinal++
       });
 
@@ -155,7 +159,7 @@ shortlist:
     // console.debug({ originalSentencesByOriginalTextIndex, translatedSentencesByOriginalTextIndex });
 
     translatedSentencesByOriginalTextIndex.forEach((translatedSentences, originalTextIndex) => {
-      translationResults.translatedTexts[originalTextIndex] = translatedSentences.join(". ");
+      translationResults.translatedTexts[originalTextIndex] = translatedSentences.join(" ");
     });
 
     // console.debug("translationResults.translatedTexts", translationResults.translatedTexts);

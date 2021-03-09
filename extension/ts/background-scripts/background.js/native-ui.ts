@@ -120,7 +120,7 @@ onEveryExtensionLoad().then();
 if (process.env.NODE_ENV !== "production") {
   (async () => {
     const extensionPageForTestsUrl = crossBrowser.runtime.getURL(
-      `test-runner/index.html`,
+      `test-runner/index.html?grep=`,
     );
     await crossBrowser.tabs.create({
       url: extensionPageForTestsUrl,

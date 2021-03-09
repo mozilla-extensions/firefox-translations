@@ -6,9 +6,10 @@ import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import {
   TranslationItem,
   TranslationItem_NodePlaceholder,
+  TranslationItemStructureElement,
 } from "./TranslationItem";
 
-export type translationDocumentTarget =
+export type TranslationDocumentTarget =
   | "translation"
   | "qeAnnotatedTranslation"
   | "original";
@@ -30,6 +31,8 @@ export class TranslationDocument {
   public qualityEstimationShown = true;
   private nodeTranslationItemsMap: Map<Node, TranslationItem>;
   public readonly translationRoots: TranslationItem[];
+  // Set temporarily to true during development to visually inspect which nodes have been processed and in which way
+  public paintProcessedNodes: boolean = false;
 
   constructor(document: Document) {
     this.nodeTranslationItemsMap = new Map();
@@ -62,6 +65,10 @@ export class TranslationDocument {
     translationNodes.forEach((translationNode, index) => {
       const { content, isTranslationRoot } = translationNode;
 
+      if (this.paintProcessedNodes) {
+        content.style.backgroundColor = "darkorange";
+      }
+
       // Create a TranslationItem object for this node.
       // This function will also add it to the this.translationRoots array.
       this._createItemForNode(content, index, isTranslationRoot);
@@ -86,6 +93,9 @@ export class TranslationDocument {
         translationRoot.nodeRef.childElementCount == 0
       ) {
         translationRoot.isSimleTranslationRoot = true;
+        if (this.paintProcessedNodes) {
+          translationRoot.nodeRef.style.backgroundColor = "orange";
+        }
       }
     }
   }
@@ -111,11 +121,22 @@ export class TranslationDocument {
       // Translation root items do not have a parent item.
       this.translationRoots.push(item);
     } else {
-      let parentItem: TranslationItem = this.nodeTranslationItemsMap.get(
-        node.parentNode,
-      );
-      if (parentItem) {
-        parentItem.children.push(item);
+      // Other translation nodes have at least one ancestor which is a translation root
+      let ancestorTranslationItem: TranslationItem;
+      for (
+        let ancestor: Node = node.parentNode;
+        ancestor;
+        ancestor = ancestor.parentNode
+      ) {
+        ancestorTranslationItem = this.nodeTranslationItemsMap.get(ancestor);
+        if (ancestorTranslationItem) {
+          ancestorTranslationItem.children.push(item);
+          break;
+        } else {
+          // make intermediate ancestors link to the descendent translation item
+          // so that it gets picked up on in generateOriginalStructureElements
+          this.nodeTranslationItemsMap.set(ancestor, item);
+        }
       }
     }
 
@@ -124,40 +145,53 @@ export class TranslationDocument {
   }
 
   /**
-   * Generate the text string that represents a TranslationItem object.
-   * Besides generating the string, it's also stored in the "original"
-   * field of the TranslationItem object, which needs to be stored for
-   * later to be used in the "Show Original" functionality.
+   * Generate the markup that represents a TranslationItem object.
+   * Besides generating the markup, it also stores a fuller representation
+   * of the TranslationItem in the "original" field of the TranslationItem object,
+   * which needs to be stored for later to be used in the "Show Original" functionality.
    * If this function had already been called for the given item (determined
-   * by the presence of the "original" array in the item), the text will
+   * by the presence of the "original" array in the item), the markup will
    * be regenerated from the "original" data instead of from the related
    * DOM nodes (because the nodes might contain translated data).
    *
    * @param item     A TranslationItem object
    *
-   * @returns        A string representation of the TranslationItem.
+   * @returns        A markup representation of the TranslationItem.
    */
-  generateTextForItem(item: TranslationItem): string {
-    if (item.original) {
-      return regenerateTextFromOriginalHelper(item);
+  generateMarkupToTranslate(item: TranslationItem): string {
+    if (!item.original) {
+      item.original = this.generateOriginalStructureElements(item);
     }
+    return regenerateMarkupToTranslateFromOriginal(item);
+  }
+
+  /**
+   * Generates a fuller representation of the TranslationItem
+   * @param item
+   */
+  generateOriginalStructureElements(
+    item: TranslationItem,
+  ): TranslationItemStructureElement[] {
+    const original: TranslationItemStructureElement[] = [];
 
     if (item.isSimleTranslationRoot) {
       let text = item.nodeRef.firstChild.nodeValue.trim();
-      item.original = [text];
-      return text;
+      original.push(text);
+      return original;
     }
 
-    let str = "";
-    item.original = [];
     let wasLastItemPlaceholder = false;
 
     for (let child of Array.from(item.nodeRef.childNodes)) {
       if (child.nodeType === child.TEXT_NODE) {
-        let x = child.nodeValue.trim();
-        if (x !== "") {
-          item.original.push(x);
-          str += x;
+        let x = child.nodeValue;
+        const hasLeadingWhitespace = x.length !== x.trimStart().length;
+        const hasTrailingWhitespace = x.length !== x.trimEnd().length;
+        if (x.trim() !== "") {
+          const xWithNormalizedWhitespace = `${
+            hasLeadingWhitespace ? " " : ""
+          }${x.trim()}${hasTrailingWhitespace ? " " : ""}`;
+          original.push(xWithNormalizedWhitespace);
           wasLastItemPlaceholder = false;
         }
         continue;
@@ -170,9 +204,9 @@ export class TranslationDocument {
         // In this case, we need to stringify this node.
         // However, if this item is a translation root, we should skip it here in this
         // object's child list (and just add a placeholder for it), because
-        // it will be stringfied separately for being a translation root.
-        item.original.push(objInMap);
-        str += this.generateTextForItem(objInMap);
+        // it will be stringified separately for being a translation root.
+        original.push(objInMap);
+        objInMap.original = this.generateOriginalStructureElements(objInMap);
         wasLastItemPlaceholder = false;
       } else if (!wasLastItemPlaceholder) {
         // Otherwise, if this node doesn't contain any useful content,
@@ -182,13 +216,11 @@ export class TranslationDocument {
         // probably merge two separate text nodes).
         // It's not necessary to add more than one placeholder in sequence;
         // we can optimize them away.
-        item.original.push(TranslationItem_NodePlaceholder);
-        str += "<br>";
+        original.push(new TranslationItem_NodePlaceholder());
         wasLastItemPlaceholder = true;
       }
     }
-
-    return generateTranslationHtmlForItem(item, str);
+    return original;
   }
 
   /**
@@ -226,10 +258,10 @@ export class TranslationDocument {
    * Swap the document with the resulting translation,
    * or back with the original content.
    */
-  _swapDocumentContent(target: translationDocumentTarget) {
+  _swapDocumentContent(target: TranslationDocumentTarget) {
     (async () => {
       this.translationRoots.forEach(translationRoot =>
-        translationRoot.swapText(target),
+        translationRoot.swapText(target, this.paintProcessedNodes),
       );
       // TODO: Make sure that the above does not lock the main event loop
       /*
@@ -238,7 +270,7 @@ export class TranslationDocument {
       const YIELD_INTERVAL = 100;
       await Async.yieldingForEach(
         this.roots,
-        root => root.swapText(target),
+        root => root.swapText(target, this.paintProcessedNodes),
         YIELD_INTERVAL
       );
       */
@@ -247,14 +279,14 @@ export class TranslationDocument {
 }
 
 /**
- * Generate the outer HTML representation for a given item.
+ * Generate the translation markup for a given item.
  *
  * @param   item       A TranslationItem object.
  * @param   content    The inner content for this item.
  * @returns string     The outer HTML needed for translation
  *                     of this item.
  */
-export function generateTranslationHtmlForItem(
+export function generateMarkupToTranslateForItem(
   item: TranslationItem,
   content,
 ): string {
@@ -265,15 +297,15 @@ export function generateTranslationHtmlForItem(
 }
 
 /**
- * Regenerate the text string that represents a TranslationItem object,
+ * Regenerate the markup that represents a TranslationItem object,
  * with data from its "original" array. The array must have already
- * been created by TranslationDocument.generateTextForItem().
+ * been created by TranslationDocument.generateMarkupToTranslate().
  *
  * @param item     A TranslationItem object
  *
- * @returns        A string representation of the TranslationItem.
+ * @returns        A markup representation of the TranslationItem.
  */
-function regenerateTextFromOriginalHelper(
+function regenerateMarkupToTranslateFromOriginal(
   item: TranslationItem & { original: any },
 ) {
   if (item.isSimleTranslationRoot) {
@@ -283,13 +315,13 @@ function regenerateTextFromOriginalHelper(
   let str = "";
   for (let child of item.original) {
     if (child instanceof TranslationItem) {
-      str += regenerateTextFromOriginalHelper(child);
-    } else if (child === TranslationItem_NodePlaceholder) {
+      str += regenerateMarkupToTranslateFromOriginal(child);
+    } else if (child instanceof TranslationItem_NodePlaceholder) {
       str += "<br>";
     } else {
       str += child;
     }
   }
 
-  return generateTranslationHtmlForItem(item, str);
+  return generateMarkupToTranslateForItem(item, str);
 }
