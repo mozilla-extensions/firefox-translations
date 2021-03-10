@@ -127,7 +127,7 @@ export class DynamicActionIcon {
     }
     const imageData = this.ctx.getImageData(0, 0, this.width, this.height);
     this.actionApi.setIcon({
-      imageData: imageData,
+      imageData,
       tabId,
     });
   }

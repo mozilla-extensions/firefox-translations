@@ -76,7 +76,7 @@ const workerManager = {
   get workerReady() {
     if (!this._workerReadyPromise) {
       this._workerReadyPromise = new Promise(resolve => {
-        let worker = new Worker(WORKER_URL);
+        const worker = new Worker(WORKER_URL);
         worker.onmessage = msg => {
           if (msg.data == "ready") {
             resolve(worker);

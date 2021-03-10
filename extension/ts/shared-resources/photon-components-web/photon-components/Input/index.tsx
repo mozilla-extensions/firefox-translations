@@ -42,7 +42,7 @@ export class Input extends React.Component<InputProps, InputState> {
     const { type = "text", value } = this.state;
 
     const isPassword = originalType == "password";
-    const hasContent = value.length > 0;
+    const hasContent = !!value.length;
 
     const style = {};
     if (icon) {

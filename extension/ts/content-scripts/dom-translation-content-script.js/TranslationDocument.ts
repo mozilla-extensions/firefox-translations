@@ -86,7 +86,7 @@ export class TranslationDocument {
     // simple root as plain-text in the translation process and with that
     // we are able to reduce their data payload sent to the translation service.
 
-    for (let translationRoot of this.translationRoots) {
+    for (const translationRoot of this.translationRoots) {
       if (
         !translationRoot.children.length &&
         translationRoot.nodeRef instanceof Element &&
@@ -115,7 +115,7 @@ export class TranslationDocument {
       return this.nodeTranslationItemsMap.get(node);
     }
 
-    let item = new TranslationItem(node, id, isTranslationRoot);
+    const item = new TranslationItem(node, id, isTranslationRoot);
 
     if (isTranslationRoot) {
       // Translation root items do not have a parent item.
@@ -175,16 +175,16 @@ export class TranslationDocument {
     const original: TranslationItemStructureElement[] = [];
 
     if (item.isSimleTranslationRoot) {
-      let text = item.nodeRef.firstChild.nodeValue.trim();
+      const text = item.nodeRef.firstChild.nodeValue.trim();
       original.push(text);
       return original;
     }
 
     let wasLastItemPlaceholder = false;
 
-    for (let child of Array.from(item.nodeRef.childNodes)) {
+    for (const child of Array.from(item.nodeRef.childNodes)) {
       if (child.nodeType === child.TEXT_NODE) {
-        let x = child.nodeValue;
+        const x = child.nodeValue;
         const hasLeadingWhitespace = x.length !== x.trimStart().length;
         const hasTrailingWhitespace = x.length !== x.trimEnd().length;
         if (x.trim() !== "") {
@@ -197,7 +197,7 @@ export class TranslationDocument {
         continue;
       }
 
-      let objInMap = this.nodeTranslationItemsMap.get(child);
+      const objInMap = this.nodeTranslationItemsMap.get(child);
       if (objInMap && !objInMap.isTranslationRoot) {
         // If this childNode is present in the nodeTranslationItemsMap, it means
         // it's a translation node: it has useful content for translation.
@@ -294,7 +294,7 @@ export class TranslationDocument {
     const translationRootsVisible = [];
     const translationRootsVisibleInViewport = [];
     for (let i = 0; i < translationRoots.length; i++) {
-      let translationRoot = translationRoots[i];
+      const translationRoot = translationRoots[i];
       const visible = isElementVisible(translationRoot.nodeRef);
       if (visible) {
         translationRootsVisible.push(translationRoot);
@@ -336,7 +336,7 @@ export function generateMarkupToTranslateForItem(
   item: TranslationItem,
   content,
 ): string {
-  let localName = item.isTranslationRoot ? "div" : "b";
+  const localName = item.isTranslationRoot ? "div" : "b";
   return (
     "<" + localName + " id=n" + item.id + ">" + content + "</" + localName + ">"
   );
@@ -359,7 +359,7 @@ function regenerateMarkupToTranslateFromOriginal(
   }
 
   let str = "";
-  for (let child of item.original) {
+  for (const child of item.original) {
     if (child instanceof TranslationItem) {
       str += regenerateMarkupToTranslateFromOriginal(child);
     } else if (child instanceof TranslationItem_NodePlaceholder) {
@@ -382,18 +382,18 @@ const isElementVisibleInViewport = (
   elementsVisibleInViewport: Node[],
   el: Node,
 ): boolean => {
-  return elementsVisibleInViewport.filter($el => $el === el).length > 0;
+  return !!elementsVisibleInViewport.filter($el => $el === el).length;
 };
 
 const getElementsVisibleInViewport = async (
   elements: HTMLElement[],
 ): Promise<Node[]> => {
   return new Promise(resolve => {
-    let options = {
+    const options = {
       threshold: 0.0,
     };
 
-    let callback: IntersectionObserverCallback = (entries, $observer) => {
+    const callback: IntersectionObserverCallback = (entries, $observer) => {
       // console.debug("InteractionObserver callback", entries.length, entries);
       const elementsInViewport = entries
         .filter(entry => entry.isIntersecting)
@@ -402,7 +402,7 @@ const getElementsVisibleInViewport = async (
       resolve(elementsInViewport);
     };
 
-    let observer = new IntersectionObserver(callback, options);
+    const observer = new IntersectionObserver(callback, options);
     elements.forEach(el => observer.observe(el));
   });
 };

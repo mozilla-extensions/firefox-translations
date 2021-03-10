@@ -10,7 +10,7 @@ export const getCurrentTab = async (): Promise<Tab | null> => {
     active: true,
     currentWindow: true,
   });
-  if (activeTabs.length > 0) {
+  if (activeTabs.length) {
     return activeTabs[0];
   }
   return null;

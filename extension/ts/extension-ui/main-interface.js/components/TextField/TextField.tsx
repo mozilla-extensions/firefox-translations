@@ -41,14 +41,14 @@ const TextField = ({
 
   const classes = classNames({
     TextField: "TextField",
-    processing: processing,
+    processing,
     withPrefixIcon: prefixIcon,
     withSuffixIcon: suffixIcon,
-    textArea: textArea,
+    textArea,
     maxLengthSet: maxLength,
-    itemOver: itemOver,
-    allowDrop: allowDrop,
-    allowClear: allowClear,
+    itemOver,
+    allowDrop,
+    allowClear,
   });
 
   const changeHandler = (
@@ -126,7 +126,7 @@ const TextField = ({
         </label>
       ) : null}
       {allowClear ? (
-        content !== undefined && content.length > 0 ? (
+        content !== undefined && content.length ? (
           <span className={"TextField__clearIcon"} onClick={clear}>
             <BsXCircleFill />
           </span>

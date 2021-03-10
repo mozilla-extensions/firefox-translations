@@ -13,7 +13,7 @@ interface Props {
 const Card = ({ children, actions, title, size, borderless, style }: Props) => {
   const classes = classNames({
     Card: "Card",
-    borderless: borderless,
+    borderless,
   });
 
   return (

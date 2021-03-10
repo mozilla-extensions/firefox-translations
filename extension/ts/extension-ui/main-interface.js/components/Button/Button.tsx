@@ -28,7 +28,7 @@ const Button = ({
   const classes = classNames({
     Button: "Button",
     [`${type}`]: type,
-    block: block,
+    block,
   });
 
   return (

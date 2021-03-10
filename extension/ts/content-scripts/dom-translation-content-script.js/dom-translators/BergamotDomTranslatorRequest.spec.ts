@@ -57,7 +57,7 @@ describe(testSuiteName, function() {
       markupsToTranslate: testSourceLanguageTexts,
     };
 
-    let bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
+    const bergamotDomTranslatorRequest = new BergamotDomTranslatorRequest(
       translationRequestData,
       from,
       to,

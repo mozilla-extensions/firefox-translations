@@ -22,18 +22,18 @@ if (process.env.UI === "extension-ui") {
 
     let driver;
 
-    before(async () => {
+    before(async function() {
       driver = await launchFirefox();
       extensionId = await installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);
     });
 
-    after(async () => {
+    after(async function() {
       await driver.quit();
     });
 
-    it("the element exists", async () => {
+    it("the element exists", async function() {
       const browserActionButtonElement = await lookForBrowserActionIcon(driver);
       assertElementExists(
         browserActionButtonElement,
@@ -41,7 +41,7 @@ if (process.env.UI === "extension-ui") {
       );
     });
 
-    it("responds to click", async () => {
+    it("responds to click", async function() {
       const browserActionButtonElement = await lookForBrowserActionIcon(driver);
       assertElementExists(
         browserActionButtonElement,

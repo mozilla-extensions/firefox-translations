@@ -95,7 +95,8 @@ function parseChunkResult(
       try {
         const translationRoot: TranslationItem =
           domTranslationChunk.translationRoots[index];
-        let translatedMarkup = translationResponseData.translatedMarkups[index];
+        const translatedMarkup =
+          translationResponseData.translatedMarkups[index];
         let qeAnnotatedTranslatedMarkup =
           translationResponseData.qeAnnotatedTranslatedMarkups[index];
 

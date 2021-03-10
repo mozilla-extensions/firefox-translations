@@ -117,8 +117,7 @@ export const getTranslationNodes = (
     const childChildTextNodesWithTextForTranslation = childChildTextNodes
       .map(textNode => textNode.textContent)
       .filter(hasTextForTranslation);
-    const isTranslationNode =
-      childChildTextNodesWithTextForTranslation.length > 0;
+    const isTranslationNode = !!childChildTextNodesWithTextForTranslation.length;
 
     if (isTranslationNode) {
       // At this point, we know we have a translation node at hand, but we need

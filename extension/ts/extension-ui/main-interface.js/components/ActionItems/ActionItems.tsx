@@ -28,16 +28,15 @@ export class ActionItems extends React.Component<
                 <List.Item text={i.text} icon={i.icon} action={i.action} />
               </Link>
             );
-          else
-            return (
-              <List.Item
-                style={i.action ? { cursor: "pointer" } : {}}
-                key={`item-${index}`}
-                text={i.text}
-                icon={i.icon}
-                action={i.action}
-              />
-            );
+          return (
+            <List.Item
+              style={i.action ? { cursor: "pointer" } : {}}
+              key={`item-${index}`}
+              text={i.text}
+              icon={i.icon}
+              action={i.action}
+            />
+          );
         })}
       </List>
     );

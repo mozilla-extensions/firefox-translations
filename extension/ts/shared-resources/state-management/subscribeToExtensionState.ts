@@ -145,7 +145,7 @@ export async function subscribeToExtensionState() {
   const runServerActionLocally = (
     actionCall: SerializedActionCallWithModelIdOverrides,
   ) => {
-    let wasServerAction = serverAction;
+    const wasServerAction = serverAction;
     serverAction = true;
     try {
       // in clients we use the sync new model ids version to make sure that
@@ -170,16 +170,15 @@ export async function subscribeToExtensionState() {
         // and send it to the server (background context)
         // it will then be replicated by the server (background context) and properly executed
         server.sendMessage(serializeActionCall(actionCall, rootStore));
-        ctx.data["cancelled"] = true; // just for logging purposes
+        ctx.data.cancelled = true; // just for logging purposes
         // "cancel" the action by returning undefined
         return {
           result: ActionTrackingResult.Return,
           value: undefined,
         };
-      } else {
-        // run actions that comes from the server (background context) unmodified
-        return undefined;
       }
+      // run actions that comes from the server (background context) unmodified
+      return undefined;
     },
   });
 

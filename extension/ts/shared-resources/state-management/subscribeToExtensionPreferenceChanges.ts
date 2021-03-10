@@ -60,7 +60,7 @@ export const communicateExtensionPreferenceChangesToContentScripts = async (
   store: Store,
   portNames: string[],
 ): Promise<(port: Port) => void> => {
-  let connectedPorts: { [portName: string]: Port } = {};
+  const connectedPorts: { [portName: string]: Port } = {};
 
   // Broadcast updates to extension preferences
   const originalSetExtensionPreferences = store.setExtensionPreferences.bind(

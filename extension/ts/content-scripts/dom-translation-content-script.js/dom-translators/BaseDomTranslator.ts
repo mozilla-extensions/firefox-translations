@@ -106,7 +106,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   async translate(): Promise<{
     characterCount: number;
   }> {
-    let currentIndex = 0;
+    const currentIndex = 0;
     const chunksBeingProcessed = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
@@ -237,7 +237,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   ): DomTranslationChunk {
     let currentDataSize = 0;
     let currentChunks = 0;
-    let translationRequestData: TranslationRequestData = {
+    const translationRequestData: TranslationRequestData = {
       markupsToTranslate: [],
     };
     const chunkTranslationRoots = [];

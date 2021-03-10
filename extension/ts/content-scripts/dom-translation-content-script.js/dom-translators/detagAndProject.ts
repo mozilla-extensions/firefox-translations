@@ -46,7 +46,7 @@ function serializeNodeIntoTokens(node: Node): NodeToken[] {
   const tokens: NodeToken[] = [];
   try {
     // @ts-ignore
-    for (let child of node.childNodes) {
+    for (const child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
         const textChunk = child.nodeValue.trim();
         // If this is only whitespace, only add such a token and then visit the next node
@@ -140,7 +140,7 @@ export const project = (
   // relationship between original text nodes and words in the translated string
   const translatedStringWords = translatedString.split(" ");
   let currentTextTokenOrdinal = 0;
-  let remainingTranslatedStringWords = [...translatedStringWords];
+  const remainingTranslatedStringWords = [...translatedStringWords];
   let whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
   const projectedStringParts = detaggedString.tokens.map(
     (token, tokenOrdinal): string => {
@@ -182,7 +182,7 @@ export const project = (
   let projectedString = projectedStringParts.join("");
 
   // Add any remaining translated words to the end
-  if (remainingTranslatedStringWords.length > 0) {
+  if (remainingTranslatedStringWords.length) {
     // Add a whitespace to the end first in case there was none, or else two words will be joined together
     if (lastToken.type !== "whitespace") {
       projectedString += " ";

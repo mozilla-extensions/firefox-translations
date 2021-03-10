@@ -161,7 +161,7 @@ class WorkerManager {
   get workerReady() {
     if (!this._workerReadyPromise) {
       this._workerReadyPromise = new Promise(resolve => {
-        let worker = new Worker(WORKER_URL);
+        const worker = new Worker(WORKER_URL);
         worker.onmessage = (msg: { data: "ready" | IncomingWorkerMessage }) => {
           console.log("Incoming message from worker", { msg });
           if (msg.data === "ready") {
@@ -233,7 +233,7 @@ class TranslationRequestManager {
       return;
     }
     this.processing = true;
-    while (this.queuedRequests.length > 0) {
+    while (this.queuedRequests.length) {
       console.info(
         `Processing translation request queue of ${this.queuedRequests.length} requests`,
       );

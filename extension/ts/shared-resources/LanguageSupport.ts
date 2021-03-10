@@ -54,7 +54,7 @@ export class LanguageSupport {
     const possibleDefaultTargetLanguages = acceptedTargetLanguages.filter(
       languageCode => supportedTargetLanguages.includes(languageCode),
     );
-    if (possibleDefaultTargetLanguages.length > 0) {
+    if (possibleDefaultTargetLanguages.length) {
       return possibleDefaultTargetLanguages[0];
     }
     return null;

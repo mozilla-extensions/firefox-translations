@@ -22,7 +22,7 @@ const List = ({
 }: Props) => {
   const classes = classNames({
     List: "List",
-    borderless: borderless,
+    borderless,
   });
 
   const listItems = data

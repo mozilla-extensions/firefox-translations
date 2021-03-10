@@ -12,7 +12,7 @@ interface Props {
 const MenuItem = ({ children, icon, onClick, disabled }: Props) => {
   const classes = classNames({
     Menu__Item: "Menu__Item",
-    disabled: disabled,
+    disabled,
   });
 
   return (

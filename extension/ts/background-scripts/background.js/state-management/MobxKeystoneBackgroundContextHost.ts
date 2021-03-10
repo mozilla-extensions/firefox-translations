@@ -99,16 +99,15 @@ export class MobxKeystoneBackgroundContextHost {
             serializedActionCall,
             backgroundContextRootStore,
           );
-          ctx.data["cancelled"] = true; // just for logging purposes
+          ctx.data.cancelled = true; // just for logging purposes
           // "cancel" the action by returning undefined
           return {
             result: ActionTrackingResult.Return,
             value: undefined,
           };
-        } else {
-          // run actions that are being applied for propagation to content scripts unmodified
-          return undefined;
         }
+        // run actions that are being applied for propagation to content scripts unmodified
+        return undefined;
       },
     });
   }

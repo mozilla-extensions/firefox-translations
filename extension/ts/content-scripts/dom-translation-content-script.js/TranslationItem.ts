@@ -121,9 +121,9 @@ export class TranslationItem {
       return;
     }
 
-    let domParser = new DOMParser();
+    const domParser = new DOMParser();
 
-    let doc = domParser.parseFromString(translatedMarkup, "text/html");
+    const doc = domParser.parseFromString(translatedMarkup, "text/html");
     this.translation = [];
     parseResultNode(this, doc.body.firstChild, "translation");
   }
@@ -135,8 +135,8 @@ export class TranslationItem {
    * @param qeAnnotatedTranslatedMarkup
    */
   parseQeAnnotatedTranslationResult(qeAnnotatedTranslatedMarkup: string) {
-    let domParser = new DOMParser();
-    let doc = domParser.parseFromString(
+    const domParser = new DOMParser();
+    const doc = domParser.parseFromString(
       qeAnnotatedTranslatedMarkup,
       "text/html",
     );
@@ -152,7 +152,7 @@ export class TranslationItem {
    *                  it was not found.
    */
   getChildById(id: string) {
-    for (let child of this.children) {
+    for (const child of this.children) {
       const childId = "n" + child.id;
       if (childId === id) {
         return child;
@@ -205,7 +205,7 @@ function parseResultNode(
   try {
     const into = item[target];
     // @ts-ignore
-    for (let child of node.childNodes) {
+    for (const child of node.childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
         into.push(child.nodeValue);
       } else if (child.localName === "br") {
@@ -303,19 +303,19 @@ function swapTextForItem(
 ) {
   // visitStack is the stack of items that we still need to visit.
   // Let's start the process by adding the translation root item.
-  let visitStack = [item];
+  const visitStack = [item];
 
   if (paintProcessedNodes) {
     item.nodeRef.style.border = "1px solid maroon";
   }
   while (visitStack.length) {
-    let curItem: TranslationItem = visitStack.shift();
+    const curItem: TranslationItem = visitStack.shift();
 
     if (paintProcessedNodes) {
       item.nodeRef.style.border = "1px solid yellow";
     }
 
-    let domNode = curItem.nodeRef;
+    const domNode = curItem.nodeRef;
     if (!domNode) {
       // Skipping this item due to a missing node.
       continue;
@@ -396,13 +396,13 @@ function swapTextForItem(
     // Now let's walk through all items in the `target` array of the
     // TranslationItem. This means either the TranslationItem.original or
     // TranslationItem.translation array.
-    for (let targetItem of curItem[target]) {
+    for (const targetItem of curItem[target]) {
       if (targetItem instanceof TranslationItem) {
         // If the array element is another TranslationItem object, let's
         // add it to the stack to be visited.
         visitStack.push(targetItem);
 
-        let targetNode = targetItem.nodeRef;
+        const targetNode = targetItem.nodeRef;
 
         // If the node is not in the expected position, let's reorder
         // it into position...
@@ -478,7 +478,7 @@ function swapTextForItem(
           // since quality estimated annotated nodes
           // replaced the simple text nodes of the original document
           // @ts-ignore
-          for (let child of curNode.parentNode.childNodes) {
+          for (const child of curNode.parentNode.childNodes) {
             if (
               child.dataset &&
               typeof child.dataset.translationQeScore !== "undefined"
@@ -493,7 +493,7 @@ function swapTextForItem(
 
           curNode = getNextSiblingSkippingEmptyTextNodes(curNode);
         } else if (target === "qeAnnotatedTranslation") {
-          let nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
+          const nextSibling = getNextSiblingSkippingEmptyTextNodes(curNode);
           // Replace the text node with the qe-annotated node to maintain the
           // right order in original DOM tree of the document.
           curNode.parentNode.replaceChild(targetItem, curNode);

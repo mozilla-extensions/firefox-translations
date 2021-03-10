@@ -12,8 +12,8 @@ export interface Props {
 const Switch = ({ checked, disabled, onToggle, icon }: Props) => {
   const classes = classNames({
     Switch: "Switch",
-    checked: checked,
-    disabled: disabled,
+    checked,
+    disabled,
   });
 
   const toggle = (e: MouseEvent) => {

@@ -65,18 +65,18 @@ if (process.env.UI === "native-ui") {
 
     let driver;
 
-    before(async () => {
+    before(async function() {
       driver = await launchFirefox();
       await installExtension(driver);
       // Allow our extension some time to set up the initial ui
       await driver.sleep(1000);
     });
 
-    after(async () => {
+    after(async function() {
       await driver.quit();
     });
 
-    it("The translation infobar is not shown on eg about:debugging", async () => {
+    it("The translation infobar is not shown on eg about:debugging", async function() {
       await navigateToURL(driver, "about:debugging");
       const infobarElement = await lookForInfobar(driver, tabsCurrentlyOpened);
       assertElementDoesNotExist(infobarElement, "infobarElement");
@@ -90,7 +90,7 @@ if (process.env.UI === "native-ui") {
       assert.equal(valueAttribute, "translation");
     };
 
-    it("The translation infobar is shown on a web-page with Spanish content", async () => {
+    it("The translation infobar is shown on a web-page with Spanish content", async function() {
       // ... this test continues the session from the previous test
       await navigateToURL(driver, fixtureUrl);
       await assertInfobarIsShown(tabsCurrentlyOpened);
@@ -126,14 +126,14 @@ if (process.env.UI === "native-ui") {
       assertElementExists(translatedPageElement, "translatedPageElement");
     };
 
-    it("Translation via the infobar works", async () => {
+    it("Translation via the infobar works", async function() {
       // ... this test continues the session from the previous test
       await translateViaInfobar(tabsCurrentlyOpened);
       await assertTranslationSucceeded();
       await takeScreenshot(driver, this.ctx.test.fullTitle());
     });
 
-    it("Translation via the infobar works after further navigations", async () => {
+    it("Translation via the infobar works after further navigations", async function() {
       // ... this test continues the session from the previous test
       await navigateToURL(driver, fixtureUrl);
       await translateViaInfobar(tabsCurrentlyOpened);
@@ -151,7 +151,7 @@ if (process.env.UI === "native-ui") {
       );
     });
 
-    it("Translation via the infobar works when translating in multiple tabs at the same time", async () => {
+    it("Translation via the infobar works when translating in multiple tabs at the same time", async function() {
       // ... this test continues the session from the previous test
       await driver.switchTo().newWindow("tab");
       tabsCurrentlyOpened++;

@@ -154,8 +154,6 @@ const init = async () => {
           }
         }
       }
-
-      return;
     },
   );
 

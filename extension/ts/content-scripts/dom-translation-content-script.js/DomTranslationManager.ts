@@ -27,7 +27,7 @@ export class DomTranslationManager {
   async attemptToDetectLanguage() {
     console.debug("Attempting to detect language");
 
-    let url = String(this.document.location);
+    const url = String(this.document.location);
     if (!url.startsWith("http://") && !url.startsWith("https://")) {
       console.debug("Not a HTTP(S) url, translation unavailable", { url });
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
@@ -110,8 +110,6 @@ export class DomTranslationManager {
 
     console.debug("Updating state to reflect that language has been detected");
     await this.checkLanguageSupport(detectedLanguageResults);
-
-    return;
   }
 
   async checkLanguageSupport(detectedLanguageResults: DetectedLanguageResults) {
@@ -197,7 +195,7 @@ export class DomTranslationManager {
     // be used instead of creating a new one so that we can use the original
     // content of the page for the new translation instead of the newly
     // translated text.
-    let translationDocument =
+    const translationDocument =
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
@@ -205,7 +203,7 @@ export class DomTranslationManager {
       TranslationStatus.TRANSLATING,
     );
 
-    let domTranslator = new BergamotDomTranslator(
+    const domTranslator = new BergamotDomTranslator(
       translationDocument,
       from,
       to,
@@ -260,8 +258,6 @@ export class DomTranslationManager {
         TranslationStatus.ERROR,
       );
     }
-
-    return;
   }
 
   async getDocumentTranslationStatistics() {
