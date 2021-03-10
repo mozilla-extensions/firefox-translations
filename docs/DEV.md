@@ -26,7 +26,7 @@
 
 # Developing this extension
 
-The commands in these instructions are meant to be run in the `extension/` folder in this repo.
+The commands in these instructions are meant to be run in the root folder in this repo.
 
 ## First time setup
 
