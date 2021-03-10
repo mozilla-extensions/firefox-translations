@@ -12,6 +12,7 @@ import {
   modelLoadTime,
   wordsPerSecond,
 } from "../telemetry/generated/performance";
+import { fromLang, toLang } from "../telemetry/generated/metadata";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've loaded/processed large models/translations
@@ -254,6 +255,8 @@ class TranslationRequestManager {
     const { loadModelParams } = translateParams;
     const { from, to } = loadModelParams;
     const languagePair = `${from}${to}`;
+    Telemetry.global.record(() => fromLang.set(from), "fromLang");
+    Telemetry.global.record(() => toLang.set(to), "toLang");
 
     // First check if we need to load a model
     if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {

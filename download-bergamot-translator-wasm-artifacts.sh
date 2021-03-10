@@ -3,7 +3,7 @@
 if [ ! -d downloaded-bergamot-translator-wasm-artifacts ]; then
   mkdir downloaded-bergamot-translator-wasm-artifacts
   cd downloaded-bergamot-translator-wasm-artifacts
-  wget "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.data"
-  wget "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.js"
-  wget "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.wasm"
+  wget --no-check-certificate "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.data"
+  wget --no-check-certificate "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.js"
+  wget --no-check-certificate "https://10-340211362-gh.circle-artifacts.com/0/build-wasm/wasm/bergamot-translator-worker.wasm"
 fi

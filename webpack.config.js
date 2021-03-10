@@ -78,6 +78,27 @@ if (process.env.NODE_ENV === "production") {
   plugins.push(new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]));
 }
 
+// telemetry configuration
+let telemetryAppId = "org-mozilla-bergamot-test";
+let telemetryDebugMode = "true";
+
+if (process.env.NODE_ENV === "production") {
+  telemetryDebugMode = "false";
+  if (process.env.UI === "firefox-infobar-ui") {
+    telemetryAppId = "org-mozilla-bergamot";
+  }
+  if (process.env.UI === "cross-browser-ui") {
+    telemetryAppId = "org-mozilla-bergamot-cross-browser";
+  }
+}
+
+plugins.push(
+  new webpack.EnvironmentPlugin({
+    TELEMETRY_APP_ID: telemetryAppId,
+    TELEMETRY_DEBUG_MODE: telemetryDebugMode,
+  }),
+);
+
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
 if (
   process.env.SENTRY_AUTH_TOKEN !== "foo" &&

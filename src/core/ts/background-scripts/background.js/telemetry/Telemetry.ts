@@ -4,17 +4,20 @@
 
 import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
+import { config } from "../../../config";
 
 export class Telemetry {
   private static _instance = null;
   private _metricsToSubmit;
 
   constructor() {
-    Glean.initialize("org.mozilla.bergamot_translator", true, {
-      debug: { logPings: true },
+    Glean.initialize(config.telemetryAppId, true, {
+      debug: { logPings: config.telemetryDebugMode },
     });
     this._metricsToSubmit = 0;
-    console.debug("Telemetry: initialization completed.");
+    console.debug(
+      `Telemetry: initialization completed with application ID ${config.telemetryAppId}.`,
+    );
   }
 
   /**
