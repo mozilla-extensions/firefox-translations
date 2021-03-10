@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "outDir": "./debug/ts-compiled-to-js-by-tsc",
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "noImplicitAny": false,
+    "alwaysStrict": true,
+    "module": "commonjs",
+    "target": "es6",
+    "jsx": "react",
+    "lib": ["es2017", "dom"],
+    "esModuleInterop": true,
+    "allowJs": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "test/in-browser/**/*.ts"]
+}
