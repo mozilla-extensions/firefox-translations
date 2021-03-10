@@ -20,7 +20,12 @@ package.json
 # don't lint/format fixtures
 test/fixtures/
 # don't lint/format third party modules
+bergamot-translator/
+emsdk/
 node_modules/
 src/test-runner/inc/
 firefox-nightly-linux
-downloaded-bergamot-translator-wasm-artifacts
+downloaded-bergamot-translator-wasm-artifacts/
+# don't lint ci configuration
+.circleci/
+taskcluster/
