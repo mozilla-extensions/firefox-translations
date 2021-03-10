@@ -14,11 +14,11 @@ set -x
 if [ "$1" != "" ]; then
   ARTIFACTS_DIRECTORY="$1"
 else
-  ARTIFACTS_DIRECTORY=../bergamot-translator/build-wasm/wasm
+  ARTIFACTS_DIRECTORY=./bergamot-translator/build-wasm/wasm
 fi
 
-cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" src/wasm/bergamot-translator-worker.appendix.js > src/wasm/bergamot-translator-worker.js
-cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/wasm/bergamot-translator-worker.wasm
-cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.data" src/wasm/bergamot-translator-worker.data
+cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" src/core/static/wasm/bergamot-translator-worker.appendix.js > src/core/static/wasm/bergamot-translator-worker.js
+cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/core/static/wasm/bergamot-translator-worker.wasm
+cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.data" src/core/static/wasm/bergamot-translator-worker.data
 
 exit 0

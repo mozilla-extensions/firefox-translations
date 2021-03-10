@@ -12,7 +12,7 @@ const {
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
 const extensionId =
-  targetBrowser === "firefox" && ui === "native-ui"
+  targetBrowser === "firefox" && ui === "firefox-infobar-ui"
     ? "bergamot-browser-extension@mozilla.org"
     : "bergamot-browser-extension@browser.mt";
 
@@ -57,11 +57,8 @@ async function generateManifest({ dotEnvPath }) {
       96: "icons/extension-icon.96x96.png",
       128: "icons/extension-icon.128x128.png",
     },
-    options_ui: {
-      page: "options-ui/options-ui.html",
-    },
   };
-  if (ui === "native-ui") {
+  if (ui === "firefox-infobar-ui") {
     manifest.hidden = true;
     manifest.experiment_apis = {
       translateUi: {
@@ -79,6 +76,9 @@ async function generateManifest({ dotEnvPath }) {
       default_title: "__MSG_browserActionButtonTitle__",
       default_popup: "main-interface/popup.html",
     };
+    manifest.options_ui = {
+      page: "options-ui/options-ui.html",
+    };
   }
   if (targetBrowser === "firefox") {
     manifest.applications = {
@@ -87,14 +87,16 @@ async function generateManifest({ dotEnvPath }) {
         strict_min_version: "77.0a1",
       },
     };
-    if (ui === "extension-ui") {
+    if (ui === "cross-browser-ui") {
       manifest.browser_action.browser_style = false;
+      manifest.options_ui.browser_style = false;
     }
-    manifest.options_ui.browser_style = false;
   }
   if (targetBrowser === "chrome") {
-    manifest.browser_action.chrome_style = false;
-    manifest.options_ui.chrome_style = false;
+    if (ui === "cross-browser-ui") {
+      manifest.browser_action.chrome_style = false;
+      manifest.options_ui.chrome_style = false;
+    }
     // https://github.com/WebAssembly/content-security-policy/issues/7
     manifest.content_security_policy =
       "script-src 'self' 'unsafe-eval'; object-src 'self';";

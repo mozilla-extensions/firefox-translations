@@ -53,16 +53,16 @@ jobs:
           command: yarn bergamot-translator:download-and-import
 
       - run:
-          name: Build Firefox extension - Native UI variant
-          command: yarn build:native-ui
+          name: Build extension - Firefox Infobar UI
+          command: yarn build:firefox-infobar-ui
 
       - run:
-          name: Build Firefox extension
-          command: yarn build:default
+          name: Build extension - Firefox Cross-browser UI
+          command: yarn build:cross-browser-ui:firefox
 
       - run:
-          name: Build Chrome extension
-          command: yarn build:chrome
+          name: Build extension - Chrome Cross-browser UI
+          command: yarn build:cross-browser-ui:chrome
 
       - store_artifacts:
           path: "dist"
@@ -70,8 +70,8 @@ jobs:
 
       - run:
           name: Run tests
-          command: FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn functional-tests
+          command: FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn e2e-tests
 
       - store_artifacts:
-          path: "test/functional/results"
-          destination: "test/functional/results"
+          path: "test/e2e/results"
+          destination: "test/e2e/results"

@@ -1,7 +1,7 @@
 /* eslint-env node */
 const path = require("path");
 
-const examplePagesToTranslate = [
+const urlsToOpenOnRun = [
   "http://0.0.0.0:4000/newstest2013.es.top10lines.html",
   "http://0.0.0.0:4000/newstest2013.es.top300lines.html",
   "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21/original.html",
@@ -31,8 +31,9 @@ const artifactsDir = path.join(
 );
 
 // Using native UI requires a special build and signing process, restricted to specific extension ids
-const firefoxNativeUi = targetBrowser === "firefox" && ui === "native-ui";
-const extensionId = firefoxNativeUi
+const firefoxInfobarUi =
+  targetBrowser === "firefox" && ui === "firefox-infobar-ui";
+const extensionId = firefoxInfobarUi
   ? "bergamot-browser-extension@mozilla.org"
   : "bergamot-browser-extension@browser.mt";
 
@@ -46,7 +47,7 @@ const defaultConfig = {
     overwriteDest: true,
   },
   run: {
-    browserConsole: ui === "native-ui",
+    browserConsole: ui === "firefox-infobar-ui",
   },
 };
 
@@ -58,7 +59,7 @@ if (targetBrowser === "firefox") {
       extensionId,
     )}`,
     `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
-    ...examplePagesToTranslate,
+    ...urlsToOpenOnRun,
     "about:debugging#/runtime/this-firefox",
   ];
   defaultConfig.run.pref = [
@@ -72,9 +73,9 @@ if (targetBrowser === "firefox") {
     "browser.aboutConfig.showWarning=false",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
-  defaultConfig.filename = firefoxNativeUi
-    ? `bergamot-browser-extension-{version}-firefox-native-ui.xpi`
-    : `bergamot-browser-extension-{version}-firefox-extension-ui.xpi`;
+  defaultConfig.filename = firefoxInfobarUi
+    ? `bergamot-browser-extension-{version}-firefox-infobar-ui.xpi`
+    : `bergamot-browser-extension-{version}-firefox-cross-browser-ui.xpi`;
 }
 
 if (targetBrowser === "chrome") {
@@ -83,9 +84,9 @@ if (targetBrowser === "chrome") {
   defaultConfig.run.startUrl = [
     // "chrome://extensions", // Not available until https://github.com/mozilla/web-ext/issues/1979 is resolved
     `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
-    ...examplePagesToTranslate,
+    ...urlsToOpenOnRun,
   ];
-  defaultConfig.filename = `${extensionId}-{version}-chrome.zip`;
+  defaultConfig.filename = `${extensionId}-{version}-chrome-cross-browser-ui.zip`;
 }
 
 module.exports = defaultConfig;

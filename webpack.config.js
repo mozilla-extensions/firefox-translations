@@ -14,19 +14,34 @@ const dotEnvPath =
     ? "./.env.production"
     : "./.env.development";
 
+const copyPluginPatterns = [{ from: "src/core/static", to: buildPath }];
+
 // Set entry points based on build variant
 const entry = {
-  background: `./ts/background-scripts/background.js/${ui}.ts`,
+  background: `./src/${ui}/ts/background-scripts/background.js/index.ts`,
   "dom-translation-content-script":
-    "./ts/content-scripts/dom-translation-content-script.js/index.ts",
+    "./src/core/ts/content-scripts/dom-translation-content-script.js/index.ts",
 };
-if (ui === "extension-ui") {
-  entry["options-ui"] = "./ts/extension-ui/options-ui.js/index.tsx";
-  entry["get-started"] = "./ts/extension-ui/get-started.js/index.tsx";
-  entry["main-interface"] = "./ts/extension-ui/main-interface.js/index.tsx";
+if (ui === "cross-browser-ui") {
+  entry["options-ui"] =
+    "./src/cross-browser-ui/ts/extension-pages/options-ui.js/index.tsx";
+  entry["get-started"] =
+    "./src/cross-browser-ui/ts/extension-pages/get-started.js/index.tsx";
+  entry["main-interface"] =
+    "./src/cross-browser-ui/ts/extension-pages/main-interface.js/index.tsx";
+  copyPluginPatterns.push({
+    from: "src/cross-browser-ui/static",
+    to: buildPath,
+  });
+} else {
+  copyPluginPatterns.push({
+    from: "src/firefox-infobar-ui/static",
+    to: buildPath,
+  });
 }
 if (process.env.NODE_ENV !== "production") {
-  entry.tests = "./ts/tests.js/index.ts";
+  entry.tests = "./test/in-browser/ts/tests.js/index.ts";
+  copyPluginPatterns.push({ from: "test/in-browser/static", to: buildPath });
 }
 
 // Make env vars available in the current scope
@@ -42,9 +57,9 @@ const plugins = [
     path: dotEnvPath,
     safe: true,
   }),
-  // Copy non-webpack-monitored files under "src" to the build directory
+  // Copy non-webpack-monitored files under "static" directories to the build directory
   new CopyPlugin({
-    patterns: [{ from: "src", to: buildPath }],
+    patterns: copyPluginPatterns,
   }),
 ];
 

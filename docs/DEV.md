@@ -59,7 +59,7 @@ Repeat this process any time there has been an update in the bergamot-translator
 To build for Firefox:
 
 ```bash
-yarn build:default
+yarn build:cross-browser-ui:firefox
 ```
 
 The build artifact will be created under `dist/firefox/extension-ui`.
@@ -67,7 +67,7 @@ The build artifact will be created under `dist/firefox/extension-ui`.
 For Chrome:
 
 ```bash
-yarn build:chrome
+yarn build:cross-browser-ui:chrome
 ```
 
 The build artifact will be created under `dist/chrome/extension-ui`.
@@ -75,10 +75,10 @@ The build artifact will be created under `dist/chrome/extension-ui`.
 To build the Firefox native UI variant:
 
 ```bash
-yarn build:native-ui
+yarn build:firefox-infobar-ui
 ```
 
-The build artifact will be created under `dist/firefox/native-ui`.
+The build artifact will be created under `dist/firefox/firefox-infobar-ui`.
 
 ## Development mode
 
@@ -95,13 +95,13 @@ yarn watch
 Or, for the Firefox native UI variant:
 
 ```bash
-yarn watch:native-ui
+yarn watch:firefox-infobar-ui
 ```
 
 ### Chrome
 
 ```bash
-yarn watch:chrome
+yarn watch:cross-browser-ui:chrome
 ```
 
 ## Creating a signed build of the extension for self-distribution
@@ -109,7 +109,7 @@ yarn watch:chrome
 After version bumping and setting the API_KEY and API_SECRET env vars:
 
 ```bash
-yarn build:default && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
+yarn build:cross-browser-ui:firefox && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
 ```
 
 Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
@@ -163,22 +163,22 @@ To produce a clean log output for forwarding to developers / attaching to issues
 Firefox:
 
 ```bash
-yarn build:default
+yarn build:cross-browser-ui:firefox
 npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
 ```
 
 Chrome:
 
 ```bash
-yarn build:chrome
+yarn build:cross-browser-ui:chrome
 npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
 ```
 
 Firefox native UI variant:
 
 ```bash
-yarn build:native-ui
-npx webpack-bundle-analyzer build/firefox/native-ui.stats.json build/firefox/native-ui
+yarn build:firefox-infobar-ui
+npx webpack-bundle-analyzer build/firefox/firefox-infobar-ui.stats.json build/firefox/firefox-infobar-ui
 ```
 
 ## Opening up specific extension pages

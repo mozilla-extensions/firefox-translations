@@ -23,7 +23,7 @@ module.exports = {
   ],
   overrides: [
     {
-      files: "src/**",
+      files: "src/**/.js",
       env: {
         browser: true,
         webextensions: true,
@@ -31,7 +31,7 @@ module.exports = {
     },
     {
       ...typescriptBaseConfig,
-      files: ["ts/**/*.ts", "ts/**/*.tsx"],
+      files: ["src/**/*.ts", "src/**/*.tsx", "test/in-browser/**/*.ts"],
       extends: ["plugin:mocha/recommended"],
       globals: {
         // the dotenv-webpack plugin exposes process.env.* based on the contents in .env.development or .env.production
@@ -51,10 +51,10 @@ module.exports = {
     },
     {
       ...typescriptBaseConfig,
-      files: "test/functional/**/*.ts",
+      files: "test/e2e/**/*.ts",
       extends: ["plugin:mocha/recommended"],
       parserOptions: {
-        project: "./test/functional/tsconfig.json",
+        project: "./test/e2e/tsconfig.json",
       },
       plugins: ["mocha"],
       env: {
