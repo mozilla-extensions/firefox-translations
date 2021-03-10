@@ -67,9 +67,12 @@ export interface TranslationResults {
   translatedTexts: string[];
 }
 
+/* eslint-disable no-unused-vars, no-shadow */
+// TODO: update typescript-eslint when support for this kind of declaration is supported
 interface PendingRequest<T> {
   resolve: (T) => void;
 }
+/* eslint-enable no-unused-vars, no-shadow */
 
 interface TranslationResultsWorkerMessage extends WorkerMessage {
   type: "translationResults";
@@ -135,7 +138,7 @@ class WorkerManager {
     // Determine if our input was large enough to trigger heap growth,
     // or if we're already waiting to destroy the worker when it's
     // idle. If so, schedule termination after the idle timeout.
-    if (this.estimatedHeapGrowth >= FOO_LIMIT || this._idleTimeout != null) {
+    if (this.estimatedHeapGrowth >= FOO_LIMIT || this._idleTimeout !== null) {
       this.flushWorker();
     }
     */
@@ -188,7 +191,7 @@ class WorkerManager {
 
   // Schedule the current worker to be terminated after the idle timeout.
   flushWorker() {
-    if (this._idleTimeout != null) {
+    if (this._idleTimeout !== null) {
       clearTimeout(this._idleTimeout);
     }
 
@@ -332,7 +335,9 @@ class TranslationRequestManager {
       this.queuedRequests.push(translateRequestWorkerMessage);
     });
     // Kick off queue processing async
+    /* eslint-disable no-unused-vars */
     this.processQueue().then(_r => void 0);
+    /* eslint-enable no-unused-vars */
     // Return the promise that resolves when the in-scope translation request resolves
     return requestPromise;
   }
@@ -346,6 +351,6 @@ export const BergamotTranslatorAPI = {
     from: string,
     to: string,
   ): Promise<TranslationResults> {
-    return await translationRequestManager.translate(texts, from, to);
+    return translationRequestManager.translate(texts, from, to);
   },
 };

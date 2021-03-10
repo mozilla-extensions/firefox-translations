@@ -7,7 +7,6 @@ import { Diff2HtmlUIConfig } from "diff2html/lib/ui/js/diff2html-ui-base";
 import "diff2html/bundles/css/diff2html.min.css";
 import { TranslationDocument } from "../content-scripts/dom-translation-content-script.js/TranslationDocument";
 import { TranslationItem } from "../content-scripts/dom-translation-content-script.js/TranslationItem";
-import { assert } from "chai";
 const Diff = require("diff");
 const prettier = require("prettier/standalone");
 const plugins = [require("prettier/parser-html")];

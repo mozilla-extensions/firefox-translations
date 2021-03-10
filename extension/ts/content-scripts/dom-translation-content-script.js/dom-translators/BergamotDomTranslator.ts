@@ -50,13 +50,13 @@ export class BergamotDomTranslator extends BaseDomTranslator {
       { MAX_REQUEST_DATA, MAX_REQUEST_TEXTS, MAX_REQUESTS },
       (
         translationRequestData: TranslationRequestData,
-        sourceLanguage: string,
-        targetLanguage: string,
+        $sourceLanguage: string,
+        $targetLanguage: string,
       ) =>
         new BergamotDomTranslatorRequest(
           translationRequestData,
-          sourceLanguage,
-          targetLanguage,
+          $sourceLanguage,
+          $targetLanguage,
         ),
     );
   }
@@ -93,8 +93,6 @@ function parseChunkResult(
   domTranslationChunk.translationRoots.forEach(
     (translationRoot: TranslationItem, index) => {
       try {
-        const translationRoot: TranslationItem =
-          domTranslationChunk.translationRoots[index];
         const translatedMarkup =
           translationResponseData.translatedMarkups[index];
         let qeAnnotatedTranslatedMarkup =

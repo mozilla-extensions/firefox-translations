@@ -24,7 +24,7 @@ export class ExtensionIconTranslationState {
     >();
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
-      async (documentTranslationStates, previousDocumentTranslationStates) => {
+      async (documentTranslationStates, _previousDocumentTranslationStates) => {
         // console.log("documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
         const tabTopFrameStates = Object.keys(documentTranslationStates)
@@ -42,12 +42,12 @@ export class ExtensionIconTranslationState {
             dynamicActionIcons.set(
               tabId,
               new DynamicActionIcon(
-                tabId,
+                // tabId,
                 browser.browserAction,
                 48,
                 48,
-                24,
-                29,
+                // 24,
+                // 29,
               ),
             );
           }
@@ -181,7 +181,7 @@ export class ExtensionIconTranslationState {
           }
         }
 
-        // TODO: check previousDocumentTranslationStates for those that had something and now should be inactive
+        // TODO: check _previousDocumentTranslationStates for those that had something and now should be inactive
       },
     );
   }

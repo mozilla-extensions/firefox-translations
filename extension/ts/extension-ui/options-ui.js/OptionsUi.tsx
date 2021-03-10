@@ -12,7 +12,6 @@ import Port = Runtime.Port;
 import { DisplayError } from "./DisplayError";
 import { ExtensionPreferences } from "../../background-scripts/background.js/state-management/Store";
 import { captureExceptionWithExtras } from "../../shared-resources/ErrorReporting";
-import Button from "../../shared-resources/photon-components-web/photon-components/Button";
 import { config } from "../../config";
 
 export interface OptionsUiProps {}
@@ -58,14 +57,14 @@ export class OptionsUi extends Component<OptionsUiProps, OptionsUiState> {
             loading: false,
             extensionPreferences,
           });
-          return null;
+          return;
         }
         if (m.dataDeletionRequested) {
           await this.setState({
             loading: false,
             dataDeletionRequested: true,
           });
-          return null;
+          return;
         }
         captureExceptionWithExtras(new Error("Unexpected message"), { m });
         console.error("Unexpected message", { m });
@@ -90,7 +89,7 @@ export class OptionsUi extends Component<OptionsUiProps, OptionsUiState> {
     });
   };
 
-  handleEnableErrorReportingChange = async changeEvent => {
+  handleEnableErrorReportingChange = async _changeEvent => {
     await this.saveExtensionPreferences({
       ...this.state.extensionPreferences,
       enableErrorReporting: !this.state.extensionPreferences
@@ -98,7 +97,7 @@ export class OptionsUi extends Component<OptionsUiProps, OptionsUiState> {
     });
   };
 
-  handleHidePrivacySummaryBannerChange = async changeEvent => {
+  handleHidePrivacySummaryBannerChange = async _changeEvent => {
     await this.saveExtensionPreferences({
       ...this.state.extensionPreferences,
       hidePrivacySummaryBanner: !this.state.extensionPreferences

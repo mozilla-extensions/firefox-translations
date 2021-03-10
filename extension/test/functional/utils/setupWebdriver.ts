@@ -44,7 +44,9 @@ export const Context = {
 export const launchFirefox = async (): Promise<WebDriver> => {
   // Selenium/Webdriver/Geckodriver sometimes throws exceptions that can't be caught.
   // We catch them here so that they show up in stderr without terminating the node process
+  /* eslint-disable mozilla/balanced-listeners */
   process.on("unhandledRejection", r => console.error("unhandledRejection", r));
+  /* eslint-enable mozilla/balanced-listeners */
 
   const options = new Options();
 

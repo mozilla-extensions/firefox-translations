@@ -83,7 +83,7 @@ class TranslationBrowserChromeUi {
     }
   }
 
-  shouldShowInfoBar(aPrincipal) {
+  shouldShowInfoBar(principal) {
     if (
       ![
         TranslationInfoBarStates.STATE_OFFER,
@@ -116,7 +116,7 @@ class TranslationBrowserChromeUi {
     // or if we should never show the infobar for this domain.
     const perms = this.Services.perms;
     if (
-      perms.testExactPermissionFromPrincipal(aPrincipal, "translate") ===
+      perms.testExactPermissionFromPrincipal(principal, "translate") ===
       perms.DENY_ACTION
     ) {
       // TranslationTelemetry.recordAutoRejectedTranslationOffer();
@@ -157,8 +157,8 @@ class TranslationBrowserChromeUi {
       PopupNotifications.remove(notification);
     }
 
-    const callback = (aTopic /* , aNewBrowser */) => {
-      if (aTopic === "swapping") {
+    const callback = (topic /* , aNewBrowser */) => {
+      if (topic === "swapping") {
         const infoBarVisible = this.notificationBox.getNotificationWithValue(
           "translation",
         );
@@ -168,7 +168,7 @@ class TranslationBrowserChromeUi {
         return true;
       }
 
-      if (aTopic !== "showing") {
+      if (topic !== "showing") {
         return false;
       }
       const translationNotification = this.notificationBox.getNotificationWithValue(

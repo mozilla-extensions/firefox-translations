@@ -58,7 +58,7 @@ export class MobxKeystoneBackgroundContextHost {
               initialState,
               requestId,
             });
-            return null;
+            return;
           }
           if (actionCall) {
             const _ = actionIsBeingAppliedForPropagationToContentScripts;
@@ -68,15 +68,15 @@ export class MobxKeystoneBackgroundContextHost {
               backgroundContextRootStore,
             );
             actionIsBeingAppliedForPropagationToContentScripts = _;
-            return null;
+            return;
           }
           captureExceptionWithExtras(new Error("Unexpected message"), { m });
           console.error("Unexpected message", { m });
         },
       );
-      port.onDisconnect.addListener((port: Port) => {
+      port.onDisconnect.addListener(($port: Port) => {
         const existingPortIndex = this.connectedPorts.findIndex(
-          p => p === port,
+          p => p === $port,
         );
         this.connectedPorts.splice(existingPortIndex, 1);
       });
@@ -107,7 +107,9 @@ export class MobxKeystoneBackgroundContextHost {
           };
         }
         // run actions that are being applied for propagation to content scripts unmodified
+        /* eslint-disable consistent-return */
         return undefined;
+        /* eslint-enable consistent-return */
       },
     });
   }

@@ -11,6 +11,7 @@ export const mockLocalStorage: LocalStorageWrapper & { reset: () => void } = {
     if (typeof keys === "string") {
       keys = [keys];
     } else if (keys.length !== undefined) {
+      // do nothing
     } else if (typeof keys === "object") {
       keys = Object.keys(keys);
     }

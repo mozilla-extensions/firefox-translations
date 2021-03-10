@@ -9,14 +9,9 @@ class TranslationBrowserChromeUiNotificationManager {
     this.browser = browser;
   }
 
-  translate(aFrom, aTo) {
-    console.log("translate", { aFrom, aTo });
-    this.apiEventEmitter.emit(
-      "onTranslateButtonPressed",
-      this.tabId,
-      aFrom,
-      aTo,
-    );
+  translate(from, to) {
+    console.log("translate", { from, to });
+    this.apiEventEmitter.emit("onTranslateButtonPressed", this.tabId, from, to);
   }
 
   showOriginalContent() {

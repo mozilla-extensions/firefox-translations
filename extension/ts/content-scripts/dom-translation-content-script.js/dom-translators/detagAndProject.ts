@@ -139,45 +139,41 @@ export const project = (
   // Inject the tags naively in the translated string assuming a 1:1
   // relationship between original text nodes and words in the translated string
   const translatedStringWords = translatedString.split(" ");
-  let currentTextTokenOrdinal = 0;
   const remainingTranslatedStringWords = [...translatedStringWords];
   let whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
-  const projectedStringParts = detaggedString.tokens.map(
-    (token, tokenOrdinal): string => {
-      const determineProjectedStringPart = () => {
-        if (token.type === "word") {
-          currentTextTokenOrdinal++;
-          const correspondingTranslatedWord = remainingTranslatedStringWords.shift();
-          // If we have run out of translated words, don't attempt to add to the projected string
-          if (correspondingTranslatedWord === undefined) {
-            return "";
-          }
-          // Otherwise, inject the translated word
-          // ... possibly with a space injected in case none has been injected since the last word
-          const $projectedStringPart = `${
-            whitespaceHaveBeenInjectedSinceTheLastWordWasInjected ? "" : " "
-          }${correspondingTranslatedWord}`;
-          whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = false;
-          return $projectedStringPart;
-        } else if (token.type === "whitespace") {
-          // Don't pad whitespace onto each other when there are no more words
-          if (remainingTranslatedStringWords.length === 0) {
-            return "";
-          }
-          whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
-          return token.textRepresentation;
-        } else if (token.type === "tag") {
-          if (isTagTokenWithImpliedWhitespace(token)) {
-            whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
-          }
-          return token.textRepresentation;
+  const projectedStringParts = detaggedString.tokens.map((token): string => {
+    const determineProjectedStringPart = () => {
+      if (token.type === "word") {
+        const correspondingTranslatedWord = remainingTranslatedStringWords.shift();
+        // If we have run out of translated words, don't attempt to add to the projected string
+        if (correspondingTranslatedWord === undefined) {
+          return "";
         }
-        throw new Error(`Unexpected token type: ${token.type}`);
-      };
-      const projectedStringPart = determineProjectedStringPart();
-      return projectedStringPart;
-    },
-  );
+        // Otherwise, inject the translated word
+        // ... possibly with a space injected in case none has been injected since the last word
+        const $projectedStringPart = `${
+          whitespaceHaveBeenInjectedSinceTheLastWordWasInjected ? "" : " "
+        }${correspondingTranslatedWord}`;
+        whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = false;
+        return $projectedStringPart;
+      } else if (token.type === "whitespace") {
+        // Don't pad whitespace onto each other when there are no more words
+        if (remainingTranslatedStringWords.length === 0) {
+          return "";
+        }
+        whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
+        return token.textRepresentation;
+      } else if (token.type === "tag") {
+        if (isTagTokenWithImpliedWhitespace(token)) {
+          whitespaceHaveBeenInjectedSinceTheLastWordWasInjected = true;
+        }
+        return token.textRepresentation;
+      }
+      throw new Error(`Unexpected token type: ${token.type}`);
+    };
+    const projectedStringPart = determineProjectedStringPart();
+    return projectedStringPart;
+  });
 
   let projectedString = projectedStringParts.join("");
 

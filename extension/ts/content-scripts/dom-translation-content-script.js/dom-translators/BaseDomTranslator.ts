@@ -106,7 +106,6 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   async translate(): Promise<{
     characterCount: number;
   }> {
-    const currentIndex = 0;
     const chunksBeingProcessed = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
@@ -125,7 +124,6 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     ) {
       // Determine the data for the next request.
       const domTranslationChunk = this.generateNextDomTranslationChunk(
-        currentRequestOrdinal,
         translationRoots,
         translationRootsVisible,
         translationRootsVisibleInViewport,
@@ -230,7 +228,6 @@ export class BaseDomTranslator extends MinimalDomTranslator {
    * the Nth request we are generating, based on the input params.
    */
   private generateNextDomTranslationChunk(
-    currentRequestOrdinal: number,
     translationRoots: TranslationItem[],
     translationRootsVisible: TranslationItem[],
     translationRootsVisibleInViewport: TranslationItem[],

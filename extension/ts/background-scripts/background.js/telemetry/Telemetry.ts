@@ -21,7 +21,7 @@ export class Telemetry {
    * Provides access to Telemetry singleton.
    */
   public static get global(): Telemetry {
-    if (Telemetry._instance == null) {
+    if (Telemetry._instance === null) {
       Telemetry._instance = new Telemetry();
     }
     return Telemetry._instance;

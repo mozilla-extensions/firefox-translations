@@ -20,7 +20,7 @@ import { flatten } from "flat";
 
 // Initialize Sentry SDK if we have a non-placeholder DSN configured
 let sentryIntialized = false;
-if (config.sentryDsn.indexOf("<project>") === -1) {
+if (config.sentryDsn.includes("<project>")) {
   Sentry.init({ dsn: config.sentryDsn });
   sentryIntialized = true;
 }
@@ -137,6 +137,7 @@ Sentry.configureScope(scope => {
       // console.log("Processed sentry event", { event });
       return event;
     }
+    return null;
   });
 });
 

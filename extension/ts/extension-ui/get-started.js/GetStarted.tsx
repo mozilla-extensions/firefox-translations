@@ -46,7 +46,7 @@ export class GetStarted extends Component<GetStartedProps, GetStartedState> {
             loading: false,
             extensionPreferences,
           });
-          return null;
+          return;
         }
         captureExceptionWithExtras(new Error("Unexpected message"), { m });
         console.error("Unexpected message", { m });

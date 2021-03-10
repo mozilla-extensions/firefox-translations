@@ -4,16 +4,10 @@
 
 import {
   BergamotApiClient,
-  BergamotRestApiParagraph,
-  BergamotRestApiSentence,
   BergamotRestApiTranslateRequestResult,
 } from "./lib/BergamotApiClient";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
-import {
-  BergamotTranslatorAPI,
-  TranslationResults,
-} from "./lib/BergamotTranslatorAPI";
 const bergamotApiClient = new BergamotApiClient();
 
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {

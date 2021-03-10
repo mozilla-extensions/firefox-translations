@@ -57,7 +57,7 @@ const workerManager = {
     // Determine if our input was large enough to trigger heap growth,
     // or if we're already waiting to destroy the worker when it's
     // idle. If so, schedule termination after the idle timeout.
-    if (params.text.length >= LARGE_STRING || this._idleTimeout != null) {
+    if (params.text.length >= LARGE_STRING || this._idleTimeout !== null) {
       this.flushWorker();
     }
 
@@ -78,7 +78,7 @@ const workerManager = {
       this._workerReadyPromise = new Promise(resolve => {
         const worker = new Worker(WORKER_URL);
         worker.onmessage = msg => {
-          if (msg.data == "ready") {
+          if (msg.data === "ready") {
             resolve(worker);
           } else {
             this.onDetectLanguageWorkerResult(msg.data);
@@ -96,7 +96,7 @@ const workerManager = {
 
   // Schedule the current worker to be terminated after the idle timeout.
   flushWorker() {
-    if (this._idleTimeout != null) {
+    if (this._idleTimeout !== null) {
       clearTimeout(this._idleTimeout);
     }
 

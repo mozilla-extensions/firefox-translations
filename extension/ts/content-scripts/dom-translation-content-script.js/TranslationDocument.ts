@@ -90,7 +90,7 @@ export class TranslationDocument {
       if (
         !translationRoot.children.length &&
         translationRoot.nodeRef instanceof Element &&
-        translationRoot.nodeRef.childElementCount == 0
+        translationRoot.nodeRef.childElementCount === 0
       ) {
         translationRoot.isSimleTranslationRoot = true;
         if (this.paintProcessedNodes) {

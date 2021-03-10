@@ -18,6 +18,10 @@ import { ExtensionState } from "../../shared-resources/models/ExtensionState";
 import { ExtensionIconTranslationState } from "./extension-ui/ExtensionIconTranslationState";
 import { connectRootStoreToDevTools } from "./state-management/connectRootStoreToDevTools";
 const store = new Store(localStorageWrapper);
+/* eslint-disable no-unused-vars */
+// TODO: update typescript-eslint when support for this kind of declaration is supported
+type PortListener = (port: Port) => void;
+/* eslint-enable no-unused-vars */
 
 /**
  * Ties together overall execution logic and allows content scripts
@@ -25,10 +29,10 @@ const store = new Store(localStorageWrapper);
  */
 class ExtensionGlue {
   private extensionState: ExtensionState = createBackgroundContextRootStore();
-  private extensionPreferencesPortListener: (port: Port) => void;
-  private contentScriptLanguageDetectorProxyPortListener: (port: Port) => void;
-  private contentScriptBergamotApiClientPortListener: (port: Port) => void;
-  private contentScriptFrameInfoPortListener: (port: Port) => void;
+  private extensionPreferencesPortListener: PortListener;
+  private contentScriptLanguageDetectorProxyPortListener: PortListener;
+  private contentScriptBergamotApiClientPortListener: PortListener;
+  private contentScriptFrameInfoPortListener: PortListener;
 
   constructor() {}
 
@@ -93,15 +97,15 @@ class ExtensionGlue {
   async cleanup() {
     // Tear down content script port listeners
     [
-      "extensionPreferencesPortListener",
-      "contentScriptLanguageDetectorProxyPortListener",
-      "contentScriptBergamotApiClientPortListener",
-      "contentScriptFrameInfoPortListener",
-    ].forEach(listenerName => {
+      this.extensionPreferencesPortListener,
+      this.contentScriptLanguageDetectorProxyPortListener,
+      this.contentScriptBergamotApiClientPortListener,
+      this.contentScriptFrameInfoPortListener,
+    ].forEach((listener: PortListener) => {
       try {
-        crossBrowser.runtime.onConnect.removeListener(this[listenerName]);
+        crossBrowser.runtime.onConnect.removeListener(listener);
       } catch (err) {
-        console.warn(`${listenerName} removal error`, err);
+        console.warn(`Port listener removal error`, err);
       }
     });
   }

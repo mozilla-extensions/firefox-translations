@@ -27,7 +27,7 @@ export class Store implements LocalStorageWrapper {
     this.set = localStorageWrapper.set;
   }
   get = async (
-    keys?:
+    _keys?:
       | null
       | string
       | string[]
@@ -37,7 +37,7 @@ export class Store implements LocalStorageWrapper {
   ): Promise<{
     [s: string]: any;
   }> => ({});
-  set = async (items: StorageAreaSetItemsType): Promise<void> => {};
+  set = async (_items: StorageAreaSetItemsType): Promise<void> => {};
 
   initialExtensionPreferences = async (): Promise<ExtensionPreferences> => {
     return {

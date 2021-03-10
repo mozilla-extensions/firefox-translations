@@ -30,7 +30,6 @@ export class TextArea extends React.Component<TextAreaProps, TextAreaState> {
 
   render() {
     const {
-      type: originalType,
       onChange: originalOnChange, // eslint-disable-line no-unused-vars
       icon = null,
       label = null,
@@ -39,7 +38,7 @@ export class TextArea extends React.Component<TextAreaProps, TextAreaState> {
       ...props
     } = this.props;
 
-    const { type = "text", value } = this.state;
+    const { value } = this.state;
 
     const style = {};
     if (icon) {

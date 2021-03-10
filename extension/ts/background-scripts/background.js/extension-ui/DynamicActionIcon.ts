@@ -47,31 +47,30 @@ const drawBadge = (ctx, text, textColor, badgeBackgroundColor) => {
 };
 
 export class DynamicActionIcon {
-  private tabId: number;
   private ctx;
   private actionApi: BrowserAction.Static;
   private iconImg;
   private width: number;
   private height: number;
-  private rotationCenterX: number;
-  private rotationCenterY: number;
+  // private rotationCenterX: number;
+  // private rotationCenterY: number;
   private badgeText: string;
   private badgeTextColor: ColorValue = "#ffffff";
   private badgeBackgroundColor: ColorValue = "#000000";
   constructor(
-    tabId: number,
+    // tabId: number,
     actionApi,
     width,
     height,
-    rotationCenterX,
-    rotationCenterY,
+    // rotationCenterX,
+    // rotationCenterY,
   ) {
     this.ctx = document.createElement("canvas").getContext("2d");
     this.actionApi = actionApi;
     this.width = width;
     this.height = height;
-    this.rotationCenterX = rotationCenterX;
-    this.rotationCenterY = rotationCenterY;
+    // this.rotationCenterX = rotationCenterX;
+    // this.rotationCenterY = rotationCenterY;
   }
 
   private clear() {

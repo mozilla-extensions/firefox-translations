@@ -76,7 +76,7 @@ export class TestDomTranslator extends MinimalDomTranslator {
     const targetLanguageTexts = this.getNormalizedTexts(this.targetLanguage);
 
     // Translate and parse translation results
-    translationRoots.forEach((translationRoot, index) => {
+    translationRoots.forEach(translationRoot => {
       const markupToTranslate = this.translationDocument.generateMarkupToTranslate(
         translationRoot,
       );

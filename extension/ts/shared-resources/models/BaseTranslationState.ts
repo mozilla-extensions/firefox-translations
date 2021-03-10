@@ -7,6 +7,8 @@ import { DetectedLanguageResults } from "../../background-scripts/background.js/
 import { computed } from "mobx";
 import { browser } from "webextension-polyfill-ts";
 
+/* eslint-disable no-unused-vars, no-shadow */
+// TODO: update typescript-eslint when support for this kind of declaration is supported
 export enum TranslationStatus {
   UNKNOWN = "UNKNOWN",
   UNAVAILABLE = "UNAVAILABLE",
@@ -20,6 +22,7 @@ export enum TranslationStatus {
   TRANSLATED = "TRANSLATED",
   ERROR = "ERROR",
 }
+/* eslint-enable no-unused-vars, no-shadow */
 
 @model("bergamotTranslate/BaseTranslationState")
 export class BaseTranslationState extends Model({

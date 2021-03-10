@@ -3,7 +3,11 @@ import { join } from "path";
 import { Context } from "./setupWebdriver";
 const sanitize = require("sanitize-filename");
 
-export const takeScreenshot = async (driver, title = "Untitled screenshot") => {
+/* eslint-disable consistent-return */
+export const takeScreenshot = async (
+  driver,
+  title = "Untitled screenshot",
+): Promise<void> => {
   const previousContext = driver.getContext();
   await driver.setContext(Context.CHROME);
   try {
@@ -17,7 +21,7 @@ export const takeScreenshot = async (driver, title = "Untitled screenshot") => {
     );
     const data = await driver.takeScreenshot();
     await driver.setContext(previousContext);
-    return await fs.promises.writeFile(destinationPath, data, "base64");
+    return fs.promises.writeFile(destinationPath, data, "base64");
   } catch (screenshotError) {
     console.error(
       "An exception occurred while grabbing a screenshot. This has been caught to make sure that tests keep running despite missing screenshot artifacts. Original exception:",

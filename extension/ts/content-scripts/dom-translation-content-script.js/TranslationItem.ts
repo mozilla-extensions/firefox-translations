@@ -236,6 +236,10 @@ function parseResultNode(
   }
 }
 
+/* eslint-disable complexity */
+// TODO: Simplify swapTextForItem to avoid the following eslint error:
+// Function 'swapTextForItem' has a complexity of 35. Maximum allowed is 34  complexity
+
 /**
  * Helper function to swap the text of a TranslationItem
  * between its original and translated states.
@@ -486,7 +490,7 @@ function swapTextForItem(
               // There should be only 1 such node. Remove the curNode from the
               // parent's children and replace the qe-annotated node with it to
               // maintain the right order in original DOM tree of the document.
-              curNode = curNode.parentNode.removeChild(curNode);
+              curNode.remove();
               child.parentNode.replaceChild(curNode, child);
             }
           }
@@ -519,6 +523,8 @@ function swapTextForItem(
     }
   }
 }
+
+/* eslint-enable complexity */
 
 function getNextSiblingSkippingEmptyTextNodes(startSibling) {
   let item = startSibling.nextSibling;

@@ -121,13 +121,12 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     return this._getAnonElt("translationStates").selectedIndex;
   }
 
-  // aTranslation is a TranslationBrowserChromeUiNotificationManager instance.
-  init(aTranslation) {
-    this.translation = aTranslation;
+  init(translationBrowserChromeUiNotificationManager) {
+    this.translation = translationBrowserChromeUiNotificationManager;
 
-    const sortByLocalizedName = function(aList) {
-      const names = Services.intl.getLanguageDisplayNames(undefined, aList);
-      return aList
+    const sortByLocalizedName = function(list) {
+      const names = Services.intl.getLanguageDisplayNames(undefined, list);
+      return list
         .map((code, i) => [code, names[i]])
         .sort((a, b) => a[1].localeCompare(b[1]));
     };
@@ -145,8 +144,9 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     detectedLanguage.value = this.translation.uiState.detectedLanguage;
 
     // translatedFrom is only set if we have already translated this page.
-    if (aTranslation.uiState.translatedFrom) {
-      fromLanguage.value = aTranslation.uiState.translatedFrom;
+    if (translationBrowserChromeUiNotificationManager.uiState.translatedFrom) {
+      fromLanguage.value =
+        translationBrowserChromeUiNotificationManager.uiState.translatedFrom;
     }
 
     // Fill the list of supported target languages.
@@ -158,12 +158,14 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       toLanguage.appendItem(name, code);
     }
 
-    if (aTranslation.uiState.translatedTo) {
-      toLanguage.value = aTranslation.uiState.translatedTo;
+    if (translationBrowserChromeUiNotificationManager.uiState.translatedTo) {
+      toLanguage.value =
+        translationBrowserChromeUiNotificationManager.uiState.translatedTo;
     }
 
-    if (aTranslation.uiState.infobarState) {
-      this.state = aTranslation.uiState.infobarState;
+    if (translationBrowserChromeUiNotificationManager.uiState.infobarState) {
+      this.state =
+        translationBrowserChromeUiNotificationManager.uiState.infobarState;
     }
 
     /*
@@ -245,8 +247,8 @@ window.MozTranslationNotification = class extends MozElements.Notification {
      */
   }
 
-  _getAnonElt(aAnonId) {
-    return this.querySelector("[anonid=" + aAnonId + "]");
+  _getAnonElt(anonId) {
+    return this.querySelector("[anonid=" + anonId + "]");
   }
 
   fromLanguageChanged() {

@@ -32,7 +32,7 @@ export class ContentScriptLanguageDetectorProxy {
             resultsMessageListener,
           );
           resolve(languageDetectorResults.results);
-          return null;
+          return;
         }
         captureExceptionWithExtras(new Error("Unexpected message"), { m });
         console.error("Unexpected message", { m });

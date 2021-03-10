@@ -11,6 +11,8 @@ src/wasm/bergamot-translator-worker.data
 src/wasm/bergamot-translator-worker.js
 src/wasm/bergamot-translator-worker.wasm
 src/wasm/cld-worker.*
+# currently not maintaining these source files
+ts/extension-ui/main-interface.js/components/
 # makes sure that eslintrc.js gets linted/formatted
 !.eslintrc.js
 # don't lint/format package.json since npm install formats it differently by default

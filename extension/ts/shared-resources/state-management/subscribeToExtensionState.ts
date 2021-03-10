@@ -19,6 +19,7 @@ import Port = Runtime.Port;
 import { captureExceptionWithExtras } from "../ErrorReporting";
 import { nanoid } from "nanoid";
 import { ExtensionState } from "../models/ExtensionState";
+import { ActionTrackingReturn } from "mobx-keystone/dist/actionMiddlewares/actionTrackingMiddleware";
 
 // disable runtime data checking (we rely on TypeScript at compile time so that our model definitions can be cleaner)
 setGlobalConfig({
@@ -49,18 +50,18 @@ class MobxKeystoneProxy {
     // listen to updates from host
     const actionCallResultsMessageListener = async (
       m: ExpectedMessageFormat,
-    ) => {
+    ): Promise<void> => {
       if (m.serializedActionCallToReplicate) {
         const { serializedActionCallToReplicate } = m;
         // console.log("MobxKeystoneProxy received applyActionResult", {serializedActionCallToReplicate});
         this.msgListeners.forEach(listener =>
           listener(serializedActionCallToReplicate!),
         );
-        return null;
+        return;
       }
       if (m.initialState) {
         // handled in another listener, do nothing here
-        return null;
+        return;
       }
       captureExceptionWithExtras(new Error("Unexpected message"), { m });
       console.error("Unexpected message", { m });
@@ -72,7 +73,9 @@ class MobxKeystoneProxy {
   async requestInitialState(): Promise<any> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
-      const resultsMessageListener = async (m: ExpectedMessageFormat) => {
+      const resultsMessageListener = async (
+        m: ExpectedMessageFormat,
+      ): Promise<void> => {
         if (m.initialState) {
           const { initialState } = m;
           if (m.requestId !== requestId) {
@@ -83,11 +86,11 @@ class MobxKeystoneProxy {
             resultsMessageListener,
           );
           resolve(initialState);
-          return null;
+          return;
         }
         if (m.serializedActionCallToReplicate) {
           // handled in another listener, do nothing here
-          return null;
+          return;
         }
         captureExceptionWithExtras(new Error("Unexpected message"), { m });
         console.error("Unexpected message", { m });
@@ -101,7 +104,7 @@ class MobxKeystoneProxy {
       });
     });
   }
-  async actionCall(actionCall: SerializedActionCall): Promise<any> {
+  async actionCall(actionCall: SerializedActionCall): Promise<void> {
     return new Promise((resolve, _reject) => {
       const requestId = nanoid();
       // console.debug("MobxKeystoneProxy (Content Script Context): actionCall via content script mobx keystone proxy", { actionCall });
@@ -164,7 +167,7 @@ export async function subscribeToExtensionState() {
 
   // also listen to local actions, cancel them and send them to the server (background context)
   onActionMiddleware(rootStore, {
-    onStart(actionCall, ctx) {
+    onStart(actionCall, ctx): void | ActionTrackingReturn {
       if (!serverAction) {
         // if the action does not come from the server (background context) cancel it silently
         // and send it to the server (background context)
@@ -178,7 +181,9 @@ export async function subscribeToExtensionState() {
         };
       }
       // run actions that comes from the server (background context) unmodified
+      /* eslint-disable consistent-return */
       return undefined;
+      /* eslint-enable consistent-return */
     },
   });
 

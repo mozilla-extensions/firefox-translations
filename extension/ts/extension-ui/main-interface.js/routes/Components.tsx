@@ -65,7 +65,9 @@ export function Components() {
     const timer = setInterval(() => {
       if (progressValue < 100) {
         setProgressValue(v => v + 1);
-      } else setProgressValue(v => 0);
+      } else {
+        setProgressValue(_v => 0);
+      }
     }, 10);
 
     return () => clearInterval(timer);

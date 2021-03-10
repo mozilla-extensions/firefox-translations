@@ -72,7 +72,6 @@ export const getTranslationNodes = (
     const childElement: HTMLElement = childElements[i];
 
     const tagName = childElement.tagName.toLowerCase();
-    const isElementNode = childElement.nodeType === Node.ELEMENT_NODE;
     const isTextNode = childElement.nodeType === Node.TEXT_NODE;
 
     if (isTextNode) {

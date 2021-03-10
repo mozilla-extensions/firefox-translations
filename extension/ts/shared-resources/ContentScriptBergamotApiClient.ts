@@ -39,7 +39,7 @@ export class ContentScriptBergamotApiClient {
             resultsMessageListener,
           );
           resolve(translationRequestResults.results);
-          return null;
+          return;
         }
         captureExceptionWithExtras(new Error("Unexpected message"), { m });
         console.error("Unexpected message", { m });

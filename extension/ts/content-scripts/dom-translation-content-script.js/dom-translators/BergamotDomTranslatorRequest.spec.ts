@@ -20,6 +20,7 @@ import {
 
 const testSuiteName = "BergamotDomTranslatorRequest";
 
+/* eslint-disable mocha/no-setup-in-describe */
 describe(testSuiteName, function() {
   const outputDiv = document.getElementById("output");
   const diffContainerDiv = document.getElementById("diff");

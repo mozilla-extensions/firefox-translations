@@ -17,15 +17,17 @@ import {
   translate,
   changeLang,
   closed,
-  displayed,
-  neverTranslateLang,
+  // displayed,
+  // neverTranslateLang,
   neverTranslateSite,
-  notNow,
+  // notNow,
 } from "../telemetry/generated/infobar";
 import { Telemetry } from "../telemetry/Telemetry";
-import { custom } from "../telemetry/generated/pings";
-import { fromLang, toLang } from "../telemetry/generated/metadata";
+// import { custom } from "../telemetry/generated/pings";
+// import { fromLang, toLang } from "../telemetry/generated/metadata";
 
+/* eslint-disable no-unused-vars, no-shadow */
+// TODO: update typescript-eslint when support for this kind of declaration is supported
 enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
   STATE_TRANSLATING = 1,
@@ -33,6 +35,7 @@ enum NativeTranslateUiStateInfobarState {
   STATE_ERROR = 3,
   STATE_UNAVAILABLE = 4,
 }
+/* eslint-enable no-unused-vars, no-shadow */
 
 /**
  * The properties exposed to the infobar are:
@@ -182,12 +185,15 @@ export class NativeTranslateUiBroker {
         case TranslationStatus.ERROR:
           return NativeTranslateUiStateInfobarState.STATE_ERROR;
       }
+      throw Error(
+        `No corresponding NativeTranslateUiStateInfobarState available for translationStatus "${translationStatus}"`,
+      );
     };
 
     // React to document translation state changes
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
-      async (documentTranslationStates, previousDocumentTranslationStates) => {
+      async (documentTranslationStates, _previousDocumentTranslationStates) => {
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
@@ -206,7 +212,7 @@ export class NativeTranslateUiBroker {
             uiState,
           );
         }
-        // TODO: check previousDocumentTranslationStates for those that had something and now should be inactive
+        // TODO: check _previousDocumentTranslationStates for those that had something and now should be inactive
       },
     );
   }

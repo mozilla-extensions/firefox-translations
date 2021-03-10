@@ -5,6 +5,7 @@
 import { assert } from "chai";
 import { getTranslationNodes } from "./getTranslationNodes";
 
+/* eslint-disable mocha/no-setup-in-describe */
 describe("getTranslationNodes", function() {
   const domParser = new DOMParser();
 

@@ -19,9 +19,9 @@ export const subscribeToExtensionPreferenceChangesInBackgroundScript = async (
     store,
   );
   store.setExtensionPreferences = async (
-    extensionPreferences: ExtensionPreferences,
+    $extensionPreferences: ExtensionPreferences,
   ) => {
-    await originalSetExtensionPreferences(extensionPreferences);
+    await originalSetExtensionPreferences($extensionPreferences);
     callback(await store.getExtensionPreferences());
   };
 };
@@ -82,7 +82,7 @@ export const communicateExtensionPreferenceChangesToContentScripts = async (
     if (!portNames.includes(port.name)) {
       return;
     }
-    port.onMessage.addListener(async function(m) {
+    port.onMessage.addListener(async function(m): Promise<void> {
       connectedPorts[port.name] = port;
       // console.debug(`Message from port "${port.name}"`, { m });
       if (m.requestExtensionPreferences) {
@@ -98,8 +98,8 @@ export const communicateExtensionPreferenceChangesToContentScripts = async (
         });
       }
     });
-    port.onDisconnect.addListener((port: Port) => {
-      delete connectedPorts[port.name];
+    port.onDisconnect.addListener(($port: Port) => {
+      delete connectedPorts[$port.name];
     });
   };
   browser.runtime.onConnect.addListener(
