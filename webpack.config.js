@@ -7,12 +7,7 @@ const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 
-const {
-  targetEnvironment,
-  targetBrowser,
-  buildPath,
-  ui,
-} = require("./build-config.js");
+const { targetEnvironment, buildPath, ui } = require("./build-config.js");
 
 const dotEnvPath =
   targetEnvironment === "production"
@@ -84,28 +79,18 @@ if (targetEnvironment === "production") {
 }
 
 // telemetry configuration
-let telemetryAppId = "org-mozilla-bergamot-test";
-let telemetryDebugMode = "true";
-
-if (targetEnvironment === "production") {
-  telemetryDebugMode = "false";
-  if (ui === "firefox-infobar-ui") {
-    telemetryAppId = "org-mozilla-bergamot";
-  }
-  if (ui === "cross-browser-ui") {
-    if (targetBrowser === "firefox") {
-      telemetryAppId = "org-mozilla-bergamot-cross-browser-firefox";
-    }
-    if (targetBrowser === "chrome") {
-      telemetryAppId = "org-mozilla-bergamot-cross-browser-chrome";
-    }
-  }
+let telemetryAppId;
+if (ui === "firefox-infobar-ui") {
+  telemetryAppId = "org-mozilla-bergamot";
+} else if (ui === "cross-browser-ui") {
+  telemetryAppId = "org-mozilla-bergamot-cross-browser";
+} else {
+  throw Error("Could not determine telemetry app id");
 }
 
 plugins.push(
   new webpack.EnvironmentPlugin({
     TELEMETRY_APP_ID: telemetryAppId,
-    TELEMETRY_DEBUG_MODE: telemetryDebugMode,
   }),
 );
 

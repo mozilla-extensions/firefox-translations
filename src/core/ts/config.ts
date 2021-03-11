@@ -2,7 +2,7 @@ export const config = {
   bergamotRestApiUrl: process.env.BERGAMOT_REST_API_INBOUND_URL,
   sentryDsn: process.env.SENTRY_DSN,
   telemetryAppId: process.env.TELEMETRY_APP_ID,
-  telemetryDebugMode: process.env.TELEMETRY_DEBUG_MODE === "true",
+  telemetryDebugMode: process.env.NODE_ENV !== "production",
   supportedLanguagePairs: [
     // "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
     // ISO 639-1 codes
