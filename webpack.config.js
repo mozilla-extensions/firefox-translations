@@ -86,13 +86,15 @@ if (targetEnvironment === "production") {
 // telemetry configuration
 let telemetryAppId = "org-mozilla-bergamot-test";
 
+// disabled for cross-browser until we figure out which IDs are more suitable
+// and get data collection review approval for these channels of distribution
 if (targetEnvironment === "production") {
   if (ui === "firefox-infobar-ui") {
     telemetryAppId = "org-mozilla-bergamot";
   } else if (ui === "cross-browser-ui" && targetBrowser === "firefox") {
-    telemetryAppId = "org-mozilla-bergamot-cross-browser-firefox";
+    // telemetryAppId = "org-mozilla-bergamot-cross-browser-firefox";
   } else if (ui === "cross-browser-ui" && targetBrowser === "chrome") {
-    telemetryAppId = "org-mozilla-bergamot-cross-browser-chrome";
+    // telemetryAppId = "org-mozilla-bergamot-cross-browser-chrome";
   } else {
     throw Error("Could not determine telemetry app id");
   }
