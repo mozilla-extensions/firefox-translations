@@ -7,10 +7,10 @@ const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 
-const { buildPath, ui } = require("./build-config.js");
+const { targetEnvironment, buildPath, ui } = require("./build-config.js");
 
 const dotEnvPath =
-  process.env.NODE_ENV === "production"
+  targetEnvironment === "production"
     ? "./.env.production"
     : "./.env.development";
 
@@ -39,7 +39,7 @@ if (ui === "cross-browser-ui") {
     to: buildPath,
   });
 }
-if (process.env.NODE_ENV !== "production") {
+if (targetEnvironment !== "production") {
   entry.tests = "./test/in-browser/ts/tests.js/index.ts";
   copyPluginPatterns.push({ from: "test/in-browser/static", to: buildPath });
 }
@@ -64,7 +64,7 @@ const plugins = [
 ];
 
 //
-if (process.env.NODE_ENV === "production") {
+if (targetEnvironment === "production") {
   // Generate a stats file associated with each build
   plugins.push(
     new BundleAnalyzerPlugin({
@@ -78,10 +78,26 @@ if (process.env.NODE_ENV === "production") {
   plugins.push(new webpack.EnvironmentPlugin(["REMOTE_DEV_SERVER_PORT"]));
 }
 
+// telemetry configuration
+let telemetryAppId;
+if (ui === "firefox-infobar-ui") {
+  telemetryAppId = "org-mozilla-bergamot";
+} else if (ui === "cross-browser-ui") {
+  telemetryAppId = "org-mozilla-bergamot-cross-browser";
+} else {
+  throw Error("Could not determine telemetry app id");
+}
+
+plugins.push(
+  new webpack.EnvironmentPlugin({
+    TELEMETRY_APP_ID: telemetryAppId,
+  }),
+);
+
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
 if (
   process.env.SENTRY_AUTH_TOKEN !== "foo" &&
-  (process.env.NODE_ENV === "production" ||
+  (targetEnvironment === "production" ||
     process.env.TEST_SENTRY_WEBPACK_PLUGIN === "1")
 ) {
   plugins.push(

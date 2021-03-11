@@ -134,8 +134,7 @@ export class NativeTranslateUiBroker {
         // supportedTargetLanguagesGivenDefaultSourceLanguage,
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
-
-      // these metrics can be recorded multiples times here, it's ok
+      // todo: move to an appropriate place
       /*
       Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
       Telemetry.global.record(

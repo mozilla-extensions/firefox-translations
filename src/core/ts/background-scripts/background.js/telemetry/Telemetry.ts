@@ -4,17 +4,21 @@
 
 import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
+import { config } from "../../../config";
 
 export class Telemetry {
   private static _instance = null;
   private _metricsToSubmit;
 
   constructor() {
-    Glean.initialize("org.mozilla.bergamot_translator", true, {
-      debug: { logPings: true },
+    const appId = config.telemetryAppId;
+    Glean.initialize(appId, true, {
+      debug: { logPings: config.telemetryDebugMode },
     });
     this._metricsToSubmit = 0;
-    console.debug("Telemetry: initialization completed.");
+    console.info(
+      `Telemetry: initialization completed with application ID ${appId}.`,
+    );
   }
 
   /**
@@ -38,7 +42,7 @@ export class Telemetry {
   /**
    * Collects a telemetry metric or event.
    * @param metricFunc The function which calls one of the generated metrics or events.
-   * @param name Optional. The name of the metrics to show in console for debug purpposes
+   * @param name Optional. The name of the metrics to show in console for debug purposes
    */
   public record = (metricFunc: Function, name?: string) => {
     try {
