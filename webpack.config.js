@@ -79,13 +79,12 @@ if (targetEnvironment === "production") {
 }
 
 // telemetry configuration
-let telemetryAppId;
-if (ui === "firefox-infobar-ui") {
+let telemetryAppId = "org-mozilla-bergamot-test";
+
+// use test one for cross-browser until we figure out which IDs are more suitable
+// and get data collection review approval for these channels of distribution
+if (targetEnvironment === "production" && ui === "firefox-infobar-ui") {
   telemetryAppId = "org-mozilla-bergamot";
-} else if (ui === "cross-browser-ui") {
-  telemetryAppId = "org-mozilla-bergamot-cross-browser";
-} else {
-  throw Error("Could not determine telemetry app id");
 }
 
 plugins.push(
