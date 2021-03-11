@@ -11,12 +11,13 @@ export class Telemetry {
   private _metricsToSubmit;
 
   constructor() {
-    Glean.initialize(config.telemetryAppId, true, {
+    const appId = config.telemetryAppId;
+    Glean.initialize(appId, true, {
       debug: { logPings: config.telemetryDebugMode },
     });
     this._metricsToSubmit = 0;
-    console.debug(
-      `Telemetry: initialization completed with application ID ${config.telemetryAppId}.`,
+    console.info(
+      `Telemetry: initialization completed with application ID ${appId}.`,
     );
   }
 
@@ -41,7 +42,7 @@ export class Telemetry {
   /**
    * Collects a telemetry metric or event.
    * @param metricFunc The function which calls one of the generated metrics or events.
-   * @param name Optional. The name of the metrics to show in console for debug purpposes
+   * @param name Optional. The name of the metrics to show in console for debug purposes
    */
   public record = (metricFunc: Function, name?: string) => {
     try {

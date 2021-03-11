@@ -7,10 +7,15 @@ const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
 
-const { buildPath, ui } = require("./build-config.js");
+const {
+  targetEnvironment,
+  targetBrowser,
+  buildPath,
+  ui,
+} = require("./build-config.js");
 
 const dotEnvPath =
-  process.env.NODE_ENV === "production"
+  targetEnvironment === "production"
     ? "./.env.production"
     : "./.env.development";
 
@@ -39,7 +44,7 @@ if (ui === "cross-browser-ui") {
     to: buildPath,
   });
 }
-if (process.env.NODE_ENV !== "production") {
+if (targetEnvironment !== "production") {
   entry.tests = "./test/in-browser/ts/tests.js/index.ts";
   copyPluginPatterns.push({ from: "test/in-browser/static", to: buildPath });
 }
@@ -64,7 +69,7 @@ const plugins = [
 ];
 
 //
-if (process.env.NODE_ENV === "production") {
+if (targetEnvironment === "production") {
   // Generate a stats file associated with each build
   plugins.push(
     new BundleAnalyzerPlugin({
@@ -82,13 +87,18 @@ if (process.env.NODE_ENV === "production") {
 let telemetryAppId = "org-mozilla-bergamot-test";
 let telemetryDebugMode = "true";
 
-if (process.env.NODE_ENV === "production") {
+if (targetEnvironment === "production") {
   telemetryDebugMode = "false";
-  if (process.env.UI === "firefox-infobar-ui") {
+  if (ui === "firefox-infobar-ui") {
     telemetryAppId = "org-mozilla-bergamot";
   }
-  if (process.env.UI === "cross-browser-ui") {
-    telemetryAppId = "org-mozilla-bergamot-cross-browser";
+  if (ui === "cross-browser-ui") {
+    if (targetBrowser === "firefox") {
+      telemetryAppId = "org-mozilla-bergamot-cross-browser-firefox";
+    }
+    if (targetBrowser === "chrome") {
+      telemetryAppId = "org-mozilla-bergamot-cross-browser-chrome";
+    }
   }
 }
 
@@ -102,7 +112,7 @@ plugins.push(
 // Only upload sources to Sentry if building a production build or testing the sentry plugin
 if (
   process.env.SENTRY_AUTH_TOKEN !== "foo" &&
-  (process.env.NODE_ENV === "production" ||
+  (targetEnvironment === "production" ||
     process.env.TEST_SENTRY_WEBPACK_PLUGIN === "1")
 ) {
   plugins.push(
