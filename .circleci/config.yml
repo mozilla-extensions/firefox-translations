@@ -12,7 +12,7 @@ jobs:
       # Download and cache dependencies (update the numerical cache key suffix manually to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-1
+            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-4
 
       - run:
           name: Download and import Bergamot Translator build artifacts
@@ -27,21 +27,20 @@ jobs:
           name:  Install Firefox
           command: |
             yarn get-firefox:linux
-            # Prevent any tests from using the default installed version of Firefox by accident
-            sudo rm /usr/bin/firefox || true
 
       - save_cache:
           paths:
             - downloaded-bergamot-translator-wasm-artifacts
             - node_modules
             - firefox-nightly-linux
-          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-1
+          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-4
 
       - run:
           name: Print which version of Firefox is installed
           command: |
             echo "Version of Firefox installed:"
             ./firefox-nightly-linux/firefox-bin -v
+            cat firefox-nightly-linux/platform.ini
 
       - run:
           name: Lint

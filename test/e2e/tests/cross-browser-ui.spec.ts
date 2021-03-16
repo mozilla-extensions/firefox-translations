@@ -30,6 +30,7 @@ if (process.env.UI === "cross-browser-ui") {
     });
 
     after(async function() {
+      await takeScreenshot(driver, this.test.fullTitle());
       await driver.quit();
     });
 

@@ -84,7 +84,7 @@ async function generateManifest({ dotEnvPath }) {
     manifest.applications = {
       gecko: {
         id: extensionId,
-        strict_min_version: "77.0a1",
+        strict_min_version: "88.0a1",
       },
     };
     if (ui === "cross-browser-ui") {
