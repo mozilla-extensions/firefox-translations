@@ -12,6 +12,8 @@ export const defaultFirefoxTestPreferences = {
   "extensions.experiments.enabled": true,
   "browser.proton.enabled": true,
   "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled": true,
+  "javascript.options.wasm_simd": true,
+  "javascript.options.wasm_simd_wormhole": true,
   "browser.translation.ui.show": false,
   "browser.translation.detectLanguage": false,
   "browser.aboutConfig.showWarning": false,
