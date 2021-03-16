@@ -3,10 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { config } from "../../../config";
-import {
-  BergamotTranslatorAPI,
-  TranslationResults,
-} from "./BergamotTranslatorAPI";
 import { TranslationApiClient } from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 const MS_IN_A_MINUTE = 60 * 1000;
@@ -57,7 +53,7 @@ export interface BergamotRestApiSentence {
   }[];
 }
 
-export class BergamotApiClient implements TranslationApiClient {
+export class BergamotRestApiClient implements TranslationApiClient {
   /**
    * Timeout after which we consider a ping submission failed.
    */
@@ -82,45 +78,8 @@ export class BergamotApiClient implements TranslationApiClient {
 
   public sendTranslationRequest = async (
     texts: string | string[],
-    from: string,
-    to: string,
-  ): Promise<BergamotRestApiTranslateRequestResult> => {
-    return this.sendTranslationRequestViaWASMAPI(texts, from, to);
-    // TODO: Possibly make it configurable to build/configure the extension to use the REST API - eg for performance testing / research
-    // return this.sendTranslationRequestViaRestAPI(texts, from, to);
-  };
-
-  public sendTranslationRequestViaWASMAPI = async (
-    texts: string | string[],
-    from: string,
-    to: string,
-  ): Promise<BergamotRestApiTranslateRequestResult> => {
-    if (typeof texts === "string") {
-      texts = [texts];
-    }
-    const translatorApiResults: TranslationResults = await BergamotTranslatorAPI.translate(
-      texts,
-      from,
-      to,
-    );
-    const paragraphs: BergamotRestApiParagraph[] = translatorApiResults.translatedTexts.map(
-      text => {
-        const sentenceList: BergamotRestApiSentence[] = [
-          { nBest: [{ translation: text }] },
-        ];
-        return {
-          0: sentenceList,
-        };
-      },
-    );
-    const results: BergamotRestApiTranslateRequestResult = {
-      text: paragraphs,
-    };
-    return results;
-  };
-
-  public sendTranslationRequestViaRestAPI = async (
-    texts: string | string[],
+    _from: string,
+    _to: string,
   ): Promise<BergamotRestApiTranslateRequestResult> => {
     const payload: BergamotRestApiTranslationRequestPayload = {
       text: texts,

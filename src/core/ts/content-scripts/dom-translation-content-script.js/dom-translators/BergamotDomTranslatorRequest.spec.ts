@@ -10,7 +10,7 @@ import {
   TranslationResponseData,
 } from "./BaseDomTranslator";
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
-import { BergamotApiClient } from "../../../background-scripts/background.js/lib/BergamotApiClient";
+import { BergamotWasmApiClient } from "../../../background-scripts/background.js/translation-api-clients/BergamotWasmApiClient";
 import {
   createElementShowingPlainText,
   createHeader,
@@ -64,7 +64,7 @@ describe(testSuiteName, function() {
       to,
     );
 
-    const bergamotApiClient = new BergamotApiClient();
+    const bergamotApiClient = new BergamotWasmApiClient();
     const translationResponseData: TranslationResponseData & {
       translatedPlainTextStrings: string[];
       plainStringsToTranslate: string[];

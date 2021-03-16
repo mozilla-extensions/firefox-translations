@@ -6,7 +6,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { nanoid } from "nanoid";
 import { captureExceptionWithExtras } from "./ErrorReporting";
-import { BergamotRestApiTranslateRequestResult } from "../background-scripts/background.js/lib/BergamotApiClient";
+import { BergamotRestApiTranslateRequestResult } from "../background-scripts/background.js/translation-api-clients/BergamotRestApiClient";
 
 export class ContentScriptBergamotApiClient {
   private backgroundContextPort: Port;

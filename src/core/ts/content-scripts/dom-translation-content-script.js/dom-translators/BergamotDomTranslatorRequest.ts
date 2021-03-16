@@ -11,7 +11,7 @@ import {
 import {
   BergamotRestApiParagraph,
   BergamotRestApiTranslateRequestResult,
-} from "../../../background-scripts/background.js/lib/BergamotApiClient";
+} from "../../../background-scripts/background.js/translation-api-clients/BergamotRestApiClient";
 import { detag, DetaggedString, project } from "./detagAndProject";
 
 /**

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TranslationDocument } from "../TranslationDocument";
-import { BergamotRestApiTranslateRequestResult } from "../../../background-scripts/background.js/lib/BergamotApiClient";
+import { BergamotRestApiTranslateRequestResult } from "../../../background-scripts/background.js/translation-api-clients/BergamotRestApiClient";
 import { TranslationItem } from "../TranslationItem";
 import { MinimalDomTranslator } from "./MinimalDomTranslator";
 
