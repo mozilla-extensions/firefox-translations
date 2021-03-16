@@ -4,6 +4,7 @@
 
 import { config } from "../../../config";
 import { TranslationApiClient } from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
+import { TranslationResults } from "../lib/BergamotTranslatorAPI";
 
 const MS_IN_A_MINUTE = 60 * 1000;
 
@@ -33,20 +34,20 @@ interface BergamotRestApiTranslationRequestPayload {
 /**
  * The API response format can be referred here: https://github.com/browsermt/mts
  */
-export interface BergamotRestApiTranslateRequestResult {
+interface BergamotRestApiTranslateRequestResult {
   text: BergamotRestApiParagraph[];
 }
 
 // Each 'Paragraph' contains a list of 'Sentence translation' list.
 // There should be only 1 such list.
-export interface BergamotRestApiParagraph {
+interface BergamotRestApiParagraph {
   0: BergamotRestApiSentence[];
 }
 
 // 'Sentence translation' list contains 'Sentence translation' objects
 // where each object contains all the information related to translation
 // of each sentence in source language.
-export interface BergamotRestApiSentence {
+interface BergamotRestApiSentence {
   nBest: {
     translation: string;
     sentenceScore?: string;
@@ -77,10 +78,10 @@ export class BergamotRestApiClient implements TranslationApiClient {
   };
 
   public sendTranslationRequest = async (
-    texts: string | string[],
+    texts: string[],
     _from: string,
     _to: string,
-  ): Promise<BergamotRestApiTranslateRequestResult> => {
+  ): Promise<TranslationResults> => {
     const payload: BergamotRestApiTranslationRequestPayload = {
       text: texts,
       options: {
@@ -113,8 +114,87 @@ export class BergamotRestApiClient implements TranslationApiClient {
     if (!dataResponse.ok) {
       throw new Error("Data response failed");
     }
-    const parsedResponse = await dataResponse.json();
+    const parsedResponse: BergamotRestApiTranslateRequestResult = await dataResponse.json();
     // console.log({ parsedResponse });
-    return parsedResponse;
+
+    const originalTexts = texts;
+    const translatedTexts = [];
+    const qeAnnotatedTranslatedTexts = [];
+
+    parsedResponse.text.map((paragraph: BergamotRestApiParagraph) => {
+      const translationObjects = getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
+        paragraph,
+      );
+
+      // TODO: Currently the rest server doesn't retain the leading/trailing
+      // whitespace information of sentences. It is a bug on rest server side.
+      // Once it is fixed there, we need to stop appending whitespaces.
+      const separator = " ";
+
+      // Join sentence translations
+      const translatedPlainTextString = translationObjects
+        .map(({ translation }) => translation)
+        .join(separator);
+
+      translatedTexts.push(translatedPlainTextString);
+
+      // Generate QE Annotated HTML for each sentence
+      const qeAnnotatedSentenceHTMLs = translationObjects.map(
+        ({ translation, sentenceScore }) =>
+          generateQEAnnotatedHTML(translation, sentenceScore),
+      );
+      const qeAnnotatedTranslatedMarkup = qeAnnotatedSentenceHTMLs.join(
+        separator,
+      );
+      qeAnnotatedTranslatedTexts.push(qeAnnotatedTranslatedMarkup);
+    });
+
+    return {
+      originalTexts,
+      translatedTexts,
+      qeAnnotatedTranslatedTexts,
+    };
   };
+}
+
+/**
+ * This function parses 'Paragraph' entity of the response for the
+ * the best translations and returns them
+ */
+function getBestTranslationObjectsOfEachSentenceInBergamotRestApiParagraph(
+  paragraph: BergamotRestApiParagraph,
+) {
+  const bestTranslations = [];
+  paragraph[0].forEach(sentenceTranslationList => {
+    // Depending on the request, there might be multiple 'best translations'.
+    // We are fetching the best one (present in 'translation' field).
+    const bestTranslation = sentenceTranslationList.nBest[0];
+    bestTranslations.push(bestTranslation);
+  });
+  return bestTranslations;
+}
+
+/**
+ * This function generates the Quality Estimation annotated HTML of a string
+ * based on its score.
+ *
+ * @param   translation    input string
+ * @param   score          score of the input string
+ * @returns string         QE annotated HTML of input string
+ */
+function generateQEAnnotatedHTML(translation, score) {
+  // Color choices and thresholds below are chosen based on intuitiveness.
+  // They will be changed according to the UI design of Translator once it
+  // is fixed.
+  let color: string;
+  if (score >= -0.2) {
+    color = "green";
+  } else if (score >= -0.5 && score < -0.2) {
+    color = "black";
+  } else if (score >= -0.8 && score < -0.5) {
+    color = "mediumvioletred";
+  } else {
+    color = "red";
+  }
+  return `<span data-translation-qe-score="${score}" style="color:${color}"> ${translation}</span>`;
 }

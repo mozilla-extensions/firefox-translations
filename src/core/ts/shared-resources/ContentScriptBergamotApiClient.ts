@@ -6,7 +6,7 @@ import { browser, Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { nanoid } from "nanoid";
 import { captureExceptionWithExtras } from "./ErrorReporting";
-import { BergamotRestApiTranslateRequestResult } from "../background-scripts/background.js/translation-api-clients/BergamotRestApiClient";
+import { TranslationResults } from "../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export class ContentScriptBergamotApiClient {
   private backgroundContextPort: Port;
@@ -20,13 +20,13 @@ export class ContentScriptBergamotApiClient {
     texts: string[],
     from: string,
     to: string,
-  ): Promise<BergamotRestApiTranslateRequestResult> {
+  ): Promise<TranslationResults> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
       const resultsMessageListener = async (m: {
         translationRequestResults?: {
           requestId: string;
-          results: BergamotRestApiTranslateRequestResult;
+          results: TranslationResults;
         };
       }) => {
         if (m.translationRequestResults) {
@@ -54,10 +54,5 @@ export class ContentScriptBergamotApiClient {
         requestId,
       });
     });
-  }
-  parseNbestTranslationsFromResponse(parsedResponse) {
-    return parsedResponse.text.map(translation =>
-      translation[0] ? translation[0][0].nBest[0].translation : "",
-    );
   }
 }

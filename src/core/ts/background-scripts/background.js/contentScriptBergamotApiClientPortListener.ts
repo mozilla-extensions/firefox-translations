@@ -5,7 +5,7 @@
 import { BergamotWasmApiClient } from "./translation-api-clients/BergamotWasmApiClient";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
-import { BergamotRestApiTranslateRequestResult } from "./translation-api-clients/BergamotRestApiClient";
+import { TranslationResults } from "./lib/BergamotTranslatorAPI";
 const bergamotApiClient = new BergamotWasmApiClient();
 // TODO: Possibly make it configurable to build/configure the extension to use the REST API - eg for performance testing / research
 // const bergamotApiClient = new BergamotRestApiClient();
@@ -22,7 +22,7 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, from, to, requestId } = m;
-    const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
+    const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
       texts,
       from,
       to,
