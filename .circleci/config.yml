@@ -12,7 +12,7 @@ jobs:
       # Download and cache dependencies (update the numerical cache key suffix manually to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-3
+            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-4
 
       - run:
           name: Download and import Bergamot Translator build artifacts
@@ -33,7 +33,7 @@ jobs:
             - downloaded-bergamot-translator-wasm-artifacts
             - node_modules
             - firefox-nightly-linux
-          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-3
+          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-4
 
       - run:
           name: Print which version of Firefox is installed
