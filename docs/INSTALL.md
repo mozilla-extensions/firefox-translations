@@ -27,8 +27,6 @@ There are three flavors:
 - If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) since the current release requires bleeding edge browser capabilities.
 - Make sure that the following preferences are set to `true` in `about:config`:
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-  - `javascript.options.wasm_simd`
-  - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
@@ -56,8 +54,6 @@ There are three flavors:
   - `extensions.experiments.enabled`
   - `browser.proton.enabled`
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-  - `javascript.options.wasm_simd`
-  - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
