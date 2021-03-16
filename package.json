@@ -162,7 +162,7 @@
     "build:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=production; npm-run-all just-build",
     "clean": "trash build/${NODE_ENV}/${TARGET_BROWSER}/${UI}/",
     "clean:test": "trash test/build",
-    "e2e-tests": "concurrently --kill-others 'npm-run-all -n e2e-tests:firefox-infobar-ui e2e-tests:cross-browser-ui:firefox' 'yarn serve-fixtures --port 4001' 'yarn geckodriver -vv 1> test/e2e/results/logs/geckodriver.log 2> test/e2e/results/logs/geckodriver.errors.log' || true",
+    "e2e-tests": "concurrently --success first --kill-others 'npm-run-all -n e2e-tests:firefox-infobar-ui e2e-tests:cross-browser-ui:firefox' 'yarn serve-fixtures --port 4001' 'yarn geckodriver -vv 1> test/e2e/results/logs/geckodriver.log 2> test/e2e/results/logs/geckodriver.errors.log'",
     "e2e-tests:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/production/firefox/cross-browser-ui/bergamot-browser-extension-$npm_package_version-firefox-cross-browser-ui.xpi GECKODRIVER_URL=http://127.0.0.1:4444; ts-mocha -p test/e2e/tsconfig.json test/e2e/tests/*.spec.ts --bail --full-trace",
     "e2e-tests:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/production/firefox/firefox-infobar-ui/bergamot-browser-extension-$npm_package_version-firefox-infobar-ui.xpi GECKODRIVER_URL=http://127.0.0.1:4444; ts-mocha -p test/e2e/tsconfig.json test/e2e/tests/*.spec.ts --bail --full-trace",
     "format": "npm-run-all -s -n format:prettier format:docs format:eslint format:fixpack",

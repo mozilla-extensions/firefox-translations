@@ -73,6 +73,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     });
 
     after(async function() {
+      await takeScreenshot(driver, this.test.fullTitle());
       await driver.quit();
     });
 

@@ -1,4 +1,4 @@
 [submodule "bergamot-translator"]
 	path = bergamot-translator
 	url = https://github.com/mozilla/bergamot-translator.git
-	branch = wasm-integration
+	branch = main
