@@ -101,40 +101,9 @@ shortlist:
     const request = new Module.TranslationRequest();
     const input = new Module.VectorString();
 
-    const originalTextIndexSentenceOrdinalMap = new Map();
-
-    // Initialize the input
-    let sentenceOrdinal = 0;
-    const sentencesToTranslate = [];
-    texts.forEach((text, originalTextIndex) => {
-      translationResults.originalTexts.push(text);
-
-      // Temporary naive sentence splitter
-      const sentences = text.trim().split(". ");
-      // console.debug({ sentences });
-      sentences.forEach((sentence, sentenceIndex) => {
-        const trimmedSentence = sentence.trim();
-        if (trimmedSentence === "") {
-          return;
-        }
-        originalTextIndexSentenceOrdinalMap.set(
-          sentenceOrdinal,
-          originalTextIndex,
-        );
-        const originalSentenceEndedWithAPeriod =
-          sentenceIndex > 0 ||
-          (sentences.length === 1 && text.trim().indexOf(". ") > 0);
-        const sentenceToTranslate = `${trimmedSentence}${
-          originalSentenceEndedWithAPeriod ? "." : ""
-        }`;
-        // console.debug({text, trimmedSentence, sentences, sentenceIndex, originalSentenceEndedWithAPeriod, sentenceToTranslate});
-        sentencesToTranslate.push(sentenceToTranslate);
-        sentenceOrdinal++;
-      });
-    });
-
-    sentencesToTranslate.forEach(sentence => {
-      input.push_back(sentence);
+    // Add texts to translate
+    texts.forEach(text => {
+      input.push_back(text);
     });
 
     // Access input (just for debugging)
@@ -145,58 +114,20 @@ shortlist:
     }
     */
 
-    // translate the input; the result is a vector<TranslationResult>
+    // Translate the input; the result is a vector<TranslationResult>
     const result = model.translate(input, request);
 
     // Access input after translation (just for debugging)
     console.debug("Input size after translate API call =", input.size());
-    /*
-    for (let i = 0; i < input.size(); i++) {
-      console.debug(" val:" + input.get(i));
-    }
-    */
 
     // Access original and translated text from each entry of vector<TranslationResult>
     console.debug("Result size=", result.size());
-    const originalSentencesByOriginalTextIndex = [];
-    const translatedSentencesByOriginalTextIndex = [];
-    for (
-      let $sentenceOrdinal = 0;
-      $sentenceOrdinal < result.size();
-      $sentenceOrdinal++
-    ) {
-      const originalText = result.get($sentenceOrdinal).getOriginalText();
-      const translatedText = result.get($sentenceOrdinal).getTranslatedText();
-      // console.debug(" original={" + originalText + "}, translation={" + translatedText + "}", { $sentenceOrdinal },);
-      const originalTextIndex = originalTextIndexSentenceOrdinalMap.get(
-        $sentenceOrdinal,
-      );
-      // console.debug({ originalTextIndex });
-      if (!originalSentencesByOriginalTextIndex[originalTextIndex]) {
-        originalSentencesByOriginalTextIndex[originalTextIndex] = [];
-      }
-      originalSentencesByOriginalTextIndex[originalTextIndex].push(
-        originalText,
-      );
-      if (!translatedSentencesByOriginalTextIndex[originalTextIndex]) {
-        translatedSentencesByOriginalTextIndex[originalTextIndex] = [];
-      }
-      translatedSentencesByOriginalTextIndex[originalTextIndex].push(
-        translatedText,
-      );
+    for (let i = 0; i < result.size(); i++) {
+      const originalText = result.get(i).getOriginalText();
+      const translatedText = result.get(i).getTranslatedText();
+      translationResults.originalTexts.push(originalText);
+      translationResults.translatedTexts.push(translatedText);
     }
-
-    // console.debug({ originalSentencesByOriginalTextIndex, translatedSentencesByOriginalTextIndex });
-
-    translatedSentencesByOriginalTextIndex.forEach(
-      (translatedSentences, originalTextIndex) => {
-        translationResults.translatedTexts[
-          originalTextIndex
-        ] = translatedSentences.join(" ");
-      },
-    );
-
-    // console.debug("translationResults.translatedTexts", translationResults.translatedTexts);
 
     // Clean up the instances
     request.delete();
