@@ -66,6 +66,7 @@ interface TranslateRequestWorkerMessage extends WorkerMessage {
 export interface TranslationResults {
   originalTexts: string[];
   translatedTexts: string[];
+  qeAnnotatedTranslatedTexts?: string[];
 }
 
 /* eslint-disable no-unused-vars, no-shadow */

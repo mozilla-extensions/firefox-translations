@@ -17,9 +17,6 @@ export class Translator {
       originLanguage,
       targetLanguage,
     );
-    const nbestTranslations = this.bergamotApiClient.parseNbestTranslationsFromResponse(
-      translationResults,
-    );
-    return nbestTranslations[0];
+    return translationResults.translatedTexts[0];
   }
 }

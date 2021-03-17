@@ -2,13 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  BergamotApiClient,
-  BergamotRestApiTranslateRequestResult,
-} from "./lib/BergamotApiClient";
+import { BergamotWasmApiClient } from "./translation-api-clients/BergamotWasmApiClient";
+import { BergamotRestApiClient } from "./translation-api-clients/BergamotRestApiClient";
 import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
-const bergamotApiClient = new BergamotApiClient();
+import { TranslationResults } from "./lib/BergamotTranslatorAPI";
+import { config } from "../../config";
+
+// Currently it is possible build variants of the extension that uses the REST API - eg for performance testing / research
+const bergamotApiClient = config.useBergamotRestApi
+  ? new BergamotRestApiClient()
+  : new BergamotWasmApiClient();
 
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   if (port.name !== "port-from-content-script-bergamot-api-client") {
@@ -22,7 +26,7 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, from, to, requestId } = m;
-    const results: BergamotRestApiTranslateRequestResult = await bergamotApiClient.sendTranslationRequest(
+    const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
       texts,
       from,
       to,

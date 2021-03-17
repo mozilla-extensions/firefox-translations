@@ -1,5 +1,6 @@
 export const config = {
   bergamotRestApiUrl: process.env.BERGAMOT_REST_API_INBOUND_URL,
+  useBergamotRestApi: process.env.USE_BERGAMOT_REST_API === "1",
   sentryDsn: process.env.SENTRY_DSN,
   telemetryAppId: process.env.TELEMETRY_APP_ID,
   telemetryDebugMode: process.env.NODE_ENV !== "production",
