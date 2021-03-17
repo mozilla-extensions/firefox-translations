@@ -134,14 +134,6 @@ export class NativeTranslateUiBroker {
         // supportedTargetLanguagesGivenDefaultSourceLanguage,
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
-      // todo: move to an appropriate place
-      /*
-      Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
-      Telemetry.global.record(
-        () => toLang.set(defaultTargetLanguage),
-        "toLang",
-      );
-       */
 
       return {
         acceptedTargetLanguages,

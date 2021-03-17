@@ -6,6 +6,31 @@ import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { config } from "../../../config";
 
+/*
+    Telemetry.global.record(() => fromLang.set(from), "fromLang");
+    Telemetry.global.record(() => toLang.set(to), "toLang");
+
+    // todo: replace to timespan when it is supported
+    Telemetry.global.record(
+      () => modelLoadTime.set(String(loadModelEnd - loadModelStart)),
+      "loadModelTime",
+    );
+
+    // todo: replace to timespan when it is supported
+    Telemetry.global.record(
+      () => translationTime.set(String(timeSpentMs)),
+      "translateTime",
+    );
+
+    // todo: replace to quantity when it is supported
+    Telemetry.global.record(
+      () => wordsPerSecond.set(String(speed)),
+      "translateSpeed",
+    );
+
+    Telemetry.global.submit();
+ */
+
 export class Telemetry {
   private static _instance = null;
   private _metricsToSubmit;

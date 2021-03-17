@@ -6,13 +6,6 @@
 
 import { browser } from "webextension-polyfill-ts";
 import { nanoid } from "nanoid";
-import { Telemetry } from "../telemetry/Telemetry";
-import {
-  translationTime,
-  modelLoadTime,
-  wordsPerSecond,
-} from "../telemetry/generated/performance";
-import { fromLang, toLang } from "../telemetry/generated/metadata";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've loaded/processed large models/translations
@@ -245,7 +238,6 @@ class TranslationRequestManager {
       await this.processNextItemInQueue();
     }
     this.processing = false;
-    Telemetry.global.submit();
   }
 
   async processNextItemInQueue() {
@@ -256,8 +248,6 @@ class TranslationRequestManager {
     const { loadModelParams } = translateParams;
     const { from, to } = loadModelParams;
     const languagePair = `${from}${to}`;
-    Telemetry.global.record(() => fromLang.set(from), "fromLang");
-    Telemetry.global.record(() => toLang.set(to), "toLang");
 
     // First check if we need to load a model
     if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {
@@ -272,11 +262,8 @@ class TranslationRequestManager {
       this.loadedLanguagePair = languagePair;
 
       const loadModelEnd = performance.now();
-      // todo: replace to timespan when it is supported
-      Telemetry.global.record(
-        () => modelLoadTime.set(String(loadModelEnd - loadModelStart)),
-        "loadModelTime",
-      );
+      const loadModelDuration = loadModelEnd - loadModelStart;
+      console.info({ loadModelDuration });
     }
 
     // Send the translation request
@@ -288,23 +275,14 @@ class TranslationRequestManager {
     this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
 
     const end = performance.now();
-    // todo: replace to timespan when it is supported
     const timeSpentMs = end - start;
-    Telemetry.global.record(
-      () => translationTime.set(String(timeSpentMs)),
-      "translateTime",
-    );
 
     // we might want to pass this info from wasm if it exists
     const wordsNumber = translateParams.texts
       .map(x => x.split(" ").length)
       .reduce((a, b) => a + b, 0);
     const speed = Math.floor((wordsNumber / timeSpentMs) * 1000);
-    // todo: replace to quantity when it is supported
-    Telemetry.global.record(
-      () => wordsPerSecond.set(String(speed)),
-      "translateSpeed",
-    );
+    console.info({ speed });
   }
 
   async translate(
