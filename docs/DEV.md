@@ -10,15 +10,22 @@
   - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
     - [Firefox](#firefox)
+    - [Firefox - Infobar UI](#firefox---infobar-ui)
+    - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
+    - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
     - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
-  - [Run end-to-end functional tests](#run-end-to-end-functional-tests)
+  - [Run end-to-end tests](#run-end-to-end-tests)
     - [Locally](#locally)
     - [Continuous Integration](#continuous-integration)
     - [Troubleshooting functional tests](#troubleshooting-functional-tests)
   - [Troubleshooting the extension when it is running](#troubleshooting-the-extension-when-it-is-running)
-    - [Firefox](#firefox-1)
+    - [Firefox - Infobar UI](#firefox---infobar-ui-1)
+    - [Firefox - Cross-browser UI](#firefox---cross-browser-ui-1)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
+    - [Firefox - Infobar UI](#firefox---infobar-ui-2)
+    - [Chrome - Cross-browser UI](#chrome---cross-browser-ui-1)
+    - [Firefox - Cross-browser UI](#firefox---cross-browser-ui-2)
   - [Opening up specific extension pages](#opening-up-specific-extension-pages)
   - [Enabling error reporting via Sentry](#enabling-error-reporting-via-sentry)
 
@@ -44,6 +51,10 @@ To use artifacts that are known to work (built by bergamot-translator's CI):
 yarn bergamot-translator:download-and-import
 ```
 
+Re-run this command any time there has been an update to `src/core/static/wasm/bergamot-translator-worker.appendix.js`.
+
+Note: Once this command has run, it will create a folder called `downloaded-bergamot-translator-wasm-artifacts` and if this folder exists, it will not re-download the artifacts again. Thus, to make sure that you are using the most up to date WASM artifacts, remove the `downloaded-bergamot-translator-wasm-artifacts` folder, then re-run the command.
+
 ## Building Bergamot Translator WASM artifacts and importing them to the extension
 
 If you are actively changing files in [bergamot-translator](../bergamot-translator/README.md), run the following to build and import locally built WASM artifacts:
@@ -52,7 +63,7 @@ If you are actively changing files in [bergamot-translator](../bergamot-translat
 yarn bergamot-translator:build-and-import
 ```
 
-Repeat this process any time there has been an update in the bergamot-translator submodule.
+Re-run this command any time there has been an update in the bergamot-translator submodule, or after `src/core/static/wasm/bergamot-translator-worker.appendix.js` has been changed.
 
 ## Creating extension builds for distribution
 
@@ -62,7 +73,7 @@ To build for Firefox:
 yarn build:cross-browser-ui:firefox
 ```
 
-The build artifact will be created under `dist/firefox/extension-ui`.
+The build artifact will be created under `dist/production/firefox/cross-browser-ui`.
 
 For Chrome:
 
@@ -70,7 +81,7 @@ For Chrome:
 yarn build:cross-browser-ui:chrome
 ```
 
-The build artifact will be created under `dist/chrome/extension-ui`.
+The build artifact will be created under `dist/production/chrome/cross-browser-ui`.
 
 To build the Firefox native UI variant:
 
@@ -78,7 +89,7 @@ To build the Firefox native UI variant:
 yarn build:firefox-infobar-ui
 ```
 
-The build artifact will be created under `dist/firefox/firefox-infobar-ui`.
+The build artifact will be created under `dist/production/firefox/firefox-infobar-ui`.
 
 ## Development mode
 
@@ -88,21 +99,25 @@ If you haven't already, download and install Firefox Nightly from [here](https:/
 
 ### Firefox
 
-```bash
-yarn watch
-```
-
-Or, for the Firefox native UI variant:
+### Firefox - Infobar UI
 
 ```bash
 yarn watch:firefox-infobar-ui
 ```
 
-### Chrome
+### Chrome - Cross-browser UI
 
 ```bash
 yarn watch:cross-browser-ui:chrome
 ```
+
+### Firefox - Cross-browser UI
+
+```bash
+yarn watch:cross-browser-ui:firefox
+```
+
+### Chrome
 
 ## Creating a signed build of the extension for self-distribution
 
@@ -112,25 +127,25 @@ After version bumping and setting the API_KEY and API_SECRET env vars:
 yarn build:cross-browser-ui:firefox && npx web-ext sign --api-key $API_KEY --api-secret $API_SECRET
 ```
 
-Note: This is for Firefox and non-native UI only. Chrome Web Store does not offer signed builds for self-distribution.
+Note: This is for Firefox version with the cross-browser UI only. Chrome Web Store does not offer signed builds for self-distribution and the Firefox infobar UI version gets signed via a separate process.
 
-## Run end-to-end functional tests
+## Run end-to-end tests
 
 ### Locally
 
 ```bash
-yarn functional-tests
+yarn e2e-tests
 ```
 
 ### Continuous Integration
 
-End-to-end functional tests are run against each new commits/PRs. Read more about the current CI setup [here](./CI.md).
+End-to-end tests are run against each new commits/PRs. Read more about the current CI setup [here](./CI.md).
 
 ### Troubleshooting functional tests
 
 **Basic principles**
 
-Functional tests are run using the built extension artifacts found in `dist/`. To test new non-test-related code changes, remember to re-run the relevant build command.
+End-to-end tests are run using the built extension artifacts found in `dist/production/`. To test new non-test-related code changes, remember to re-run the relevant build command.
 
 **Intervening**
 
@@ -142,46 +157,48 @@ If you want to intervene in a test (eg. to double-check something), follow this 
 
 **Obtaining Geckodriver logs**
 
-To troubleshoot issues with failing tests when only cryptic error messages are available, check the geckodriver logs, located in `test/functional/results/logs/`.
+To troubleshoot issues with failing tests when only cryptic error messages are available, check the geckodriver logs, located in `test/e2e/results/logs/`.
 
 ## Troubleshooting the extension when it is running
 
-### Firefox
+Hint: To produce a clean log output for forwarding to developers / attaching to issues, first click the Trash can icon in the top left before repeating the steps that leads to the erroneous behavior.
 
-1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
-2. Click Console
-
-Or, for the Firefox native UI variant:
+### Firefox - Infobar UI
 
 1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40mozilla.org`
 2. Click Console
 
-To produce a clean log output for forwarding to developers / attaching to issues, first click the Trash can icon in the top left before repeating the steps that leads to the erroneous behavior.
+### Firefox - Cross-browser UI
+
+1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
+2. Click Console
 
 ## Analyze webpack bundle size
 
-Firefox:
-
-```bash
-yarn build:cross-browser-ui:firefox
-npx webpack-bundle-analyzer build/firefox/extension-ui.stats.json build/firefox/extension-ui
-```
-
-Chrome:
-
-```bash
-yarn build:cross-browser-ui:chrome
-npx webpack-bundle-analyzer build/chrome/extension-ui.stats.json build/chrome/extension-ui
-```
-
-Firefox native UI variant:
+### Firefox - Infobar UI
 
 ```bash
 yarn build:firefox-infobar-ui
-npx webpack-bundle-analyzer build/firefox/firefox-infobar-ui.stats.json build/firefox/firefox-infobar-ui
+npx webpack-bundle-analyzer build/production/firefox/firefox-infobar-ui.stats.json build/production/firefox/firefox-infobar-ui
+```
+
+### Chrome - Cross-browser UI
+
+```bash
+yarn build:cross-browser-ui:chrome
+npx webpack-bundle-analyzer build/production/chrome/cross-browser-ui.stats.json build/production/chrome/cross-browser-ui
+```
+
+### Firefox - Cross-browser UI
+
+```bash
+yarn build:cross-browser-ui:firefox
+npx webpack-bundle-analyzer build/production/firefox/cross-browser-ui.stats.json build/production/firefox/cross-browser-ui
 ```
 
 ## Opening up specific extension pages
+
+(Only relevant when developing the Cross-browser UI)
 
 From the background context:
 
