@@ -34,14 +34,14 @@ async function generateManifest({ dotEnvPath }) {
       {
         js: ["commons.js"],
         matches: ["<all_urls>"],
-        all_frames: false,
+        all_frames: true,
         run_at: "document_idle",
         match_about_blank: false,
       },
       {
         js: ["dom-translation-content-script.js"],
         matches: ["<all_urls>"],
-        all_frames: false,
+        all_frames: true,
         run_at: "document_idle",
         match_about_blank: false,
       },
