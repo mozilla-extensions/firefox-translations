@@ -4,14 +4,10 @@ import { installExtension, launchFirefox } from "../utils/setupWebdriver";
 import { lookForPageElement } from "../utils/lookForElement";
 import { navigateToURL } from "../utils/navigateToURL";
 import { By } from "selenium-webdriver";
-import {
-  assertElementDoesNotExist,
-  assertElementExists,
-} from "../utils/assertElement";
+import { assertElementExists } from "../utils/assertElement";
 import { takeScreenshot } from "../utils/takeScreenshot";
 import {
   assertInfobarIsShown,
-  lookForInfobar,
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../utils/translation";
@@ -33,14 +29,14 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
   );
 }
 
-let tabsCurrentlyOpened = 1;
+const tabsCurrentlyOpened = 1;
 
-const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
+const fixtureUrl = "http://0.0.0.0:4001/multiple-frames.html";
 const maxToleratedModelLoadingDurationInSeconds = 20;
 const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
-  describe("Infobar interactions", function() {
+  describe("Multiple frames", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
       (15 +
@@ -63,14 +59,7 @@ if (process.env.UI === "firefox-infobar-ui") {
       await driver.quit();
     });
 
-    it("The translation infobar is not shown on eg about:debugging", async function() {
-      await navigateToURL(driver, "about:debugging");
-      const infobarElement = await lookForInfobar(driver, tabsCurrentlyOpened);
-      assertElementDoesNotExist(infobarElement, "infobarElement");
-      await takeScreenshot(driver, this.test.fullTitle());
-    });
-
-    it("The translation infobar is shown on a web-page with Spanish content", async function() {
+    it("The translation infobar is shown on a multi-frame web-page with Spanish content", async function() {
       // ... this test continues the session from the previous test
       await navigateToURL(driver, fixtureUrl);
       await assertInfobarIsShown(driver, tabsCurrentlyOpened);
@@ -99,52 +88,15 @@ if (process.env.UI === "firefox-infobar-ui") {
       assertElementExists(translatedPageElement, "translatedPageElement");
     };
 
-    it("Translation via the infobar works", async function() {
+    it("Translation of all frames", async function() {
       // ... this test continues the session from the previous test
       await assertOriginalPageElementExists();
       await translateViaInfobar(driver, tabsCurrentlyOpened);
+      await assertTranslationSucceeded();
+      const iframe = driver.findElement(By.css("iframe"));
+      await driver.switchTo().frame(iframe);
       await assertTranslationSucceeded();
       await takeScreenshot(driver, this.test.fullTitle());
-    });
-
-    it("Translation via the infobar works after further navigations", async function() {
-      // ... this test continues the session from the previous test
-      await navigateToURL(driver, fixtureUrl);
-      await assertOriginalPageElementExists();
-      await translateViaInfobar(driver, tabsCurrentlyOpened);
-      await assertTranslationSucceeded();
-      await takeScreenshot(
-        driver,
-        `${this.test.fullTitle()} - After navigation 1`,
-      );
-      await navigateToURL(driver, fixtureUrl);
-      await assertOriginalPageElementExists();
-      await translateViaInfobar(driver, tabsCurrentlyOpened);
-      await assertTranslationSucceeded();
-      await takeScreenshot(
-        driver,
-        `${this.test.fullTitle()} - After navigation 2`,
-      );
-    });
-
-    it("Translation via the infobar works when translating in multiple tabs at the same time", async function() {
-      // ... this test continues the session from the previous test
-      await driver.switchTo().newWindow("tab");
-      tabsCurrentlyOpened++;
-      await navigateToURL(driver, fixtureUrl);
-      await assertOriginalPageElementExists();
-      await translateViaInfobar(driver, tabsCurrentlyOpened);
-      const originalWindow = await driver.getWindowHandle();
-      await driver.switchTo().newWindow("tab");
-      tabsCurrentlyOpened++;
-      await navigateToURL(driver, fixtureUrl);
-      await assertOriginalPageElementExists();
-      await translateViaInfobar(driver, tabsCurrentlyOpened);
-      await assertTranslationSucceeded();
-      await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 2`);
-      await driver.switchTo().window(originalWindow);
-      await assertTranslationSucceeded();
-      await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 1`);
     });
   });
 }
