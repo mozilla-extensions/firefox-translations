@@ -9,11 +9,9 @@
   - [Building Bergamot Translator WASM artifacts and importing them to the extension](#building-bergamot-translator-wasm-artifacts-and-importing-them-to-the-extension)
   - [Creating extension builds for distribution](#creating-extension-builds-for-distribution)
   - [Development mode](#development-mode)
-    - [Firefox](#firefox)
     - [Firefox - Infobar UI](#firefox---infobar-ui)
     - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
     - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
-    - [Chrome](#chrome)
   - [Creating a signed build of the extension for self-distribution](#creating-a-signed-build-of-the-extension-for-self-distribution)
   - [Run end-to-end tests](#run-end-to-end-tests)
     - [Locally](#locally)
@@ -97,8 +95,6 @@ This will build the extension, launch the browser, install the extension and sta
 
 If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) before running the below commands.
 
-### Firefox
-
 ### Firefox - Infobar UI
 
 ```bash
@@ -116,8 +112,6 @@ yarn watch:cross-browser-ui:chrome
 ```bash
 yarn watch:cross-browser-ui:firefox
 ```
-
-### Chrome
 
 ## Creating a signed build of the extension for self-distribution
 
