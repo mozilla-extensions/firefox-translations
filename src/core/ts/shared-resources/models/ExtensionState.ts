@@ -76,4 +76,69 @@ export class ExtensionState extends Model({
       translateOwnTextTranslationStateMapKey(translateOwnTextTranslationState),
     );
   }
+
+  private tabSpecificDocumentTranslationStates(tabId) {
+    const result = [];
+    this.documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (documentTranslationState.tabId === tabId) {
+          result.push(documentTranslationState);
+        }
+      },
+    );
+    return result;
+  }
+
+  public requestTranslationOfAllFramesInTab(tabId, from, to) {
+    // Request translation of all frames in a specific tab
+    this.tabSpecificDocumentTranslationStates(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["translateFrom"],
+            value: from,
+          },
+          {
+            op: "replace",
+            path: ["translateTo"],
+            value: to,
+          },
+          {
+            op: "replace",
+            path: ["translationRequested"],
+            value: true,
+          },
+        ]);
+      },
+    );
+  }
+
+  public showOriginalInTab(tabId: number) {
+    this.tabSpecificDocumentTranslationStates(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["showOriginal"],
+            value: true,
+          },
+        ]);
+      },
+    );
+  }
+
+  public hideOriginalInTab(tabId: number) {
+    this.tabSpecificDocumentTranslationStates(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["showOriginal"],
+            value: false,
+          },
+        ]);
+      },
+    );
+  }
 }

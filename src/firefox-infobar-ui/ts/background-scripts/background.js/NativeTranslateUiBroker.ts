@@ -210,44 +210,11 @@ export class NativeTranslateUiBroker {
     );
   }
 
-  getDocumentTranslationStatesByTabId(tabId) {
-    const { extensionState } = this;
-    const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentTabDocumentTranslationStates = [];
-    documentTranslationStates.forEach(
-      (documentTranslationState: DocumentTranslationState) => {
-        if (documentTranslationState.tabId === tabId) {
-          currentTabDocumentTranslationStates.push(documentTranslationState);
-        }
-      },
-    );
-    return currentTabDocumentTranslationStates;
-  }
-
-  translateAllFramesInTab(tabId, from, to) {
+  async translateAllFramesInTab(tabId, from, to) {
+    // A translation session starts when a translation is requested in a
+    // specific tab and ends when all translations in that tab has completed
     // Request translation of all frames in a specific tab
-    this.getDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["translateFrom"],
-            value: from,
-          },
-          {
-            op: "replace",
-            path: ["translateTo"],
-            value: to,
-          },
-          // TODO: NOT LIKE THIS:
-          {
-            op: "replace",
-            path: ["translationRequested"],
-            value: true,
-          },
-        ]);
-      },
-    );
+    this.extensionState.requestTranslationOfAllFramesInTab(tabId, from, to);
   }
 
   onSelectTranslateFrom(tabId) {
@@ -281,45 +248,20 @@ export class NativeTranslateUiBroker {
       () => translate.record(),
       "onTranslateButtonPressed",
     );
-
-    // A translation session starts when a translation is requested in a
-    // specific tab and ends when all translations in that tab has completed
     this.translateAllFramesInTab(tabId, from, to);
   }
 
   onShowOriginalButtonPressed(tabId) {
     console.debug("onShowOriginalButtonPressed", { tabId });
-    this.getDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["showOriginal"],
-            value: true,
-          },
-        ]);
-      },
-    );
+    this.extensionState.showOriginalInTab(tabId);
   }
 
   onShowTranslatedButtonPressed(tabId) {
     console.debug("onShowTranslatedButtonPressed", { tabId });
-    this.getDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["showOriginal"],
-            value: false,
-          },
-        ]);
-      },
-    );
+    this.extensionState.hideOriginalInTab(tabId);
   }
 
   async stop() {
-    Telemetry.global.submit();
-
     await browserWithExperimentAPIs.experiments.translateUi.stop();
     this.eventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[
