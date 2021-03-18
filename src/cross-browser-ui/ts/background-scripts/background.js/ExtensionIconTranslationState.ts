@@ -27,6 +27,8 @@ export class ExtensionIconTranslationState {
       async (documentTranslationStates, _previousDocumentTranslationStates) => {
         // console.log("documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
+        // To make things a bit simpler, we let the ui reflect only the translation state of the top frame in each tab
+        // and assume that child frames (if present) are in a similar state
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],

@@ -185,6 +185,8 @@ export class NativeTranslateUiBroker {
     onSnapshot(
       this.extensionState.$.documentTranslationStates,
       async (documentTranslationStates, _previousDocumentTranslationStates) => {
+        // To make things a bit simpler, we let the ui reflect only the translation state of the top frame in each tab
+        // and assume that child frames (if present) are in a similar state
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
@@ -208,18 +210,44 @@ export class NativeTranslateUiBroker {
     );
   }
 
-  getFrameDocumentTranslationStatesByTabId(tabId) {
+  getDocumentTranslationStatesByTabId(tabId) {
     const { extensionState } = this;
     const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentFrameDocumentTranslationStates = [];
+    const currentTabDocumentTranslationStates = [];
     documentTranslationStates.forEach(
       (documentTranslationState: DocumentTranslationState) => {
         if (documentTranslationState.tabId === tabId) {
-          currentFrameDocumentTranslationStates.push(documentTranslationState);
+          currentTabDocumentTranslationStates.push(documentTranslationState);
         }
       },
     );
-    return currentFrameDocumentTranslationStates;
+    return currentTabDocumentTranslationStates;
+  }
+
+  translateAllFramesInTab(tabId, from, to) {
+    // Request translation of all frames in a specific tab
+    this.getDocumentTranslationStatesByTabId(tabId).forEach(
+      (dts: DocumentTranslationState) => {
+        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
+          {
+            op: "replace",
+            path: ["translateFrom"],
+            value: from,
+          },
+          {
+            op: "replace",
+            path: ["translateTo"],
+            value: to,
+          },
+          // TODO: NOT LIKE THIS:
+          {
+            op: "replace",
+            path: ["translationRequested"],
+            value: true,
+          },
+        ]);
+      },
+    );
   }
 
   onSelectTranslateFrom(tabId) {
@@ -254,32 +282,14 @@ export class NativeTranslateUiBroker {
       "onTranslateButtonPressed",
     );
 
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["translateFrom"],
-            value: from,
-          },
-          {
-            op: "replace",
-            path: ["translateTo"],
-            value: to,
-          },
-          {
-            op: "replace",
-            path: ["translationRequested"],
-            value: true,
-          },
-        ]);
-      },
-    );
+    // A translation session starts when a translation is requested in a
+    // specific tab and ends when all translations in that tab has completed
+    this.translateAllFramesInTab(tabId, from, to);
   }
 
   onShowOriginalButtonPressed(tabId) {
     console.debug("onShowOriginalButtonPressed", { tabId });
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
+    this.getDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
         this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
           {
@@ -294,7 +304,7 @@ export class NativeTranslateUiBroker {
 
   onShowTranslatedButtonPressed(tabId) {
     console.debug("onShowTranslatedButtonPressed", { tabId });
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
+    this.getDocumentTranslationStatesByTabId(tabId).forEach(
       (dts: DocumentTranslationState) => {
         this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
           {
