@@ -2,6 +2,7 @@
 const path = require("path");
 
 const urlsToOpenOnRun = [
+  "http://0.0.0.0:4000/multiple-frames.html",
   "http://0.0.0.0:4000/newstest2013.es.top10lines.html",
   "http://0.0.0.0:4000/newstest2013.es.top300lines.html",
   "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21/original.html",
