@@ -279,7 +279,13 @@ class TranslationRequestManager {
 
     // we might want to pass this info from wasm if it exists
     const wordsNumber = translateParams.texts
-      .map(x => x.split(" ").length)
+      .map(
+        x =>
+          x
+            .trim()
+            .split(" ")
+            .filter(word => word.trim() !== "").length,
+      )
       .reduce((a, b) => a + b, 0);
     const speed = Math.floor((wordsNumber / timeSpentMs) * 1000);
     console.info({ speed });
