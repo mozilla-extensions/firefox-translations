@@ -5,7 +5,7 @@
   "author": "Mozilla",
   "dependencies": {
     "@ant-design/colors": "^4.0.5",
-    "@mozilla/glean": "^0.3.0",
+    "@mozilla/glean": "^0.6.1",
     "@popperjs/core": "^2.4.4",
     "@sentry/browser": "^5.15.5",
     "classnames": "^2.2.6",
