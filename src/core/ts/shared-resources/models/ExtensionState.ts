@@ -4,6 +4,7 @@
 
 import {
   applyPatches,
+  getSnapshot,
   Model,
   model,
   modelAction,
@@ -14,6 +15,9 @@ import { DocumentTranslationState } from "./DocumentTranslationState";
 import { FragmentTranslationState } from "./FragmentTranslationState";
 import { TranslateOwnTextTranslationState } from "./TranslateOwnTextTranslationState";
 import { FrameInfo } from "../types/bergamot.types";
+import { computed } from "mobx";
+import { TabTranslationState } from "./TabTranslationState";
+import { TranslationStatus } from "./BaseTranslationState";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;
@@ -75,6 +79,120 @@ export class ExtensionState extends Model({
     this.translateOwnTextTranslationStates.delete(
       translateOwnTextTranslationStateMapKey(translateOwnTextTranslationState),
     );
+  }
+
+  @computed
+  /**
+   * Groups document translation states by tab id
+   */
+  get documentTranslationStatesByTabId() {
+    const map = new Map<number, DocumentTranslationState[]>();
+    this.documentTranslationStates.forEach(
+      (documentTranslationState: DocumentTranslationState) => {
+        if (map.has(documentTranslationState.tabId)) {
+          map.set(documentTranslationState.tabId, [
+            ...map.get(documentTranslationState.tabId),
+            documentTranslationState,
+          ]);
+        } else {
+          map.set(documentTranslationState.tabId, [documentTranslationState]);
+        }
+      },
+    );
+    return map;
+  }
+
+  @computed
+  /**
+   * Merged tab-grouped document translation states into single tab translation states
+   * that incorporates the states of all child frames' document translation states
+   */
+  get tabTranslationStates(): Map<number, TabTranslationState> {
+    const map = new Map<number, TabTranslationState>();
+    this.documentTranslationStatesByTabId.forEach(
+      (documentTranslationStates: DocumentTranslationState[], tabId) => {
+        console.log({ tabId, documentTranslationStates });
+        // Use top frame state attributes to represent most of the tab state
+        const tabTopFrameState = documentTranslationStates.find(
+          (dts: DocumentTranslationState) => dts.frameId === 0,
+        );
+        console.log({ tabTopFrameState });
+        const {
+          isVisible,
+          displayQualityEstimation,
+          translationRequested,
+          cancellationRequested,
+          detectedLanguageResults,
+          translateFrom,
+          translateTo,
+          windowId,
+          showOriginal,
+          url,
+        } = getSnapshot(tabTopFrameState);
+
+        // Sum some state attributes
+        const wordCount = documentTranslationStates
+          .map(dts => dts.wordCount)
+          .reduce((a, b) => a + b, 0);
+        const wordCountVisible = documentTranslationStates
+          .map(dts => dts.wordCountVisible)
+          .reduce((a, b) => a + b, 0);
+        const wordCountVisibleInViewport = documentTranslationStates
+          .map(dts => dts.wordCountVisibleInViewport)
+          .reduce((a, b) => a + b, 0);
+
+        // Special merging of translation status
+        const anyTabHasTranslationStatus = (
+          translationStatus: TranslationStatus,
+        ) =>
+          documentTranslationStates.find(
+            dts => dts.translationStatus === translationStatus,
+          );
+        const tabTranslationStatus = (): TranslationStatus => {
+          if (
+            anyTabHasTranslationStatus(TranslationStatus.DETECTING_LANGUAGE)
+          ) {
+            return TranslationStatus.DETECTING_LANGUAGE;
+          }
+          if (
+            anyTabHasTranslationStatus(
+              TranslationStatus.DOWNLOADING_TRANSLATION_MODEL,
+            )
+          ) {
+            return TranslationStatus.DOWNLOADING_TRANSLATION_MODEL;
+          }
+          if (anyTabHasTranslationStatus(TranslationStatus.TRANSLATING)) {
+            return TranslationStatus.TRANSLATING;
+          }
+          if (anyTabHasTranslationStatus(TranslationStatus.ERROR)) {
+            return TranslationStatus.ERROR;
+          }
+          return tabTopFrameState.translationStatus;
+        };
+        const translationStatus = tabTranslationStatus();
+
+        const tabTranslationState = new TabTranslationState({
+          isVisible,
+          displayQualityEstimation,
+          translationRequested,
+          cancellationRequested,
+          detectedLanguageResults,
+          translateFrom,
+          translateTo,
+          translationStatus,
+          tabId,
+          wordCount,
+          windowId,
+          showOriginal,
+          url,
+          wordCountVisible,
+          wordCountVisibleInViewport,
+        });
+
+        map.set(tabId, tabTranslationState);
+      },
+    );
+    return map;
   }
 
   private tabSpecificDocumentTranslationStates(tabId) {

@@ -3,17 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ExtendedModel, model, prop } from "mobx-keystone";
-import { BaseTranslationState } from "./BaseTranslationState";
+import { TabTranslationState } from "./TabTranslationState";
 
 @model("bergamotTranslate/DocumentTranslationState")
 export class DocumentTranslationState extends ExtendedModel(
-  BaseTranslationState,
+  TabTranslationState,
   {
-    windowId: prop<number>(),
     frameId: prop<number>(),
-    showOriginal: prop<boolean>({ setterAction: true }),
-    url: prop<string>(),
-    wordCountVisible: prop<number>(),
-    wordCountVisibleInViewport: prop<number>(),
   },
 ) {}

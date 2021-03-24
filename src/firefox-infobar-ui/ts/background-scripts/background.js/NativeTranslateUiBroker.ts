@@ -2,11 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  ModelInstanceData,
-  onSnapshot,
-  SnapshotOutOfModel,
-} from "mobx-keystone";
 import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
 import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
@@ -22,7 +17,9 @@ import {
   neverTranslateSite,
   // notNow,
 } from "../../../../core/ts/background-scripts/background.js/telemetry/generated/infobar";
-import { DocumentTranslationState } from "../../../../core/ts/shared-resources/models/DocumentTranslationState";
+import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
+import { SnapshotOutOfModel } from "mobx-keystone";
+import { reaction } from "mobx";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -118,8 +115,8 @@ export class NativeTranslateUiBroker {
     const { summarizeLanguageSupport } = new LanguageSupport();
 
     // Boils down extension state to the subset relevant for the native translate ui
-    const nativeTranslateUiStateFromDocumentTranslationState = async (
-      dts: SnapshotOutOfModel<DocumentTranslationState>,
+    const nativeTranslateUiStateFromTabTranslationState = async (
+      dts: SnapshotOutOfModel<TabTranslationState>,
     ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         dts.translationStatus,
@@ -181,31 +178,20 @@ export class NativeTranslateUiBroker {
       );
     };
 
-    // React to document translation state changes
-    onSnapshot(
-      this.extensionState.$.documentTranslationStates,
-      async (documentTranslationStates, _previousDocumentTranslationStates) => {
-        // To make things a bit simpler, we let the ui reflect only the translation state of the top frame in each tab
-        // and assume that child frames (if present) are in a similar state
-        const tabTopFrameStates = Object.keys(documentTranslationStates)
-          .map(
-            (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
-          )
-          .filter(
-            (dts: ModelInstanceData<DocumentTranslationState>) =>
-              dts.frameId === 0,
-          );
-        for (const dts of tabTopFrameStates) {
-          const { tabId } = dts;
-          const uiState = await nativeTranslateUiStateFromDocumentTranslationState(
-            dts,
+    // React to tab translation state changes
+    reaction(
+      () => this.extensionState.tabTranslationStates,
+      async (tabTranslationStates, _previousTabTranslationStates) => {
+        tabTranslationStates.forEach(async (tts, tabId) => {
+          const uiState = await nativeTranslateUiStateFromTabTranslationState(
+            tts,
           );
           browserWithExperimentAPIs.experiments.translateUi.setUiState(
             tabId,
             uiState,
           );
-        }
-        // TODO: check _previousDocumentTranslationStates for those that had something and now should be inactive
+        });
+        // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
       },
     );
   }
