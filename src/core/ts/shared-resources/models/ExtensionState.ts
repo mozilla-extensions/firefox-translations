@@ -111,12 +111,22 @@ export class ExtensionState extends Model({
     const map = new Map<number, TabTranslationState>();
     this.documentTranslationStatesByTabId.forEach(
       (documentTranslationStates: DocumentTranslationState[], tabId) => {
-        console.log({ tabId, documentTranslationStates });
-        // Use top frame state attributes to represent most of the tab state
         const tabTopFrameState = documentTranslationStates.find(
           (dts: DocumentTranslationState) => dts.frameId === 0,
         );
-        console.log({ tabTopFrameState });
+
+        // If the top frame state is unavailable (may happen during the early stages of a
+        // document translation state model instance), return an equally uninformative tab translation state
+        if (!tabTopFrameState) {
+          const tabTranslationState = new TabTranslationState({
+            tabId,
+            ...getSnapshot(documentTranslationStates[0]),
+          });
+          map.set(tabId, tabTranslationState);
+          return;
+        }
+
+        // Use top frame state attributes to represent most of the tab state if available
         const {
           isVisible,
           displayQualityEstimation,
