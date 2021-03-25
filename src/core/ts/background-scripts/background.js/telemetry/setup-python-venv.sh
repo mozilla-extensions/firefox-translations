@@ -6,7 +6,7 @@ python -m venv venv
 source venv/bin/activate
 
 # Install requirements
-pip install -U glean_parser
+pip install -U -r requirements.txt
 
 echo "* Success: To activate the python venv, run"
 echo "    source venv/bin/activate"
