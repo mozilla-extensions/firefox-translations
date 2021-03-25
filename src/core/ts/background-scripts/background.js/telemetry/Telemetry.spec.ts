@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { assert } from "chai";
-import { telemetry } from "./Telemetry";
+import { gleanRecorder, telemetry } from "./Telemetry";
 import { counterTest, eventTest, stringTest } from "./generated/test";
 import { fromLang, toLang } from "./generated/metadata";
 
@@ -63,6 +63,19 @@ describe("Telemetry", function() {
     await submitAndAssert();
   });
 
+  it("test metrics collected via GleanRecorder", async function() {
+    console.info(this.test.fullTitle());
+
+    await gleanRecorder.transaction(async () => {
+      eventTest.record();
+      // eventTest.record({ from_lang: "from", to_lang: "to" })
+      counterTest.add();
+      stringTest.set(testStrVal);
+    });
+
+    await submitAndAssert();
+  });
+
   it("expect multiple simultaneous async metrics collection not to work when using Glean.js directly", async function() {
     console.info(this.test.fullTitle());
 
@@ -102,5 +115,51 @@ describe("Telemetry", function() {
 
     console.log({ actual, expected });
     assert.notDeepEqual(actual, expected);
+  });
+
+  it("expect multiple simultaneous async metrics collection to work when using Glean.js via GleanRecorder", async function() {
+    console.info(this.test.fullTitle());
+
+    const expected = {};
+    const actual = {};
+
+    // Dispatch 10 metrics collections simultaneously
+    await Promise.all(
+      [...Array(10).keys()].map(index => {
+        return (async () => {
+          expected[index] = {
+            from: `from${index}`,
+            to: `to${index}`,
+            $modelLoadTime: `${index}`,
+            $translationTime: `${index}`,
+            $wordsPerSecond: `${index}`,
+          };
+
+          return gleanRecorder.transaction(async () => {
+            await telemetry.onTranslationAttemptConcluded(
+              `from${index}`,
+              `to${index}`,
+              index,
+              index,
+              index,
+              async () => {
+                actual[index] = {
+                  from: await fromLang.testGetValue(pingName),
+                  to: await toLang.testGetValue(pingName),
+                  $modelLoadTime: await modelLoadTime.testGetValue(pingName),
+                  $translationTime: await translationTime.testGetValue(
+                    pingName,
+                  ),
+                  $wordsPerSecond: await wordsPerSecond.testGetValue(pingName),
+                };
+              },
+            );
+          });
+        })();
+      }),
+    );
+
+    console.log({ actual, expected });
+    assert.deepEqual(actual, expected);
   });
 });
