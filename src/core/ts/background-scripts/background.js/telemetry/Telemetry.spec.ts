@@ -3,32 +3,104 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { assert } from "chai";
-import { Telemetry } from "./Telemetry";
+import { telemetry } from "./Telemetry";
 import { counterTest, eventTest, stringTest } from "./generated/test";
+import { fromLang, toLang } from "./generated/metadata";
 
-const testSuite = "Telemetry";
-// todo: enable when glean.js supports test tools to not upload pings
-describe.skip(testSuite, function() {
-  const testName = "telemetry test:metrics_collected";
-  it(testName, async function() {
-    console.info(`${testSuite}: ${testName}`);
-    const testStrVal = "test";
-    const pingName = "custom";
-    const telemetry = new Telemetry();
+import {
+  modelLoadTime,
+  translationTime,
+  wordsPerSecond,
+} from "./generated/performance";
 
-    telemetry.record(() => eventTest.record(), "testEvent");
-    telemetry.record(() => counterTest.add(), "testCounter");
-    telemetry.record(() => stringTest.set(testStrVal), "testString");
+const testStrVal = "test";
+const pingName = "custom";
 
-    assert.equal(1, (await eventTest.testGetValue(pingName)).length);
-    assert.equal(1, await counterTest.testGetValue(pingName));
-    assert.equal(testStrVal, await stringTest.testGetValue(pingName));
+const submitAndAssert = async () => {
+  const eventTestValue = await eventTest.testGetValue(pingName);
+  const counterTestValue = await counterTest.testGetValue(pingName);
+  const stringTestValue = await stringTest.testGetValue(pingName);
+  // const fromLangValue = await fromLang.testGetValue(pingName);
+  // const toLangValue = await toLang.testGetValue(pingName);
+  const mostRecentEventTestValue = eventTestValue.slice().pop();
 
-    telemetry.submit();
-    assert.isUndefined(await eventTest.testGetValue(pingName));
-    assert.isUndefined(await counterTest.testGetValue(pingName));
-    assert.isUndefined(await stringTest.testGetValue(pingName));
+  console.log({
+    eventTestValue,
+    mostRecentEventTestValue,
+    counterTestValue,
+    stringTestValue,
+    // fromLangValue,
+    // toLangValue,
+  });
 
-    console.log("test passed");
+  // assert.equal(eventTestValue.length, 1);
+  assert.equal(mostRecentEventTestValue.name, "event_test");
+  // assert.equal(counterTestValue, 1);
+  assert.equal(stringTestValue, testStrVal);
+
+  telemetry.submit();
+  assert.isUndefined(await eventTest.testGetValue(pingName));
+  assert.isUndefined(await counterTest.testGetValue(pingName));
+  assert.isUndefined(await stringTest.testGetValue(pingName));
+  // assert.isUndefined(await fromLang.testGetValue(pingName));
+  // assert.isUndefined(await toLang.testGetValue(pingName));
+};
+
+describe("Telemetry", function() {
+  beforeEach(async function() {
+    // TODO: Reset Glean before running each test
+    // await Glean.testResetGlean("org-mozilla-bergamot-in-browser-tests");
+  });
+
+  it("test metrics collected via Glean.js directly", async function() {
+    console.info(this.test.fullTitle());
+
+    eventTest.record();
+    // eventTest.record({ from_lang: "from", to_lang: "to" })
+    counterTest.add();
+    stringTest.set(testStrVal);
+
+    await submitAndAssert();
+  });
+
+  it("expect multiple simultaneous async metrics collection not to work when using Glean.js directly", async function() {
+    console.info(this.test.fullTitle());
+
+    const expected = {};
+    const actual = {};
+
+    // Dispatch 10 metrics collections simultaneously
+    await Promise.all(
+      [...Array(10).keys()].map(index => {
+        return (async () => {
+          expected[index] = {
+            from: `from${index}`,
+            to: `to${index}`,
+            $modelLoadTime: `${index}`,
+            $translationTime: `${index}`,
+            $wordsPerSecond: `${index}`,
+          };
+          await telemetry.onTranslationAttemptConcluded(
+            `from${index}`,
+            `to${index}`,
+            index,
+            index,
+            index,
+            async () => {
+              actual[index] = {
+                from: await fromLang.testGetValue(pingName),
+                to: await toLang.testGetValue(pingName),
+                $modelLoadTime: await modelLoadTime.testGetValue(pingName),
+                $translationTime: await translationTime.testGetValue(pingName),
+                $wordsPerSecond: await wordsPerSecond.testGetValue(pingName),
+              };
+            },
+          );
+        })();
+      }),
+    );
+
+    console.log({ actual, expected });
+    assert.notDeepEqual(actual, expected);
   });
 });

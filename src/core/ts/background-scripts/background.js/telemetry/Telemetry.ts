@@ -5,100 +5,106 @@
 import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { config } from "../../../config";
-
-/*
-    Telemetry.global.record(() => fromLang.set(from), "fromLang");
-    Telemetry.global.record(() => toLang.set(to), "toLang");
-
-    // todo: replace to timespan when it is supported
-    Telemetry.global.record(
-      () => modelLoadTime.set(String(loadModelEnd - loadModelStart)),
-      "loadModelTime",
-    );
-
-    // todo: replace to timespan when it is supported
-    Telemetry.global.record(
-      () => translationTime.set(String(timeSpentMs)),
-      "translateTime",
-    );
-
-    // todo: replace to quantity when it is supported
-    Telemetry.global.record(
-      () => wordsPerSecond.set(String(speed)),
-      "translateSpeed",
-    );
-
-    Telemetry.global.submit();
- */
+import {
+  modelLoadTime,
+  translationTime,
+  wordsPerSecond,
+} from "./generated/performance";
+import { fromLang, toLang } from "./generated/metadata";
+import {
+  closed,
+  changeLang,
+  neverTranslateSite,
+  translate,
+  // displayed,
+  // neverTranslateLang,
+  // notNow,
+} from "./generated/infobar";
+import { nanoid } from "nanoid";
 
 export class Telemetry {
-  private static _instance = null;
-  private _metricsToSubmit;
-
   constructor() {
     const appId = config.telemetryAppId;
     Glean.initialize(appId, true, {
       debug: { logPings: config.telemetryDebugMode },
     });
-    this._metricsToSubmit = 0;
     console.info(
       `Telemetry: initialization completed with application ID ${appId}.`,
     );
   }
 
-  /**
-   * Provides access to Telemetry singleton.
-   */
-  public static get global(): Telemetry {
-    if (Telemetry._instance === null) {
-      Telemetry._instance = new Telemetry();
-    }
-    return Telemetry._instance;
+  public onSelectTranslateFrom(tabId: number) {
+    changeLang.record();
+    this.submit();
+  }
+
+  public onSelectTranslateTo(tabId: number) {
+    changeLang.record();
+    this.submit();
+  }
+
+  public onInfoBarClosed(tabId: number) {
+    closed.record();
+    this.submit();
+  }
+
+  public onNeverTranslateThisSite(tabId: number) {
+    neverTranslateSite.record();
+    this.submit();
+  }
+
+  public onTranslateButtonPressed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    translate.record();
+    this.submit();
+  }
+
+  public onShowOriginalButtonPressed(tabId: number) {
+    // TODO?
+  }
+
+  public onShowTranslatedButtonPressed(tabId: number) {
+    // TODO?
   }
 
   /**
-   * Enables uploading Glean metrics to telemetry server.
-   * @param val bool
+   * A translation attempt starts when a translation is requested in a
+   * specific tab and ends when all translations in that tab has completed
    */
-  public setUploadEnabled(val: boolean) {
-    Glean.setUploadEnabled(val);
-  }
-
-  /**
-   * Collects a telemetry metric or event.
-   * @param metricFunc The function which calls one of the generated metrics or events.
-   * @param name Optional. The name of the metrics to show in console for debug purposes
-   */
-  public record = (metricFunc: Function, name?: string) => {
-    try {
-      metricFunc();
-      this._metricsToSubmit += 1;
-      console.debug(
-        `Telemetry: metric recorded, name: ${name}, total not submitted: ${this._metricsToSubmit}`,
-      );
-    } catch (err) {
-      // telemetry error shouldn't crash the app
-      console.error(`Telemetry: Error. a metric was not recorded.`, err);
+  public async onTranslationAttemptConcluded(
+    from: string,
+    to: string,
+    $modelLoadTime: number,
+    $translationTime: number,
+    $wordsPerSecond: number,
+    beforeSubmit: () => Promise<void> = undefined,
+  ) {
+    fromLang.set(from);
+    toLang.set(to);
+    modelLoadTime.set(String($modelLoadTime));
+    translationTime.set(String($translationTime));
+    wordsPerSecond.set(String($wordsPerSecond));
+    if (beforeSubmit) {
+      await beforeSubmit();
     }
-  };
+    this.submit();
+  }
 
   /**
    * Submits all collected metrics in a custom ping.
    */
   public submit = () => {
     try {
-      if (this._metricsToSubmit > 0) {
-        custom.submit();
-        this._metricsToSubmit = 0;
-        console.info("Telemetry: the ping is submitted.");
-      } else {
-        console.warn(
-          "Telemetry: there were no metrics recorded, the ping is not submitted.",
-        );
-      }
+      // TODO: Always include the fx telemetry id string metric in pings
+      custom.submit();
+      console.info("Telemetry: the ping is submitted.");
     } catch (err) {
       // telemetry error shouldn't crash the app
       console.error(`Telemetry: Error. The ping was not submitted.`, err);
     }
   };
 }
+
+// Expose singleton instances
+export const telemetry = new Telemetry();

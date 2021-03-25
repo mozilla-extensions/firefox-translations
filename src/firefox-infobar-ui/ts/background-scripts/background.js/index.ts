@@ -17,7 +17,7 @@ import { connectRootStoreToDevTools } from "../../../../core/ts/background-scrip
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { NativeTranslateUiBroker } from "./NativeTranslateUiBroker";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
-import { Telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -93,7 +93,7 @@ class ExtensionGlue {
   async cleanup() {
     await this.nativeTranslateUiBroker.stop();
     // Make sure to send buffered telemetry events
-    Telemetry.global.submit();
+    telemetry.submit();
     // Tear down content script port listeners
     [
       this.extensionPreferencesPortListener,
