@@ -28,9 +28,6 @@ There are three flavors:
 - Make sure that the following preferences are set to `true` in `about:config`:
   - `browser.proton.enabled`
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-- Make sure that the following preferences are set to `false` in `about:config`:
-  - `browser.translation.ui.show`
-  - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
