@@ -24,19 +24,25 @@ There are three flavors:
 
 ## Firefox - Infobar UI
 
-- If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) since the current release requires bleeding edge browser capabilities.
+- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly, English or German edition from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
+- (Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles))
 - Make sure that the following preferences are set to `true` in `about:config`:
-  - `browser.proton.enabled`
-  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
-- Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
-- Add the extension to Firefox (Click `Add`)
+  - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to test these unreleased candidate builds)
+  - `browser.proton.enabled` (This enables the preview of the upcoming Firefox design)
+  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
+- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-infobar-ui.dev-root-signed.xpi) to start the download and installation of the extension
+- Click `Continue to Installation` in the popup that comes up (Allows extensions to be downloaded from GitHub)
+- Click `Add` (Adds the extension to Firefox)
+- To try it out, visit a page in a language combination that is supported for translation
+  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ and https://www.mozilla.org/et/
+- With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
+- Press Translate in the translation infobar that pops up
 
 <!--
 ## Chrome - Cross-browser UI
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
-- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-chrome.zip)
+- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension_browser.mt-0.3.0-chrome-cross-browser-ui.zip)
 - Unpack the zip file locally
 - Start Chrome Canary with the following extra argument: `--js-flags="--experimental-wasm-simd"`, eg `/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --js-flags="--experimental-wasm-simd"`
 - Enter `chrome://extensions` in Chrome's address bar and press enter
@@ -47,16 +53,17 @@ There are three flavors:
 
 ## Firefox - Cross-browser UI
 
-- If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) since the current release requires bleeding edge browser capabilities.
+- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly, English or German edition from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
+- (Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles))
 - Make sure that the following preferences are set to `true` in `about:config`:
-  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-  - `javascript.options.wasm_simd`
-  - `javascript.options.wasm_simd_wormhole`
-- Make sure that the following preferences are set to `false` in `about:config`:
-  - `xpinstall.signatures.required`
-  - `browser.translation.ui.show`
-  - `browser.translation.ui.detectLanguage`
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
-- Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
-- Add the extension to Firefox (Click `Add`)
+  - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to test these unreleased candidate builds)
+  - `browser.proton.enabled` (This enables the preview of the upcoming Firefox design)
+  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
+- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-cross-browser-ui.xpi) to start the download and installation of the extension
+- Click `Continue to Installation` in the popup that comes up (Allows extensions to be downloaded from GitHub)
+- Click `Add` (Adds the extension to Firefox)
+- To try it out, visit a page in a language combination that is supported for translation
+  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ and https://www.mozilla.org/et/
+- With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
+- Press Translate in the translation infobar that pops up
 -->
