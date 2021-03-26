@@ -5,6 +5,16 @@
 
 - [Installation instructions](#installation-instructions)
   - [Firefox - Infobar UI](#firefox---infobar-ui)
+    - [Preparations](#preparations)
+    - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension)
+    - [Demo](#demo)
+<!--
+  - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
+  - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
+    - [Preparations](#preparations-1)
+    - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension-1)
+    - [Demo](#demo-1)
+-->
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -24,18 +34,27 @@ There are three flavors:
 
 ## Firefox - Infobar UI
 
-- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly, English or German edition from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
-- (Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles))
+### Preparations
+
+- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly (English or German edition) from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
+- Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles)
+
+### Configuring Nightly and installing the extension
+
 - Make sure that the following preferences are set to `true` in `about:config`:
   - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to test these unreleased candidate builds)
   - `browser.proton.enabled` (This enables the preview of the upcoming Firefox design)
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-infobar-ui.dev-root-signed.xpi) to start the download and installation of the extension
-- Click `Continue to Installation` in the popup that comes up (Allows extensions to be downloaded from GitHub)
-- Click `Add` (Adds the extension to Firefox)
-- To try it out, visit a page in a language combination that is supported for translation
-  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ and https://www.mozilla.org/et/
-- With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
+- Wait for the extension to be downloaded
+- Click `Add` in the popup that comes up
+- The extension is now installed
+
+### Demo
+
+- To try it out, visit a page in a language combination that is supported for translation, eg one of:
+  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ or https://www.mozilla.org/et/
+  - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
 - Press Translate in the translation infobar that pops up
 
 <!--
@@ -53,17 +72,27 @@ There are three flavors:
 
 ## Firefox - Cross-browser UI
 
-- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly, English or German edition from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
-- (Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles))
+### Preparations
+
+- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly (English or German edition) from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
+- Optionally [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles)
+
+### Configuring Nightly and installing the extension
+
 - Make sure that the following preferences are set to `true` in `about:config`:
   - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to test these unreleased candidate builds)
   - `browser.proton.enabled` (This enables the preview of the upcoming Firefox design)
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-cross-browser-ui.xpi) to start the download and installation of the extension
-- Click `Continue to Installation` in the popup that comes up (Allows extensions to be downloaded from GitHub)
-- Click `Add` (Adds the extension to Firefox)
-- To try it out, visit a page in a language combination that is supported for translation
-  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ and https://www.mozilla.org/et/
-- With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
-- Press Translate in the translation infobar that pops up
+- Wait for the extension to be downloaded
+- Click `Add` in the popup that comes up
+- The extension is now installed
+
+### Demo
+
+- To try it out, visit a page in a language combination that is supported for translation, eg one of:
+  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ or https://www.mozilla.org/et/
+  - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
+- Click the extension icon <img src="../src/core/static/icons/extension-icon.48x48.png"> next to the address bar
+- Press Translate in the popup
 -->
