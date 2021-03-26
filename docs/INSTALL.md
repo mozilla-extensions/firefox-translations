@@ -5,8 +5,6 @@
 
 - [Installation instructions](#installation-instructions)
   - [Firefox - Infobar UI](#firefox---infobar-ui)
-  - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
-  - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -16,11 +14,13 @@ This document outlines how to get the v0.3.0 pre-release version of the extensio
 
 Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/tag/v0.3.0).
 
+<!--
 There are three flavors:
 
 - **Firefox - Infobar UI** - Firefox-only version which uses native browser UI elements
 - **Chrome - Cross-browser UI** - Chrome version of the extension - uses a cross-browser compatible UI (since we have no way of modifying native browser UI elements on Chrome)
 - **Firefox - Cross-browser UI** - Firefox version of the extension with the cross-browser compatible UI
+-->
 
 ## Firefox - Infobar UI
 
@@ -35,6 +35,7 @@ There are three flavors:
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
 
+<!--
 ## Chrome - Cross-browser UI
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
@@ -61,3 +62,4 @@ There are three flavors:
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/bergamot-browser-extension_browser.mt-0.2.0-firefox.xpi) to start the download and installation of the extension
 - Allow extensions to be downloaded from GitHub in the popup that comes up (Click `Continue to Installation`)
 - Add the extension to Firefox (Click `Add`)
+-->
