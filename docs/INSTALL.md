@@ -12,9 +12,9 @@
 
 # Installation instructions
 
-This document outlines how to get the v0.2.0 pre-release version of the extension running locally.
+This document outlines how to get the v0.3.0 pre-release version of the extension running locally.
 
-Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/tag/v0.2.0).
+Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/tag/v0.3.0).
 
 There are three flavors:
 
