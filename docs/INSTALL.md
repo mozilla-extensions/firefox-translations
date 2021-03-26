@@ -26,13 +26,9 @@ There are three flavors:
 
 - If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) since the current release requires bleeding edge browser capabilities.
 - Make sure that the following preferences are set to `true` in `about:config`:
-  - `extensions.experiments.enabled`
   - `browser.proton.enabled`
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
-  - `javascript.options.wasm_simd`
-  - `javascript.options.wasm_simd_wormhole`
 - Make sure that the following preferences are set to `false` in `about:config`:
-  - `xpinstall.signatures.required`
   - `browser.translation.ui.show`
   - `browser.translation.ui.detectLanguage`
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.2.0/translation_mozilla.org-0.2.0-firefox.xpi) to start the download and installation of the extension
