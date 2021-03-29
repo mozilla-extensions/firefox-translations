@@ -58,6 +58,7 @@ export const launchFirefox = async (): Promise<WebDriver> => {
   options.setProxy(
     proxy.manual({ http: "localhost:8080", https: "localhost:8080" }),
   );
+  options.setAcceptInsecureCerts(true);
 
   Object.keys(defaultFirefoxTestPreferences).forEach(key => {
     options.setPreference(key, defaultFirefoxTestPreferences[key]);
