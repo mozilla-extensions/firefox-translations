@@ -16,6 +16,7 @@ import {
   translateViaInfobar,
 } from "../utils/translation";
 import * as assert from "assert";
+import * as waitOn from "wait-on";
 
 async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
   return lookForPageElement(
@@ -50,6 +51,14 @@ const maxToleratedModelLoadingDurationInSeconds = 20;
 const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
+  before(async function() {
+    // Make sure required network resources are available before commencing tests
+    await waitOn({
+      resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
+      timeout: 1000, // timeout in ms, default Infinity
+    });
+  });
+
   describe("Infobar interactions", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
