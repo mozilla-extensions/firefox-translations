@@ -142,9 +142,8 @@ const init = async () => {
 
         if (hasChanged("displayQualityEstimation")) {
           if (
-            domTranslationManager?.contentWindow?.translationDocument &&
             currentTabFrameDocumentTranslationState.displayQualityEstimation !==
-              translationDocument.qualityEstimationShown
+            translationDocument.qualityEstimationShown
           ) {
             if (translationDocument.qualityEstimationShown) {
               translationDocument.showTranslation();

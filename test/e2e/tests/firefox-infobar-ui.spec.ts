@@ -98,17 +98,23 @@ if (process.env.UI === "firefox-infobar-ui") {
         mitmProxyConfigurationSuccessMessageElement,
         "mitmProxyConfigurationSuccessMessageElement",
       );
-      await takeScreenshot(driver, this.test.fullTitle());
+      await takeScreenshot(driver, `${this.test.fullTitle()} - http nav`);
 
       try {
         await navigateToURL(driver, "https://mozilla.com");
-        await takeScreenshot(driver, this.test.fullTitle());
+        await takeScreenshot(driver, `${this.test.fullTitle()} - https nav`);
         assert(
           true,
           "Successfully visited a https site without encountering a certificate error",
         );
       } catch (err) {
-        if (err.name === "InsecureCertificateError") {
+        if (
+          err.name === "InsecureCertificateError" ||
+          (err.name === "WebDriverError" &&
+            err.message.includes(
+              "Reached error page: about:neterror?e=nssFailure2",
+            ))
+        ) {
           assert(
             false,
             "The mitxproxy certificate is not installed in the profile",
