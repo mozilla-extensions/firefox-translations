@@ -127,16 +127,22 @@ Note: This is for Firefox version with the cross-browser UI only. Chrome Web Sto
 
 ### Locally
 
-First time setup:
+Before running the tests locally for the first time, install [mitmproxy](https://mitmproxy.org). Example installation command for Mac:
 
 ```bash
-test/e2e/setup-python-venv.sh
+brew install mitmproxy
 ```
 
-Then, run:
+To run the end-to-end tests, run:
 
 ```bash
 yarn e2e-tests
+```
+
+Note, to modify the `test/e2e/intercept-telemetry-requests.py` script, it may be useful to have the Python deps installed:
+
+```bash
+test/e2e/setup-python-venv.sh
 ```
 
 ### Continuous Integration

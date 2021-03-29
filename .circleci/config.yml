@@ -29,15 +29,9 @@ jobs:
             yarn ci:install-firefox:linux
 
       - run:
-          name:  Install Mitmproxy
+          name:  Install Mitmproxy (required to verify telemetry in e2e tests)
           command: |
             .circleci/install-mitmproxy.sh
-
-      - run:
-          name:  Install python dependencies for e2e tests
-          command: |
-            sudo apt update && sudo apt install -y -q python3-venv
-            test/e2e/setup-python-venv.sh
 
       - save_cache:
           paths:
