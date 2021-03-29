@@ -26,7 +26,7 @@ jobs:
       - run:
           name:  Install Firefox
           command: |
-            yarn get-firefox:linux
+            yarn ci:install-firefox:linux
 
       - save_cache:
           paths:
