@@ -127,6 +127,14 @@ Note: This is for Firefox version with the cross-browser UI only. Chrome Web Sto
 
 ### Locally
 
+First time setup:
+
+```bash
+test/e2e/setup-python-venv.sh
+```
+
+Then, run:
+
 ```bash
 yarn e2e-tests
 ```

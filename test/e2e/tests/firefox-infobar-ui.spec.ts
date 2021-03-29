@@ -15,6 +15,16 @@ import {
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../utils/translation";
+import * as assert from "assert";
+
+async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
+  return lookForPageElement(
+    driver,
+    By.xpath,
+    "//*[contains(text(),'Install mitmproxy')]",
+    timeout,
+  );
+}
 
 async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(
@@ -61,6 +71,36 @@ if (process.env.UI === "firefox-infobar-ui") {
     after(async function() {
       await takeScreenshot(driver, this.test.fullTitle());
       await driver.quit();
+    });
+
+    it("Proxy server for telemetry-validation is properly configured", async function() {
+      await navigateToURL(driver, "http://mitm.it");
+      const mitmProxyConfigurationSuccessMessageElement = await lookForMitmProxyConfigurationSuccessMessage(
+        driver,
+        3000,
+      );
+      assertElementExists(
+        mitmProxyConfigurationSuccessMessageElement,
+        "mitmProxyConfigurationSuccessMessageElement",
+      );
+      await takeScreenshot(driver, this.test.fullTitle());
+
+      try {
+        await navigateToURL(driver, "https://mozilla.com");
+        await takeScreenshot(driver, this.test.fullTitle());
+        assert(
+          true,
+          "Successfully visited a https site without encountering a certificate error",
+        );
+      } catch (err) {
+        if (err.name === "InsecureCertificateError") {
+          assert(
+            false,
+            "The mitxproxy certificate is not installed in the profile",
+          );
+        }
+        throw err;
+      }
     });
 
     it("The translation infobar is not shown on eg about:debugging", async function() {

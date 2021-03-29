@@ -1,5 +1,6 @@
 import * as cmd from "selenium-webdriver/lib/command";
 import { Options } from "selenium-webdriver/firefox";
+import * as proxy from "selenium-webdriver/proxy";
 import { Builder, WebDriver as OriginalWebDriver } from "selenium-webdriver";
 import { normalizeBinary } from "fx-runner/lib/utils";
 import * as fs from "fs";
@@ -49,6 +50,14 @@ export const launchFirefox = async (): Promise<WebDriver> => {
   /* eslint-enable mozilla/balanced-listeners */
 
   const options = new Options();
+
+  // Route traffic through test-controlled proxy to be able to intercept telemetry requests
+  // (Uses a profile that includes the mitmproxy-ca-cert.pem certificate)
+  const profilePath = join(process.cwd(), "test", "e2e", "profile");
+  options.setProfile(profilePath);
+  options.setProxy(
+    proxy.manual({ http: "localhost:8080", https: "localhost:8080" }),
+  );
 
   Object.keys(defaultFirefoxTestPreferences).forEach(key => {
     options.setPreference(key, defaultFirefoxTestPreferences[key]);
