@@ -161,7 +161,7 @@
     "build:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui NODE_ENV=production; npm-run-all just-build",
     "build:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=production; npm-run-all just-build",
     "ci:install-firefox:linux": "[ ! -d \"./firefox-nightly-linux\" ] && get-firefox --branch nightly --platform linux --extract && mv firefox firefox-nightly-linux || true",
-    "ci:install-mitmproxy:linux": "wget https://snapshots.mitmproxy.org/6.0.2/mitmproxy-6.0.2-linux.tar.gz && tar -xvf mitmproxy-6.0.2-linux.tar.gz && mv mitm* /usr/local/bin/",
+    "ci:install-mitmproxy:linux": "wget https://snapshots.mitmproxy.org/6.0.2/mitmproxy-6.0.2-linux.tar.gz && tar -xvf mitmproxy-6.0.2-linux.tar.gz && mv mitm* /home/circleci/.local/bin/",
     "clean": "trash build/${NODE_ENV}/${TARGET_BROWSER}/${UI}/",
     "clean:test": "trash test/build",
     "e2e-tests": "concurrently --success first --kill-others 'npm-run-all -n e2e-tests:firefox-infobar-ui e2e-tests:cross-browser-ui:firefox' 'test/e2e/run-telemetry-intercepting-proxy-server.sh 1> test/e2e/results/logs/mitmproxy.log 2> test/e2e/results/logs/mitmproxy.errors.log' 'yarn serve-fixtures --port 4001' 'yarn geckodriver -vv 1> test/e2e/results/logs/geckodriver.log 2> test/e2e/results/logs/geckodriver.errors.log'",
