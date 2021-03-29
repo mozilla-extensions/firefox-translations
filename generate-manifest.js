@@ -34,30 +34,28 @@ async function generateManifest({ dotEnvPath }) {
       {
         js: ["commons.js"],
         matches: ["<all_urls>"],
-        all_frames: false,
+        all_frames: true,
         run_at: "document_idle",
         match_about_blank: false,
       },
       {
         js: ["dom-translation-content-script.js"],
         matches: ["<all_urls>"],
-        all_frames: false,
+        all_frames: true,
         run_at: "document_idle",
         match_about_blank: false,
       },
     ],
-    permissions: [
-      "<all_urls>",
-      `${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`,
-      "storage",
-      "alarms",
-    ],
+    permissions: ["<all_urls>", "storage", "alarms"],
     icons: {
       48: "icons/extension-icon.48x48.png",
       96: "icons/extension-icon.96x96.png",
       128: "icons/extension-icon.128x128.png",
     },
   };
+  if (process.env.USE_BERGAMOT_REST_API === "1") {
+    manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
+  }
   if (ui === "firefox-infobar-ui") {
     manifest.hidden = true;
     manifest.experiment_apis = {

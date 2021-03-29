@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TranslationDocument } from "../TranslationDocument";
-import { BergamotRestApiTranslateRequestResult } from "../../../background-scripts/background.js/lib/BergamotApiClient";
 import { TranslationItem } from "../TranslationItem";
 import { MinimalDomTranslator } from "./MinimalDomTranslator";
+import { TranslationResults } from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export interface TranslationRequestData {
   markupsToTranslate: string[];
@@ -21,7 +21,7 @@ export interface TranslationApiClient {
     texts: string[],
     from: string,
     to: string,
-  ) => Promise<BergamotRestApiTranslateRequestResult>;
+  ) => Promise<TranslationResults>;
 }
 
 type DomTranslatorRequestFactory = (

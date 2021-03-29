@@ -95,18 +95,18 @@ function parseChunkResult(
       try {
         const translatedMarkup =
           translationResponseData.translatedMarkups[index];
-        let qeAnnotatedTranslatedMarkup =
-          translationResponseData.qeAnnotatedTranslatedMarkups[index];
-
-        qeAnnotatedTranslatedMarkup = generateMarkupToTranslateForItem(
-          translationRoot,
-          qeAnnotatedTranslatedMarkup,
-        );
-
         translationRoot.parseTranslationResult(translatedMarkup);
-        translationRoot.parseQeAnnotatedTranslationResult(
-          qeAnnotatedTranslatedMarkup,
-        );
+        if (translationResponseData.qeAnnotatedTranslatedMarkups) {
+          let qeAnnotatedTranslatedMarkup =
+            translationResponseData.qeAnnotatedTranslatedMarkups[index];
+          qeAnnotatedTranslatedMarkup = generateMarkupToTranslateForItem(
+            translationRoot,
+            qeAnnotatedTranslatedMarkup,
+          );
+          translationRoot.parseQeAnnotatedTranslationResult(
+            qeAnnotatedTranslatedMarkup,
+          );
+        }
       } catch (e) {
         errorOccurred = true;
         console.error("Translation error: ", e);
