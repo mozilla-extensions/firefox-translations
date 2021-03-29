@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { assert } from "chai";
-import { telemetry } from "./Telemetry";
+import { custom } from "./generated/pings";
 import { counterTest, eventTest, stringTest } from "./generated/test";
 import Glean from "@mozilla/glean/webext";
 import { config } from "../../../config";
@@ -29,7 +29,7 @@ const submitAndAssert = async () => {
   assert.equal(counterTestValue, 1);
   assert.equal(stringTestValue, testStrVal);
 
-  telemetry.submit();
+  custom.submit();
   assert.isUndefined(await eventTest.testGetValue(pingName));
   assert.isUndefined(await counterTest.testGetValue(pingName));
   assert.isUndefined(await stringTest.testGetValue(pingName));
