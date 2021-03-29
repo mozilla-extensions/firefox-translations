@@ -1,17 +1,19 @@
 """Send a reply from the proxy without sending any data to the remote server."""
 # Setup telemetry storage path
-import os
-from datetime import datetime
 import json
+import os
 
 from mitmproxy import ctx, http
 
+TELEMETRY_FOLDER = os.environ.get("TELEMETRY_FOLDER")
+if not TELEMETRY_FOLDER:
+    raise Exception("The env var TELEMETRY_FOLDER must be set")
+
 current_dir_path = os.path.dirname(os.path.realpath(__file__))
-now = datetime.now()
-date_time = now.strftime("%Y-%m-%d-%H%M%S")
 telemetry_path = os.path.join(
-    current_dir_path, "results", "telemetry", date_time)
-os.makedirs(telemetry_path)
+    current_dir_path, "results", "telemetry", TELEMETRY_FOLDER
+)
+os.makedirs(telemetry_path, exist_ok=True)
 
 print(
     f"Proxy server telemetry interceptor configured to store seen telemetry in {telemetry_path}"
@@ -30,7 +32,9 @@ def request(flow: http.HTTPFlow) -> None:
 
         # save response
         filename = f'{parsed["ping_info"]["seq"]}.json'
-        with open(os.path.join(telemetry_path, filename), "w") as f:
+        client_id_specific_telemetry_path = os.path.join(telemetry_path, parsed["client_info"]["client_id"])
+        os.makedirs(client_id_specific_telemetry_path, exist_ok=True)
+        with open(os.path.join(client_id_specific_telemetry_path, filename), "w") as f:
             f.write(formatted_json_string)
 
         # respond without sending request to external server

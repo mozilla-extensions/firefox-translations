@@ -42,10 +42,11 @@ export const launchFixturesServer = () => {
 };
 
 export const launchTestProxyServer = () => {
+  const TELEMETRY_FOLDER = "foo";
   launchTestServer(
     "mitmdump",
     ["-s", "./test/e2e/intercept-telemetry-requests.py"],
     "test-proxy-server",
-    {},
+    { TELEMETRY_FOLDER },
   );
 };
