@@ -20,8 +20,14 @@ import {
   // neverTranslateLang,
   // notNow,
 } from "./generated/infobar";
-import { nanoid } from "nanoid";
 
+/**
+ * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
+ *
+ * Synchronous methods here is important, since it is the only way to guarantee that multiple Glean API calls are
+ * executed sequentially and not interleaved with other asynchronous Telemetry recording.
+ * For more information, see: https://github.com/mozilla-extensions/bergamot-browser-extension/pull/76#discussion_r602128568
+ */
 export class Telemetry {
   constructor() {
     const appId = config.telemetryAppId;
@@ -72,22 +78,18 @@ export class Telemetry {
    * A translation attempt starts when a translation is requested in a
    * specific tab and ends when all translations in that tab has completed
    */
-  public async onTranslationAttemptConcluded(
+  public onTranslationAttemptConcluded(
     from: string,
     to: string,
     $modelLoadTime: number,
     $translationTime: number,
     $wordsPerSecond: number,
-    beforeSubmit: () => Promise<void> = undefined,
   ) {
     fromLang.set(from);
     toLang.set(to);
     modelLoadTime.set(String($modelLoadTime));
     translationTime.set(String($translationTime));
     wordsPerSecond.set(String($wordsPerSecond));
-    if (beforeSubmit) {
-      await beforeSubmit();
-    }
     this.submit();
   }
 
@@ -106,89 +108,5 @@ export class Telemetry {
   };
 }
 
-type GleanTransaction = () => Promise<void>;
-
-/* eslint-disable no-unused-vars, no-shadow */
-// TODO: update typescript-eslint when support for this kind of declaration is supported
-interface PendingGleanTransaction<T> {
-  resolve: (T) => void;
-}
-/* eslint-enable no-unused-vars, no-shadow */
-
-interface GleanRecording {
-  gleanTransaction: GleanTransaction;
-  id?: string;
-}
-
-/**
- * Class responsible for recording Glean telemetry synchronously
- */
-export class GleanRecorder {
-  private processing: boolean;
-  private queue: GleanRecording[] = [];
-  private pendingTransactions: Map<
-    string,
-    PendingGleanTransaction<void>
-  > = new Map();
-
-  async processQueue() {
-    if (this.processing) {
-      return;
-    }
-    this.processing = true;
-    while (this.queue.length) {
-      console.info(
-        `Processing Glean.js recorder queue of ${this.queue.length} recordings`,
-      );
-      await this.processNextItemInQueue();
-    }
-    this.processing = false;
-  }
-
-  async processNextItemInQueue() {
-    // Shift the next request off the queue
-    const { gleanTransaction, id } = this.queue.shift();
-    // Record the event
-    try {
-      const results = await gleanTransaction();
-      console.debug(
-        `Telemetry: metric recorded, id: ${id}, queue size: ${this.queue.length}`,
-      );
-      // Resolve the corresponding promise
-      this.pendingTransactions.get(id).resolve(results);
-    } catch (err) {
-      // telemetry error shouldn't crash the app
-      console.error(`Telemetry: Error. a metric was not recorded.`, err);
-      // Resolve the corresponding promise
-      this.pendingTransactions.get(id).resolve(void 0);
-    }
-  }
-
-  transaction(gleanTransaction: GleanTransaction): Promise<void> {
-    const id = nanoid();
-    const promise: Promise<void> = new Promise(resolve => {
-      this.pendingTransactions.set(id, { resolve });
-      if (this.processing) {
-        console.info(
-          `Glean transaction will be processed after ${this.queue.length +
-            1} already queued transactions`,
-        );
-      } else {
-        console.info(`Queued Glean transaction`);
-      }
-      this.queue.push({ gleanTransaction, id });
-    });
-
-    // Kick off queue processing async
-    /* eslint-disable no-unused-vars */
-    this.processQueue().then(_r => void 0);
-    /* eslint-enable no-unused-vars */
-
-    // Return the promise that resolves when the in-scope transaction resolves
-    return promise;
-  }
-}
-
 // Expose singleton instances
 export const telemetry = new Telemetry();
-export const gleanRecorder = new GleanRecorder();
