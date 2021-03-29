@@ -36,6 +36,7 @@ jobs:
       - run:
           name:  Install python dependencies for e2e tests
           command: |
+            sudo apt update && sudo apt install -y -q python3-venv
             test/e2e/setup-python-venv.sh
 
       - save_cache:
