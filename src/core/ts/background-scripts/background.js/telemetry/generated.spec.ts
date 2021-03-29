@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { assert } from "chai";
+import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { counterTest, eventTest, stringTest } from "./generated/test";
-import Glean from "@mozilla/glean/webext";
 import { config } from "../../../config";
 
 const testStrVal = "test";
