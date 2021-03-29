@@ -17,6 +17,10 @@ import {
 } from "../utils/translation";
 import * as assert from "assert";
 import * as waitOn from "wait-on";
+import {
+  launchFixturesServer,
+  launchTestProxyServer,
+} from "../utils/setupServers";
 
 async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
   return lookForPageElement(
@@ -52,7 +56,9 @@ const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
   before(async function() {
-    // Make sure required network resources are available before commencing tests
+    // Launch and make sure required test servers are available before commencing tests
+    launchFixturesServer();
+    launchTestProxyServer();
     await waitOn({
       resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
       timeout: 1000, // timeout in ms, default Infinity
