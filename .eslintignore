@@ -19,6 +19,7 @@ package.json
 # don't lint/format fixtures
 test/fixtures/
 # don't lint/format third party modules
+.venv
 venv
 bergamot-translator/
 emsdk/
