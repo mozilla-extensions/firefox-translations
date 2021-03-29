@@ -61,7 +61,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     launchTestProxyServer();
     await waitOn({
       resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
-      timeout: 1000, // timeout in ms, default Infinity
+      timeout: 2000, // timeout in ms, default Infinity
     });
   });
 
