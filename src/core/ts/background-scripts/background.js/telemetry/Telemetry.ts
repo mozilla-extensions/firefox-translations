@@ -37,6 +37,9 @@ export class Telemetry {
     console.info(
       `Telemetry: initialization completed with application ID ${appId}.`,
     );
+    // Disabled telemetry until opt-out-preference is respected (https://github.com/mozilla-extensions/bergamot-browser-extension/issues/51)
+    this.setUploadEnabled(false);
+    console.info(`Note: Telemetry upload is disabled in this build`);
   }
 
   public onSelectTranslateFrom(tabId: number) {
