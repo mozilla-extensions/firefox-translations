@@ -63,4 +63,5 @@ export const launchTestProxyServer = () => {
     "test-proxy-server",
     {},
   );
+  return proxyInstanceId;
 };

@@ -21,6 +21,7 @@ import {
   launchFixturesServer,
   launchTestProxyServer,
 } from "../utils/setupServers";
+import { readSeenTelemetry } from "../utils/telemetry";
 
 async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
   return lookForPageElement(
@@ -48,6 +49,9 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
   );
 }
 
+let proxyInstanceId;
+const maxToleratedTelemetryUploadingDurationInSeconds = 10;
+
 let tabsCurrentlyOpened = 1;
 
 const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
@@ -58,7 +62,7 @@ if (process.env.UI === "firefox-infobar-ui") {
   before(async function() {
     // Launch and make sure required test servers are available before commencing tests
     launchFixturesServer();
-    launchTestProxyServer();
+    proxyInstanceId = launchTestProxyServer();
     await waitOn({
       resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
       timeout: 2000, // timeout in ms, default Infinity
@@ -69,6 +73,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
       (15 +
+        maxToleratedTelemetryUploadingDurationInSeconds +
         maxToleratedModelLoadingDurationInSeconds +
         maxToleratedTranslationDurationInSeconds * 5) *
         1000,
@@ -166,6 +171,31 @@ if (process.env.UI === "firefox-infobar-ui") {
       await translateViaInfobar(driver, tabsCurrentlyOpened);
       await assertTranslationSucceeded();
       await takeScreenshot(driver, this.test.fullTitle());
+    });
+
+    it("Telemetry checks after: Translation via the infobar works", async function() {
+      // ... this test continues the session from the previous test
+      const seenTelemetry = await readSeenTelemetry(
+        0,
+        1,
+        proxyInstanceId,
+        maxToleratedTelemetryUploadingDurationInSeconds * 1000,
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events.length,
+        1,
+        "The first ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].metrics.string["metadata.from_lang"],
+        "es",
+        "The first ping has correct from_lang metadata",
+      );
+      assert.strictEqual(
+        seenTelemetry[1].metrics.string["metadata.from_lang"],
+        "es",
+        "The second ping has correct from_lang metadata",
+      );
     });
 
     it("Translation via the infobar works after further navigations", async function() {
