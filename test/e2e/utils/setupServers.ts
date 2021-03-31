@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { join } from "path";
+import { nanoid } from "nanoid";
 
 export const launchTestServer = (
   cmd: string,
@@ -42,11 +43,24 @@ export const launchFixturesServer = () => {
 };
 
 export const launchTestProxyServer = () => {
-  const TELEMETRY_FOLDER = "foo";
+  const date = new Date();
+  const utcDateISOString = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split(".")[0];
+  const proxyInstanceId = `${utcDateISOString}-${nanoid(4)}`;
   launchTestServer(
     "mitmdump",
-    ["-s", "./test/e2e/intercept-telemetry-requests.py"],
+    [
+      "-s",
+      "./test/e2e/intercept-glean-telemetry-requests.py",
+      "--set",
+      "glean_app_id=org-mozilla-bergamot",
+      "--set",
+      `proxy_instance_id=${proxyInstanceId}`,
+    ],
     "test-proxy-server",
-    { TELEMETRY_FOLDER },
+    {},
   );
 };
