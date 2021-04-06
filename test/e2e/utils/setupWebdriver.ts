@@ -52,14 +52,8 @@ export const launchFirefox = async (): Promise<WebDriver> => {
   const options = new Options();
 
   // Route traffic through test-controlled proxy to be able to intercept telemetry requests
-  // (Uses a platform-specific profile that includes the mitmproxy-ca-cert.pem certificate)
-  const profilePath = join(
-    process.cwd(),
-    "test",
-    "e2e",
-    "profile",
-    process.platform,
-  );
+  // (Uses a profile that includes the mitmproxy-ca-cert.pem certificate)
+  const profilePath = join(process.cwd(), "test", "e2e", "profile");
   options.setProfile(profilePath);
   options.setProxy(
     proxy.manual({ http: "localhost:8080", https: "localhost:8080" }),
