@@ -58,6 +58,8 @@ export const launchTestProxyServer = () => {
       "-s",
       "./test/e2e/intercept-glean-telemetry-requests.py",
       "--set",
+      "confdir=./test/e2e/.mitmproxy",
+      "--set",
       "glean_app_id=org-mozilla-bergamot",
       "--set",
       `proxy_instance_id=${proxyInstanceId}`,
