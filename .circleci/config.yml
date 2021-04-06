@@ -61,9 +61,9 @@ jobs:
           name: Build extension - Firefox Infobar UI
           command: yarn build:firefox-infobar-ui
 
-      #- run:
-      #    name: Build extension - Firefox Cross-browser UI
-      #    command: yarn build:cross-browser-ui:firefox
+      - run:
+          name: Build extension - Firefox Cross-browser UI
+          command: yarn build:cross-browser-ui:firefox
 
       #- run:
       #    name: Build extension - Chrome Cross-browser UI
