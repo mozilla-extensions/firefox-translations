@@ -17,6 +17,8 @@ import { contentScriptLanguageDetectorProxyPortListener } from "../../../../core
 import { connectRootStoreToDevTools } from "../../../../core/ts/background-scripts/background.js/state-management/connectRootStoreToDevTools";
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
+import { Telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import { initializeGlean } from "../../../../core/ts/background-scripts/background.js/telemetry/initializeGlean";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -75,6 +77,9 @@ class ExtensionGlue {
   }
 
   async start() {
+    // Set up telemetry
+    initializeGlean();
+
     // Let extension icon react to document translation state changes
     const extensionIconTranslationState = new ExtensionIconTranslationState(
       this.extensionState,
@@ -95,6 +100,8 @@ class ExtensionGlue {
   }
 
   async cleanup() {
+    // Make sure to send buffered telemetry events
+    Telemetry.submit();
     // Tear down content script port listeners
     [
       this.extensionPreferencesPortListener,

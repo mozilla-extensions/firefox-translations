@@ -7,7 +7,7 @@ import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
-import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import { Telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
 import { SnapshotOutOfModel } from "mobx-keystone";
 import { reaction, when } from "mobx";
@@ -202,7 +202,7 @@ export class NativeTranslateUiBroker {
     const modelLoadTimeMs = -1;
     const translationTimeMs = -1;
     const wordsPerSecond = -1;
-    telemetry.onTranslationAttemptConcluded(
+    Telemetry.onTranslationAttemptConcluded(
       from,
       to,
       modelLoadTimeMs,
@@ -213,39 +213,39 @@ export class NativeTranslateUiBroker {
 
   onSelectTranslateFrom(tabId: number) {
     console.debug("onSelectTranslateFrom", { tabId });
-    telemetry.onSelectTranslateFrom(tabId);
+    Telemetry.onSelectTranslateFrom(tabId);
   }
 
   onSelectTranslateTo(tabId: number) {
     console.debug("onSelectTranslateTo", { tabId });
-    telemetry.onSelectTranslateFrom(tabId);
+    Telemetry.onSelectTranslateFrom(tabId);
   }
 
   onInfoBarClosed(tabId: number) {
     console.debug("onInfoBarClosed", { tabId });
-    telemetry.onInfoBarClosed(tabId);
+    Telemetry.onInfoBarClosed(tabId);
   }
 
   onNeverTranslateThisSite(tabId: number) {
     console.debug("onNeverTranslateThisSite", { tabId });
-    telemetry.onNeverTranslateThisSite(tabId);
+    Telemetry.onNeverTranslateThisSite(tabId);
   }
 
   onTranslateButtonPressed(tabId: number, from: string, to: string) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
-    telemetry.onTranslateButtonPressed(tabId, from, to);
+    Telemetry.onTranslateButtonPressed(tabId, from, to);
     this.translateAllFramesInTab(tabId, from, to);
   }
 
   onShowOriginalButtonPressed(tabId: number) {
     console.debug("onShowOriginalButtonPressed", { tabId });
-    telemetry.onShowOriginalButtonPressed(tabId);
+    Telemetry.onShowOriginalButtonPressed(tabId);
     this.extensionState.showOriginalInTab(tabId);
   }
 
   onShowTranslatedButtonPressed(tabId: number) {
     console.debug("onShowTranslatedButtonPressed", { tabId });
-    telemetry.onShowTranslatedButtonPressed(tabId);
+    Telemetry.onShowTranslatedButtonPressed(tabId);
     this.extensionState.hideOriginalInTab(tabId);
   }
 
