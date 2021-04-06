@@ -22,6 +22,7 @@ import {
   launchTestProxyServer,
 } from "../utils/setupServers";
 import { readSeenTelemetry } from "../utils/telemetry";
+import * as kill from "tree-kill";
 
 async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
   return lookForPageElement(
@@ -74,8 +75,8 @@ if (process.env.UI === "firefox-infobar-ui") {
   });
 
   after(function() {
-    fixturesServerProcess.kill();
-    testProxyServerProcess.kill();
+    kill(fixturesServerProcess.pid, "SIGKILL");
+    kill(testProxyServerProcess.pid, "SIGKILL");
   });
 
   describe("Infobar interactions", function() {
