@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
+import { config } from "../../../config";
 import {
   modelLoadTime,
   translationTime,
@@ -27,42 +29,48 @@ import {
  * For more information, see: https://github.com/mozilla-extensions/bergamot-browser-extension/pull/76#discussion_r602128568
  */
 export class Telemetry {
-  public static onSelectTranslateFrom(tabId: number) {
-    changeLang.record();
-    Telemetry.submit();
+  constructor() {
+    const appId = config.telemetryAppId;
+    Glean.initialize(appId, true, {
+      debug: { logPings: config.telemetryDebugMode },
+    });
+    console.info(
+      `Telemetry: initialization completed with application ID ${appId}.`,
+    );
   }
 
-  public static onSelectTranslateTo(tabId: number) {
+  public onSelectTranslateFrom(tabId: number) {
     changeLang.record();
-    Telemetry.submit();
+    this.submit();
   }
 
-  public static onInfoBarClosed(tabId: number) {
+  public onSelectTranslateTo(tabId: number) {
+    changeLang.record();
+    this.submit();
+  }
+
+  public onInfoBarClosed(tabId: number) {
     closed.record();
-    Telemetry.submit();
+    this.submit();
   }
 
-  public static onNeverTranslateThisSite(tabId: number) {
+  public onNeverTranslateThisSite(tabId: number) {
     neverTranslateSite.record();
-    Telemetry.submit();
+    this.submit();
   }
 
-  public static onTranslateButtonPressed(
-    tabId: number,
-    from: string,
-    to: string,
-  ) {
+  public onTranslateButtonPressed(tabId: number, from: string, to: string) {
     fromLang.set(from);
     toLang.set(to);
     translate.record();
-    Telemetry.submit();
+    this.submit();
   }
 
-  public static onShowOriginalButtonPressed(tabId: number) {
+  public onShowOriginalButtonPressed(tabId: number) {
     // TODO?
   }
 
-  public static onShowTranslatedButtonPressed(tabId: number) {
+  public onShowTranslatedButtonPressed(tabId: number) {
     // TODO?
   }
 
@@ -70,7 +78,7 @@ export class Telemetry {
    * A translation attempt starts when a translation is requested in a
    * specific tab and ends when all translations in that tab has completed
    */
-  public static onTranslationAttemptConcluded(
+  public onTranslationAttemptConcluded(
     from: string,
     to: string,
     $modelLoadTime: number,
@@ -82,13 +90,13 @@ export class Telemetry {
     modelLoadTime.set(String($modelLoadTime));
     translationTime.set(String($translationTime));
     wordsPerSecond.set(String($wordsPerSecond));
-    Telemetry.submit();
+    this.submit();
   }
 
   /**
    * Submits all collected metrics in a custom ping.
    */
-  public static submit = () => {
+  public submit = () => {
     try {
       // TODO: Always include the fx telemetry id string metric in pings
       custom.submit();
@@ -99,3 +107,6 @@ export class Telemetry {
     }
   };
 }
+
+// Expose singleton instances
+export const telemetry = new Telemetry();
