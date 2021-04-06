@@ -50,6 +50,8 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
 }
 
 let proxyInstanceId;
+let fixturesServerProcess;
+let testProxyServerProcess;
 const maxToleratedTelemetryUploadingDurationInSeconds = 10;
 
 let tabsCurrentlyOpened = 1;
@@ -61,12 +63,19 @@ const maxToleratedTranslationDurationInSeconds = 100;
 if (process.env.UI === "firefox-infobar-ui") {
   before(async function() {
     // Launch and make sure required test servers are available before commencing tests
-    launchFixturesServer();
-    proxyInstanceId = launchTestProxyServer();
+    fixturesServerProcess = launchFixturesServer().serverProcess;
+    const _ = launchTestProxyServer();
+    proxyInstanceId = _.proxyInstanceId;
+    testProxyServerProcess = _.serverProcess;
     await waitOn({
       resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
       timeout: 5000, // timeout in ms, default Infinity
     });
+  });
+
+  after(function() {
+    fixturesServerProcess.kill();
+    testProxyServerProcess.kill();
   });
 
   describe("Infobar interactions", function() {

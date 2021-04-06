@@ -31,10 +31,12 @@ export const launchTestServer = (
     console.log(`Child process "${ref}" exited with code` + code);
   });
   /* eslint-enable mozilla/balanced-listeners */
+
+  return { serverProcess };
 };
 
 export const launchFixturesServer = () => {
-  launchTestServer(
+  return launchTestServer(
     "yarn",
     ["serve-fixtures", "--port", "4001"],
     "fixtures-server",
@@ -50,7 +52,7 @@ export const launchTestProxyServer = () => {
     .toISOString()
     .split(".")[0];
   const proxyInstanceId = `${utcDateISOString}-${nanoid(4)}`;
-  launchTestServer(
+  const { serverProcess } = launchTestServer(
     "mitmdump",
     [
       "-s",
@@ -63,5 +65,5 @@ export const launchTestProxyServer = () => {
     "test-proxy-server",
     {},
   );
-  return proxyInstanceId;
+  return { serverProcess, proxyInstanceId };
 };
