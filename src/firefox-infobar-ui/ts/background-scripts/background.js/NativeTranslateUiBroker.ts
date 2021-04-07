@@ -55,28 +55,34 @@ interface BrowserWithExperimentAPIs extends browserInterface {
         tabId: number,
         uiState: NativeTranslateUiState,
       ) => Promise<void>;
+      onInfoBarDisplayed: Event<(tabId: number) => void>;
       onSelectTranslateTo: Event<(tabId: number) => void>;
       onSelectTranslateFrom: Event<(tabId: number) => void>;
       onInfoBarClosed: Event<(tabId: number) => void>;
+      onNeverTranslateSelectedLanguage: Event<(tabId: number) => void>;
       onNeverTranslateThisSite: Event<(tabId: number) => void>;
+      onShowOriginalButtonPressed: Event<(tabId: number) => void>;
+      onShowTranslatedButtonPressed: Event<(tabId: number) => void>;
       onTranslateButtonPressed: Event<
         (tabId: number, from: string, to: string) => void
       >;
-      onShowOriginalButtonPressed: Event<(tabId: number) => void>;
-      onShowTranslatedButtonPressed: Event<(tabId: number) => void>;
+      onNotNowButtonPressed: Event<(tabId: number) => void>;
     };
   };
 }
 const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
 type NativeTranslateUiEventRef =
+  | "onInfoBarDisplayed"
   | "onSelectTranslateTo"
   | "onSelectTranslateFrom"
   | "onInfoBarClosed"
+  | "onNeverTranslateSelectedLanguage"
   | "onNeverTranslateThisSite"
-  | "onTranslateButtonPressed"
   | "onShowOriginalButtonPressed"
-  | "onShowTranslatedButtonPressed";
+  | "onShowTranslatedButtonPressed"
+  | "onTranslateButtonPressed"
+  | "onNotNowButtonPressed";
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;
@@ -85,13 +91,16 @@ export class NativeTranslateUiBroker {
   constructor(extensionState) {
     this.extensionState = extensionState;
     this.eventsToObserve = [
+      "onInfoBarDisplayed",
       "onSelectTranslateTo",
       "onSelectTranslateFrom",
       "onInfoBarClosed",
+      "onNeverTranslateSelectedLanguage",
       "onNeverTranslateThisSite",
-      "onTranslateButtonPressed",
       "onShowOriginalButtonPressed",
       "onShowTranslatedButtonPressed",
+      "onTranslateButtonPressed",
+      "onNotNowButtonPressed",
     ];
   }
 
@@ -211,6 +220,11 @@ export class NativeTranslateUiBroker {
     );
   }
 
+  onInfoBarDisplayed(tabId: number) {
+    console.debug("onInfoBarDisplayed", { tabId });
+    telemetry.onInfoBarDisplayed(tabId);
+  }
+
   onSelectTranslateFrom(tabId: number) {
     console.debug("onSelectTranslateFrom", { tabId });
     telemetry.onSelectTranslateFrom(tabId);
@@ -226,15 +240,14 @@ export class NativeTranslateUiBroker {
     telemetry.onInfoBarClosed(tabId);
   }
 
+  onNeverTranslateSelectedLanguage(tabId: number) {
+    console.debug("onNeverTranslateSelectedLanguage", { tabId });
+    telemetry.onNeverTranslateSelectedLanguage(tabId);
+  }
+
   onNeverTranslateThisSite(tabId: number) {
     console.debug("onNeverTranslateThisSite", { tabId });
     telemetry.onNeverTranslateThisSite(tabId);
-  }
-
-  onTranslateButtonPressed(tabId: number, from: string, to: string) {
-    console.debug("onTranslateButtonPressed", { tabId, from, to });
-    telemetry.onTranslateButtonPressed(tabId, from, to);
-    this.translateAllFramesInTab(tabId, from, to);
   }
 
   onShowOriginalButtonPressed(tabId: number) {
@@ -247,6 +260,17 @@ export class NativeTranslateUiBroker {
     console.debug("onShowTranslatedButtonPressed", { tabId });
     telemetry.onShowTranslatedButtonPressed(tabId);
     this.extensionState.hideOriginalInTab(tabId);
+  }
+
+  onTranslateButtonPressed(tabId: number, from: string, to: string) {
+    console.debug("onTranslateButtonPressed", { tabId, from, to });
+    telemetry.onTranslateButtonPressed(tabId, from, to);
+    this.translateAllFramesInTab(tabId, from, to);
+  }
+
+  onNotNowButtonPressed(tabId: number) {
+    console.debug("onNotNowButtonPressed", { tabId });
+    telemetry.onNotNowButtonPressed(tabId);
   }
 
   async stop() {

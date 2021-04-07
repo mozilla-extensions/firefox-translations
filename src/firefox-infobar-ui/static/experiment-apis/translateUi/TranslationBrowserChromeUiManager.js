@@ -9,9 +9,34 @@ class TranslationBrowserChromeUiNotificationManager {
     this.browser = browser;
   }
 
-  translate(from, to) {
-    console.log("translate", { from, to });
-    this.apiEventEmitter.emit("onTranslateButtonPressed", this.tabId, from, to);
+  infobarDisplayed() {
+    console.log("infobarDisplayed");
+    this.apiEventEmitter.emit("onInfoBarDisplayed", this.tabId);
+  }
+
+  toLanguageChanged() {
+    console.log("toLanguageChanged");
+    this.apiEventEmitter.emit("onSelectTranslateTo", this.tabId);
+  }
+
+  fromLanguageChanged() {
+    console.log("fromLanguageChanged");
+    this.apiEventEmitter.emit("onSelectTranslateFrom", this.tabId);
+  }
+
+  infobarClosed() {
+    console.log("infobarClosed");
+    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId);
+  }
+
+  neverForLanguage() {
+    console.log("neverForLanguage");
+    this.apiEventEmitter.emit("onNeverTranslateSelectedLanguage", this.tabId);
+  }
+
+  neverForSite() {
+    console.log("neverForSite");
+    this.apiEventEmitter.emit("onNeverTranslateThisSite", this.tabId);
   }
 
   showOriginalContent() {
@@ -24,19 +49,14 @@ class TranslationBrowserChromeUiNotificationManager {
     this.apiEventEmitter.emit("onShowTranslatedButtonPressed", this.tabId);
   }
 
-  infobarClosed() {
-    console.log("infobarClosed");
-    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId);
+  translate(from, to) {
+    console.log("translate", { from, to });
+    this.apiEventEmitter.emit("onTranslateButtonPressed", this.tabId, from, to);
   }
 
-  fromLanguageChanged() {
-    console.log("fromLanguageChanged");
-    this.apiEventEmitter.emit("onSelectTranslateFrom", this.tabId);
-  }
-
-  toLanguageChanged() {
-    console.log("toLanguageChanged");
-    this.apiEventEmitter.emit("onSelectTranslateTo", this.tabId);
+  notNow() {
+    console.log("notNow");
+    this.apiEventEmitter.emit("onNotNowButtonPressed", this.tabId);
   }
 
   /*

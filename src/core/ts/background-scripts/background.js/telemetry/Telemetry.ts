@@ -12,13 +12,13 @@ import {
 } from "./generated/performance";
 import { fromLang, toLang } from "./generated/metadata";
 import {
-  closed,
+  displayed,
   changeLang,
+  closed,
   neverTranslateSite,
   translate,
-  // displayed,
-  // neverTranslateLang,
-  // notNow,
+  neverTranslateLang,
+  notNow,
 } from "./generated/infobar";
 
 /**
@@ -39,6 +39,11 @@ export class Telemetry {
     );
   }
 
+  public onInfoBarDisplayed(tabId: number) {
+    displayed.record();
+    this.submit();
+  }
+
   public onSelectTranslateFrom(tabId: number) {
     changeLang.record();
     this.submit();
@@ -54,15 +59,13 @@ export class Telemetry {
     this.submit();
   }
 
-  public onNeverTranslateThisSite(tabId: number) {
-    neverTranslateSite.record();
+  public onNeverTranslateSelectedLanguage(tabId: number) {
+    neverTranslateLang.record();
     this.submit();
   }
 
-  public onTranslateButtonPressed(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    translate.record();
+  public onNeverTranslateThisSite(tabId: number) {
+    neverTranslateSite.record();
     this.submit();
   }
 
@@ -72,6 +75,18 @@ export class Telemetry {
 
   public onShowTranslatedButtonPressed(tabId: number) {
     // TODO?
+  }
+
+  public onTranslateButtonPressed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    translate.record();
+    this.submit();
+  }
+
+  public onNotNowButtonPressed(tabId: number) {
+    notNow.record();
+    this.submit();
   }
 
   /**

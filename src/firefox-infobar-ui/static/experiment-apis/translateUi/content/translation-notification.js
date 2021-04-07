@@ -31,7 +31,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             </menulist>
             <label value="&translation.translateThisPage.label;"/>
             <button class="notification-button primary" label="&translation.translate.button;" anonid="translate" oncommand="this.closest('notification').translate();"/>
-            <button class="notification-button" label="&translation.notNow.button;" anonid="notNow" oncommand="this.closest('notification').closeCommand();"/>
+            <button class="notification-button" label="&translation.notNow.button;" anonid="notNow" oncommand="this.closest('notification').notNow();"/>
           </hbox>
           <vbox class="translating-box" pack="center">
             <label value="&translation.translatingContent.label;"/>
@@ -284,11 +284,20 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
   /**
    * To be called when the infobar should be closed per user's wish (e.g.
-   * by clicking the notification's close button
+   * by clicking the notification's close button, the not now button or choosing never to translate)
    */
   closeCommand() {
     this.close();
     this.translation.infobarClosed();
+  }
+
+  /**
+   * To be called when the infobar should be closed per user's wish
+   * by clicking the Not now button
+   */
+  notNow() {
+    this.translation.notNow();
+    this.closeCommand();
   }
 
   _handleButtonHiding() {
@@ -376,6 +385,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     Services.prefs.setCharPref(kPrefName, val);
 
+    this.translation.neverForLanguage();
     this.closeCommand();
   }
 
@@ -384,6 +394,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     const perms = Services.perms;
     perms.addFromPrincipal(principal, "translate", perms.DENY_ACTION);
 
+    this.translation.neverForSite();
     this.closeCommand();
   }
 };
