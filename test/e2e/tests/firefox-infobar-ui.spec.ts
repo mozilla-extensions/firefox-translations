@@ -175,6 +175,34 @@ if (process.env.UI === "firefox-infobar-ui") {
       assertElementExists(translatedPageElement, "translatedPageElement");
     };
 
+    it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
+      // ... this test continues the session from the previous test
+      const seenTelemetry = await readSeenTelemetry(
+        0,
+        0,
+        proxyInstanceId,
+        maxToleratedTelemetryUploadingDurationInSeconds * 1000,
+      );
+      // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
+      console.log(this.test.fullTitle());
+      console.log({ proxyInstanceId });
+      assert.strictEqual(
+        seenTelemetry[0].events.length,
+        1,
+        "The first ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].category,
+        "infobar",
+        "The first ping's event category is 'infobar'",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].name,
+        "displayed",
+        "The first ping's event name is 'displayed'",
+      );
+    });
+
     it("Translation via the infobar works", async function() {
       // ... this test continues the session from the previous test
       await assertOriginalPageElementExists();
@@ -186,15 +214,27 @@ if (process.env.UI === "firefox-infobar-ui") {
     it("Telemetry checks after: Translation via the infobar works", async function() {
       // ... this test continues the session from the previous test
       const seenTelemetry = await readSeenTelemetry(
-        0,
         1,
+        2,
         proxyInstanceId,
         maxToleratedTelemetryUploadingDurationInSeconds * 1000,
       );
+
+      // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
       assert.strictEqual(
         seenTelemetry[0].events.length,
         1,
         "The first ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].category,
+        "infobar",
+        "The first ping's event category is 'infobar'",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].name,
+        "translate",
+        "The first ping's event name is 'translate'",
       );
       assert.strictEqual(
         seenTelemetry[0].metrics.string["metadata.from_lang"],
