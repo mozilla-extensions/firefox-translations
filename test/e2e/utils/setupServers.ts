@@ -1,6 +1,31 @@
 import * as fs from "fs";
 import { join } from "path";
 import { nanoid } from "nanoid";
+import { navigateToURL } from "./navigateToURL";
+import { assertElementExists } from "./assertElement";
+import { takeScreenshot } from "./takeScreenshot";
+import { assert } from "chai";
+import { WebDriver } from "./setupWebdriver";
+import { lookForPageElement } from "./lookForElement";
+import { By } from "selenium-webdriver";
+import * as kill from "tree-kill";
+import * as waitOn from "wait-on";
+
+export const startTestServers = async () => {
+  // Launch and make sure required test servers are available before commencing tests
+  const fixturesServerProcess = launchFixturesServer().serverProcess;
+  const { proxyInstanceId, serverProcess } = launchTestProxyServer();
+  const testProxyServerProcess = serverProcess;
+  await waitOn({
+    resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
+    timeout: 5000, // timeout in ms, default Infinity
+  });
+  const shutdownTestServers = async () => {
+    kill(fixturesServerProcess.pid, "SIGKILL");
+    kill(testProxyServerProcess.pid, "SIGKILL");
+  };
+  return { proxyInstanceId, shutdownTestServers };
+};
 
 export const launchTestServer = (
   cmd: string,
@@ -68,4 +93,49 @@ export const launchTestProxyServer = () => {
     {},
   );
   return { serverProcess, proxyInstanceId };
+};
+
+async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
+  return lookForPageElement(
+    driver,
+    By.xpath,
+    "//*[contains(text(),'Install mitmproxy')]",
+    timeout,
+  );
+}
+
+export const verifyTestProxyServer = async function(driver: WebDriver, test) {
+  await navigateToURL(driver, "http://mitm.it");
+  const mitmProxyConfigurationSuccessMessageElement = await lookForMitmProxyConfigurationSuccessMessage(
+    driver,
+    3000,
+  );
+  assertElementExists(
+    mitmProxyConfigurationSuccessMessageElement,
+    "mitmProxyConfigurationSuccessMessageElement",
+  );
+  await takeScreenshot(driver, `${test.fullTitle()} - http nav`);
+
+  try {
+    await navigateToURL(driver, "https://mozilla.com");
+    await takeScreenshot(driver, `${test.fullTitle()} - https nav`);
+    assert(
+      true,
+      "Successfully visited a https site without encountering a certificate error",
+    );
+  } catch (err) {
+    if (
+      err.name === "InsecureCertificateError" ||
+      (err.name === "WebDriverError" &&
+        err.message.includes(
+          "Reached error page: about:neterror?e=nssFailure2",
+        ))
+    ) {
+      assert(
+        false,
+        "The mitxproxy certificate is not installed in the profile",
+      );
+    }
+    throw err;
+  }
 };

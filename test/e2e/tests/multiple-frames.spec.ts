@@ -10,7 +10,7 @@ import {
   assertInfobarIsShown,
   lookForInfobarTranslateButton,
   translateViaInfobar,
-} from "../utils/translation";
+} from "../utils/translationInfobar";
 
 async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(

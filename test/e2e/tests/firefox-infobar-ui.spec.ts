@@ -13,24 +13,13 @@ import {
   closeInfobarViaNotNowButton,
   lookForInfobarTranslateButton,
   translateViaInfobar,
-} from "../utils/translation";
+} from "../utils/translationInfobar";
 import * as assert from "assert";
-import * as waitOn from "wait-on";
 import {
-  launchFixturesServer,
-  launchTestProxyServer,
+  startTestServers,
+  verifyTestProxyServer,
 } from "../utils/setupServers";
 import { readSeenTelemetry } from "../utils/telemetry";
-import * as kill from "tree-kill";
-
-async function lookForMitmProxyConfigurationSuccessMessage(driver, timeout) {
-  return lookForPageElement(
-    driver,
-    By.xpath,
-    "//*[contains(text(),'Install mitmproxy')]",
-    timeout,
-  );
-}
 
 async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(
@@ -50,8 +39,7 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
 }
 
 let proxyInstanceId;
-let fixturesServerProcess;
-let testProxyServerProcess;
+let shutdownTestServers;
 const maxToleratedTelemetryUploadingDurationInSeconds = 10;
 
 let tabsCurrentlyOpened = 1;
@@ -62,23 +50,16 @@ const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
   before(async function() {
-    // Launch and make sure required test servers are available before commencing tests
-    fixturesServerProcess = launchFixturesServer().serverProcess;
-    const _ = launchTestProxyServer();
+    const _ = await startTestServers();
     proxyInstanceId = _.proxyInstanceId;
-    testProxyServerProcess = _.serverProcess;
-    await waitOn({
-      resources: ["tcp:localhost:4001", "tcp:localhost:8080"],
-      timeout: 5000, // timeout in ms, default Infinity
-    });
+    shutdownTestServers = _.shutdownTestServers;
   });
 
   after(function() {
-    kill(fixturesServerProcess.pid, "SIGKILL");
-    kill(testProxyServerProcess.pid, "SIGKILL");
+    shutdownTestServers();
   });
 
-  describe("Infobar interactions", function() {
+  describe("Basic infobar interactions", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
       (15 +
@@ -103,39 +84,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     });
 
     it("Proxy server for telemetry-validation is properly configured", async function() {
-      await navigateToURL(driver, "http://mitm.it");
-      const mitmProxyConfigurationSuccessMessageElement = await lookForMitmProxyConfigurationSuccessMessage(
-        driver,
-        3000,
-      );
-      assertElementExists(
-        mitmProxyConfigurationSuccessMessageElement,
-        "mitmProxyConfigurationSuccessMessageElement",
-      );
-      await takeScreenshot(driver, `${this.test.fullTitle()} - http nav`);
-
-      try {
-        await navigateToURL(driver, "https://mozilla.com");
-        await takeScreenshot(driver, `${this.test.fullTitle()} - https nav`);
-        assert(
-          true,
-          "Successfully visited a https site without encountering a certificate error",
-        );
-      } catch (err) {
-        if (
-          err.name === "InsecureCertificateError" ||
-          (err.name === "WebDriverError" &&
-            err.message.includes(
-              "Reached error page: about:neterror?e=nssFailure2",
-            ))
-        ) {
-          assert(
-            false,
-            "The mitxproxy certificate is not installed in the profile",
-          );
-        }
-        throw err;
-      }
+      await verifyTestProxyServer(driver, this.test);
     });
 
     it("The translation infobar is not shown on eg about:debugging", async function() {
