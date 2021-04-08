@@ -11,7 +11,7 @@ let shutdownTestServers;
 
 describe("Test servers", function() {
   // This gives Firefox time to start, and us a bit longer during some of the tests.
-  this.timeout(15 * 1000);
+  this.timeout(25 * 1000);
 
   let driver;
 

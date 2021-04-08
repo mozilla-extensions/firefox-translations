@@ -39,7 +39,7 @@ const maxToleratedModelLoadingDurationInSeconds = 20;
 const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
-  describe("Multiple frames", function() {
+  describe("Translation: Multiple frames", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
       (15 +
