@@ -1,6 +1,6 @@
 /* eslint-env node, mocha */
 
-import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
+import { launchFirefox } from "../../utils/setupWebdriver";
 import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   startTestServers,
@@ -19,7 +19,6 @@ describe("Test servers", function() {
     const _ = await startTestServers();
     shutdownTestServers = _.shutdownTestServers;
     driver = await launchFirefox();
-    await installExtension(driver);
     // Allow our extension some time to set up the initial ui
     await driver.sleep(1000);
   });
