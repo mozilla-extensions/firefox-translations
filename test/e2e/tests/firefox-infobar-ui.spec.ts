@@ -4,14 +4,13 @@ import { installExtension, launchFirefox } from "../utils/setupWebdriver";
 import { lookForPageElement } from "../utils/lookForElement";
 import { navigateToURL } from "../utils/navigateToURL";
 import { By } from "selenium-webdriver";
-import {
-  assertElementDoesNotExist,
-  assertElementExists,
-} from "../utils/assertElement";
+import { assertElementExists } from "../utils/assertElement";
 import { takeScreenshot } from "../utils/takeScreenshot";
 import {
+  assertInfobarIsNotShown,
   assertInfobarIsShown,
-  lookForInfobar,
+  closeInfobarViaCloseButton,
+  closeInfobarViaNotNowButton,
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../utils/translation";
@@ -141,8 +140,7 @@ if (process.env.UI === "firefox-infobar-ui") {
 
     it("The translation infobar is not shown on eg about:debugging", async function() {
       await navigateToURL(driver, "about:debugging");
-      const infobarElement = await lookForInfobar(driver, tabsCurrentlyOpened);
-      assertElementDoesNotExist(infobarElement, "infobarElement");
+      await assertInfobarIsNotShown(driver, tabsCurrentlyOpened);
       await takeScreenshot(driver, this.test.fullTitle());
     });
 
@@ -184,8 +182,6 @@ if (process.env.UI === "firefox-infobar-ui") {
         maxToleratedTelemetryUploadingDurationInSeconds * 1000,
       );
       // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
-      console.log(this.test.fullTitle());
-      console.log({ proxyInstanceId });
       assert.strictEqual(
         seenTelemetry[0].events.length,
         1,
@@ -236,15 +232,26 @@ if (process.env.UI === "firefox-infobar-ui") {
         "translate",
         "The first ping's event name is 'translate'",
       );
-      assert.strictEqual(
-        seenTelemetry[0].metrics.string["metadata.from_lang"],
-        "es",
-        "The first ping has correct from_lang metadata",
+      assert.deepStrictEqual(
+        seenTelemetry[0].metrics.string,
+        {
+          "metadata.from_lang": "es",
+          "metadata.to_lang": "en",
+        },
+        "The first ping's string metrics are correct",
       );
-      assert.strictEqual(
-        seenTelemetry[1].metrics.string["metadata.from_lang"],
-        "es",
-        "The second ping has correct from_lang metadata",
+
+      // Check telemetry for: Translated words per second, Model load time, Translation time
+      assert.deepStrictEqual(
+        seenTelemetry[1].metrics.string,
+        {
+          "metadata.from_lang": "es",
+          "metadata.to_lang": "en",
+          "performance.model_load_time": "-1",
+          "performance.translation_time": "-1",
+          "performance.words_per_second": "-1",
+        },
+        "The second ping's string metrics are correct",
       );
     });
 
@@ -287,5 +294,91 @@ if (process.env.UI === "firefox-infobar-ui") {
       await assertTranslationSucceeded();
       await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 1`);
     });
+
+    it("The translation infobar can be closed via the close button", async function() {
+      // ... this test continues the session from the previous test
+      await navigateToURL(driver, fixtureUrl);
+      await closeInfobarViaCloseButton(driver, tabsCurrentlyOpened);
+      await takeScreenshot(driver, this.test.fullTitle());
+    });
+
+    it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
+      // ... this test continues the session from the previous test
+      const seenTelemetry = await readSeenTelemetry(
+        16,
+        16,
+        proxyInstanceId,
+        maxToleratedTelemetryUploadingDurationInSeconds * 1000,
+      );
+
+      // Check telemetry for: When the user hits the infobar button or menu item 'Close'
+      assert.strictEqual(
+        seenTelemetry[0].events.length,
+        1,
+        "The first ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].category,
+        "infobar",
+        "The first ping's event category is 'infobar'",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].name,
+        "closed",
+        "The first ping's event name is 'close'",
+      );
+    });
+
+    it("The translation infobar can be closed via the 'Not now' button", async function() {
+      // ... this test continues the session from the previous test
+      await navigateToURL(driver, fixtureUrl);
+      await closeInfobarViaNotNowButton(driver, tabsCurrentlyOpened);
+      await takeScreenshot(driver, this.test.fullTitle());
+    });
+
+    it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
+      // ... this test continues the session from the previous test
+      const seenTelemetry = await readSeenTelemetry(
+        19,
+        20,
+        proxyInstanceId,
+        maxToleratedTelemetryUploadingDurationInSeconds * 1000,
+      );
+
+      // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
+      assert.strictEqual(
+        seenTelemetry[0].events.length,
+        1,
+        "The first ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].category,
+        "infobar",
+        "The first ping's event category is 'infobar'",
+      );
+      assert.strictEqual(
+        seenTelemetry[0].events[0].name,
+        "not_now",
+        "The first ping's event name is 'not_now'",
+      );
+      assert.strictEqual(
+        seenTelemetry[1].events.length,
+        1,
+        "The second ping contains one Glean event",
+      );
+      assert.strictEqual(
+        seenTelemetry[1].events[0].category,
+        "infobar",
+        "The second ping's event category is 'infobar'",
+      );
+      assert.strictEqual(
+        seenTelemetry[1].events[0].name,
+        "closed",
+        "The second ping's event name is 'not_now'",
+      );
+    });
+
+    // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
+    // Check telemetry for: When the user hits the infobar button or menu item 'Never translate site'"
   });
 }
