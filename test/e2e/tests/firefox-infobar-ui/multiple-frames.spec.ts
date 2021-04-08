@@ -1,16 +1,16 @@
 /* eslint-env node, mocha */
 
-import { installExtension, launchFirefox } from "../utils/setupWebdriver";
-import { lookForPageElement } from "../utils/lookForElement";
-import { navigateToURL } from "../utils/navigateToURL";
+import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
+import { lookForPageElement } from "../../utils/lookForElement";
+import { navigateToURL } from "../../utils/navigateToURL";
 import { By } from "selenium-webdriver";
-import { assertElementExists } from "../utils/assertElement";
-import { takeScreenshot } from "../utils/takeScreenshot";
+import { assertElementExists } from "../../utils/assertElement";
+import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsShown,
   lookForInfobarTranslateButton,
   translateViaInfobar,
-} from "../utils/translationInfobar";
+} from "../../utils/translationInfobar";
 
 async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(

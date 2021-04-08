@@ -1,12 +1,12 @@
 /* eslint-env node, mocha */
 
 import { assert } from "chai";
-import { installExtension, launchFirefox } from "../utils/setupWebdriver";
-import { extensionWidgetId } from "../utils/extensionWidgetId";
-import { lookForBrowserElement } from "../utils/lookForElement";
+import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
+import { extensionWidgetId } from "../../utils/extensionWidgetId";
+import { lookForBrowserElement } from "../../utils/lookForElement";
 import { By } from "selenium-webdriver";
-import { assertElementExists } from "../utils/assertElement";
-import { takeScreenshot } from "../utils/takeScreenshot";
+import { assertElementExists } from "../../utils/assertElement";
+import { takeScreenshot } from "../../utils/takeScreenshot";
 
 let extensionId;
 
