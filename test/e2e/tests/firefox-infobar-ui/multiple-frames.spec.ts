@@ -11,6 +11,7 @@ import {
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../../utils/translationInfobar";
+import { startTestServers } from "../../utils/setupServers";
 
 async function lookForFixturePageOriginalContent(driver) {
   return lookForPageElement(
@@ -28,6 +29,8 @@ async function lookForFixturePageTranslatedContent(driver, timeout) {
     timeout,
   );
 }
+
+let shutdownTestServers;
 
 const tabsCurrentlyOpened = 1;
 
@@ -48,6 +51,8 @@ if (process.env.UI === "firefox-infobar-ui") {
     let driver;
 
     before(async function() {
+      const _ = await startTestServers();
+      shutdownTestServers = _.shutdownTestServers;
       driver = await launchFirefox();
       await installExtension(driver);
       // Allow our extension some time to set up the initial ui
@@ -57,6 +62,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     after(async function() {
       await takeScreenshot(driver, this.test.fullTitle());
       await driver.quit();
+      shutdownTestServers();
     });
 
     it("The translation infobar is shown on a multi-frame web-page with Spanish content", async function() {

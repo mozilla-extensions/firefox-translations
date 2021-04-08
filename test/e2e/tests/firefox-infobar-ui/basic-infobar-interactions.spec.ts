@@ -15,10 +15,7 @@ import {
   translateViaInfobar,
 } from "../../utils/translationInfobar";
 import * as assert from "assert";
-import {
-  startTestServers,
-  verifyTestProxyServer,
-} from "../../utils/setupServers";
+import { startTestServers } from "../../utils/setupServers";
 import { readSeenTelemetry } from "../../utils/telemetry";
 
 async function lookForFixturePageOriginalContent(driver) {
@@ -49,16 +46,6 @@ const maxToleratedModelLoadingDurationInSeconds = 20;
 const maxToleratedTranslationDurationInSeconds = 100;
 
 if (process.env.UI === "firefox-infobar-ui") {
-  before(async function() {
-    const _ = await startTestServers();
-    proxyInstanceId = _.proxyInstanceId;
-    shutdownTestServers = _.shutdownTestServers;
-  });
-
-  after(function() {
-    shutdownTestServers();
-  });
-
   describe("Basic infobar interactions", function() {
     // This gives Firefox time to start, and us a bit longer during some of the tests.
     this.timeout(
@@ -72,6 +59,9 @@ if (process.env.UI === "firefox-infobar-ui") {
     let driver;
 
     before(async function() {
+      const _ = await startTestServers();
+      proxyInstanceId = _.proxyInstanceId;
+      shutdownTestServers = _.shutdownTestServers;
       driver = await launchFirefox();
       await installExtension(driver);
       // Allow our extension some time to set up the initial ui
@@ -81,10 +71,7 @@ if (process.env.UI === "firefox-infobar-ui") {
     after(async function() {
       await takeScreenshot(driver, this.test.fullTitle());
       await driver.quit();
-    });
-
-    it("Proxy server for telemetry-validation is properly configured", async function() {
-      await verifyTestProxyServer(driver, this.test);
+      shutdownTestServers();
     });
 
     it("The translation infobar is not shown on eg about:debugging", async function() {
