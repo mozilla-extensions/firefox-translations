@@ -239,7 +239,4 @@ describe("Basic infobar interactions", function() {
       "The second ping's event name is 'closed'",
     );
   });
-
-  // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
-  // Check telemetry for: When the user hits the infobar button or menu item 'Never translate site'"
 });

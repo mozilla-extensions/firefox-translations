@@ -316,8 +316,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     this._handleButtonHiding();
   }
 
-  optionsShowing() {
-    // Get the source language name.
+  _getSourceLang() {
     let lang;
     if (
       this.translation.uiState.infobarState ===
@@ -337,7 +336,16 @@ window.MozTranslationNotification = class extends MozElements.Notification {
         lang = this.translation.uiState.detectedLanguage;
       }
     }
+    if (!lang) {
+      throw new Error("Source language is not defined");
+    }
+    return lang;
+  }
 
+  optionsShowing() {
+    const lang = this._getSourceLang();
+
+    // Get the source language name.
     const langName = Services.intl.getLanguageDisplayNames(undefined, [
       lang,
     ])[0];
@@ -356,7 +364,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       "accesskey",
       bundle.GetStringFromName(kStrId + ".accesskey"),
     );
-    item.langCode = lang;
 
     // We may need to disable the menuitems if they have already been used.
     // Check if translation is already disabled for this language:
@@ -376,12 +383,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
   neverForLanguage() {
     const kPrefName = "browser.translation.neverForLanguages";
+    const sourceLang = this._getSourceLang();
 
     let val = Services.prefs.getCharPref(kPrefName);
     if (val) {
       val += ",";
     }
-    val += this._getAnonElt("neverForLanguage").langCode;
+    val += sourceLang;
 
     Services.prefs.setCharPref(kPrefName, val);
 

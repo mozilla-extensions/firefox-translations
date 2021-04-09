@@ -34,7 +34,26 @@ export async function lookForInfobarOptionsButton(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification hbox.translate-offer-box button[anonid="options"]`,
+    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"]`,
+  );
+}
+
+export async function lookForInfobarNeverTranslateCurrentLanguageMenuItem(
+  driver,
+  nthTab,
+) {
+  return lookForBrowserElement(
+    driver,
+    By.css,
+    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForLanguage"]`,
+  );
+}
+
+export async function lookForInfobarNeverTranslateSiteMenuItem(driver, nthTab) {
+  return lookForBrowserElement(
+    driver,
+    By.css,
+    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForSite"]`,
   );
 }
 
@@ -84,5 +103,53 @@ export const closeInfobarViaNotNowButton = async (driver, nthTab) => {
   assertElementExists(notNowButtonElement, "notNowButtonElement");
   await driver.sleep(500); // Work around apparent race condition that would result in "displayed" telemetry being sent after "closed" telemetry
   await notNowButtonElement.click();
+  await driver.wait(until.stalenessOf(infobarElement), 1000);
+};
+
+export const closeInfobarViaNeverTranslateCurrentLanguageMenuItem = async (
+  driver,
+  nthTab,
+) => {
+  const infobarElement = await assertInfobarIsShown(driver, nthTab);
+  const optionsButtonElement = await lookForInfobarOptionsButton(
+    driver,
+    nthTab,
+  );
+  assertElementExists(optionsButtonElement, "optionsButtonElement");
+  await optionsButtonElement.click();
+  const neverTranslateCurrentLanguageMenuItemElement = await lookForInfobarNeverTranslateCurrentLanguageMenuItem(
+    driver,
+    nthTab,
+  );
+  assertElementExists(
+    neverTranslateCurrentLanguageMenuItemElement,
+    "neverTranslateCurrentLanguageMenuItemElement",
+  );
+  await driver.sleep(500); // Work around apparent race condition that would result in "displayed" telemetry being sent after "closed" telemetry
+  await neverTranslateCurrentLanguageMenuItemElement.click();
+  await driver.wait(until.stalenessOf(infobarElement), 1000);
+};
+
+export const closeInfobarViaNeverTranslateSiteMenuItem = async (
+  driver,
+  nthTab,
+) => {
+  const infobarElement = await assertInfobarIsShown(driver, nthTab);
+  const optionsButtonElement = await lookForInfobarOptionsButton(
+    driver,
+    nthTab,
+  );
+  assertElementExists(optionsButtonElement, "optionsButtonElement");
+  await optionsButtonElement.click();
+  const neverTranslateSiteMenuItemElement = await lookForInfobarNeverTranslateSiteMenuItem(
+    driver,
+    nthTab,
+  );
+  assertElementExists(
+    neverTranslateSiteMenuItemElement,
+    "neverTranslateSiteMenuItemElement",
+  );
+  await driver.sleep(500); // Work around apparent race condition that would result in "displayed" telemetry being sent after "closed" telemetry
+  await neverTranslateSiteMenuItemElement.click();
   await driver.wait(until.stalenessOf(infobarElement), 1000);
 };
