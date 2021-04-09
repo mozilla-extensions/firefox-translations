@@ -215,7 +215,6 @@ class WorkerManager {
 const workerManager = new WorkerManager();
 
 interface TranslationPerformanceStats {
-  translationWallTimeMs: number;
   seconds: number;
   textCount: number;
   wordCount: number;
@@ -245,7 +244,6 @@ const translationPerformanceStats = (
   const wordsPerSecond = Math.round(wordCount / seconds);
   const charactersPerSecond = Math.round(characterCount / seconds);
   return {
-    translationWallTimeMs,
     seconds,
     textCount,
     wordCount,
@@ -263,6 +261,7 @@ export interface ModelLoadedEventData {
 
 export interface TranslationFinishedEventData {
   requestId: string;
+  translationWallTimeMs: number;
   originalTextsTranslationPerformanceStats: TranslationPerformanceStats;
   translatedTextsTranslationPerformanceStats: TranslationPerformanceStats;
 }
@@ -346,6 +345,7 @@ class TranslationRequestDispatcher extends EventTarget {
     );
     const translationFinishedEventData: TranslationFinishedEventData = {
       requestId,
+      translationWallTimeMs,
       originalTextsTranslationPerformanceStats,
       translatedTextsTranslationPerformanceStats,
     };
@@ -452,15 +452,12 @@ export const BergamotTranslatorAPI = {
       const { originalTextsTranslationPerformanceStats } = e.detail;
       const {
         wordCount,
-        translationWallTimeMs,
+        seconds,
         wordsPerSecond,
       } = originalTextsTranslationPerformanceStats;
 
       console.info(
-        `BergamotTranslatorAPI: Translation of ${
-          texts.length
-        } texts (wordCount ${wordCount}) took ${translationWallTimeMs /
-          1000} secs (${wordsPerSecond} words per second)`,
+        `BergamotTranslatorAPI: Translation of ${texts.length} texts (wordCount ${wordCount}) took ${seconds} secs (${wordsPerSecond} words per second)`,
       );
 
       onTranslationFinished(e.detail);

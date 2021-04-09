@@ -8,6 +8,7 @@ import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { TranslationResults } from "./lib/BergamotTranslatorAPI";
 import { config } from "../../config";
+import { TranslationRequestProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 // Currently it is possible build variants of the extension that uses the REST API - eg for performance testing / research
 const bergamotApiClient = config.useBergamotRestApi
@@ -26,13 +27,16 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, from, to, requestId } = m;
-    const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
-      texts,
-      from,
-      to,
-    );
-    // console.log({ results });
     try {
+      const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
+        texts,
+        from,
+        to,
+        (translationRequestProgress: TranslationRequestProgress) => {
+          console.log("TODO", { translationRequestProgress });
+        },
+      );
+      // console.log({ results });
       port.postMessage({
         translationRequestResults: {
           results,

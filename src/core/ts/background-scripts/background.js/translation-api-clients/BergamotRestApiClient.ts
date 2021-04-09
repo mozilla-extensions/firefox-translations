@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { config } from "../../../config";
-import { TranslationApiClient } from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
+import {
+  TranslationApiClient,
+  TranslationRequestProgressCallback,
+} from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 import { TranslationResults } from "../lib/BergamotTranslatorAPI";
 
 const MS_IN_A_MINUTE = 60 * 1000;
@@ -81,6 +84,7 @@ export class BergamotRestApiClient implements TranslationApiClient {
     texts: string[],
     _from: string,
     _to: string,
+    _translationRequestProgressCallback: TranslationRequestProgressCallback,
   ): Promise<TranslationResults> => {
     const payload: BergamotRestApiTranslationRequestPayload = {
       text: texts,

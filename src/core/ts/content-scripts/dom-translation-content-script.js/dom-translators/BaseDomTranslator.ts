@@ -16,11 +16,23 @@ export interface TranslationResponseData {
   qeAnnotatedTranslatedMarkups: string[];
 }
 
+export interface TranslationRequestProgress {
+  modelLoaded: boolean;
+  modelLoadWallTimeMs: number;
+  translationFinished: boolean;
+  translationWallTimeMs: number;
+}
+
+export type TranslationRequestProgressCallback = (
+  translationRequestProgress: TranslationRequestProgress,
+) => void;
+
 export interface TranslationApiClient {
   sendTranslationRequest: (
     texts: string[],
     from: string,
     to: string,
+    translationRequestProgressCallback: TranslationRequestProgressCallback,
   ) => Promise<TranslationResults>;
 }
 
