@@ -4,6 +4,8 @@
 
 import {
   BergamotTranslatorAPI,
+  ModelLoadedEventData,
+  TranslationFinishedEventData,
   TranslationResults,
 } from "../lib/BergamotTranslatorAPI";
 import { TranslationApiClient } from "../../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
@@ -17,6 +19,16 @@ export class BergamotWasmApiClient implements TranslationApiClient {
     if (typeof texts === "string") {
       texts = [texts];
     }
-    return BergamotTranslatorAPI.translate(texts, from, to);
+    const translationResults = await BergamotTranslatorAPI.translate(
+      texts,
+      from,
+      to,
+      (modelLoadedEventData: ModelLoadedEventData) =>
+        console.log("TODO", { modelLoadedEventData }),
+      (translationFinishedEventData: TranslationFinishedEventData) =>
+        console.log("TODO", { translationFinishedEventData }),
+    );
+    console.log({ translationResults });
+    return translationResults;
   };
 }
