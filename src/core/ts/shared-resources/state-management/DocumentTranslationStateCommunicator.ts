@@ -5,8 +5,10 @@
 import { FrameInfo } from "../types/bergamot.types";
 import { TranslationStatus } from "../models/BaseTranslationState";
 import { ExtensionState } from "../models/ExtensionState";
-import { FrameTranslationProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
-import { mapToObject } from "mobx-keystone";
+import {
+  FrameTranslationProgress,
+  TranslationRequestProgress,
+} from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 /**
  * Helper class to communicate updated document translation states.
@@ -45,35 +47,44 @@ export class DocumentTranslationStateCommunicator {
       progressOfIndividualTranslationRequests,
     } = frameTranslationProgress;
 
-    const serialized = mapToObject(progressOfIndividualTranslationRequests);
-    console.log("broadcastUpdatedFrameTranslationProgress", {
+    const translationRequestProgressEntries = Array.from(
       progressOfIndividualTranslationRequests,
-      serialized,
-    });
+    ).map(
+      ([, translationRequestProgress]: [string, TranslationRequestProgress]) =>
+        translationRequestProgress,
+    );
+
+    const totalModelLoadWallTimeMs = translationRequestProgressEntries
+      .map((trp: TranslationRequestProgress) => trp.modelLoadWallTimeMs || 0)
+      .reduce((a, b) => a + b, 0);
+    const totalTranslationWallTimeMs = translationRequestProgressEntries
+      .map((trp: TranslationRequestProgress) => trp.translationWallTimeMs || 0)
+      .reduce((a, b) => a + b, 0);
+    const totalTranslationEngineRequestCount =
+      translationRequestProgressEntries.length;
+
     setTimeout(() => {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
         this.frameInfo,
         [
           {
             op: "replace",
-            path: ["progressOfIndividualTranslationRequests"],
-            value: serialized,
+            path: ["totalModelLoadWallTimeMs"],
+            value: totalModelLoadWallTimeMs,
+          },
+          {
+            op: "replace",
+            path: ["totalTranslationWallTimeMs"],
+            value: totalTranslationWallTimeMs,
+          },
+          {
+            op: "replace",
+            path: ["totalTranslationEngineRequestCount"],
+            value: totalTranslationEngineRequestCount,
           },
         ],
       );
     }, 0);
-    /*
-    // TODO: Evaluate value of calculating and setting the following attributes to the state directly instead of relying on computed properties
-    wordCount: prop<number>(),
-    wordCountVisible: prop<number>(),
-    wordCountVisibleInViewport: prop<number>(),
-    translatedWordCount: prop<number>(),
-    translatedWordCountVisible: prop<number>(),
-    translatedWordCountVisibleInViewport: prop<number>(),
-    totalModelLoadWallTimeMs: prop<number>(),
-    totalTranslationWallTimeMs: prop<number>(),
-    totalTranslationEngineRequestCount: prop<number>(),
-     */
   }
 
   clear() {

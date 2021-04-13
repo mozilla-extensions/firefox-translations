@@ -144,16 +144,36 @@ describe("Basic infobar interactions", function() {
     );
 
     // Check telemetry for: Translated words per second, Model load time, Translation time
-    assert.deepStrictEqual(
-      seenTelemetry[1].metrics.string,
-      {
-        "metadata.from_lang": "es",
-        "metadata.to_lang": "en",
-        "performance.model_load_time": "-1",
-        "performance.translation_time": "-1",
-        "performance.words_per_second": "-1",
-      },
-      "The second ping's string metrics are correct",
+    assert.strictEqual(
+      seenTelemetry[1].metrics.string["metadata.from_lang"],
+      "es",
+      "The second ping's string metrics 'metadata.from_lang' is correct",
+    );
+    assert.strictEqual(
+      seenTelemetry[1].metrics.string["metadata.from_lang"],
+      "en",
+      "The second ping's string metrics 'metadata.to_lang' is correct",
+    );
+    assert(
+      parseInt(
+        seenTelemetry[1].metrics.string["performance.model_load_time"],
+        10,
+      ) > 0,
+      "The second ping's string metrics 'performance.model_load_time' is a string that when parsed evaluates to more than 0",
+    );
+    assert(
+      parseInt(
+        seenTelemetry[1].metrics.string["performance.translation_time"],
+        10,
+      ) > 0,
+      "The second ping's string metrics 'performance.translation_time' is a string that when parsed evaluates to more than 0",
+    );
+    assert(
+      parseInt(
+        seenTelemetry[1].metrics.string["performance.words_per_second"],
+        10,
+      ) > 0,
+      "The second ping's string metrics 'performance.words_per_second' is a string that when parsed evaluates to more than 0",
     );
   });
 

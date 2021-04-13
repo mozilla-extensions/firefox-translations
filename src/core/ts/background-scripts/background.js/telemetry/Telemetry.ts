@@ -96,15 +96,15 @@ export class Telemetry {
   public onTranslationAttemptConcluded(
     from: string,
     to: string,
-    $modelLoadTime: number,
-    $translationTime: number,
+    modelLoadWallTimeMs: number,
+    translationWallTimeMs: number,
     $wordsPerSecond: number,
   ) {
     fromLang.set(from);
     toLang.set(to);
-    modelLoadTime.set(String($modelLoadTime));
-    translationTime.set(String($translationTime));
-    wordsPerSecond.set(String($wordsPerSecond));
+    modelLoadTime.set(String(Math.round(modelLoadWallTimeMs)));
+    translationTime.set(String(Math.round(translationWallTimeMs)));
+    wordsPerSecond.set(String(Math.round($wordsPerSecond)));
     this.submit();
   }
 

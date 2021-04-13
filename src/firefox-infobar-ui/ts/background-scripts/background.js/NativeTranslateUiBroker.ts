@@ -199,6 +199,8 @@ export class NativeTranslateUiBroker {
   }
 
   async translateAllFramesInTab(tabId: number, from: string, to: string) {
+    // Start timing
+    const start = performance.now();
     // Request translation of all frames in a specific tab
     this.extensionState.requestTranslationOfAllFramesInTab(tabId, from, to);
     // Wait for translation in all frames in tab to complete
@@ -209,24 +211,38 @@ export class NativeTranslateUiBroker {
         currentTabTranslationState.translationStatus,
       );
     });
-    // Record translation attempt concluded telemetry
+    // End timing
+    const end = performance.now();
+    const translationWallTimeMs = end - start;
+
+    // Record "translation attempt concluded" telemetry
     const { tabTranslationStates } = this.extensionState;
     const currentTabTranslationState = getSnapshot(
       tabTranslationStates.get(tabId),
     );
-    console.log(
-      "TODO: Read performance attributes from currentTabTranslationState",
-      { currentTabTranslationState },
+
+    const {
+      totalModelLoadWallTimeMs,
+      totalTranslationEngineRequestCount,
+      totalTranslationWallTimeMs,
+      wordCount,
+    } = currentTabTranslationState;
+
+    const perceivedSeconds = translationWallTimeMs / 1000;
+    const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
+    const translationEngineWordsPerSecond = Math.round(
+      wordCount / (totalTranslationWallTimeMs / 1000),
     );
-    const modelLoadTimeMs = -1;
-    const translationTimeMs = -1;
-    const wordsPerSecond = -1;
+    console.info(
+      `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which operated at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
+        1000} seconds.`,
+    );
     telemetry.onTranslationAttemptConcluded(
       from,
       to,
-      modelLoadTimeMs,
-      translationTimeMs,
-      wordsPerSecond,
+      totalModelLoadWallTimeMs,
+      totalTranslationWallTimeMs,
+      translationEngineWordsPerSecond,
     );
   }
 

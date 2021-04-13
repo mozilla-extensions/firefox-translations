@@ -5,7 +5,6 @@
 import {
   applyPatches,
   getSnapshot,
-  mapToObject,
   Model,
   model,
   modelAction,
@@ -20,7 +19,6 @@ import { FrameInfo } from "../types/bergamot.types";
 import { computed } from "mobx";
 import { TabTranslationState } from "./TabTranslationState";
 import { TranslationStatus } from "./BaseTranslationState";
-import { TranslationRequestProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;
@@ -153,26 +151,15 @@ export class ExtensionState extends Model({
         const wordCountVisibleInViewport = documentTranslationStates
           .map(dts => dts.wordCountVisibleInViewport)
           .reduce((a, b) => a + b, 0);
-
-        // Merge the progressOfIndividualTranslationRequests attribute across all frames in the tab
-        const progressOfIndividualTranslationRequests: Map<
-          string,
-          TranslationRequestProgress
-        > = new Map();
-        documentTranslationStates.forEach(dts => {
-          dts.progressOfIndividualTranslationRequests.forEach(
-            (translationRequestProgress: TranslationRequestProgress) => {
-              const translationRequestProgressSnapshot = getSnapshot(
-                translationRequestProgress,
-              );
-              console.log({ translationRequestProgressSnapshot });
-              progressOfIndividualTranslationRequests.set(
-                translationRequestProgressSnapshot.requestId,
-                translationRequestProgressSnapshot,
-              );
-            },
-          );
-        });
+        const totalModelLoadWallTimeMs = documentTranslationStates
+          .map(dts => dts.totalModelLoadWallTimeMs)
+          .reduce((a, b) => a + b, 0);
+        const totalTranslationWallTimeMs = documentTranslationStates
+          .map(dts => dts.totalTranslationWallTimeMs)
+          .reduce((a, b) => a + b, 0);
+        const totalTranslationEngineRequestCount = documentTranslationStates
+          .map(dts => dts.totalTranslationEngineRequestCount)
+          .reduce((a, b) => a + b, 0);
 
         // Special merging of translation status
         const anyTabHasTranslationStatus = (
@@ -220,9 +207,9 @@ export class ExtensionState extends Model({
           url,
           wordCountVisible,
           wordCountVisibleInViewport,
-          progressOfIndividualTranslationRequests: mapToObject(
-            progressOfIndividualTranslationRequests,
-          ),
+          totalModelLoadWallTimeMs,
+          totalTranslationWallTimeMs,
+          totalTranslationEngineRequestCount,
         };
 
         const tabTranslationState = new TabTranslationState(

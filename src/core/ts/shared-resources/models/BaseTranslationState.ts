@@ -41,6 +41,9 @@ export class BaseTranslationState extends Model({
   }),
   tabId: prop<number>(),
   wordCount: prop<number>(),
+  totalModelLoadWallTimeMs: prop<number>(),
+  totalTranslationWallTimeMs: prop<number>(),
+  totalTranslationEngineRequestCount: prop<number>(),
   progressOfIndividualTranslationRequests: prop_mapObject(
     () => new Map<string, TranslationRequestProgress>(),
   ),
