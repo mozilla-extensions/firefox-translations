@@ -5,6 +5,7 @@
 import {
   BergamotTranslatorAPI,
   ModelLoadedEventData,
+  ModelWillLoadEventData,
   TranslationFinishedEventData,
   TranslationRequestQueuedEventData,
   TranslationResults,
@@ -29,6 +30,8 @@ export class BergamotWasmApiClient implements TranslationApiClient {
     const translationRequestProgress: TranslationRequestProgress = {
       requestId: undefined,
       queued: false,
+      modelLoadNecessary: undefined,
+      modelLoading: false,
       modelLoaded: undefined,
       modelLoadWallTimeMs: undefined,
       translationFinished: false,
@@ -49,7 +52,15 @@ export class BergamotWasmApiClient implements TranslationApiClient {
           Object.assign({}, translationRequestProgress),
         );
       },
+      (_modelWillLoadEventData: ModelWillLoadEventData) => {
+        translationRequestProgress.modelLoadNecessary = true;
+        translationRequestProgress.modelLoading = true;
+        translationRequestProgressCallback(
+          Object.assign({}, translationRequestProgress),
+        );
+      },
       (modelLoadedEventData: ModelLoadedEventData) => {
+        translationRequestProgress.modelLoading = false;
         translationRequestProgress.modelLoaded = true;
         translationRequestProgress.modelLoadWallTimeMs =
           modelLoadedEventData.loadModelResults.modelLoadWallTimeMs;

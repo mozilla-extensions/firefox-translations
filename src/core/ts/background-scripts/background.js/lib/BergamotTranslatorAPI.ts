@@ -264,6 +264,11 @@ export interface ModelLoadedEventData {
   loadModelResults: LoadModelResults;
 }
 
+export interface ModelWillLoadEventData {
+  requestId: string;
+  loadModelParams: LoadModelParams;
+}
+
 export interface TranslationFinishedEventData {
   requestId: string;
   translationWallTimeMs: number;
@@ -310,6 +315,15 @@ class TranslationRequestDispatcher extends EventTarget {
 
     // First check if we need to load a model
     if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {
+      const modelWillLoadEventData: ModelWillLoadEventData = {
+        requestId,
+        loadModelParams,
+      };
+      this.dispatchEvent(
+        new CustomEvent("modelWillLoad", {
+          detail: modelWillLoadEventData,
+        }),
+      );
       const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
         type: "loadModel",
         requestId,
@@ -419,6 +433,7 @@ export const BergamotTranslatorAPI = {
     onTranslationRequestQueued: (
       translationRequestQueuedEventData: TranslationRequestQueuedEventData,
     ) => void,
+    onModelWillLoad: (modelWillLoadEventData: ModelWillLoadEventData) => void,
     onModelLoaded: (modelLoadedEventData: ModelLoadedEventData) => void,
     onTranslationFinished: (
       translationFinishedEventData: TranslationFinishedEventData,
@@ -447,6 +462,23 @@ export const BergamotTranslatorAPI = {
         );
       }
       onTranslationRequestQueued(e.detail);
+    };
+    const modelWillLoadListener = (
+      e: CustomEvent & { detail: ModelWillLoadEventData },
+    ) => {
+      // console.debug('Listener received "modelWillLoad".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      translationRequestDispatcher.removeEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
+      );
+      const languagePair = `${from}${to}`;
+      console.info(
+        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} will load`,
+      );
+      onModelWillLoad(e.detail);
     };
     const modelLoadedListener = (
       e: CustomEvent & { detail: ModelLoadedEventData },
@@ -502,6 +534,10 @@ export const BergamotTranslatorAPI = {
         translationRequestQueuedListener,
       );
       translationRequestDispatcher.addEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
+      );
+      translationRequestDispatcher.addEventListener(
         "modelLoaded",
         modelLoadedListener,
       );
@@ -525,6 +561,10 @@ export const BergamotTranslatorAPI = {
       translationRequestDispatcher.removeEventListener(
         "translationRequestQueued",
         translationRequestQueuedListener,
+      );
+      translationRequestDispatcher.removeEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
       );
       translationRequestDispatcher.removeEventListener(
         "modelLoaded",
