@@ -221,6 +221,7 @@ export class DomTranslationManager {
         { from, to },
       );
 
+      // TODO: Timeout here to be able to abort UI in case translation hangs
       await domTranslator.translate(
         (frameTranslationProgress: FrameTranslationProgress) => {
           this.documentTranslationStateCommunicator.broadcastUpdatedFrameTranslationProgress(
@@ -243,22 +244,6 @@ export class DomTranslationManager {
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATED,
       );
-
-      /*
-      // TODO: Restore telemetry
-      const translateResult = await domTranslator.translate();
-      result = {
-        characterCount: translateResult.characterCount,
-        from: from,
-        to: to,
-      };
-      // Record the number of characters translated.
-      this.translationTelemetry.recordTranslation(
-        result.from,
-        result.to,
-        result.characterCount,
-      );
-       */
     } catch (ex) {
       console.error("Translation error", ex);
       translationDocument.translationError = true;
