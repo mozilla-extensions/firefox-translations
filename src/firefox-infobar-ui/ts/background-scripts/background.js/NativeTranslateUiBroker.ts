@@ -9,7 +9,7 @@ import { TranslationStatus } from "../../../../core/ts/shared-resources/models/B
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
 import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
-import { SnapshotOutOfModel } from "mobx-keystone";
+import { getSnapshot } from "mobx-keystone";
 import { reaction, when } from "mobx";
 
 /* eslint-disable no-unused-vars, no-shadow */
@@ -116,13 +116,13 @@ export class NativeTranslateUiBroker {
 
     // Boils down extension state to the subset relevant for the native translate ui
     const nativeTranslateUiStateFromTabTranslationState = async (
-      dts: SnapshotOutOfModel<TabTranslationState>,
+      tts: TabTranslationState,
     ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
-        dts.translationStatus,
+        tts.translationStatus,
       );
 
-      const detectedLanguage = dts.detectedLanguageResults?.language;
+      const detectedLanguage = tts.detectedLanguageResults?.language;
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -138,9 +138,9 @@ export class NativeTranslateUiBroker {
         // defaultSourceLanguage,
         defaultTargetLanguage,
         infobarState,
-        translatedFrom: dts.translateFrom,
-        translatedTo: dts.translateTo,
-        originalShown: dts.showOriginal,
+        translatedFrom: tts.translateFrom,
+        translatedTo: tts.translateTo,
+        originalShown: tts.showOriginal,
         // Additionally, since supported source and target languages are only supported in specific pairs, keep these dynamic:
         supportedSourceLanguages,
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
@@ -182,15 +182,17 @@ export class NativeTranslateUiBroker {
     reaction(
       () => this.extensionState.tabTranslationStates,
       async (tabTranslationStates, _previousTabTranslationStates) => {
-        tabTranslationStates.forEach(async (tts, tabId) => {
-          const uiState = await nativeTranslateUiStateFromTabTranslationState(
-            tts,
-          );
-          browserWithExperimentAPIs.experiments.translateUi.setUiState(
-            tabId,
-            uiState,
-          );
-        });
+        tabTranslationStates.forEach(
+          async (tts: TabTranslationState, tabId) => {
+            const uiState = await nativeTranslateUiStateFromTabTranslationState(
+              tts,
+            );
+            browserWithExperimentAPIs.experiments.translateUi.setUiState(
+              tabId,
+              uiState,
+            );
+          },
+        );
         // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
       },
     );
@@ -208,6 +210,14 @@ export class NativeTranslateUiBroker {
       );
     });
     // Record translation attempt concluded telemetry
+    const { tabTranslationStates } = this.extensionState;
+    const currentTabTranslationState = getSnapshot(
+      tabTranslationStates.get(tabId),
+    );
+    console.log(
+      "TODO: Read performance attributes from currentTabTranslationState",
+      { currentTabTranslationState },
+    );
     const modelLoadTimeMs = -1;
     const translationTimeMs = -1;
     const wordsPerSecond = -1;

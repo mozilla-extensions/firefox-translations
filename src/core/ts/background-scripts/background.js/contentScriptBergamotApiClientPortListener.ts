@@ -15,6 +15,12 @@ const bergamotApiClient = config.useBergamotRestApi
   ? new BergamotRestApiClient()
   : new BergamotWasmApiClient();
 
+export interface TranslationRequestUpdate {
+  requestId: string;
+  results?: TranslationResults;
+  translationRequestProgress?: TranslationRequestProgress;
+}
+
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   if (port.name !== "port-from-content-script-bergamot-api-client") {
     return;
@@ -33,15 +39,22 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
         from,
         to,
         (translationRequestProgress: TranslationRequestProgress) => {
-          console.log("TODO", { translationRequestProgress });
+          const translationRequestUpdate: TranslationRequestUpdate = {
+            translationRequestProgress,
+            requestId,
+          };
+          port.postMessage({
+            translationRequestUpdate,
+          });
         },
       );
       // console.log({ results });
+      const translationRequestUpdate: TranslationRequestUpdate = {
+        results,
+        requestId,
+      };
       port.postMessage({
-        translationRequestResults: {
-          results,
-          requestId,
-        },
+        translationRequestUpdate,
       });
     } catch (err) {
       if (err.message === "Attempt to postMessage on disconnected port") {

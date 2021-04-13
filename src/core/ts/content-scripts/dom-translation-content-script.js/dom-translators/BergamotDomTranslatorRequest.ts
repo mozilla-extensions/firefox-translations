@@ -6,6 +6,7 @@ import {
   DomTranslatorRequest,
   TranslationApiClient,
   TranslationRequestData,
+  TranslationRequestProgressCallback,
   TranslationResponseData,
 } from "./BaseDomTranslator";
 import { detag, DetaggedString, project } from "./detagAndProject";
@@ -44,6 +45,7 @@ export class BergamotDomTranslatorRequest implements DomTranslatorRequest {
    */
   async fireRequest(
     bergamotApiClient: TranslationApiClient,
+    translationRequestProgressCallback: TranslationRequestProgressCallback,
   ): Promise<
     TranslationResponseData & {
       translatedPlainTextStrings: string[];
@@ -64,6 +66,7 @@ export class BergamotDomTranslatorRequest implements DomTranslatorRequest {
       plainStringsToTranslate,
       this.sourceLanguage,
       this.targetLanguage,
+      translationRequestProgressCallback,
     );
 
     return {

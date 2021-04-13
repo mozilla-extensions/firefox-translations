@@ -11,6 +11,7 @@ import { TranslationStatus } from "../../shared-resources/models/BaseTranslation
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 import { detag } from "./dom-translators/detagAndProject";
+import { FrameTranslationProgress } from "./dom-translators/BaseDomTranslator";
 
 export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
@@ -219,7 +220,14 @@ export class DomTranslationManager {
         `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
         { from, to },
       );
-      await domTranslator.translate();
+
+      await domTranslator.translate(
+        (frameTranslationProgress: FrameTranslationProgress) => {
+          this.documentTranslationStateCommunicator.broadcastUpdatedFrameTranslationProgress(
+            frameTranslationProgress,
+          );
+        },
+      );
 
       console.info(
         `Translation of web page document completed (translated ${

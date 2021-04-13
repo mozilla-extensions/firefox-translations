@@ -7,6 +7,8 @@ import Port = Runtime.Port;
 import { nanoid } from "nanoid";
 import { captureExceptionWithExtras } from "./ErrorReporting";
 import { TranslationResults } from "../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { TranslationRequestUpdate } from "../background-scripts/background.js/contentScriptBergamotApiClientPortListener";
+import { TranslationRequestProgressCallback } from "../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 export class ContentScriptBergamotApiClient {
   private backgroundContextPort: Port;
@@ -20,29 +22,39 @@ export class ContentScriptBergamotApiClient {
     texts: string[],
     from: string,
     to: string,
+    translationRequestProgressCallback: TranslationRequestProgressCallback,
   ): Promise<TranslationResults> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
       const resultsMessageListener = async (m: {
-        translationRequestResults?: {
-          requestId: string;
-          results: TranslationResults;
-        };
+        translationRequestUpdate?: TranslationRequestUpdate;
       }) => {
-        if (m.translationRequestResults) {
-          const { translationRequestResults } = m;
-          if (translationRequestResults.requestId !== requestId) {
+        if (m.translationRequestUpdate) {
+          const { translationRequestUpdate } = m;
+          if (translationRequestUpdate.requestId !== requestId) {
             return;
           }
-          // console.debug("ContentScriptBergamotApiClient received translationRequestResults", {translationRequestResults});
-          this.backgroundContextPort.onMessage.removeListener(
-            resultsMessageListener,
-          );
-          resolve(translationRequestResults.results);
-          return;
+          // console.debug("ContentScriptBergamotApiClient received translationRequestUpdate", { translationRequestUpdate });
+          const {
+            results,
+            translationRequestProgress,
+          } = translationRequestUpdate;
+          if (translationRequestProgress) {
+            translationRequestProgressCallback(translationRequestProgress);
+            return;
+          }
+          if (results) {
+            this.backgroundContextPort.onMessage.removeListener(
+              resultsMessageListener,
+            );
+            resolve(translationRequestUpdate.results);
+            return;
+          }
         }
-        captureExceptionWithExtras(new Error("Unexpected message"), { m });
-        console.error("Unexpected message", { m });
+        captureExceptionWithExtras(new Error("Unexpected message structure"), {
+          m,
+        });
+        console.error("Unexpected message structure", { m });
         reject({ m });
       };
       this.backgroundContextPort.onMessage.addListener(resultsMessageListener);

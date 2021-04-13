@@ -16,7 +16,22 @@ export interface TranslationResponseData {
   qeAnnotatedTranslatedMarkups: string[];
 }
 
+export interface FrameTranslationProgress {
+  progressOfIndividualTranslationRequests: Map<
+    string,
+    TranslationRequestProgress
+  >;
+}
+
+export type FrameTranslationProgressCallback = (
+  frameTranslationProgress: FrameTranslationProgress,
+) => void;
+
 export interface TranslationRequestProgress {
+  requestId: string;
+  queued: boolean;
+  modelLoadNecessary: boolean;
+  modelLoading: boolean;
   modelLoaded: boolean;
   modelLoadWallTimeMs: number;
   translationFinished: boolean;
@@ -45,6 +60,7 @@ type DomTranslatorRequestFactory = (
 export interface DomTranslatorRequest {
   fireRequest: (
     apiClient: TranslationApiClient,
+    translationRequestProgressCallback: TranslationRequestProgressCallback,
   ) => Promise<TranslationResponseData>;
   characterCount: number;
 }
@@ -73,6 +89,7 @@ interface TranslationApiLimits {
  */
 export class BaseDomTranslator extends MinimalDomTranslator {
   public translatedCharacterCount: number;
+  public translatedWordCount: number;
   public partialSuccess: boolean;
   private translationApiClient: TranslationApiClient;
   private parseChunkResult: TranslationParseChunkResultFunction;
@@ -101,6 +118,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   ) {
     super(translationDocument, sourceLanguage, targetLanguage);
     this.translatedCharacterCount = 0;
+    this.translatedWordCount = 0;
     this.partialSuccess = false;
     this.translationApiClient = translationApiClient;
     this.parseChunkResult = parseChunkResult;
@@ -115,10 +133,12 @@ export class BaseDomTranslator extends MinimalDomTranslator {
    * @returns {Promise}          A promise that will resolve when the translation
    *                             task is finished.
    */
-  async translate(): Promise<{
+  async translate(
+    frameTranslationProgressCallback: FrameTranslationProgressCallback,
+  ): Promise<{
     characterCount: number;
   }> {
-    const chunksBeingProcessed = [];
+    const chunksBeingProcessed: Promise<TranslationResponseData>[] = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
     const { translationRoots } = this.translationDocument;
@@ -127,6 +147,11 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       translationRootsVisibleInViewport,
     } = await this.translationDocument.determineVisibilityOfTranslationRoots();
     this.translationRootsPickedUpForTranslation = [];
+
+    const progressOfIndividualTranslationRequests: Map<
+      string,
+      TranslationRequestProgress
+    > = new Map();
 
     // Split the document into various requests to be sent to the translation API
     for (
@@ -157,8 +182,20 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       );
 
       // Fire off the requests in parallel to existing requests
-      const chunkBeingProcessed = domTranslatorRequest
-        .fireRequest(this.translationApiClient)
+      const chunkBeingProcessed = domTranslatorRequest.fireRequest(
+        this.translationApiClient,
+        (translationRequestProgress: TranslationRequestProgress) => {
+          progressOfIndividualTranslationRequests.set(
+            translationRequestProgress.requestId,
+            translationRequestProgress,
+          );
+          frameTranslationProgressCallback({
+            progressOfIndividualTranslationRequests,
+          });
+        },
+      );
+      chunksBeingProcessed.push(chunkBeingProcessed);
+      chunkBeingProcessed
         .then((translationResponseData: TranslationResponseData) => {
           if (translationResponseData) {
             this.chunkCompleted(
@@ -168,14 +205,13 @@ export class BaseDomTranslator extends MinimalDomTranslator {
             );
           } else {
             throw new Error(
-              "The return translationResonseData was false/empty",
+              "The returned translationResonseData was false/empty",
             );
           }
         })
         .catch(err => {
           console.error("DomTranslator fireRequest error", err);
         });
-      chunksBeingProcessed.push(chunkBeingProcessed);
       console.info(
         `Fired off request with ${domTranslationChunk.translationRoots.length} translation roots to the translation backend`,
         { domTranslationChunk },

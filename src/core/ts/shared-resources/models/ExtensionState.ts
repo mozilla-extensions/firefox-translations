@@ -5,9 +5,11 @@
 import {
   applyPatches,
   getSnapshot,
+  mapToObject,
   Model,
   model,
   modelAction,
+  ModelPropsCreationData,
   Patch,
   prop_mapObject,
 } from "mobx-keystone";
@@ -18,6 +20,7 @@ import { FrameInfo } from "../types/bergamot.types";
 import { computed } from "mobx";
 import { TabTranslationState } from "./TabTranslationState";
 import { TranslationStatus } from "./BaseTranslationState";
+import { TranslationRequestProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;
@@ -151,6 +154,26 @@ export class ExtensionState extends Model({
           .map(dts => dts.wordCountVisibleInViewport)
           .reduce((a, b) => a + b, 0);
 
+        // Merge the progressOfIndividualTranslationRequests attribute across all frames in the tab
+        const progressOfIndividualTranslationRequests: Map<
+          string,
+          TranslationRequestProgress
+        > = new Map();
+        documentTranslationStates.forEach(dts => {
+          dts.progressOfIndividualTranslationRequests.forEach(
+            (translationRequestProgress: TranslationRequestProgress) => {
+              const translationRequestProgressSnapshot = getSnapshot(
+                translationRequestProgress,
+              );
+              console.log({ translationRequestProgressSnapshot });
+              progressOfIndividualTranslationRequests.set(
+                translationRequestProgressSnapshot.requestId,
+                translationRequestProgressSnapshot,
+              );
+            },
+          );
+        });
+
         // Special merging of translation status
         const anyTabHasTranslationStatus = (
           translationStatus: TranslationStatus,
@@ -181,7 +204,7 @@ export class ExtensionState extends Model({
         };
         const translationStatus = tabTranslationStatus();
 
-        const tabTranslationState = new TabTranslationState({
+        const tabTranslationStateData: ModelPropsCreationData<TabTranslationState> = {
           isVisible,
           displayQualityEstimation,
           translationRequested,
@@ -197,7 +220,14 @@ export class ExtensionState extends Model({
           url,
           wordCountVisible,
           wordCountVisibleInViewport,
-        });
+          progressOfIndividualTranslationRequests: mapToObject(
+            progressOfIndividualTranslationRequests,
+          ),
+        };
+
+        const tabTranslationState = new TabTranslationState(
+          tabTranslationStateData,
+        );
 
         map.set(tabId, tabTranslationState);
       },
