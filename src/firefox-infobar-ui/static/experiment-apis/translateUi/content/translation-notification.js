@@ -34,7 +34,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             <button class="notification-button" label="&translation.notNow.button;" anonid="notNow" oncommand="this.closest('notification').notNow();"/>
           </hbox>
           <vbox class="translating-box" pack="center">
-            <label value="&translation.translatingContent.label;"/>
+            <hbox><label value="&translation.translatingContent.label;"/><label anonid="progress-label" value=""/></hbox>
           </vbox>
           <hbox class="translated-box" align="center">
             <label value="&translation.translatedFrom.label;"/>
@@ -96,6 +96,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
+  translationProgressUpdate() {
+    this._getAnonElt("progress-label").setAttribute(
+      "value",
+      "(TODO: Report translation progress here)",
+    );
+  }
+
   set state(val) {
     const deck = this._getAnonElt("translationStates");
 
@@ -105,20 +112,15 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
 
     let stateName;
-    for (const name of [
-      "OFFER",
-      "TRANSLATING",
-      "TRANSLATED",
-      "ERROR",
-      "STATE_UNAVAILABLE",
-      "LOADING",
-    ]) {
-      if (this.translation.TranslationInfoBarStates["STATE_" + name] === val) {
+    for (const name of ["OFFER", "TRANSLATING", "TRANSLATED", "ERROR"]) {
+      if (Translation["STATE_" + name] === val) {
         stateName = name.toLowerCase();
         break;
       }
     }
     this.setAttribute("state", stateName);
+
+    this.translationProgressUpdate();
 
     // Workaround to show the animated icon also in the "loading" state. Extension-external
     // code specifies that only the "translating" state shows an animated icon
