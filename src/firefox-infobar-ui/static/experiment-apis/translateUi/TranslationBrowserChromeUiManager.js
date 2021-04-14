@@ -58,8 +58,4 @@ class TranslationBrowserChromeUiNotificationManager {
     console.log("notNow");
     this.apiEventEmitter.emit("onNotNowButtonPressed", this.tabId);
   }
-
-  /*
-  | "onNeverTranslateThisSite"
-   */
 }
