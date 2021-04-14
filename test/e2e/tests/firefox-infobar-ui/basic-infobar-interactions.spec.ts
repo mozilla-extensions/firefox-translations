@@ -77,12 +77,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(
-      0,
-      0,
-      proxyInstanceId,
-      maxToleratedTelemetryUploadingDurationInSeconds * 1000,
-    );
+    const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
     // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
     assert.strictEqual(
       seenTelemetry[0].events.length,
@@ -111,12 +106,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: Translation via the infobar works", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(
-      1,
-      2,
-      proxyInstanceId,
-      maxToleratedTelemetryUploadingDurationInSeconds * 1000,
-    );
+    const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
 
     // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
     assert.strictEqual(
@@ -186,12 +176,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(
-      4,
-      4,
-      proxyInstanceId,
-      maxToleratedTelemetryUploadingDurationInSeconds * 1000,
-    );
+    const seenTelemetry = await readSeenTelemetry(4, 4, proxyInstanceId);
 
     // Check telemetry for: When the user hits the infobar button or menu item 'Close'
     assert.strictEqual(
@@ -220,12 +205,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(
-      6,
-      7,
-      proxyInstanceId,
-      maxToleratedTelemetryUploadingDurationInSeconds * 1000,
-    );
+    const seenTelemetry = await readSeenTelemetry(6, 7, proxyInstanceId);
 
     // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
     assert.strictEqual(

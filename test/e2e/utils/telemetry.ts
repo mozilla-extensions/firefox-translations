@@ -10,7 +10,6 @@ export const readSeenTelemetry = async (
   startSequenceNo,
   endSequenceNo,
   proxyInstanceId: string,
-  timeout: number,
 ) => {
   const telemetryStoragePath = join(
     process.cwd(),
@@ -26,7 +25,7 @@ export const readSeenTelemetry = async (
   ).map(sequenceNo => join(telemetryStoragePath, `${sequenceNo}.json`));
   await waitOn({
     resources: telemetryJsonFilePaths,
-    timeout, // timeout in ms, default Infinity
+    timeout: maxToleratedTelemetryUploadingDurationInSeconds * 1000, // timeout in ms, default Infinity
   });
   const telemetryJsonTexts = await Promise.all(
     telemetryJsonFilePaths.map(telemetryJsonFilePath =>

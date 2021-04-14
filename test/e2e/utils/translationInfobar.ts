@@ -6,11 +6,13 @@ import { assert } from "chai";
 import { By, until } from "selenium-webdriver";
 import { lookForBrowserElement } from "./lookForElement";
 
+const cssSelectorForInfobarDeck = `tabpanels#tabbrowser-tabpanels.plain > hbox`;
+
 export async function lookForInfobar(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification`,
   );
 }
 
@@ -18,7 +20,7 @@ export async function lookForInfobarTranslateButton(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification hbox.translate-offer-box button[anonid="translate"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification hbox.translate-offer-box button[anonid="translate"]`,
   );
 }
 
@@ -26,7 +28,7 @@ export async function lookForInfobarNotNowButton(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification hbox.translate-offer-box button[anonid="notNow"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification hbox.translate-offer-box button[anonid="notNow"]`,
   );
 }
 
@@ -34,7 +36,7 @@ export async function lookForInfobarOptionsButton(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification button[anonid="options"]`,
   );
 }
 
@@ -45,7 +47,7 @@ export async function lookForInfobarNeverTranslateCurrentLanguageMenuItem(
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForLanguage"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForLanguage"]`,
   );
 }
 
@@ -53,7 +55,7 @@ export async function lookForInfobarNeverTranslateSiteMenuItem(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForSite"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification button[anonid="options"] menuitem[anonid="neverForSite"]`,
   );
 }
 
@@ -61,7 +63,7 @@ export async function lookForInfobarCloseButton(driver, nthTab) {
   return lookForBrowserElement(
     driver,
     By.css,
-    `tabpanels#tabbrowser-tabpanels.plain > hbox:nth-of-type(${nthTab}) notification toolbarbutton[anonid="closeButton"]`,
+    `${cssSelectorForInfobarDeck}:nth-of-type(${nthTab}) notification toolbarbutton[anonid="closeButton"]`,
   );
 }
 
