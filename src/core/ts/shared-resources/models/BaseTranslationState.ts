@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Model, model, prop, prop_mapObject } from "mobx-keystone";
+import { Model, model, prop } from "mobx-keystone";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { computed } from "mobx";
 import { browser } from "webextension-polyfill-ts";
-import { TranslationRequestProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -41,12 +40,11 @@ export class BaseTranslationState extends Model({
   }),
   tabId: prop<number>(),
   wordCount: prop<number>(),
+  wordCountVisible: prop<number>(),
+  wordCountVisibleInViewport: prop<number>(),
   totalModelLoadWallTimeMs: prop<number>(),
   totalTranslationWallTimeMs: prop<number>(),
   totalTranslationEngineRequestCount: prop<number>(),
-  progressOfIndividualTranslationRequests: prop_mapObject(
-    () => new Map<string, TranslationRequestProgress>(),
-  ),
 }) {
   @computed
   get effectiveTranslateFrom() {

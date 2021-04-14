@@ -40,6 +40,17 @@ export class DocumentTranslationStateCommunicator {
     }, 0);
   }
 
+  /**
+   * This method was chosen as the place to sum up the progress of individual translation
+   * requests into the similar translation progress attributes present at the frame level
+   * in document translation state objects (totalTranslationWallTimeMs, totalTranslationEngineRequestCount etc).
+   *
+   * A more natural place to do this conversion would be as computed properties in the mobx models
+   * but it proved problematic to keep and patch a progressOfIndividualTranslationRequests map attribute
+   * in document translation state objects, so reduction to simpler attributes is done here instead.
+   *
+   * @param frameTranslationProgress
+   */
   broadcastUpdatedFrameTranslationProgress(
     frameTranslationProgress: FrameTranslationProgress,
   ) {

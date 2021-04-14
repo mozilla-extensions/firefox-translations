@@ -165,7 +165,6 @@ export class NativeTranslateUiBroker {
         case TranslationStatus.OFFER:
           return NativeTranslateUiStateInfobarState.STATE_OFFER;
         case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
-          return NativeTranslateUiStateInfobarState.STATE_TRANSLATING;
         case TranslationStatus.TRANSLATING:
           return NativeTranslateUiStateInfobarState.STATE_TRANSLATING;
         case TranslationStatus.TRANSLATED:
@@ -234,7 +233,8 @@ export class NativeTranslateUiBroker {
       wordCount / (totalTranslationWallTimeMs / 1000),
     );
     console.info(
-      `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which operated at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
+      `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
+        1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
         1000} seconds.`,
     );
     telemetry.onTranslationAttemptConcluded(

@@ -10,6 +10,4 @@ export class TabTranslationState extends ExtendedModel(BaseTranslationState, {
   windowId: prop<number>(),
   showOriginal: prop<boolean>({ setterAction: true }),
   url: prop<string>(),
-  wordCountVisible: prop<number>(),
-  wordCountVisibleInViewport: prop<number>(),
 }) {}
