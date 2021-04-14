@@ -6,7 +6,7 @@ import { assert } from "chai";
 import { By, until } from "selenium-webdriver";
 import { lookForBrowserElement } from "./lookForElement";
 
-const cssSelectorForInfobarDeck = `tabpanels#tabbrowser-tabpanels.plain > hbox`;
+const cssSelectorForInfobarDeck = `#tab-notification-deck > vbox`;
 
 export async function lookForInfobar(driver, nthTab) {
   return lookForBrowserElement(
