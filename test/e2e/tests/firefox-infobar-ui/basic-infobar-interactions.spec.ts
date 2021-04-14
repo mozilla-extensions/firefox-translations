@@ -140,7 +140,7 @@ describe("Basic infobar interactions", function() {
       "The second ping's string metrics 'metadata.from_lang' is correct",
     );
     assert.strictEqual(
-      seenTelemetry[1].metrics.string["metadata.from_lang"],
+      seenTelemetry[1].metrics.string["metadata.to_lang"],
       "en",
       "The second ping's string metrics 'metadata.to_lang' is correct",
     );
