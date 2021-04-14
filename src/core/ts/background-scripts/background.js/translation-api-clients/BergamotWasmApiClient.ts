@@ -69,6 +69,7 @@ export class BergamotWasmApiClient implements TranslationApiClient {
         );
       },
       (translationFinishedEventData: TranslationFinishedEventData) => {
+        translationRequestProgress.queued = false;
         translationRequestProgress.translationFinished = true;
         translationRequestProgress.translationWallTimeMs =
           translationFinishedEventData.translationWallTimeMs;

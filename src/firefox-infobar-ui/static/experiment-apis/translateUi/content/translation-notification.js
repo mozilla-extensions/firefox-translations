@@ -96,11 +96,12 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
-  translationProgressUpdate() {
+  updateTranslationProgress(modelLoading, queuedTranslationEngineRequestCount) {
     this._getAnonElt("progress-label").setAttribute(
       "value",
-      "(TODO: Report translation progress here)",
+      JSON.stringify({ modelLoading, queuedTranslationEngineRequestCount }),
     );
+    // TODO: only show if nothing has happened for 2 seconds for instance
   }
 
   set state(val) {
@@ -119,8 +120,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       }
     }
     this.setAttribute("state", stateName);
-
-    this.translationProgressUpdate();
 
     // Workaround to show the animated icon also in the "loading" state. Extension-external
     // code specifies that only the "translating" state shows an animated icon

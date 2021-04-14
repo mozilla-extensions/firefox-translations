@@ -160,6 +160,28 @@ export class ExtensionState extends Model({
         const totalTranslationEngineRequestCount = documentTranslationStates
           .map(dts => dts.totalTranslationEngineRequestCount)
           .reduce((a, b) => a + b, 0);
+        const queuedTranslationEngineRequestCount = documentTranslationStates
+          .map(dts => dts.queuedTranslationEngineRequestCount)
+          .reduce((a, b) => a + b, 0);
+
+        // Merge translation-progress-related booleans as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
+        const modelLoadNecessary = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelLoadNecessary,
+        ).length;
+        const modelLoading = modelLoadNecessary
+          ? !!documentTranslationStates.find(
+              (dts: DocumentTranslationState) => dts.modelLoading,
+            )
+          : undefined;
+        const modelLoaded = modelLoadNecessary
+          ? !!documentTranslationStates.find(
+              (dts: DocumentTranslationState) => !dts.modelLoaded,
+            )
+          : undefined;
+        const translationFinished =
+          documentTranslationStates.filter(
+            (dts: DocumentTranslationState) => !dts.translationFinished,
+          ).length === 0;
 
         // Special merging of translation status
         const anyTabHasTranslationStatus = (
@@ -210,6 +232,11 @@ export class ExtensionState extends Model({
           totalModelLoadWallTimeMs,
           totalTranslationWallTimeMs,
           totalTranslationEngineRequestCount,
+          queuedTranslationEngineRequestCount,
+          modelLoadNecessary,
+          modelLoading,
+          modelLoaded,
+          translationFinished,
         };
 
         const tabTranslationState = new TabTranslationState(

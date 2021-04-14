@@ -73,6 +73,28 @@ export class DocumentTranslationStateCommunicator {
       .reduce((a, b) => a + b, 0);
     const totalTranslationEngineRequestCount =
       translationRequestProgressEntries.length;
+    const queuedTranslationEngineRequestCount = translationRequestProgressEntries.filter(
+      (trp: TranslationRequestProgress) => trp.queued,
+    ).length;
+
+    // Merge translation-progress-related booleans
+    const modelLoadNecessary = !!translationRequestProgressEntries.filter(
+      (trp: TranslationRequestProgress) => trp.modelLoadNecessary,
+    ).length;
+    const modelLoading = modelLoadNecessary
+      ? !!translationRequestProgressEntries.find(
+          (trp: TranslationRequestProgress) => trp.modelLoading,
+        )
+      : undefined;
+    const modelLoaded = modelLoadNecessary
+      ? !!translationRequestProgressEntries.find(
+          (trp: TranslationRequestProgress) => !trp.modelLoaded,
+        )
+      : undefined;
+    const translationFinished =
+      translationRequestProgressEntries.filter(
+        (trp: TranslationRequestProgress) => !trp.translationFinished,
+      ).length === 0;
 
     setTimeout(() => {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
@@ -92,6 +114,31 @@ export class DocumentTranslationStateCommunicator {
             op: "replace",
             path: ["totalTranslationEngineRequestCount"],
             value: totalTranslationEngineRequestCount,
+          },
+          {
+            op: "replace",
+            path: ["queuedTranslationEngineRequestCount"],
+            value: queuedTranslationEngineRequestCount,
+          },
+          {
+            op: "replace",
+            path: ["modelLoadNecessary"],
+            value: modelLoadNecessary,
+          },
+          {
+            op: "replace",
+            path: ["modelLoading"],
+            value: modelLoading,
+          },
+          {
+            op: "replace",
+            path: ["modelLoaded"],
+            value: modelLoaded,
+          },
+          {
+            op: "replace",
+            path: ["translationFinished"],
+            value: translationFinished,
           },
         ],
       );

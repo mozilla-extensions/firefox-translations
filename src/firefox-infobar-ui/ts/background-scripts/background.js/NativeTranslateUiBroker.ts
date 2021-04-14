@@ -43,6 +43,9 @@ interface NativeTranslateUiState {
   // Additionally, since supported source and target languages are only supported in specific pairs, keep these dynamic:
   supportedSourceLanguages: string[];
   supportedTargetLanguages: string[];
+  // Translation progress
+  modelLoading: boolean;
+  queuedTranslationEngineRequestCount: number;
 }
 
 type StandardInfobarInteractionEvent = Event<
@@ -150,6 +153,10 @@ export class NativeTranslateUiBroker {
         // Additionally, since supported source and target languages are only supported in specific pairs, keep these dynamic:
         supportedSourceLanguages,
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
+        // Translation progress
+        modelLoading: tts.modelLoading,
+        queuedTranslationEngineRequestCount:
+          tts.queuedTranslationEngineRequestCount,
       };
     };
     const nativeTranslateUiStateInfobarStateFromTranslationStatus = (

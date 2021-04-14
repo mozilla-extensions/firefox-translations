@@ -45,6 +45,11 @@ export class BaseTranslationState extends Model({
   totalModelLoadWallTimeMs: prop<number>(),
   totalTranslationWallTimeMs: prop<number>(),
   totalTranslationEngineRequestCount: prop<number>(),
+  queuedTranslationEngineRequestCount: prop<number>(),
+  modelLoadNecessary: prop<boolean>(),
+  modelLoading: prop<boolean>(),
+  modelLoaded: prop<boolean>(),
+  translationFinished: prop<boolean>(),
 }) {
   @computed
   get effectiveTranslateFrom() {

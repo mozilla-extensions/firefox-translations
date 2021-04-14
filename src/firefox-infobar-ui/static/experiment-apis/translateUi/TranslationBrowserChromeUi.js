@@ -64,7 +64,7 @@ class TranslationBrowserChromeUi {
     // Set all values before showing a new translation infobar.
     this.translationBrowserChromeUiNotificationManager.uiState = uiState;
     this.setInfobarState(uiState.infobarState);
-
+    this.updateTranslationProgress(uiState);
     if (this.shouldShowInfoBar(this.browser.contentPrincipal)) {
       this.showTranslationInfoBarIfNotAlreadyShown();
     } else {
@@ -80,6 +80,20 @@ class TranslationBrowserChromeUi {
     const notif = this.notificationBox.getNotificationWithValue("translation");
     if (notif) {
       notif.state = val;
+    }
+  }
+
+  /**
+   * Informs the infobar element of the current translation progress
+   */
+  updateTranslationProgress(uiState) {
+    const notif = this.notificationBox.getNotificationWithValue("translation");
+    if (notif) {
+      const { modelLoading, queuedTranslationEngineRequestCount } = uiState;
+      notif.updateTranslationProgress(
+        modelLoading,
+        queuedTranslationEngineRequestCount,
+      );
     }
   }
 
