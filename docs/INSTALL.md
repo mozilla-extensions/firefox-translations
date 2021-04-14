@@ -8,13 +8,6 @@
     - [Preparations](#preparations)
     - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension)
     - [Demo](#demo)
-<!--
-  - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
-  - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
-    - [Preparations](#preparations-1)
-    - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension-1)
-    - [Demo](#demo-1)
--->
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
