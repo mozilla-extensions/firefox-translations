@@ -56,6 +56,9 @@ window.MozTranslationNotification = class extends MozElements.Notification {
           <vbox class="translation-unavailable" pack="center">
             <label value="&translation.serviceUnavailable.label;"/>
           </vbox>
+          <vbox class="loading" pack="center">
+            <label value="Loading language model..."/>
+          </vbox>
         </deck>
         <spacer flex="1"/>
         <button type="menu" class="notification-button" anonid="options" label="&translation.options.menu;">
@@ -102,13 +105,26 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
 
     let stateName;
-    for (const name of ["OFFER", "TRANSLATING", "TRANSLATED", "ERROR"]) {
-      if (Translation["STATE_" + name] === val) {
+    for (const name of [
+      "OFFER",
+      "TRANSLATING",
+      "TRANSLATED",
+      "ERROR",
+      "STATE_UNAVAILABLE",
+      "LOADING",
+    ]) {
+      if (this.translation.TranslationInfoBarStates["STATE_" + name] === val) {
         stateName = name.toLowerCase();
         break;
       }
     }
     this.setAttribute("state", stateName);
+
+    // Workaround to show the animated icon also in the "loading" state. Extension-external
+    // code specifies that only the "translating" state shows an animated icon
+    if (stateName === "loading") {
+      this.setAttribute("state", "translating");
+    }
 
     if (val === this.translation.TranslationInfoBarStates.STATE_TRANSLATED) {
       this._handleButtonHiding();

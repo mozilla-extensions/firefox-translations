@@ -7,6 +7,7 @@ const TranslationInfoBarStates = {
   STATE_TRANSLATED: 2,
   STATE_ERROR: 3,
   STATE_UNAVAILABLE: 4,
+  STATE_LOADING: 5,
 };
 
 class TranslationBrowserChromeUi {
@@ -90,6 +91,7 @@ class TranslationBrowserChromeUi {
         TranslationInfoBarStates.STATE_TRANSLATING,
         TranslationInfoBarStates.STATE_TRANSLATED,
         TranslationInfoBarStates.STATE_ERROR,
+        TranslationInfoBarStates.STATE_LOADING,
       ].includes(
         this.translationBrowserChromeUiNotificationManager.uiState.infobarState,
       )
