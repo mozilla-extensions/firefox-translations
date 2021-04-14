@@ -16,7 +16,7 @@ import {
 
 let shutdownTestServers;
 
-let tabsCurrentlyOpened = 1;
+let tabsCurrentlyOpened = 0;
 
 describe("Translation: Simultaneous tabs", function() {
   // This gives Firefox time to start, and us a bit longer during some of the tests.
