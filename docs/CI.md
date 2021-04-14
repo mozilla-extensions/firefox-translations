@@ -6,6 +6,7 @@
 - [Continuous Integration](#continuous-integration)
   - [CircleCI](#circleci)
     - [Run Circle CI locally (requires Docker)](#run-circle-ci-locally-requires-docker)
+    - [Installing artifacts created by CircleCI](#installing-artifacts-created-by-circleci)
   - [Taskcluster](#taskcluster)
     - [Test Taskcluster workflows locally](#test-taskcluster-workflows-locally)
 
@@ -14,6 +15,8 @@
 # Continuous Integration
 
 Both [Circle CI](https://circleci.com/) and Taskcluster is used for continuous integration. CircleCI is used as a general purpose CI, while the Taskcluster integration supports [the automated workflows common to all Mozilla extensions](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/adding-a-new-xpi.md#adding-a-new-xpi).
+
+Extension artifacts built via the TaskCluster CI are signed using a development certificate, which enables some privileges in non-release versions of Firefox given that the pref `xpinstall.signatures.dev-root` is set to `true`. These artifacts are used in pre-releases.
 
 ## CircleCI
 
@@ -48,6 +51,24 @@ cd ~/checkout
 ```
 
 Then manually launch the commands from `.circleci/config.yml` until the error has been reproduced.
+
+To forward the GUI to you local Mac workstation, start XQuartz and replace the docker run command above with:
+
+```
+xhost + 127.0.0.1
+docker run -v "$PWD:/home/circleci/checkout" -e DISPLAY=host.docker.internal:0 -it circleci/node:latest-browsers /bin/bash
+```
+
+### Installing artifacts created by CircleCI
+
+Artifacts built via CircleCI are unsigned (just like developer-created local builds), and additional config preferences are necessary to get them to work as expected. First enable the preferences outlined in the [general installation instructions](./INSTALL.md), then:
+
+- Make sure that the following preferences are set to `true` in `about:config`:
+  - `extensions.experiments.enabled`
+  - `javascript.options.wasm_simd`
+  - `javascript.options.wasm_simd_wormhole`
+- Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required`
 
 ## Taskcluster
 
