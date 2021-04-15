@@ -65,9 +65,9 @@ jobs:
           name: Build extension - Firefox Cross-browser UI
           command: yarn build:cross-browser-ui:firefox
 
-      #- run:
-      #    name: Build extension - Chrome Cross-browser UI
-      #    command: yarn build:cross-browser-ui:chrome
+      - run:
+          name: Build extension - Chrome Cross-browser UI
+          command: yarn build:cross-browser-ui:chrome
 
       - store_artifacts:
           path: "dist"
