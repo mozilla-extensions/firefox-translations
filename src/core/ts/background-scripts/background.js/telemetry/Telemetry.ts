@@ -102,8 +102,8 @@ export class Telemetry {
   ) {
     fromLang.set(from);
     toLang.set(to);
-    modelLoadTime.set(String(Math.round(modelLoadWallTimeMs)));
-    translationTime.set(String(Math.round(translationWallTimeMs)));
+    modelLoadTime.set(String(modelLoadWallTimeMs));
+    translationTime.set(String(translationWallTimeMs));
     wordsPerSecond.set(String(Math.round($wordsPerSecond)));
     this.submit();
   }
