@@ -24,6 +24,8 @@ const submitAndAssert = async () => {
     stringTestValue,
   });
 
+  // Currently, the Glean singleton is not reset after each test, so the event arrays and counters accumulate from previous tests
+  // thus we comment out assertions are not currently expected to pass
   // assert.equal(eventTestValue.length, 1);
   assert.equal(mostRecentEventTestValue.name, "event_test");
   // assert.equal(counterTestValue, 1);
