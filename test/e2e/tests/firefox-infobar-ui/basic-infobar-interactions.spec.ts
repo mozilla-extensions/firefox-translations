@@ -7,15 +7,22 @@ import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsNotShown,
   assertInfobarIsShown,
+  assertOnInfoBarClosedTelemetry,
+  assertOnInfoBarDisplayedTelemetry,
+  assertOnNotNowButtonPressedTelemetry,
+  assertOnTranslateButtonPressedTelemetry,
   closeInfobarViaCloseButton,
   closeInfobarViaNotNowButton,
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../../utils/translationInfobar";
-import * as assert from "assert";
 import { startTestServers } from "../../utils/setupServers";
-import { readSeenTelemetry } from "../../utils/telemetry";
 import {
+  maxToleratedTelemetryUploadingDurationInSeconds,
+  readSeenTelemetry,
+} from "../../utils/telemetry";
+import {
+  assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
   fixtureUrl,
@@ -25,7 +32,6 @@ import {
 
 let proxyInstanceId;
 let shutdownTestServers;
-const maxToleratedTelemetryUploadingDurationInSeconds = 10;
 
 const tabsCurrentlyOpened = 1;
 
@@ -78,22 +84,7 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
-    // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
-    assert.strictEqual(
-      seenTelemetry[0].events.length,
-      1,
-      "The first ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].category,
-      "infobar",
-      "The first ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].name,
-      "displayed",
-      "The first ping's event name is 'displayed'",
-    );
+    assertOnInfoBarDisplayedTelemetry(seenTelemetry[0]);
   });
 
   it("Translation via the infobar works", async function() {
@@ -105,66 +96,10 @@ describe("Basic infobar interactions", function() {
   });
 
   it("Telemetry checks after: Translation via the infobar works", async function() {
-    // ... this test continues the session from the previous test
+    // ... this test continues the sessiAn from the previous test
     const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
-
-    // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
-    assert.strictEqual(
-      seenTelemetry[0].events.length,
-      1,
-      "The first ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].category,
-      "infobar",
-      "The first ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].name,
-      "translate",
-      "The first ping's event name is 'translate'",
-    );
-    assert.deepStrictEqual(
-      seenTelemetry[0].metrics.string,
-      {
-        "metadata.from_lang": "es",
-        "metadata.to_lang": "en",
-      },
-      "The first ping's string metrics are correct",
-    );
-
-    // Check telemetry for: Translated words per second, Model load time, Translation time
-    assert.strictEqual(
-      seenTelemetry[1].metrics.string["metadata.from_lang"],
-      "es",
-      "The second ping's string metrics 'metadata.from_lang' is correct",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].metrics.string["metadata.to_lang"],
-      "en",
-      "The second ping's string metrics 'metadata.to_lang' is correct",
-    );
-    assert(
-      parseInt(
-        seenTelemetry[1].metrics.string["performance.model_load_time"],
-        10,
-      ) > 0,
-      "The second ping's string metrics 'performance.model_load_time' is a string that when parsed evaluates to more than 0",
-    );
-    assert(
-      parseInt(
-        seenTelemetry[1].metrics.string["performance.translation_time"],
-        10,
-      ) > 0,
-      "The second ping's string metrics 'performance.translation_time' is a string that when parsed evaluates to more than 0",
-    );
-    assert(
-      parseInt(
-        seenTelemetry[1].metrics.string["performance.words_per_second"],
-        10,
-      ) > 0,
-      "The second ping's string metrics 'performance.words_per_second' is a string that when parsed evaluates to more than 0",
-    );
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[0]);
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1]);
   });
 
   it("The translation infobar can be closed via the close button", async function() {
@@ -177,23 +112,7 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(4, 4, proxyInstanceId);
-
-    // Check telemetry for: When the user hits the infobar button or menu item 'Close'
-    assert.strictEqual(
-      seenTelemetry[0].events.length,
-      1,
-      "The first ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].category,
-      "infobar",
-      "The first ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].name,
-      "closed",
-      "The first ping's event name is 'closed'",
-    );
+    assertOnInfoBarClosedTelemetry(seenTelemetry[0]);
   });
 
   it("The translation infobar can be closed via the 'Not now' button", async function() {
@@ -206,37 +125,6 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(6, 7, proxyInstanceId);
-
-    // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
-    assert.strictEqual(
-      seenTelemetry[0].events.length,
-      1,
-      "The first ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].category,
-      "infobar",
-      "The first ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].name,
-      "not_now",
-      "The first ping's event name is 'not_now'",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events.length,
-      1,
-      "The second ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events[0].category,
-      "infobar",
-      "The second ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events[0].name,
-      "closed",
-      "The second ping's event name is 'closed'",
-    );
+    assertOnNotNowButtonPressedTelemetry(seenTelemetry[0], seenTelemetry[1]);
   });
 });

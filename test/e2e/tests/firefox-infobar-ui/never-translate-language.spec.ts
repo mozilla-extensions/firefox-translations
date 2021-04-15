@@ -5,11 +5,14 @@ import { navigateToURL } from "../../utils/navigateToURL";
 import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsNotShown,
+  assertOnNeverTranslateSelectedLanguageTelemetry,
   closeInfobarViaNeverTranslateCurrentLanguageMenuItem,
 } from "../../utils/translationInfobar";
-import * as assert from "assert";
 import { startTestServers } from "../../utils/setupServers";
-import { readSeenTelemetry } from "../../utils/telemetry";
+import {
+  maxToleratedTelemetryUploadingDurationInSeconds,
+  readSeenTelemetry,
+} from "../../utils/telemetry";
 import {
   fixtureUrl,
   maxToleratedModelLoadingDurationInSeconds,
@@ -18,7 +21,6 @@ import {
 
 let proxyInstanceId;
 let shutdownTestServers;
-const maxToleratedTelemetryUploadingDurationInSeconds = 10;
 
 const tabsCurrentlyOpened = 1;
 
@@ -63,37 +65,9 @@ describe("Never translate language", function() {
   it("Telemetry checks after: The translation infobar can be closed via the 'Never translate [Language]' menu item", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
-
-    // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
-    assert.strictEqual(
-      seenTelemetry[0].events.length,
-      1,
-      "The first ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].category,
-      "infobar",
-      "The first ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[0].events[0].name,
-      "never_translate_lang",
-      "The first ping's event name is 'never_translate_lang'",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events.length,
-      1,
-      "The second ping contains one Glean event",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events[0].category,
-      "infobar",
-      "The second ping's event category is 'infobar'",
-    );
-    assert.strictEqual(
-      seenTelemetry[1].events[0].name,
-      "closed",
-      "The second ping's event name is 'closed'",
+    assertOnNeverTranslateSelectedLanguageTelemetry(
+      seenTelemetry[0],
+      seenTelemetry[1],
     );
   });
 

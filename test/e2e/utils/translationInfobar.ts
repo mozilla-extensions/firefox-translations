@@ -155,3 +155,137 @@ export const closeInfobarViaNeverTranslateSiteMenuItem = async (
   await neverTranslateSiteMenuItemElement.click();
   await driver.wait(until.stalenessOf(infobarElement), 1000);
 };
+
+export const assertOnInfoBarDisplayedTelemetry = telemetryPayload => {
+  // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
+  assert.strictEqual(
+    telemetryPayload.events.length,
+    1,
+    "The telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].category,
+    "infobar",
+    "The telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].name,
+    "displayed",
+    "The telemetry payload's event name is 'displayed'",
+  );
+};
+
+export const assertOnInfoBarClosedTelemetry = telemetryPayload => {
+  // Check telemetry for: When the user hits the infobar button or menu item 'Close'
+  assert.strictEqual(
+    telemetryPayload.events.length,
+    1,
+    "The telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].category,
+    "infobar",
+    "The telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].name,
+    "closed",
+    "The telemetry payload's event name is 'closed'",
+  );
+};
+
+export const assertOnNeverTranslateSelectedLanguageTelemetry = (
+  telemetryPayload1,
+  telemetryPayload2,
+) => {
+  // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
+  assert.strictEqual(
+    telemetryPayload1.events.length,
+    1,
+    "The first telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].category,
+    "infobar",
+    "The first telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].name,
+    "never_translate_lang",
+    "The first telemetry payload's event name is 'never_translate_lang'",
+  );
+  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+};
+
+export const assertOnNeverTranslateThisSiteTelemetry = (
+  telemetryPayload1,
+  telemetryPayload2,
+) => {
+  // Check telemetry for: When the user hits the infobar button or menu item 'Never translate site'"
+  assert.strictEqual(
+    telemetryPayload1.events.length,
+    1,
+    "The first telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].category,
+    "infobar",
+    "The first telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].name,
+    "never_translate_site",
+    "The first telemetry payload's event name is 'never_translate_site'",
+  );
+  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+};
+
+export const assertOnTranslateButtonPressedTelemetry = telemetryPayload => {
+  // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
+  assert.strictEqual(
+    telemetryPayload.events.length,
+    1,
+    "The telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].category,
+    "infobar",
+    "The telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload.events[0].name,
+    "translate",
+    "The telemetry payload's event name is 'translate'",
+  );
+  assert.deepStrictEqual(
+    telemetryPayload.metrics.string,
+    {
+      "metadata.from_lang": "es",
+      "metadata.to_lang": "en",
+    },
+    "The telemetry payload's string metrics are correct",
+  );
+};
+
+export const assertOnNotNowButtonPressedTelemetry = (
+  telemetryPayload1,
+  telemetryPayload2,
+) => {
+  // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
+  assert.strictEqual(
+    telemetryPayload1.events.length,
+    1,
+    "The first telemetry payload contains one Glean event",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].category,
+    "infobar",
+    "The first telemetry payload's event category is 'infobar'",
+  );
+  assert.strictEqual(
+    telemetryPayload1.events[0].name,
+    "not_now",
+    "The first telemetry payload's event name is 'not_now'",
+  );
+  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+};
