@@ -89,7 +89,6 @@ interface TranslationApiLimits {
  */
 export class BaseDomTranslator extends MinimalDomTranslator {
   public translatedCharacterCount: number;
-  public translatedWordCount: number;
   public partialSuccess: boolean;
   private translationApiClient: TranslationApiClient;
   private parseChunkResult: TranslationParseChunkResultFunction;
@@ -118,7 +117,6 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   ) {
     super(translationDocument, sourceLanguage, targetLanguage);
     this.translatedCharacterCount = 0;
-    this.translatedWordCount = 0;
     this.partialSuccess = false;
     this.translationApiClient = translationApiClient;
     this.parseChunkResult = parseChunkResult;

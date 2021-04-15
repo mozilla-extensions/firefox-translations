@@ -273,7 +273,6 @@ export interface TranslationFinishedEventData {
   requestId: string;
   translationWallTimeMs: number;
   originalTextsTranslationPerformanceStats: TranslationPerformanceStats;
-  translatedTextsTranslationPerformanceStats: TranslationPerformanceStats;
 }
 
 /**
@@ -358,15 +357,10 @@ class TranslationRequestDispatcher extends EventTarget {
       translationResults.originalTexts,
       translationWallTimeMs,
     );
-    const translatedTextsTranslationPerformanceStats = translationPerformanceStats(
-      translationResults.translatedTexts,
-      translationWallTimeMs,
-    );
     const translationFinishedEventData: TranslationFinishedEventData = {
       requestId,
       translationWallTimeMs,
       originalTextsTranslationPerformanceStats,
-      translatedTextsTranslationPerformanceStats,
     };
     this.dispatchEvent(
       new CustomEvent("translationFinished", {
