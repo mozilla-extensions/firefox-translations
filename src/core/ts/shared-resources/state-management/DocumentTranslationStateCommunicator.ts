@@ -87,9 +87,9 @@ export class DocumentTranslationStateCommunicator {
         )
       : undefined;
     const modelLoaded = modelLoadNecessary
-      ? !!translationRequestProgressEntries.find(
-          (trp: TranslationRequestProgress) => !trp.modelLoaded,
-        )
+      ? !!translationRequestProgressEntries
+          .filter((trp: TranslationRequestProgress) => trp.modelLoadNecessary)
+          .find((trp: TranslationRequestProgress) => trp.modelLoaded)
       : undefined;
     const translationFinished =
       translationRequestProgressEntries.filter(

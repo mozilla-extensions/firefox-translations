@@ -97,11 +97,21 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   updateTranslationProgress(modelLoading, queuedTranslationEngineRequestCount) {
+    let progressLabelValue;
+    // TODO: Only show progress if translation has been going on for at least say, 3 seconds
+    if (modelLoading) {
+      progressLabelValue = "(Currently loading language model...)";
+    } else if (queuedTranslationEngineRequestCount > 0) {
+      progressLabelValue = `(Language model loaded. ${queuedTranslationEngineRequestCount} part${
+        queuedTranslationEngineRequestCount > 1 ? "s" : ""
+      } left to translate)`;
+    } else {
+      progressLabelValue = "";
+    }
     this._getAnonElt("progress-label").setAttribute(
       "value",
-      JSON.stringify({ modelLoading, queuedTranslationEngineRequestCount }),
+      progressLabelValue,
     );
-    // TODO: only show if nothing has happened for 2 seconds for instance
   }
 
   set state(val) {
