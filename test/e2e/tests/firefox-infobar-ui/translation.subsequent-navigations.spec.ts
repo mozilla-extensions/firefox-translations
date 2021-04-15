@@ -6,19 +6,25 @@ import { assertElementExists } from "../../utils/assertElement";
 import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsShown,
+  assertOnTranslateButtonPressedTelemetry,
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../../utils/translationInfobar";
 import { startTestServers } from "../../utils/setupServers";
 import {
+  assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
   fixtureUrl,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
-import { maxToleratedTelemetryUploadingDurationInSeconds } from "../../utils/telemetry";
+import {
+  maxToleratedTelemetryUploadingDurationInSeconds,
+  readSeenTelemetry,
+} from "../../utils/telemetry";
 
+let proxyInstanceId;
 let shutdownTestServers;
 
 const tabsCurrentlyOpened = 1;
@@ -37,6 +43,7 @@ describe("Translation: Subsequent navigations", function() {
 
   before(async function() {
     const _ = await startTestServers();
+    proxyInstanceId = _.proxyInstanceId;
     shutdownTestServers = _.shutdownTestServers;
     driver = await launchFirefox();
     await installExtension(driver);
@@ -70,7 +77,7 @@ describe("Translation: Subsequent navigations", function() {
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
-  it("Translation via the infobar works after further navigations", async function() {
+  it("Translation via the infobar works after subsequent navigations", async function() {
     // ... this test continues the session from the previous test
     await navigateToURL(driver, fixtureUrl);
     await assertOriginalPageElementExists(driver);
@@ -88,5 +95,14 @@ describe("Translation: Subsequent navigations", function() {
       driver,
       `${this.test.fullTitle()} - After navigation 2`,
     );
+  });
+
+  it("Telemetry checks after: Translation via the infobar works after subsequent navigations", async function() {
+    // ... this test continues the session from the previous test
+    const seenTelemetry = await readSeenTelemetry(0, 8, proxyInstanceId);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[4]);
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[5]);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[7]);
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[8]);
   });
 });

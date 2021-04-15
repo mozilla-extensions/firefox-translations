@@ -3,10 +3,17 @@
 import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
 import { navigateToURL } from "../../utils/navigateToURL";
 import { takeScreenshot } from "../../utils/takeScreenshot";
-import { translateViaInfobar } from "../../utils/translationInfobar";
-import { startTestServers } from "../../utils/setupServers";
-import { maxToleratedTelemetryUploadingDurationInSeconds } from "../../utils/telemetry";
 import {
+  assertOnTranslateButtonPressedTelemetry,
+  translateViaInfobar,
+} from "../../utils/translationInfobar";
+import { startTestServers } from "../../utils/setupServers";
+import {
+  maxToleratedTelemetryUploadingDurationInSeconds,
+  readSeenTelemetry,
+} from "../../utils/telemetry";
+import {
+  assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
   fixtureUrl,
@@ -14,6 +21,7 @@ import {
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
 
+let proxyInstanceId;
 let shutdownTestServers;
 
 let tabsCurrentlyOpened = 0;
@@ -32,6 +40,7 @@ describe("Translation: Simultaneous tabs", function() {
 
   before(async function() {
     const _ = await startTestServers();
+    proxyInstanceId = _.proxyInstanceId;
     shutdownTestServers = _.shutdownTestServers;
     driver = await launchFirefox();
     await installExtension(driver);
@@ -63,5 +72,14 @@ describe("Translation: Simultaneous tabs", function() {
     await driver.switchTo().window(originalWindow);
     await assertTranslationSucceeded(driver);
     await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 1`);
+  });
+
+  it("Telemetry checks after: Translation via the infobar works when translating in multiple tabs at the same time", async function() {
+    // ... this test continues the session from the previous test
+    const seenTelemetry = await readSeenTelemetry(0, 5, proxyInstanceId);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[1]);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[3]);
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[4]);
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[5]);
   });
 });

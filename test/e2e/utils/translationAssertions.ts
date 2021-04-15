@@ -56,8 +56,8 @@ export const assertOnTranslationAttemptConcludedTelemetry = telemetryPayload => 
     parseInt(
       telemetryPayload.metrics.string["performance.model_load_time"],
       10,
-    ) > 0,
-    "The telemetry payload's string metrics 'performance.model_load_time' is a string that when parsed evaluates to more than 0",
+    ) >= 0,
+    "The telemetry payload's string metrics 'performance.model_load_time' is a string that when parsed evaluates to 0 or greater",
   );
   assert(
     parseInt(
