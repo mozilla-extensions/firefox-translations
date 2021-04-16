@@ -65,7 +65,12 @@ describe("Never translate site", function() {
   it("Telemetry checks after: The translation infobar can be closed via the 'Never translate site' menu item", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
-    assertOnNeverTranslateThisSiteTelemetry(seenTelemetry[0], seenTelemetry[1]);
+    assertOnNeverTranslateThisSiteTelemetry(
+      seenTelemetry[0],
+      seenTelemetry[1],
+      "es",
+      "en",
+    );
   });
 
   it("The translation infobar is no longer displayed when visiting the same site", async function() {

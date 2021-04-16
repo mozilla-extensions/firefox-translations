@@ -68,6 +68,8 @@ describe("Never translate language", function() {
     assertOnNeverTranslateSelectedLanguageTelemetry(
       seenTelemetry[0],
       seenTelemetry[1],
+      "es",
+      "en",
     );
   });
 

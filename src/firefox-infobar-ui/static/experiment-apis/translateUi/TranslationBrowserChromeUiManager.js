@@ -9,44 +9,59 @@ class TranslationBrowserChromeUiNotificationManager {
     this.browser = browser;
   }
 
-  infobarDisplayed() {
-    console.log("infobarDisplayed");
-    this.apiEventEmitter.emit("onInfoBarDisplayed", this.tabId);
+  infobarDisplayed(from, to) {
+    console.log("infobarDisplayed", { from, to });
+    this.apiEventEmitter.emit("onInfoBarDisplayed", this.tabId, from, to);
   }
 
-  toLanguageChanged() {
-    console.log("toLanguageChanged");
-    this.apiEventEmitter.emit("onSelectTranslateTo", this.tabId);
+  toLanguageChanged(from, newTo) {
+    console.log("toLanguageChanged", { from, newTo });
+    this.apiEventEmitter.emit("onSelectTranslateTo", this.tabId, from, newTo);
   }
 
-  fromLanguageChanged() {
-    console.log("fromLanguageChanged");
-    this.apiEventEmitter.emit("onSelectTranslateFrom", this.tabId);
+  fromLanguageChanged(newFrom, to) {
+    console.log("fromLanguageChanged", { newFrom, to });
+    this.apiEventEmitter.emit("onSelectTranslateFrom", this.tabId, newFrom, to);
   }
 
-  infobarClosed() {
-    console.log("infobarClosed");
-    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId);
+  infobarClosed(from, to) {
+    console.log("infobarClosed", { from, to });
+    this.apiEventEmitter.emit("onInfoBarClosed", this.tabId, from, to);
   }
 
-  neverForLanguage() {
-    console.log("neverForLanguage");
-    this.apiEventEmitter.emit("onNeverTranslateSelectedLanguage", this.tabId);
+  neverForLanguage(from, to) {
+    console.log("neverForLanguage", { from, to });
+    this.apiEventEmitter.emit(
+      "onNeverTranslateSelectedLanguage",
+      this.tabId,
+      from,
+      to,
+    );
   }
 
-  neverForSite() {
-    console.log("neverForSite");
-    this.apiEventEmitter.emit("onNeverTranslateThisSite", this.tabId);
+  neverForSite(from, to) {
+    console.log("neverForSite", { from, to });
+    this.apiEventEmitter.emit("onNeverTranslateThisSite", this.tabId, from, to);
   }
 
-  showOriginalContent() {
-    console.log("showOriginalContent");
-    this.apiEventEmitter.emit("onShowOriginalButtonPressed", this.tabId);
+  showOriginalContent(from, to) {
+    console.log("showOriginalContent", { from, to });
+    this.apiEventEmitter.emit(
+      "onShowOriginalButtonPressed",
+      this.tabId,
+      from,
+      to,
+    );
   }
 
-  showTranslatedContent() {
-    console.log("showTranslatedContent");
-    this.apiEventEmitter.emit("onShowTranslatedButtonPressed", this.tabId);
+  showTranslatedContent(from, to) {
+    console.log("showTranslatedContent", { from, to });
+    this.apiEventEmitter.emit(
+      "onShowTranslatedButtonPressed",
+      this.tabId,
+      from,
+      to,
+    );
   }
 
   translate(from, to) {
@@ -54,8 +69,8 @@ class TranslationBrowserChromeUiNotificationManager {
     this.apiEventEmitter.emit("onTranslateButtonPressed", this.tabId, from, to);
   }
 
-  notNow() {
-    console.log("notNow");
-    this.apiEventEmitter.emit("onNotNowButtonPressed", this.tabId);
+  notNow(from, to) {
+    console.log("notNow", { from, to });
+    this.apiEventEmitter.emit("onNotNowButtonPressed", this.tabId, from, to);
   }
 }

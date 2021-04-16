@@ -253,33 +253,35 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
   fromLanguageChanged() {
     this.translation.fromLanguageChanged(
-      this._getAnonElt("fromLanguage").value,
+      this._getSourceLang(),
+      this._getTargetLang(),
     );
     this.translate();
   }
 
   toLanguageChanged() {
-    this.translation.toLanguageChanged(this._getAnonElt("toLanguage").value);
+    this.translation.toLanguageChanged(
+      this._getSourceLang(),
+      this._getTargetLang(),
+    );
     this.translate();
   }
 
   translate() {
+    const from = this._getSourceLang();
+    const to = this._getTargetLang();
+
+    // Initiate translation
+    this.translation.translate(from, to);
+
+    // Store the values used in the translation in the from and to inputs
     if (
       this.translation.uiState.infobarState ===
       this.translation.TranslationInfoBarStates.STATE_OFFER
     ) {
-      this._getAnonElt("fromLanguage").value = this._getAnonElt(
-        "detectedLanguage",
-      ).value;
-      this._getAnonElt(
-        "toLanguage",
-      ).value = this.translation.uiState.defaultTargetLanguage;
+      this._getAnonElt("fromLanguage").value = from;
+      this._getAnonElt("toLanguage").value = to;
     }
-
-    this.translation.translate(
-      this._getAnonElt("fromLanguage").value,
-      this._getAnonElt("toLanguage").value,
-    );
   }
 
   /**
@@ -287,8 +289,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
    * by clicking the notification's close button, the not now button or choosing never to translate)
    */
   closeCommand() {
+    const from = this._getSourceLang();
+    const to = this._getTargetLang();
     this.close();
-    this.translation.infobarClosed();
+    this.translation.infobarClosed(from, to);
   }
 
   /**
@@ -296,7 +300,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
    * by clicking the Not now button
    */
   notNow() {
-    this.translation.notNow();
+    this.translation.notNow(this._getSourceLang(), this._getTargetLang());
     this.closeCommand();
   }
 
@@ -307,12 +311,18 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   showOriginal() {
-    this.translation.showOriginalContent();
+    this.translation.showOriginalContent(
+      this._getSourceLang(),
+      this._getTargetLang(),
+    );
     this._handleButtonHiding();
   }
 
   showTranslation() {
-    this.translation.showTranslatedContent();
+    this.translation.showTranslatedContent(
+      this._getSourceLang(),
+      this._getTargetLang(),
+    );
     this._handleButtonHiding();
   }
 
@@ -340,6 +350,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       throw new Error("Source language is not defined");
     }
     return lang;
+  }
+
+  _getTargetLang() {
+    return (
+      this._getAnonElt("toLanguage").value ||
+      this.translation.uiState.defaultTargetLanguage
+    );
   }
 
   optionsShowing() {
@@ -393,7 +410,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     Services.prefs.setCharPref(kPrefName, val);
 
-    this.translation.neverForLanguage();
+    this.translation.neverForLanguage(
+      this._getSourceLang(),
+      this._getTargetLang(),
+    );
     this.closeCommand();
   }
 
@@ -402,7 +422,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     const perms = Services.perms;
     perms.addFromPrincipal(principal, "translate", perms.DENY_ACTION);
 
-    this.translation.neverForSite();
+    this.translation.neverForSite(this._getSourceLang(), this._getTargetLang());
     this.closeCommand();
   }
 };

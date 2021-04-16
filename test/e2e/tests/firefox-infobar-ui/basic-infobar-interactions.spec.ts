@@ -84,7 +84,7 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
-    assertOnInfoBarDisplayedTelemetry(seenTelemetry[0]);
+    assertOnInfoBarDisplayedTelemetry(seenTelemetry[0], "es", "en");
   });
 
   it("Translation via the infobar works", async function() {
@@ -112,7 +112,7 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(4, 4, proxyInstanceId);
-    assertOnInfoBarClosedTelemetry(seenTelemetry[0]);
+    assertOnInfoBarClosedTelemetry(seenTelemetry[0], "es", "en");
   });
 
   it("The translation infobar can be closed via the 'Not now' button", async function() {
@@ -125,6 +125,11 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(6, 7, proxyInstanceId);
-    assertOnNotNowButtonPressedTelemetry(seenTelemetry[0], seenTelemetry[1]);
+    assertOnNotNowButtonPressedTelemetry(
+      seenTelemetry[0],
+      seenTelemetry[1],
+      "es",
+      "en",
+    );
   });
 });

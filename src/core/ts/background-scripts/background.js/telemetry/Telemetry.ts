@@ -39,41 +39,65 @@ export class Telemetry {
     );
   }
 
-  public onInfoBarDisplayed(tabId: number) {
+  public onInfoBarDisplayed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
     displayed.record();
     this.submit();
   }
 
-  public onSelectTranslateFrom(tabId: number) {
+  public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
+    fromLang.set(newFrom);
+    toLang.set(to);
     changeLang.record();
     this.submit();
   }
 
-  public onSelectTranslateTo(tabId: number) {
+  public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
+    fromLang.set(from);
+    toLang.set(newTo);
     changeLang.record();
     this.submit();
   }
 
-  public onInfoBarClosed(tabId: number) {
+  public onInfoBarClosed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
     closed.record();
     this.submit();
   }
 
-  public onNeverTranslateSelectedLanguage(tabId: number) {
+  public onNeverTranslateSelectedLanguage(
+    tabId: number,
+    from: string,
+    to: string,
+  ) {
+    fromLang.set(from);
+    toLang.set(to);
     neverTranslateLang.record();
     this.submit();
   }
 
-  public onNeverTranslateThisSite(tabId: number) {
+  public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
     neverTranslateSite.record();
     this.submit();
   }
 
-  public onShowOriginalButtonPressed(tabId: number) {
+  public onShowOriginalButtonPressed(
+    _tabId: number,
+    _from: string,
+    _to: string,
+  ) {
     // TODO?
   }
 
-  public onShowTranslatedButtonPressed(tabId: number) {
+  public onShowTranslatedButtonPressed(
+    _tabId: number,
+    _from: string,
+    _to: string,
+  ) {
     // TODO?
   }
 
@@ -84,7 +108,9 @@ export class Telemetry {
     this.submit();
   }
 
-  public onNotNowButtonPressed(tabId: number) {
+  public onNotNowButtonPressed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
     notNow.record();
     this.submit();
   }

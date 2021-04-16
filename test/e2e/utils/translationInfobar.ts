@@ -156,7 +156,11 @@ export const closeInfobarViaNeverTranslateSiteMenuItem = async (
   await driver.wait(until.stalenessOf(infobarElement), 1000);
 };
 
-export const assertOnInfoBarDisplayedTelemetry = telemetryPayload => {
+export const assertOnInfoBarDisplayedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
   // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
   assert.strictEqual(
     telemetryPayload.events.length,
@@ -173,9 +177,21 @@ export const assertOnInfoBarDisplayedTelemetry = telemetryPayload => {
     "displayed",
     "The telemetry payload's event name is 'displayed'",
   );
+  assert.deepStrictEqual(
+    telemetryPayload.metrics.string,
+    {
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
+    },
+    "The telemetry payload's string metrics are correct",
+  );
 };
 
-export const assertOnInfoBarClosedTelemetry = telemetryPayload => {
+export const assertOnInfoBarClosedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Close'
   assert.strictEqual(
     telemetryPayload.events.length,
@@ -192,11 +208,21 @@ export const assertOnInfoBarClosedTelemetry = telemetryPayload => {
     "closed",
     "The telemetry payload's event name is 'closed'",
   );
+  assert.deepStrictEqual(
+    telemetryPayload.metrics.string,
+    {
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
+    },
+    "The telemetry payload's string metrics are correct",
+  );
 };
 
 export const assertOnNeverTranslateSelectedLanguageTelemetry = (
   telemetryPayload1,
   telemetryPayload2,
+  expectedFromLang: string,
+  expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
   assert.strictEqual(
@@ -214,12 +240,26 @@ export const assertOnNeverTranslateSelectedLanguageTelemetry = (
     "never_translate_lang",
     "The first telemetry payload's event name is 'never_translate_lang'",
   );
-  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+  assert.deepStrictEqual(
+    telemetryPayload1.metrics.string,
+    {
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
+    },
+    "The telemetry payload's string metrics are correct",
+  );
+  assertOnInfoBarClosedTelemetry(
+    telemetryPayload2,
+    expectedFromLang,
+    expectedToLang,
+  );
 };
 
 export const assertOnNeverTranslateThisSiteTelemetry = (
   telemetryPayload1,
   telemetryPayload2,
+  expectedFromLang: string,
+  expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Never translate site'"
   assert.strictEqual(
@@ -237,7 +277,19 @@ export const assertOnNeverTranslateThisSiteTelemetry = (
     "never_translate_site",
     "The first telemetry payload's event name is 'never_translate_site'",
   );
-  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+  assert.deepStrictEqual(
+    telemetryPayload1.metrics.string,
+    {
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
+    },
+    "The telemetry payload's string metrics are correct",
+  );
+  assertOnInfoBarClosedTelemetry(
+    telemetryPayload2,
+    expectedFromLang,
+    expectedToLang,
+  );
 };
 
 export const assertOnTranslateButtonPressedTelemetry = (
@@ -274,6 +326,8 @@ export const assertOnTranslateButtonPressedTelemetry = (
 export const assertOnNotNowButtonPressedTelemetry = (
   telemetryPayload1,
   telemetryPayload2,
+  expectedFromLang: string,
+  expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
   assert.strictEqual(
@@ -291,5 +345,17 @@ export const assertOnNotNowButtonPressedTelemetry = (
     "not_now",
     "The first telemetry payload's event name is 'not_now'",
   );
-  assertOnInfoBarClosedTelemetry(telemetryPayload2);
+  assert.deepStrictEqual(
+    telemetryPayload1.metrics.string,
+    {
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
+    },
+    "The telemetry payload's string metrics are correct",
+  );
+  assertOnInfoBarClosedTelemetry(
+    telemetryPayload2,
+    expectedFromLang,
+    expectedToLang,
+  );
 };
