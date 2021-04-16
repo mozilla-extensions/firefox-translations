@@ -14,7 +14,7 @@ import {
   readSeenTelemetry,
 } from "../../utils/telemetry";
 import {
-  fixtureUrl,
+  fixtures,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
@@ -54,7 +54,7 @@ describe("Never translate site", function() {
 
   it("The translation infobar can be closed via the 'Never translate site' menu item", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await closeInfobarViaNeverTranslateSiteMenuItem(
       driver,
       tabsCurrentlyOpened,
@@ -70,7 +70,7 @@ describe("Never translate site", function() {
 
   it("The translation infobar is no longer displayed when visiting the same site", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await assertInfobarIsNotShown(driver, tabsCurrentlyOpened);
     await takeScreenshot(driver, this.test.fullTitle());
   });

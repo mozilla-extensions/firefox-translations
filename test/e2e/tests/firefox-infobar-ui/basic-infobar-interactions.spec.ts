@@ -25,7 +25,7 @@ import {
   assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
-  fixtureUrl,
+  fixtures,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
@@ -71,7 +71,7 @@ describe("Basic infobar interactions", function() {
 
   it("The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await assertInfobarIsShown(driver, tabsCurrentlyOpened);
     const translateButtonElement = await lookForInfobarTranslateButton(
       driver,
@@ -89,9 +89,9 @@ describe("Basic infobar interactions", function() {
 
   it("Translation via the infobar works", async function() {
     // ... this test continues the session from the previous test
-    await assertOriginalPageElementExists(driver);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
@@ -104,7 +104,7 @@ describe("Basic infobar interactions", function() {
 
   it("The translation infobar can be closed via the close button", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await closeInfobarViaCloseButton(driver, tabsCurrentlyOpened);
     await takeScreenshot(driver, this.test.fullTitle());
   });
@@ -117,7 +117,7 @@ describe("Basic infobar interactions", function() {
 
   it("The translation infobar can be closed via the 'Not now' button", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await closeInfobarViaNotNowButton(driver, tabsCurrentlyOpened);
     await takeScreenshot(driver, this.test.fullTitle());
   });

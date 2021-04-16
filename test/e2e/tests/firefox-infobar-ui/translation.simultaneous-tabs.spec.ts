@@ -16,7 +16,7 @@ import {
   assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
-  fixtureUrl,
+  fixtures,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
@@ -58,19 +58,19 @@ describe("Translation: Simultaneous tabs", function() {
     // ... this test continues the session from the previous test
     await driver.switchTo().newWindow("tab");
     tabsCurrentlyOpened++;
-    await navigateToURL(driver, fixtureUrl);
-    await assertOriginalPageElementExists(driver);
+    await navigateToURL(driver, fixtures.es.url);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
     const originalWindow = await driver.getWindowHandle();
     await driver.switchTo().newWindow("tab");
     tabsCurrentlyOpened++;
-    await navigateToURL(driver, fixtureUrl);
-    await assertOriginalPageElementExists(driver);
+    await navigateToURL(driver, fixtures.es.url);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 2`);
     await driver.switchTo().window(originalWindow);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, `${this.test.fullTitle()} - Tab 1`);
   });
 

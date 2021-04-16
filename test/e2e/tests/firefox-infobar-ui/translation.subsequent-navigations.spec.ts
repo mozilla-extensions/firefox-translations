@@ -15,7 +15,7 @@ import {
   assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
-  fixtureUrl,
+  fixtures,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
@@ -59,7 +59,7 @@ describe("Translation: Subsequent navigations", function() {
 
   it("The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.url);
     await assertInfobarIsShown(driver, tabsCurrentlyOpened);
     const translateButtonElement = await lookForInfobarTranslateButton(
       driver,
@@ -71,26 +71,26 @@ describe("Translation: Subsequent navigations", function() {
 
   it("Translation via the infobar works", async function() {
     // ... this test continues the session from the previous test
-    await assertOriginalPageElementExists(driver);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
   it("Translation via the infobar works after subsequent navigations", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
-    await assertOriginalPageElementExists(driver);
+    await navigateToURL(driver, fixtures.es.url);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(
       driver,
       `${this.test.fullTitle()} - After navigation 1`,
     );
-    await navigateToURL(driver, fixtureUrl);
-    await assertOriginalPageElementExists(driver);
+    await navigateToURL(driver, fixtures.es.url);
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver);
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(
       driver,
       `${this.test.fullTitle()} - After navigation 2`,

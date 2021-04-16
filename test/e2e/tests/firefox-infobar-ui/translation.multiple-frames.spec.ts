@@ -1,7 +1,6 @@
 /* eslint-env node, mocha */
 
 import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
-import { lookForPageElement } from "../../utils/lookForElement";
 import { navigateToURL } from "../../utils/navigateToURL";
 import { By } from "selenium-webdriver";
 import { assertElementExists } from "../../utils/assertElement";
@@ -12,31 +11,17 @@ import {
   translateViaInfobar,
 } from "../../utils/translationInfobar";
 import { startTestServers } from "../../utils/setupServers";
-
-async function lookForFixturePageOriginalContent(driver) {
-  return lookForPageElement(
-    driver,
-    By.xpath,
-    "//*[contains(text(),'Una estrategia republicana para obstaculizar')]",
-  );
-}
-
-async function lookForFixturePageTranslatedContent(driver, timeout) {
-  return lookForPageElement(
-    driver,
-    By.xpath,
-    "//*[contains(text(),'A Republican strategy to hinder')]",
-    timeout,
-  );
-}
+import {
+  assertOriginalPageElementExists,
+  assertTranslationSucceeded,
+  fixtures,
+  maxToleratedModelLoadingDurationInSeconds,
+  maxToleratedTranslationDurationInSeconds,
+} from "../../utils/translationAssertions";
 
 let shutdownTestServers;
 
 const tabsCurrentlyOpened = 1;
-
-const fixtureUrl = "http://0.0.0.0:4001/multiple-frames.html";
-const maxToleratedModelLoadingDurationInSeconds = 20;
-const maxToleratedTranslationDurationInSeconds = 100;
 
 describe("Translation: Multiple frames", function() {
   // This gives Firefox time to start, and us a bit longer during some of the tests.
@@ -66,7 +51,7 @@ describe("Translation: Multiple frames", function() {
 
   it("The translation infobar is shown on a multi-frame web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtureUrl);
+    await navigateToURL(driver, fixtures.es.multipleFramesUrl);
     await assertInfobarIsShown(driver, tabsCurrentlyOpened);
     const translateButtonElement = await lookForInfobarTranslateButton(
       driver,
@@ -76,29 +61,14 @@ describe("Translation: Multiple frames", function() {
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
-  const assertOriginalPageElementExists = async () => {
-    const originalPageElement = await lookForFixturePageOriginalContent(driver);
-    assertElementExists(originalPageElement, "originalPageElement");
-  };
-
-  const assertTranslationSucceeded = async () => {
-    const translatedPageElement = await lookForFixturePageTranslatedContent(
-      driver,
-      (maxToleratedModelLoadingDurationInSeconds +
-        maxToleratedTranslationDurationInSeconds) *
-        1000,
-    );
-    assertElementExists(translatedPageElement, "translatedPageElement");
-  };
-
   it("Translation of all frames", async function() {
     // ... this test continues the session from the previous test
-    await assertOriginalPageElementExists();
+    await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded();
+    await assertTranslationSucceeded(driver, fixtures.es);
     const iframe = driver.findElement(By.css("iframe"));
     await driver.switchTo().frame(iframe);
-    await assertTranslationSucceeded();
+    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, this.test.fullTitle());
   });
 });

@@ -4,35 +4,69 @@ import { By } from "selenium-webdriver";
 import { WebDriver } from "./setupWebdriver";
 import { assert } from "chai";
 
-export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
 export const maxToleratedModelLoadingDurationInSeconds = 20;
 export const maxToleratedTranslationDurationInSeconds = 100;
 
-async function lookForFixturePageOriginalContent(driver: WebDriver) {
+interface Fixture {
+  url: string;
+  multipleFramesUrl?: string;
+  originalTextToLookFor: string;
+  translatedTextToLookFor: string;
+}
+
+export const fixtures: { [k: string]: Fixture } = {
+  es: {
+    url: "http://0.0.0.0:4001/newstest2013.es.top10lines.html",
+    multipleFramesUrl: "http://0.0.0.0:4001/multiple-frames.html",
+    originalTextToLookFor: "Una estrategia republicana para obstaculizar",
+    translatedTextToLookFor: "A Republican strategy to hinder",
+  },
+};
+
+export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
+
+async function lookForFixturePageOriginalContent(
+  driver: WebDriver,
+  fixture: Fixture,
+) {
   return lookForPageElement(
     driver,
     By.xpath,
-    "//*[contains(text(),'Una estrategia republicana para obstaculizar')]",
+    `//*[contains(text(),'${fixture.originalTextToLookFor}')]`,
   );
 }
 
-async function lookForFixturePageTranslatedContent(driver: WebDriver, timeout) {
+async function lookForFixturePageTranslatedContent(
+  driver: WebDriver,
+  fixture: Fixture,
+  timeout,
+) {
   return lookForPageElement(
     driver,
     By.xpath,
-    "//*[contains(text(),'A Republican strategy to hinder')]",
+    `//*[contains(text(),'${fixture.translatedTextToLookFor}')]`,
     timeout,
   );
 }
 
-export const assertOriginalPageElementExists = async (driver: WebDriver) => {
-  const originalPageElement = await lookForFixturePageOriginalContent(driver);
+export const assertOriginalPageElementExists = async (
+  driver: WebDriver,
+  fixture: Fixture,
+) => {
+  const originalPageElement = await lookForFixturePageOriginalContent(
+    driver,
+    fixture,
+  );
   assertElementExists(originalPageElement, "originalPageElement");
 };
 
-export const assertTranslationSucceeded = async (driver: WebDriver) => {
+export const assertTranslationSucceeded = async (
+  driver: WebDriver,
+  fixture: Fixture,
+) => {
   const translatedPageElement = await lookForFixturePageTranslatedContent(
     driver,
+    fixture,
     (maxToleratedModelLoadingDurationInSeconds +
       maxToleratedTranslationDurationInSeconds) *
       1000,
