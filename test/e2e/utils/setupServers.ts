@@ -52,8 +52,8 @@ export const launchTestServer = (
   serverProcess.stderr.pipe(errorLogStream);
 
   /* eslint-disable mozilla/balanced-listeners */
-  serverProcess.on("close", function(code) {
-    console.log(`Child process "${ref}" exited with code` + code);
+  serverProcess.on("close", function(_code) {
+    // console.debug(`Child process "${ref}" exited with code` + code);
   });
   /* eslint-enable mozilla/balanced-listeners */
 
