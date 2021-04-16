@@ -21,6 +21,13 @@ export const fixtures: { [k: string]: Fixture } = {
     originalTextToLookFor: "Una estrategia republicana para obstaculizar",
     translatedTextToLookFor: "A Republican strategy to hinder",
   },
+  et: {
+    url: "http://0.0.0.0:4001/wmt18.et.top10lines.html",
+    originalTextToLookFor:
+      "Eestis ja Hispaanias peeti kinni neli Kemerovo grupeeringu liiget",
+    translatedTextToLookFor:
+      "Four members of the Kemerovo group detained in Estonia and Spain",
+  },
 };
 
 export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
@@ -74,15 +81,19 @@ export const assertTranslationSucceeded = async (
   assertElementExists(translatedPageElement, "translatedPageElement");
 };
 
-export const assertOnTranslationAttemptConcludedTelemetry = telemetryPayload => {
+export const assertOnTranslationAttemptConcludedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.from_lang"],
-    "es",
+    expectedFromLang,
     "The telemetry payload's string metrics 'metadata.from_lang' is correct",
   );
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.to_lang"],
-    "en",
+    expectedToLang,
     "The telemetry payload's string metrics 'metadata.to_lang' is correct",
   );
   // Check telemetry for: Translated words per second, Model load time, Translation time

@@ -240,7 +240,11 @@ export const assertOnNeverTranslateThisSiteTelemetry = (
   assertOnInfoBarClosedTelemetry(telemetryPayload2);
 };
 
-export const assertOnTranslateButtonPressedTelemetry = telemetryPayload => {
+export const assertOnTranslateButtonPressedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
   assert.strictEqual(
     telemetryPayload.events.length,
@@ -260,8 +264,8 @@ export const assertOnTranslateButtonPressedTelemetry = telemetryPayload => {
   assert.deepStrictEqual(
     telemetryPayload.metrics.string,
     {
-      "metadata.from_lang": "es",
-      "metadata.to_lang": "en",
+      "metadata.from_lang": expectedFromLang,
+      "metadata.to_lang": expectedToLang,
     },
     "The telemetry payload's string metrics are correct",
   );

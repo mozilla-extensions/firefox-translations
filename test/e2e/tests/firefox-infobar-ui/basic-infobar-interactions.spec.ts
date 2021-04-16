@@ -98,8 +98,8 @@ describe("Basic infobar interactions", function() {
   it("Telemetry checks after: Translation via the infobar works", async function() {
     // ... this test continues the sessiAn from the previous test
     const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
-    assertOnTranslateButtonPressedTelemetry(seenTelemetry[0]);
-    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1]);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1], "es", "en");
   });
 
   it("The translation infobar can be closed via the close button", async function() {
