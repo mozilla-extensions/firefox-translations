@@ -7,11 +7,17 @@ import { assertElementExists } from "../../utils/assertElement";
 import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsShown,
+  assertOnTranslateButtonPressedTelemetry,
   lookForInfobarTranslateButton,
   translateViaInfobar,
 } from "../../utils/translationInfobar";
 import { startTestServers } from "../../utils/setupServers";
 import {
+  maxToleratedTelemetryUploadingDurationInSeconds,
+  readSeenTelemetry,
+} from "../../utils/telemetry";
+import {
+  assertOnTranslationAttemptConcludedTelemetry,
   assertOriginalPageElementExists,
   assertTranslationSucceeded,
   fixtures,
@@ -19,6 +25,7 @@ import {
   maxToleratedTranslationDurationInSeconds,
 } from "../../utils/translationAssertions";
 
+let proxyInstanceId;
 let shutdownTestServers;
 
 const tabsCurrentlyOpened = 1;
@@ -27,6 +34,7 @@ describe("Translation: Multiple frames", function() {
   // This gives Firefox time to start, and us a bit longer during some of the tests.
   this.timeout(
     (15 +
+      maxToleratedTelemetryUploadingDurationInSeconds +
       maxToleratedModelLoadingDurationInSeconds +
       maxToleratedTranslationDurationInSeconds * 5) *
       1000,
@@ -36,6 +44,7 @@ describe("Translation: Multiple frames", function() {
 
   before(async function() {
     const _ = await startTestServers();
+    proxyInstanceId = _.proxyInstanceId;
     shutdownTestServers = _.shutdownTestServers;
     driver = await launchFirefox();
     await installExtension(driver);
@@ -70,5 +79,12 @@ describe("Translation: Multiple frames", function() {
     await driver.switchTo().frame(iframe);
     await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, this.test.fullTitle());
+  });
+
+  it("Telemetry checks after: Translation of all frames", async function() {
+    // ... this test continues the session from the previous test
+    const seenTelemetry = await readSeenTelemetry(0, 2, proxyInstanceId);
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[1], "es", "en");
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[2], "es", "en");
   });
 });
