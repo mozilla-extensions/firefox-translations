@@ -44,6 +44,7 @@ interface NativeTranslateUiState {
   supportedSourceLanguages: string[];
   supportedTargetLanguages: string[];
   // Translation progress
+  translationDurationMs: number;
   modelLoading: boolean;
   queuedTranslationEngineRequestCount: number;
 }
@@ -141,6 +142,9 @@ export class NativeTranslateUiBroker {
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
 
+      const translationDurationMs =
+        Date.now() - tts.translationInitiationTimestamp;
+
       return {
         acceptedTargetLanguages,
         detectedLanguage,
@@ -154,6 +158,7 @@ export class NativeTranslateUiBroker {
         supportedSourceLanguages,
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
         // Translation progress
+        translationDurationMs,
         modelLoading: tts.modelLoading,
         queuedTranslationEngineRequestCount:
           tts.queuedTranslationEngineRequestCount,

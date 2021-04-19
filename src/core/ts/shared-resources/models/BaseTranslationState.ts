@@ -42,6 +42,7 @@ export class BaseTranslationState extends Model({
   wordCount: prop<number>(),
   wordCountVisible: prop<number>(),
   wordCountVisibleInViewport: prop<number>(),
+  translationInitiationTimestamp: prop<number>(),
   totalModelLoadWallTimeMs: prop<number>(),
   totalTranslationWallTimeMs: prop<number>(),
   totalTranslationEngineRequestCount: prop<number>(),

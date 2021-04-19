@@ -165,6 +165,12 @@ export class ExtensionState extends Model({
           .reduce((a, b) => a + b, 0);
 
         // Merge translation-progress-related booleans as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
+        const translationInitiationTimestamps = documentTranslationStates.map(
+          (dts: DocumentTranslationState) => dts.translationInitiationTimestamp,
+        );
+        const translationInitiationTimestamp = Math.min(
+          ...translationInitiationTimestamps,
+        );
         const modelLoadNecessary = !!documentTranslationStates.filter(
           (dts: DocumentTranslationState) => dts.modelLoadNecessary,
         ).length;
@@ -229,6 +235,7 @@ export class ExtensionState extends Model({
           wordCount,
           wordCountVisible,
           wordCountVisibleInViewport,
+          translationInitiationTimestamp,
           totalModelLoadWallTimeMs,
           totalTranslationWallTimeMs,
           totalTranslationEngineRequestCount,

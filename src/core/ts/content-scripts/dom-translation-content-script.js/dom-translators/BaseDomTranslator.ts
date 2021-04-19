@@ -29,6 +29,7 @@ export type FrameTranslationProgressCallback = (
 
 export interface TranslationRequestProgress {
   requestId: string;
+  initiationTimestamp: number;
   queued: boolean;
   modelLoadNecessary: boolean;
   modelLoading: boolean;

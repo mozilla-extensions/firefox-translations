@@ -56,9 +56,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
           <vbox class="translation-unavailable" pack="center">
             <label value="&translation.serviceUnavailable.label;"/>
           </vbox>
-          <vbox class="loading" pack="center">
-            <label value="Loading language model..."/>
-          </vbox>
         </deck>
         <spacer flex="1"/>
         <button type="menu" class="notification-button" anonid="options" label="&translation.options.menu;">
@@ -96,10 +93,15 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
-  updateTranslationProgress(modelLoading, queuedTranslationEngineRequestCount) {
+  updateTranslationProgress(
+    shouldShowTranslationProgress,
+    modelLoading,
+    queuedTranslationEngineRequestCount,
+  ) {
     let progressLabelValue;
-    // TODO: Only show progress if translation has been going on for at least say, 3 seconds
-    if (modelLoading) {
+    if (!shouldShowTranslationProgress) {
+      progressLabelValue = "";
+    } else if (modelLoading) {
       progressLabelValue = "(Currently loading language model...)";
     } else if (queuedTranslationEngineRequestCount > 0) {
       progressLabelValue = `(Language model loaded. ${queuedTranslationEngineRequestCount} part${

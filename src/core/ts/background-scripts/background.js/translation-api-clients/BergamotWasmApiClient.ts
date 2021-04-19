@@ -29,6 +29,7 @@ export class BergamotWasmApiClient implements TranslationApiClient {
 
     const translationRequestProgress: TranslationRequestProgress = {
       requestId: undefined,
+      initiationTimestamp: Date.now(),
       queued: false,
       modelLoadNecessary: undefined,
       modelLoading: false,

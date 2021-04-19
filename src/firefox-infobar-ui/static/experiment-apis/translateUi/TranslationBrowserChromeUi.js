@@ -1,6 +1,11 @@
 /* global TranslationBrowserChromeUiNotificationManager */
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "(TranslationBrowserChromeUi)" }]*/
 
+const { setTimeout, clearTimeout } = ChromeUtils.import(
+  "resource://gre/modules/Timer.jsm",
+  {},
+);
+
 const TranslationInfoBarStates = {
   STATE_OFFER: 0,
   STATE_TRANSLATING: 1,
@@ -15,6 +20,7 @@ class TranslationBrowserChromeUi {
     this.uiState = null;
     this.browser = browser;
     this.context = context;
+    this.shouldShowTranslationProgressTimer = undefined;
     this.importTranslationNotification();
 
     // The manager instance is injected into the translation notification bar and handles events from therein
@@ -87,10 +93,49 @@ class TranslationBrowserChromeUi {
    * Informs the infobar element of the current translation progress
    */
   updateTranslationProgress(uiState) {
+    // Don't bother updating translation progress if not currently translating
+    if (
+      this.translationBrowserChromeUiNotificationManager.uiState
+        .infobarState !== TranslationInfoBarStates.STATE_TRANSLATING
+    ) {
+      return;
+    }
     const notif = this.notificationBox.getNotificationWithValue("translation");
     if (notif) {
-      const { modelLoading, queuedTranslationEngineRequestCount } = uiState;
+      const {
+        translationDurationMs,
+        modelLoading,
+        queuedTranslationEngineRequestCount,
+      } = uiState;
+
+      // Always cancel ongoing timers so that we start from a clean state
+      if (this.shouldShowTranslationProgressTimer) {
+        clearTimeout(this.shouldShowTranslationProgressTimer);
+      }
+
+      // Only show progress if translation has been going on for at least 3 seconds
+      let shouldShowTranslationProgress;
+      const thresholdMsAfterWhichToShouldTranslationProgress = 3000;
+      if (
+        translationDurationMs >=
+        thresholdMsAfterWhichToShouldTranslationProgress
+      ) {
+        shouldShowTranslationProgress = true;
+      } else {
+        // Use a timer to show the translation progress after the threshold
+        this.shouldShowTranslationProgressTimer = setTimeout(() => {
+          notif.updateTranslationProgress(
+            true,
+            modelLoading,
+            queuedTranslationEngineRequestCount,
+          );
+          clearTimeout(this.shouldShowTranslationProgressTimer);
+        }, thresholdMsAfterWhichToShouldTranslationProgress - translationDurationMs);
+        // Don't show until then
+        shouldShowTranslationProgress = false;
+      }
       notif.updateTranslationProgress(
+        shouldShowTranslationProgress,
         modelLoading,
         queuedTranslationEngineRequestCount,
       );

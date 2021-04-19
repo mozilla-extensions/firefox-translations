@@ -65,6 +65,12 @@ export class DocumentTranslationStateCommunicator {
         translationRequestProgress,
     );
 
+    const translationInitiationTimestamps = translationRequestProgressEntries.map(
+      (trp: TranslationRequestProgress) => trp.initiationTimestamp,
+    );
+    const translationInitiationTimestamp = Math.min(
+      ...translationInitiationTimestamps,
+    );
     const totalModelLoadWallTimeMs = translationRequestProgressEntries
       .map((trp: TranslationRequestProgress) => trp.modelLoadWallTimeMs || 0)
       .reduce((a, b) => a + b, 0);
@@ -100,6 +106,11 @@ export class DocumentTranslationStateCommunicator {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
         this.frameInfo,
         [
+          {
+            op: "replace",
+            path: ["translationInitiationTimestamp"],
+            value: translationInitiationTimestamp,
+          },
           {
             op: "replace",
             path: ["totalModelLoadWallTimeMs"],
