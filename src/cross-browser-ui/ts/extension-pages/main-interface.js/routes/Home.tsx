@@ -43,15 +43,15 @@ export class Home extends React.Component<HomeProps, HomeState> {
 
     // Extract the document translation states that relate to the currently opened tab
     const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentFrameDocumentTranslationStates = [];
+    const currentTabDocumentTranslationStates = [];
     documentTranslationStates.forEach(
       (documentTranslationState: DocumentTranslationState) => {
         if (documentTranslationState.tabId === tabId) {
-          currentFrameDocumentTranslationStates.push(documentTranslationState);
+          currentTabDocumentTranslationStates.push(documentTranslationState);
         }
       },
     );
-    const topFrameDocumentTranslationState: DocumentTranslationState = currentFrameDocumentTranslationStates.find(
+    const topFrameDocumentTranslationState: DocumentTranslationState = currentTabDocumentTranslationStates.find(
       dts => dts.frameId === 0,
     ) || {
       translationStatus: TranslationStatus.UNAVAILABLE,
@@ -66,7 +66,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     } = topFrameDocumentTranslationState;
 
     const requestTranslation = () => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
@@ -80,7 +80,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const requestCancellation = () => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
@@ -94,7 +94,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const setTranslateFrom = $translateFrom => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
@@ -108,7 +108,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const setTranslateTo = $translateTo => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
@@ -204,7 +204,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const toggleShowOriginal = () => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {
@@ -218,7 +218,7 @@ export class Home extends React.Component<HomeProps, HomeState> {
     };
 
     const toggleQualityEstimation = () => {
-      currentFrameDocumentTranslationStates.forEach(
+      currentTabDocumentTranslationStates.forEach(
         (dts: DocumentTranslationState) => {
           extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
             {

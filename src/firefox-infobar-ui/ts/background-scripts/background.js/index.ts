@@ -17,6 +17,7 @@ import { connectRootStoreToDevTools } from "../../../../core/ts/background-scrip
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { NativeTranslateUiBroker } from "./NativeTranslateUiBroker";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
+import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -33,6 +34,7 @@ class ExtensionGlue {
   private contentScriptLanguageDetectorProxyPortListener: PortListener;
   private contentScriptBergamotApiClientPortListener: PortListener;
   private contentScriptFrameInfoPortListener: PortListener;
+  private nativeTranslateUiBroker: NativeTranslateUiBroker;
 
   constructor() {}
 
@@ -69,10 +71,10 @@ class ExtensionGlue {
 
   async start() {
     // Set up native translate ui
-    const nativeTranslateUiBroker = new NativeTranslateUiBroker(
+    this.nativeTranslateUiBroker = new NativeTranslateUiBroker(
       this.extensionState,
     );
-    await nativeTranslateUiBroker.start();
+    await this.nativeTranslateUiBroker.start();
 
     // Set up content script port listeners
     this.contentScriptLanguageDetectorProxyPortListener = contentScriptLanguageDetectorProxyPortListener;
@@ -87,7 +89,11 @@ class ExtensionGlue {
     });
   }
 
+  // TODO: Run this cleanup-method when relevant
   async cleanup() {
+    await this.nativeTranslateUiBroker.stop();
+    // Make sure to send buffered telemetry events
+    telemetry.submit();
     // Tear down content script port listeners
     [
       this.extensionPreferencesPortListener,

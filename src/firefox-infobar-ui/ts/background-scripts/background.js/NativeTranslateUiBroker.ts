@@ -2,27 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  ModelInstanceData,
-  onSnapshot,
-  SnapshotOutOfModel,
-} from "mobx-keystone";
 import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
 import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
-import { Telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
-import {
-  translate,
-  changeLang,
-  closed,
-  // displayed,
-  // neverTranslateLang,
-  neverTranslateSite,
-  // notNow,
-} from "../../../../core/ts/background-scripts/background.js/telemetry/generated/infobar";
-import { DocumentTranslationState } from "../../../../core/ts/shared-resources/models/DocumentTranslationState";
+import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
+import { getSnapshot } from "mobx-keystone";
+import { reaction, when } from "mobx";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -57,6 +45,10 @@ interface NativeTranslateUiState {
   supportedTargetLanguages: string[];
 }
 
+type StandardInfobarInteractionEvent = Event<
+  (tabId: number, from: string, to: string) => void
+>;
+
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {
   experiments: {
@@ -67,28 +59,36 @@ interface BrowserWithExperimentAPIs extends browserInterface {
         tabId: number,
         uiState: NativeTranslateUiState,
       ) => Promise<void>;
-      onSelectTranslateTo: Event<(tabId: number) => void>;
-      onSelectTranslateFrom: Event<(tabId: number) => void>;
-      onInfoBarClosed: Event<(tabId: number) => void>;
-      onNeverTranslateThisSite: Event<(tabId: number) => void>;
-      onTranslateButtonPressed: Event<
-        (tabId: number, from: string, to: string) => void
+      onInfoBarDisplayed: StandardInfobarInteractionEvent;
+      onSelectTranslateTo: Event<
+        (tabId: number, from: string, newTo: string) => void
       >;
-      onShowOriginalButtonPressed: Event<(tabId: number) => void>;
-      onShowTranslatedButtonPressed: Event<(tabId: number) => void>;
+      onSelectTranslateFrom: Event<
+        (tabId: number, newFrom: string, to: string) => void
+      >;
+      onInfoBarClosed: StandardInfobarInteractionEvent;
+      onNeverTranslateSelectedLanguage: StandardInfobarInteractionEvent;
+      onNeverTranslateThisSite: StandardInfobarInteractionEvent;
+      onShowOriginalButtonPressed: StandardInfobarInteractionEvent;
+      onShowTranslatedButtonPressed: StandardInfobarInteractionEvent;
+      onTranslateButtonPressed: StandardInfobarInteractionEvent;
+      onNotNowButtonPressed: StandardInfobarInteractionEvent;
     };
   };
 }
 const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
 type NativeTranslateUiEventRef =
+  | "onInfoBarDisplayed"
   | "onSelectTranslateTo"
   | "onSelectTranslateFrom"
   | "onInfoBarClosed"
+  | "onNeverTranslateSelectedLanguage"
   | "onNeverTranslateThisSite"
-  | "onTranslateButtonPressed"
   | "onShowOriginalButtonPressed"
-  | "onShowTranslatedButtonPressed";
+  | "onShowTranslatedButtonPressed"
+  | "onTranslateButtonPressed"
+  | "onNotNowButtonPressed";
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;
@@ -97,13 +97,16 @@ export class NativeTranslateUiBroker {
   constructor(extensionState) {
     this.extensionState = extensionState;
     this.eventsToObserve = [
+      "onInfoBarDisplayed",
       "onSelectTranslateTo",
       "onSelectTranslateFrom",
       "onInfoBarClosed",
+      "onNeverTranslateSelectedLanguage",
       "onNeverTranslateThisSite",
-      "onTranslateButtonPressed",
       "onShowOriginalButtonPressed",
       "onShowTranslatedButtonPressed",
+      "onTranslateButtonPressed",
+      "onNotNowButtonPressed",
     ];
   }
 
@@ -118,14 +121,14 @@ export class NativeTranslateUiBroker {
     const { summarizeLanguageSupport } = new LanguageSupport();
 
     // Boils down extension state to the subset relevant for the native translate ui
-    const nativeTranslateUiStateFromDocumentTranslationState = async (
-      dts: SnapshotOutOfModel<DocumentTranslationState>,
+    const nativeTranslateUiStateFromTabTranslationState = async (
+      tts: TabTranslationState,
     ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
-        dts.translationStatus,
+        tts.translationStatus,
       );
 
-      const detectedLanguage = dts.detectedLanguageResults?.language;
+      const detectedLanguage = tts.detectedLanguageResults?.language;
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -134,14 +137,6 @@ export class NativeTranslateUiBroker {
         // supportedTargetLanguagesGivenDefaultSourceLanguage,
         allPossiblySupportedTargetLanguages,
       } = await summarizeLanguageSupport(detectedLanguage);
-      // todo: move to an appropriate place
-      /*
-      Telemetry.global.record(() => fromLang.set(detectedLanguage), "fromLang");
-      Telemetry.global.record(
-        () => toLang.set(defaultTargetLanguage),
-        "toLang",
-      );
-       */
 
       return {
         acceptedTargetLanguages,
@@ -149,9 +144,9 @@ export class NativeTranslateUiBroker {
         // defaultSourceLanguage,
         defaultTargetLanguage,
         infobarState,
-        translatedFrom: dts.translateFrom,
-        translatedTo: dts.translateTo,
-        originalShown: dts.showOriginal,
+        translatedFrom: tts.translateFrom,
+        translatedTo: tts.translateTo,
+        originalShown: tts.showOriginal,
         // Additionally, since supported source and target languages are only supported in specific pairs, keep these dynamic:
         supportedSourceLanguages,
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
@@ -176,7 +171,6 @@ export class NativeTranslateUiBroker {
         case TranslationStatus.OFFER:
           return NativeTranslateUiStateInfobarState.STATE_OFFER;
         case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
-          return NativeTranslateUiStateInfobarState.STATE_TRANSLATING;
         case TranslationStatus.TRANSLATING:
           return NativeTranslateUiStateInfobarState.STATE_TRANSLATING;
         case TranslationStatus.TRANSLATED:
@@ -189,135 +183,129 @@ export class NativeTranslateUiBroker {
       );
     };
 
-    // React to document translation state changes
-    onSnapshot(
-      this.extensionState.$.documentTranslationStates,
-      async (documentTranslationStates, _previousDocumentTranslationStates) => {
-        const tabTopFrameStates = Object.keys(documentTranslationStates)
-          .map(
-            (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
-          )
-          .filter(
-            (dts: ModelInstanceData<DocumentTranslationState>) =>
-              dts.frameId === 0,
-          );
-        for (const dts of tabTopFrameStates) {
-          const { tabId } = dts;
-          const uiState = await nativeTranslateUiStateFromDocumentTranslationState(
-            dts,
-          );
-          browserWithExperimentAPIs.experiments.translateUi.setUiState(
-            tabId,
-            uiState,
-          );
-        }
-        // TODO: check _previousDocumentTranslationStates for those that had something and now should be inactive
+    // React to tab translation state changes
+    reaction(
+      () => this.extensionState.tabTranslationStates,
+      async (tabTranslationStates, _previousTabTranslationStates) => {
+        tabTranslationStates.forEach(
+          async (tts: TabTranslationState, tabId) => {
+            const uiState = await nativeTranslateUiStateFromTabTranslationState(
+              tts,
+            );
+            browserWithExperimentAPIs.experiments.translateUi.setUiState(
+              tabId,
+              uiState,
+            );
+          },
+        );
+        // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
       },
     );
   }
 
-  getFrameDocumentTranslationStatesByTabId(tabId) {
-    const { extensionState } = this;
-    const documentTranslationStates = extensionState.documentTranslationStates;
-    const currentFrameDocumentTranslationStates = [];
-    documentTranslationStates.forEach(
-      (documentTranslationState: DocumentTranslationState) => {
-        if (documentTranslationState.tabId === tabId) {
-          currentFrameDocumentTranslationStates.push(documentTranslationState);
-        }
-      },
+  async translateAllFramesInTab(tabId: number, from: string, to: string) {
+    // Start timing
+    const start = performance.now();
+    // Request translation of all frames in a specific tab
+    this.extensionState.requestTranslationOfAllFramesInTab(tabId, from, to);
+    // Wait for translation in all frames in tab to complete
+    await when(() => {
+      const { tabTranslationStates } = this.extensionState;
+      const currentTabTranslationState = tabTranslationStates.get(tabId);
+      return [TranslationStatus.TRANSLATED, TranslationStatus.ERROR].includes(
+        currentTabTranslationState.translationStatus,
+      );
+    });
+    // End timing
+    const end = performance.now();
+    const translationWallTimeMs = end - start;
+
+    // Record "translation attempt concluded" telemetry
+    const { tabTranslationStates } = this.extensionState;
+    const currentTabTranslationState = getSnapshot(
+      tabTranslationStates.get(tabId),
     );
-    return currentFrameDocumentTranslationStates;
-  }
 
-  onSelectTranslateFrom(tabId) {
-    console.debug("onSelectTranslateFrom", { tabId });
-    Telemetry.global.record(() => changeLang.record(), "onSelectTranslateFrom");
-    Telemetry.global.submit();
-  }
+    const {
+      totalModelLoadWallTimeMs,
+      totalTranslationEngineRequestCount,
+      totalTranslationWallTimeMs,
+      wordCount,
+    } = currentTabTranslationState;
 
-  onSelectTranslateTo(tabId) {
-    console.debug("onSelectTranslateTo", { tabId });
-    Telemetry.global.submit();
-  }
-
-  onInfoBarClosed(tabId) {
-    console.debug("onInfoBarClosed", { tabId });
-    Telemetry.global.record(() => closed.record(), "onInfoBarClosed");
-    Telemetry.global.submit();
-  }
-
-  onNeverTranslateThisSite(tabId) {
-    console.debug("onNeverTranslateThisSite", { tabId });
-    Telemetry.global.record(
-      () => neverTranslateSite.record(),
-      "onNeverTranslateThisSite",
+    const perceivedSeconds = translationWallTimeMs / 1000;
+    const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
+    const translationEngineWordsPerSecond = Math.round(
+      wordCount / (totalTranslationWallTimeMs / 1000),
+    );
+    console.info(
+      `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
+        1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
+        1000} seconds.`,
+    );
+    telemetry.onTranslationAttemptConcluded(
+      from,
+      to,
+      totalModelLoadWallTimeMs,
+      totalTranslationWallTimeMs,
+      translationEngineWordsPerSecond,
     );
   }
 
-  onTranslateButtonPressed(tabId, from, to) {
+  onInfoBarDisplayed(tabId: number, from: string, to: string) {
+    console.debug("onInfoBarDisplayed", { tabId, from, to });
+    telemetry.onInfoBarDisplayed(tabId, from, to);
+  }
+
+  onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
+    console.debug("onSelectTranslateFrom", { tabId, newFrom, to });
+    telemetry.onSelectTranslateFrom(tabId, newFrom, to);
+  }
+
+  onSelectTranslateTo(tabId: number, from: string, newTo: string) {
+    console.debug("onSelectTranslateTo", { tabId, from, newTo });
+    telemetry.onSelectTranslateFrom(tabId, from, newTo);
+  }
+
+  onInfoBarClosed(tabId: number, from: string, to: string) {
+    console.debug("onInfoBarClosed", { tabId, from, to });
+    telemetry.onInfoBarClosed(tabId, from, to);
+  }
+
+  onNeverTranslateSelectedLanguage(tabId: number, from: string, to: string) {
+    console.debug("onNeverTranslateSelectedLanguage", { tabId, from, to });
+    telemetry.onNeverTranslateSelectedLanguage(tabId, from, to);
+  }
+
+  onNeverTranslateThisSite(tabId: number, from: string, to: string) {
+    console.debug("onNeverTranslateThisSite", { tabId, from, to });
+    telemetry.onNeverTranslateThisSite(tabId, from, to);
+  }
+
+  onShowOriginalButtonPressed(tabId: number, from: string, to: string) {
+    console.debug("onShowOriginalButtonPressed", { tabId, from, to });
+    telemetry.onShowOriginalButtonPressed(tabId, from, to);
+    this.extensionState.showOriginalInTab(tabId);
+  }
+
+  onShowTranslatedButtonPressed(tabId: number, from: string, to: string) {
+    console.debug("onShowTranslatedButtonPressed", { tabId, from, to });
+    telemetry.onShowTranslatedButtonPressed(tabId, from, to);
+    this.extensionState.hideOriginalInTab(tabId);
+  }
+
+  onTranslateButtonPressed(tabId: number, from: string, to: string) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
-    Telemetry.global.record(
-      () => translate.record(),
-      "onTranslateButtonPressed",
-    );
-
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["translateFrom"],
-            value: from,
-          },
-          {
-            op: "replace",
-            path: ["translateTo"],
-            value: to,
-          },
-          {
-            op: "replace",
-            path: ["translationRequested"],
-            value: true,
-          },
-        ]);
-      },
-    );
+    telemetry.onTranslateButtonPressed(tabId, from, to);
+    this.translateAllFramesInTab(tabId, from, to);
   }
 
-  onShowOriginalButtonPressed(tabId) {
-    console.debug("onShowOriginalButtonPressed", { tabId });
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["showOriginal"],
-            value: true,
-          },
-        ]);
-      },
-    );
-  }
-
-  onShowTranslatedButtonPressed(tabId) {
-    console.debug("onShowTranslatedButtonPressed", { tabId });
-    this.getFrameDocumentTranslationStatesByTabId(tabId).forEach(
-      (dts: DocumentTranslationState) => {
-        this.extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-          {
-            op: "replace",
-            path: ["showOriginal"],
-            value: false,
-          },
-        ]);
-      },
-    );
+  onNotNowButtonPressed(tabId: number, from: string, to: string) {
+    console.debug("onNotNowButtonPressed", { tabId, from, to });
+    telemetry.onNotNowButtonPressed(tabId, from, to);
   }
 
   async stop() {
-    Telemetry.global.submit();
-
     await browserWithExperimentAPIs.experiments.translateUi.stop();
     this.eventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[

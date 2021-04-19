@@ -68,7 +68,10 @@ describe(testSuiteName, function() {
     const translationResponseData: TranslationResponseData & {
       translatedPlainTextStrings: string[];
       plainStringsToTranslate: string[];
-    } = await bergamotDomTranslatorRequest.fireRequest(bergamotApiClient);
+    } = await bergamotDomTranslatorRequest.fireRequest(
+      bergamotApiClient,
+      _translationRequestProgress => void 0,
+    );
     const {
       plainStringsToTranslate,
       translatedMarkups,

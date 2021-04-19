@@ -23,6 +23,10 @@
       parameters: [ ]
 
   events:
+    - name: onInfoBarDisplayed
+      type: function
+      description: Foo
+      parameters: [ ]
     - name: onSelectTranslateTo
       type: function
       description: Foo
@@ -32,6 +36,10 @@
       description: Foo
       parameters: [ ]
     - name: onInfoBarClosed
+      type: function
+      description: Foo
+      parameters: [ ]
+    - name: onNeverTranslateSelectedLanguage
       type: function
       description: Foo
       parameters: [ ]
@@ -48,6 +56,10 @@
       description: Foo
       parameters: [ ]
     - name: onTranslateButtonPressed
+      type: function
+      description: Foo
+      parameters: [ ]
+    - name: onNotNowButtonPressed
       type: function
       description: Foo
       parameters: [ ]

@@ -1,4 +1,5 @@
 import { TranslationDocument } from "../TranslationDocument";
+import { FrameTranslationProgressCallback } from "./BaseDomTranslator";
 
 export class MinimalDomTranslator {
   public readonly translationDocument: TranslationDocument;
@@ -19,7 +20,9 @@ export class MinimalDomTranslator {
     this.sourceLanguage = sourceLanguage;
     this.targetLanguage = targetLanguage;
   }
-  async translate(): Promise<{
+  async translate(
+    _translationProgressCallback: FrameTranslationProgressCallback,
+  ): Promise<{
     characterCount: number;
   }> {
     return { characterCount: -1 };

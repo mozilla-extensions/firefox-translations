@@ -81,7 +81,7 @@ describe(testSuiteName, function() {
         to,
       );
 
-      await domTranslator.translate();
+      await domTranslator.translate(() => {});
       translationDocument.showTranslation();
       const actualTranslatedDocHtml = prettyHTML(documentToHTML(testDoc));
 

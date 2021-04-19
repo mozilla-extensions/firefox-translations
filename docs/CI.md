@@ -31,12 +31,23 @@ circleci config validate -c .circleci/config.yml
 3. To better mimic the starting point for CI, commit your changes and clone your repository into a clean directory then run CircleCI inside that directory:
 
 ```shell
-git clone . /tmp/$(basename $PWD)
-cd /tmp/$(basename $PWD)
+git clone . ../$(basename $PWD)-ci-clone
+cd ../$(basename $PWD)-ci-clone
 circleci build
 ```
 
 Note: Steps related to caching and uploading/storing artifacts will report as failed locally. This is not necessarily a problem, they are designed to fail since the operations are not supported locally by the CircleCI build agent.
+
+4. To troubleshoot issues locally, launch the above clone of the repo in the same docker image used by Circle CI:
+
+```shell
+cd ../$(basename $PWD)-ci-clone
+git pull
+docker run -v "$PWD:/home/circleci/checkout" -it circleci/node:latest-browsers /bin/bash
+cd ~/checkout
+```
+
+Then manually launch the commands from `.circleci/config.yml` until the error has been reproduced.
 
 ## Taskcluster
 

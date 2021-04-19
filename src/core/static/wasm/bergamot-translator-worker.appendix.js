@@ -1,9 +1,10 @@
 /* global addOnPreMain, Module */
+Module.onAbort = what => {
+  console.error("Abort handler", { what });
+};
 
 addOnPreMain(function() {
   let model;
-  let modelFrom;
-  let modelTo;
 
   const log = message => {
     postMessage({
@@ -17,23 +18,20 @@ addOnPreMain(function() {
 
     const languagePair = `${from}${to}`;
 
-    // Load new model if not the same from/to language pair is already loaded
-    const loadedLanguagePair = `${modelFrom}${modelTo}`;
-    if (loadedLanguagePair !== languagePair) {
-      const start = Date.now();
+    // Delete previous instance if a model is already loaded
+    if (model) {
+      model.delete();
+    }
 
-      // Delete previous instance if another model was loaded
-      if (model) {
-        model.delete();
-      }
+    const loadModelStart = performance.now();
 
-      // Vocab files are re-used in both translation directions
-      const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+    // Vocab files are re-used in both translation directions
+    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
 
-      // Set the Model Configuration as YAML formatted string.
-      // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
-      // This example captures the most relevant options: model file, vocabulary files and shortlist file
-      const modelConfig = `models:
+    // Set the Model Configuration as YAML formatted string.
+    // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
+    // This example captures the most relevant options: model file, vocabulary files and shortlist file
+    const modelConfig = `models:
   - /${languagePair}/model.${languagePair}.intgemm.alphas.bin
 vocabs:
   - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
@@ -55,29 +53,17 @@ shortlist:
     - 50
 `;
 
-      console.log("modelConfig: ", modelConfig);
+    console.log("modelConfig: ", modelConfig);
 
-      // Instantiate the TranslationModel
-      model = new Module.TranslationModel(modelConfig);
-      modelFrom = from;
-      modelTo = to;
-      log(
-        `Model ${languagePair} loaded in ${(Date.now() - start) / 1000} secs`,
-      );
-    } else {
-      log(`Model ${languagePair} already loaded`);
-    }
+    // Instantiate the TranslationModel
+    model = new Module.TranslationModel(modelConfig);
+    const loadModelEnd = performance.now();
+    const modelLoadWallTimeMs = loadModelEnd - loadModelStart;
 
-    const start = Date.now();
     const alignmentIsSupported = model.isAlignmentSupported();
     console.debug("Alignment:", alignmentIsSupported);
 
-    log(
-      `model.isAlignmentSupported() returned in ${(Date.now() - start) /
-        1000} secs`,
-    );
-
-    return { alignmentIsSupported };
+    return { alignmentIsSupported, modelLoadWallTimeMs };
   };
 
   /**
@@ -155,23 +141,7 @@ shortlist:
     } else if (data.type === "translate") {
       try {
         console.log("Messages to translate: ", data.translateParams.texts);
-        let wordCount = 0;
-        data.translateParams.texts.forEach(text => {
-          wordCount += text
-            .trim()
-            .split(" ")
-            .filter(word => word.trim() !== "").length;
-        });
-        const start = Date.now();
         const translationResults = translate(data.translateParams.texts);
-        const secs = (Date.now() - start) / 1000;
-        log(
-          `Translation of ${
-            data.translateParams.texts.length
-          } texts (wordCount ${wordCount}) took ${secs} secs (${Math.round(
-            wordCount / secs,
-          )} words per second)`,
-        );
         postMessage({
           type: "translationResults",
           requestId,

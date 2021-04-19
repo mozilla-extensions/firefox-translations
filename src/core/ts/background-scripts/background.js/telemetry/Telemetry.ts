@@ -5,78 +5,149 @@
 import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { config } from "../../../config";
+import {
+  modelLoadTime,
+  translationTime,
+  wordsPerSecond,
+} from "./generated/performance";
+import { fromLang, toLang } from "./generated/metadata";
+import {
+  displayed,
+  changeLang,
+  closed,
+  neverTranslateSite,
+  translate,
+  neverTranslateLang,
+  notNow,
+} from "./generated/infobar";
 
+/**
+ * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
+ *
+ * Synchronous methods here is important, since it is the only way to guarantee that multiple Glean API calls are
+ * executed sequentially and not interleaved with other asynchronous Telemetry recording.
+ * For more information, see: https://github.com/mozilla-extensions/bergamot-browser-extension/pull/76#discussion_r602128568
+ */
 export class Telemetry {
-  private static _instance = null;
-  private _metricsToSubmit;
-
   constructor() {
     const appId = config.telemetryAppId;
     Glean.initialize(appId, true, {
       debug: { logPings: config.telemetryDebugMode },
     });
-    this._metricsToSubmit = 0;
     console.info(
       `Telemetry: initialization completed with application ID ${appId}.`,
     );
-    // Disabled telemetry until opt-out-preference is respected (https://github.com/mozilla-extensions/bergamot-browser-extension/issues/51)
-    this.setUploadEnabled(false);
-    console.info(`Note: Telemetry upload is disabled in this build`);
+  }
+
+  public onInfoBarDisplayed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    displayed.record();
+    this.submit();
+  }
+
+  public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
+    fromLang.set(newFrom);
+    toLang.set(to);
+    changeLang.record();
+    this.submit();
+  }
+
+  public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
+    fromLang.set(from);
+    toLang.set(newTo);
+    changeLang.record();
+    this.submit();
+  }
+
+  public onInfoBarClosed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    closed.record();
+    this.submit();
+  }
+
+  public onNeverTranslateSelectedLanguage(
+    tabId: number,
+    from: string,
+    to: string,
+  ) {
+    fromLang.set(from);
+    toLang.set(to);
+    neverTranslateLang.record();
+    this.submit();
+  }
+
+  public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    neverTranslateSite.record();
+    this.submit();
+  }
+
+  public onShowOriginalButtonPressed(
+    _tabId: number,
+    _from: string,
+    _to: string,
+  ) {
+    // TODO?
+  }
+
+  public onShowTranslatedButtonPressed(
+    _tabId: number,
+    _from: string,
+    _to: string,
+  ) {
+    // TODO?
+  }
+
+  public onTranslateButtonPressed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    translate.record();
+    this.submit();
+  }
+
+  public onNotNowButtonPressed(tabId: number, from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    notNow.record();
+    this.submit();
   }
 
   /**
-   * Provides access to Telemetry singleton.
+   * A translation attempt starts when a translation is requested in a
+   * specific tab and ends when all translations in that tab has completed
    */
-  public static get global(): Telemetry {
-    if (Telemetry._instance === null) {
-      Telemetry._instance = new Telemetry();
-    }
-    return Telemetry._instance;
+  public onTranslationAttemptConcluded(
+    from: string,
+    to: string,
+    modelLoadWallTimeMs: number,
+    translationWallTimeMs: number,
+    $wordsPerSecond: number,
+  ) {
+    fromLang.set(from);
+    toLang.set(to);
+    modelLoadTime.set(String(modelLoadWallTimeMs));
+    translationTime.set(String(translationWallTimeMs));
+    wordsPerSecond.set(String(Math.round($wordsPerSecond)));
+    this.submit();
   }
-
-  /**
-   * Enables uploading Glean metrics to telemetry server.
-   * @param val bool
-   */
-  public setUploadEnabled(val: boolean) {
-    Glean.setUploadEnabled(val);
-  }
-
-  /**
-   * Collects a telemetry metric or event.
-   * @param metricFunc The function which calls one of the generated metrics or events.
-   * @param name Optional. The name of the metrics to show in console for debug purposes
-   */
-  public record = (metricFunc: Function, name?: string) => {
-    try {
-      metricFunc();
-      this._metricsToSubmit += 1;
-      console.debug(
-        `Telemetry: metric recorded, name: ${name}, total not submitted: ${this._metricsToSubmit}`,
-      );
-    } catch (err) {
-      // telemetry error shouldn't crash the app
-      console.error(`Telemetry: Error. a metric was not recorded.`, err);
-    }
-  };
 
   /**
    * Submits all collected metrics in a custom ping.
    */
   public submit = () => {
     try {
-      if (this._metricsToSubmit > 0) {
-        custom.submit();
-        this._metricsToSubmit = 0;
-        console.info("Telemetry: the ping is submitted.");
-      } else {
-        console.warn(
-          "Telemetry: there were no metrics recorded, the ping is not submitted.",
-        );
-      }
+      // TODO: Always include the fx telemetry id string metric in pings
+      custom.submit();
+      console.info("Telemetry: the ping is submitted.");
     } catch (err) {
       // telemetry error shouldn't crash the app
       console.error(`Telemetry: Error. The ping was not submitted.`, err);
     }
   };
 }
+
+// Expose singleton instances
+export const telemetry = new Telemetry();

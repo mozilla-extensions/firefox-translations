@@ -231,6 +231,10 @@ class TranslationBrowserChromeUi {
       `translation-notification-${chromeWin.now}`,
     );
     notif.init(this.translationBrowserChromeUiNotificationManager);
+    this.translationBrowserChromeUiNotificationManager.infobarDisplayed(
+      notif._getSourceLang(),
+      notif._getTargetLang(),
+    );
     return notif;
   }
 }

@@ -142,9 +142,8 @@ const init = async () => {
 
         if (hasChanged("displayQualityEstimation")) {
           if (
-            domTranslationManager?.contentWindow?.translationDocument &&
             currentTabFrameDocumentTranslationState.displayQualityEstimation !==
-              translationDocument.qualityEstimationShown
+            translationDocument.qualityEstimationShown
           ) {
             if (translationDocument.qualityEstimationShown) {
               translationDocument.showTranslation();
@@ -170,6 +169,15 @@ const init = async () => {
           documentTranslationStatistics.wordCountVisibleInViewport,
       }),
     );
+    // Schedule removal of this document translation state when the document is closed
+    const onBeforeunloadEventListener = function(e) {
+      extensionState.deleteDocumentTranslationStateByFrameInfo(frameInfo);
+      // the absence of a returnValue property on the event will guarantee the browser unload happens
+      delete e.returnValue;
+      // balanced-listeners
+      window.removeEventListener("beforeunload", onBeforeunloadEventListener);
+    };
+    window.addEventListener("beforeunload", onBeforeunloadEventListener);
   } catch (err) {
     console.error("Instantiate DocumentTranslationState error", err);
   }

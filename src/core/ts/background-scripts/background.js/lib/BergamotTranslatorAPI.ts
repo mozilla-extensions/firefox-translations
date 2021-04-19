@@ -6,13 +6,6 @@
 
 import { browser } from "webextension-polyfill-ts";
 import { nanoid } from "nanoid";
-import { Telemetry } from "../telemetry/Telemetry";
-import {
-  translationTime,
-  modelLoadTime,
-  wordsPerSecond,
-} from "../telemetry/generated/performance";
-import { fromLang, toLang } from "../telemetry/generated/metadata";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've loaded/processed large models/translations
@@ -46,6 +39,7 @@ interface LoadModelRequestWorkerMessage extends WorkerMessage {
 
 export interface LoadModelResults {
   alignmentIsSupported: boolean;
+  modelLoadWallTimeMs: number;
 }
 
 interface LoadModelResultsWorkerMessage extends WorkerMessage {
@@ -220,11 +214,73 @@ class WorkerManager {
 
 const workerManager = new WorkerManager();
 
+interface TranslationPerformanceStats {
+  seconds: number;
+  textCount: number;
+  wordCount: number;
+  characterCount: number;
+  wordsPerSecond: number;
+  charactersPerSecond: number;
+}
+
+const translationPerformanceStats = (
+  texts: string[],
+  translationWallTimeMs: number,
+): TranslationPerformanceStats => {
+  const seconds = translationWallTimeMs / 1000;
+  const textCount = texts.length;
+  const wordCount = texts
+    .map(
+      text =>
+        text
+          .trim()
+          .split(" ")
+          .filter(word => word.trim() !== "").length,
+    )
+    .reduce((a, b) => a + b, 0);
+  const characterCount = texts
+    .map(text => text.trim().length)
+    .reduce((a, b) => a + b, 0);
+  const wordsPerSecond = Math.round(wordCount / seconds);
+  const charactersPerSecond = Math.round(characterCount / seconds);
+  return {
+    seconds,
+    textCount,
+    wordCount,
+    characterCount,
+    wordsPerSecond,
+    charactersPerSecond,
+  };
+};
+
+export interface TranslationRequestQueuedEventData {
+  requestId: string;
+  queueLength: number;
+}
+
+export interface ModelLoadedEventData {
+  requestId: string;
+  loadModelParams: LoadModelParams;
+  loadModelResults: LoadModelResults;
+}
+
+export interface ModelWillLoadEventData {
+  requestId: string;
+  loadModelParams: LoadModelParams;
+}
+
+export interface TranslationFinishedEventData {
+  requestId: string;
+  translationWallTimeMs: number;
+  originalTextsTranslationPerformanceStats: TranslationPerformanceStats;
+}
+
 /**
  * Class responsible for sending translations requests to the translation worker process
  * in a compatible and somewhat efficient order.
+ * Emits events that can be used to track translation progress at a low level.
  */
-class TranslationRequestManager {
+class TranslationRequestDispatcher extends EventTarget {
   private processing: boolean;
   private loadedLanguagePair: string;
   private queuedRequests: TranslateRequestWorkerMessage[] = [];
@@ -245,7 +301,6 @@ class TranslationRequestManager {
       await this.processNextItemInQueue();
     }
     this.processing = false;
-    Telemetry.global.submit();
   }
 
   async processNextItemInQueue() {
@@ -256,58 +311,69 @@ class TranslationRequestManager {
     const { loadModelParams } = translateParams;
     const { from, to } = loadModelParams;
     const languagePair = `${from}${to}`;
-    Telemetry.global.record(() => fromLang.set(from), "fromLang");
-    Telemetry.global.record(() => toLang.set(to), "toLang");
 
     // First check if we need to load a model
     if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {
-      const loadModelStart = performance.now();
-
+      const modelWillLoadEventData: ModelWillLoadEventData = {
+        requestId,
+        loadModelParams,
+      };
+      this.dispatchEvent(
+        new CustomEvent("modelWillLoad", {
+          detail: modelWillLoadEventData,
+        }),
+      );
       const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
         type: "loadModel",
         requestId,
         loadModelParams,
       };
-      await workerManager.loadModel(loadModelRequestWorkerMessage);
+      const loadModelResults = await workerManager.loadModel(
+        loadModelRequestWorkerMessage,
+      );
       this.loadedLanguagePair = languagePair;
-
-      const loadModelEnd = performance.now();
-      // todo: replace to timespan when it is supported
-      Telemetry.global.record(
-        () => modelLoadTime.set(String(loadModelEnd - loadModelStart)),
-        "loadModelTime",
+      const modelLoadedEventData: ModelLoadedEventData = {
+        requestId,
+        loadModelParams,
+        loadModelResults,
+      };
+      this.dispatchEvent(
+        new CustomEvent("modelLoaded", {
+          detail: modelLoadedEventData,
+        }),
       );
     }
 
     // Send the translation request
     const start = performance.now();
-
     const translationResults = await workerManager.translate(
       translateRequestWorkerMessage,
     );
-    this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
 
+    // Summarize performance stats
     const end = performance.now();
-    // todo: replace to timespan when it is supported
-    const timeSpentMs = end - start;
-    Telemetry.global.record(
-      () => translationTime.set(String(timeSpentMs)),
-      "translateTime",
+    const translationWallTimeMs = end - start;
+    const originalTextsTranslationPerformanceStats = translationPerformanceStats(
+      translationResults.originalTexts,
+      translationWallTimeMs,
+    );
+    const translationFinishedEventData: TranslationFinishedEventData = {
+      requestId,
+      translationWallTimeMs,
+      originalTextsTranslationPerformanceStats,
+    };
+    this.dispatchEvent(
+      new CustomEvent("translationFinished", {
+        detail: translationFinishedEventData,
+      }),
     );
 
-    // we might want to pass this info from wasm if it exists
-    const wordsNumber = translateParams.texts
-      .map(x => x.split(" ").length)
-      .reduce((a, b) => a + b, 0);
-    const speed = Math.floor((wordsNumber / timeSpentMs) * 1000);
-    // todo: replace to quantity when it is supported
-    Telemetry.global.record(
-      () => wordsPerSecond.set(String(speed)),
-      "translateSpeed",
-    );
+    // Resolve the translation request
+    this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
   }
 
-  async translate(
+  translate(
+    requestId: string,
     texts: string[],
     from: string,
     to: string,
@@ -320,23 +386,24 @@ class TranslationRequestManager {
       texts,
       loadModelParams,
     };
+    const translateRequestWorkerMessage: TranslateRequestWorkerMessage = {
+      type: "translate",
+      requestId,
+      translateParams,
+    };
+    this.queuedRequests.push(translateRequestWorkerMessage);
+    const queueLength = this.queuedRequests.length + (this.processing ? 1 : 0);
+    const translationRequestQueuedEventData: TranslationRequestQueuedEventData = {
+      requestId,
+      queueLength,
+    };
+    this.dispatchEvent(
+      new CustomEvent("translationRequestQueued", {
+        detail: translationRequestQueuedEventData,
+      }),
+    );
     const requestPromise: Promise<TranslationResults> = new Promise(resolve => {
-      const requestId = nanoid();
       this.queuedRequestsByRequestId.set(requestId, { resolve });
-      const translateRequestWorkerMessage: TranslateRequestWorkerMessage = {
-        type: "translate",
-        requestId,
-        translateParams,
-      };
-      if (this.processing) {
-        console.info(
-          `Queued translation request to be processed after ${this
-            .queuedRequests.length + 1} already queued requests`,
-        );
-      } else {
-        console.info(`Queued translation request`);
-      }
-      this.queuedRequests.push(translateRequestWorkerMessage);
     });
     // Kick off queue processing async
     /* eslint-disable no-unused-vars */
@@ -347,14 +414,160 @@ class TranslationRequestManager {
   }
 }
 
-const translationRequestManager = new TranslationRequestManager();
+const translationRequestDispatcher = new TranslationRequestDispatcher();
 
+/**
+ * Provide a simpler public interface (compared to above)
+ */
 export const BergamotTranslatorAPI = {
   async translate(
     texts: string[],
     from: string,
     to: string,
+    onTranslationRequestQueued: (
+      translationRequestQueuedEventData: TranslationRequestQueuedEventData,
+    ) => void,
+    onModelWillLoad: (modelWillLoadEventData: ModelWillLoadEventData) => void,
+    onModelLoaded: (modelLoadedEventData: ModelLoadedEventData) => void,
+    onTranslationFinished: (
+      translationFinishedEventData: TranslationFinishedEventData,
+    ) => void,
   ): Promise<TranslationResults> {
-    return translationRequestManager.translate(texts, from, to);
+    const requestId = nanoid();
+    const translationRequestQueuedListener = (
+      e: CustomEvent & { detail: TranslationRequestQueuedEventData },
+    ) => {
+      // console.debug('Listener received "translationRequestQueued".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      translationRequestDispatcher.removeEventListener(
+        "translationRequestQueued",
+        translationRequestQueuedListener,
+      );
+      if (e.detail.queueLength > 1) {
+        console.info(
+          `BergamotTranslatorAPI[${requestId}]: Queued translation request to be processed after ${e
+            .detail.queueLength - 1} already queued requests`,
+        );
+      } else {
+        console.info(
+          `BergamotTranslatorAPI[${requestId}]: Queued translation request for immediate execution`,
+        );
+      }
+      onTranslationRequestQueued(e.detail);
+    };
+    const modelWillLoadListener = (
+      e: CustomEvent & { detail: ModelWillLoadEventData },
+    ) => {
+      // console.debug('Listener received "modelWillLoad".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      translationRequestDispatcher.removeEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
+      );
+      const languagePair = `${from}${to}`;
+      console.info(
+        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} will load`,
+      );
+      onModelWillLoad(e.detail);
+    };
+    const modelLoadedListener = (
+      e: CustomEvent & { detail: ModelLoadedEventData },
+    ) => {
+      // console.debug('Listener received "modelLoaded".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      translationRequestDispatcher.removeEventListener(
+        "modelLoaded",
+        modelLoadedListener,
+      );
+
+      const { loadModelResults } = e.detail;
+      const languagePair = `${from}${to}`;
+      const { modelLoadWallTimeMs } = loadModelResults;
+      console.info(
+        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} loaded in ${modelLoadWallTimeMs /
+          1000} secs`,
+      );
+
+      onModelLoaded(e.detail);
+    };
+    const translationFinishedListener = (
+      e: CustomEvent & { detail: TranslationFinishedEventData },
+    ) => {
+      // console.debug('Listener received "translationFinished".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      translationRequestDispatcher.removeEventListener(
+        "translationFinished",
+        translationFinishedListener,
+      );
+
+      const { originalTextsTranslationPerformanceStats } = e.detail;
+      const {
+        wordCount,
+        seconds,
+        wordsPerSecond,
+      } = originalTextsTranslationPerformanceStats;
+
+      console.info(
+        `BergamotTranslatorAPI[${requestId}]: Translation of ${texts.length} texts (wordCount ${wordCount}) took ${seconds} secs (${wordsPerSecond} words per second)`,
+      );
+
+      onTranslationFinished(e.detail);
+    };
+    try {
+      // console.debug(`Adding listeners for request id ${requestId}`);
+      translationRequestDispatcher.addEventListener(
+        "translationRequestQueued",
+        translationRequestQueuedListener,
+      );
+      translationRequestDispatcher.addEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
+      );
+      translationRequestDispatcher.addEventListener(
+        "modelLoaded",
+        modelLoadedListener,
+      );
+      translationRequestDispatcher.addEventListener(
+        "translationFinished",
+        translationFinishedListener,
+      );
+      const requestPromise = translationRequestDispatcher.translate(
+        requestId,
+        texts,
+        from,
+        to,
+      );
+      const [translationResults] = await Promise.all([requestPromise]);
+      return translationResults;
+    } catch (error) {
+      console.debug(`BergamotTranslatorAPI[${requestId}]: Error`, error);
+      // TODO emit error event?
+      throw error;
+    } finally {
+      translationRequestDispatcher.removeEventListener(
+        "translationRequestQueued",
+        translationRequestQueuedListener,
+      );
+      translationRequestDispatcher.removeEventListener(
+        "modelWillLoad",
+        modelWillLoadListener,
+      );
+      translationRequestDispatcher.removeEventListener(
+        "modelLoaded",
+        modelLoadedListener,
+      );
+      translationRequestDispatcher.removeEventListener(
+        "translationFinished",
+        translationFinishedListener,
+      );
+    }
   },
 };
