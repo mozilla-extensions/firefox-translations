@@ -39,6 +39,12 @@ class ExtensionGlue {
   constructor() {}
 
   async init() {
+    // Add version to extension log output to facilitate general troubleshooting
+    const manifest = crossBrowser.runtime.getManifest();
+    console.info(
+      `Extension ${manifest.name} version ${manifest.version} initializing.`,
+    );
+
     // Initiate the root extension state store
     this.extensionState = createBackgroundContextRootStore();
 
