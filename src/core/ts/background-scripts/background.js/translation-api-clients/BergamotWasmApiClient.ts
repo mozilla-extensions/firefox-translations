@@ -29,6 +29,7 @@ export class BergamotWasmApiClient implements TranslationApiClient {
 
     const translationRequestProgress: TranslationRequestProgress = {
       requestId: undefined,
+      initiationTimestamp: Date.now(),
       queued: false,
       modelLoadNecessary: undefined,
       modelLoading: false,
@@ -69,6 +70,7 @@ export class BergamotWasmApiClient implements TranslationApiClient {
         );
       },
       (translationFinishedEventData: TranslationFinishedEventData) => {
+        translationRequestProgress.queued = false;
         translationRequestProgress.translationFinished = true;
         translationRequestProgress.translationWallTimeMs =
           translationFinishedEventData.translationWallTimeMs;

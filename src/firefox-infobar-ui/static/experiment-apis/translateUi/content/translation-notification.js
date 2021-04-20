@@ -34,7 +34,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             <button class="notification-button" label="&translation.notNow.button;" anonid="notNow" oncommand="this.closest('notification').notNow();"/>
           </hbox>
           <vbox class="translating-box" pack="center">
-            <label value="&translation.translatingContent.label;"/>
+            <hbox><label value="&translation.translatingContent.label;"/><label anonid="progress-label" value=""/></hbox>
           </vbox>
           <hbox class="translated-box" align="center">
             <label value="&translation.translatedFrom.label;"/>
@@ -93,6 +93,29 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
+  updateTranslationProgress(
+    shouldShowTranslationProgress,
+    modelLoading,
+    queuedTranslationEngineRequestCount,
+  ) {
+    let progressLabelValue;
+    if (!shouldShowTranslationProgress) {
+      progressLabelValue = "";
+    } else if (modelLoading) {
+      progressLabelValue = "(Currently loading language model...)";
+    } else if (queuedTranslationEngineRequestCount > 0) {
+      progressLabelValue = `(Language model loaded. ${queuedTranslationEngineRequestCount} part${
+        queuedTranslationEngineRequestCount > 1 ? "s" : ""
+      } left to translate)`;
+    } else {
+      progressLabelValue = "";
+    }
+    this._getAnonElt("progress-label").setAttribute(
+      "value",
+      progressLabelValue,
+    );
+  }
+
   set state(val) {
     const deck = this._getAnonElt("translationStates");
 
@@ -109,6 +132,12 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       }
     }
     this.setAttribute("state", stateName);
+
+    // Workaround to show the animated icon also in the "loading" state. Extension-external
+    // code specifies that only the "translating" state shows an animated icon
+    if (stateName === "loading") {
+      this.setAttribute("state", "translating");
+    }
 
     if (val === this.translation.TranslationInfoBarStates.STATE_TRANSLATED) {
       this._handleButtonHiding();
