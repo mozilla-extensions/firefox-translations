@@ -99,6 +99,6 @@ module.exports = {
     "prefer-const": "error",
     "prefer-spread": "error",
     semi: ["error", "always"],
-    "valid-jsdoc": "warn",
+    "valid-jsdoc": "off",
   },
 };
