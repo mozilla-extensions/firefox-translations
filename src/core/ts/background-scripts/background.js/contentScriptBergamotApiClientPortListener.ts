@@ -19,6 +19,7 @@ export interface TranslationRequestUpdate {
   requestId: string;
   results?: TranslationResults;
   translationRequestProgress?: TranslationRequestProgress;
+  error?: string;
 }
 
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {
@@ -63,7 +64,17 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
           err,
         );
       } else {
-        throw err;
+        console.info(
+          `Caught exception/error in content script bergamot api client port listener:`,
+          err,
+        );
+        const translationRequestUpdate: TranslationRequestUpdate = {
+          error: err.message || err,
+          requestId,
+        };
+        port.postMessage({
+          translationRequestUpdate,
+        });
       }
     }
   });

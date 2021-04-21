@@ -67,6 +67,7 @@ export interface TranslationResults {
 // TODO: update typescript-eslint when support for this kind of declaration is supported
 interface PendingRequest<T> {
   resolve: (T) => void;
+  reject: (T) => void;
 }
 /* eslint-enable no-unused-vars, no-shadow */
 
@@ -80,10 +81,18 @@ interface LogWorkerMessage extends WorkerMessage {
   message: string;
 }
 
+interface ErrorWorkerMessage extends WorkerMessage {
+  type: "error";
+  message: string;
+  requestId: string;
+  sourceMethod: "loadModel" | "translate";
+}
+
 type IncomingWorkerMessage =
   | LoadModelResultsWorkerMessage
   | TranslationResultsWorkerMessage
-  | LogWorkerMessage;
+  | LogWorkerMessage
+  | ErrorWorkerMessage;
 
 /**
  * Class responsible for instantiating and communicating between this script
@@ -100,11 +109,13 @@ class WorkerManager {
     loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage,
   ): Promise<LoadModelResults> {
     const worker = await this.workerReady;
-    const loadModelResults: LoadModelResults = await new Promise(resolve => {
-      const { requestId } = loadModelRequestWorkerMessage;
-      this.pendingRequests.set(requestId, { resolve });
-      worker.postMessage(loadModelRequestWorkerMessage);
-    });
+    const loadModelResults: LoadModelResults = await new Promise(
+      (resolve, reject) => {
+        const { requestId } = loadModelRequestWorkerMessage;
+        this.pendingRequests.set(requestId, { resolve, reject });
+        worker.postMessage(loadModelRequestWorkerMessage);
+      },
+    );
     // TODO: Update estimatedHeapGrowth
     this.checkEstimatedHeapGrowth();
     return loadModelResults;
@@ -115,9 +126,9 @@ class WorkerManager {
   ): Promise<TranslationResults> {
     const worker = await this.workerReady;
     const translationResults: TranslationResults = await new Promise(
-      resolve => {
+      (resolve, reject) => {
         const { requestId } = translateRequestWorkerMessage;
-        this.pendingRequests.set(requestId, { resolve });
+        this.pendingRequests.set(requestId, { resolve, reject });
         worker.postMessage(translateRequestWorkerMessage);
       },
     );
@@ -154,6 +165,13 @@ class WorkerManager {
     this.pendingRequests.get(requestId).resolve(translationResults);
   }
 
+  onError(errorWorkerMessage: ErrorWorkerMessage) {
+    const { requestId, message } = errorWorkerMessage;
+    this.pendingRequests
+      .get(requestId)
+      .reject(`Error event in worker: ${message}`);
+  }
+
   private _worker;
   private _workerReadyPromise;
 
@@ -162,7 +180,7 @@ class WorkerManager {
       this._workerReadyPromise = new Promise(resolve => {
         const worker = new Worker(WORKER_URL);
         worker.onmessage = (msg: { data: "ready" | IncomingWorkerMessage }) => {
-          console.log("Incoming message from worker", { msg });
+          // console.debug("Incoming message from worker", { msg });
           if (msg.data === "ready") {
             resolve(worker);
           } else if (msg.data.type === "loadModelResults") {
@@ -171,6 +189,8 @@ class WorkerManager {
             this.onTranslateWorkerResult(msg.data);
           } else if (msg.data.type === "log") {
             console.log(`Relayed log message from worker: ${msg.data.message}`);
+          } else if (msg.data.type === "error") {
+            this.onError(msg.data);
           } else {
             throw new Error("Unknown worker message payload");
           }
@@ -308,68 +328,76 @@ class TranslationRequestDispatcher extends EventTarget {
     const translateRequestWorkerMessage = this.queuedRequests.shift();
     const { translateParams, requestId } = translateRequestWorkerMessage;
 
-    const { loadModelParams } = translateParams;
-    const { from, to } = loadModelParams;
-    const languagePair = `${from}${to}`;
+    try {
+      const { loadModelParams } = translateParams;
+      const { from, to } = loadModelParams;
+      const languagePair = `${from}${to}`;
 
-    // First check if we need to load a model
-    if (!this.loadedLanguagePair || this.loadedLanguagePair !== languagePair) {
-      const modelWillLoadEventData: ModelWillLoadEventData = {
+      // First check if we need to load a model
+      if (
+        !this.loadedLanguagePair ||
+        this.loadedLanguagePair !== languagePair
+      ) {
+        const modelWillLoadEventData: ModelWillLoadEventData = {
+          requestId,
+          loadModelParams,
+        };
+        this.dispatchEvent(
+          new CustomEvent("modelWillLoad", {
+            detail: modelWillLoadEventData,
+          }),
+        );
+        const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
+          type: "loadModel",
+          requestId,
+          loadModelParams,
+        };
+        const loadModelResults = await workerManager.loadModel(
+          loadModelRequestWorkerMessage,
+        );
+        this.loadedLanguagePair = languagePair;
+        const modelLoadedEventData: ModelLoadedEventData = {
+          requestId,
+          loadModelParams,
+          loadModelResults,
+        };
+        this.dispatchEvent(
+          new CustomEvent("modelLoaded", {
+            detail: modelLoadedEventData,
+          }),
+        );
+      }
+
+      // Send the translation request
+      const start = performance.now();
+      const translationResults = await workerManager.translate(
+        translateRequestWorkerMessage,
+      );
+
+      // Summarize performance stats
+      const end = performance.now();
+      const translationWallTimeMs = end - start;
+      const originalTextsTranslationPerformanceStats = translationPerformanceStats(
+        translationResults.originalTexts,
+        translationWallTimeMs,
+      );
+      const translationFinishedEventData: TranslationFinishedEventData = {
         requestId,
-        loadModelParams,
+        translationWallTimeMs,
+        originalTextsTranslationPerformanceStats,
       };
       this.dispatchEvent(
-        new CustomEvent("modelWillLoad", {
-          detail: modelWillLoadEventData,
+        new CustomEvent("translationFinished", {
+          detail: translationFinishedEventData,
         }),
       );
-      const loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage = {
-        type: "loadModel",
-        requestId,
-        loadModelParams,
-      };
-      const loadModelResults = await workerManager.loadModel(
-        loadModelRequestWorkerMessage,
-      );
-      this.loadedLanguagePair = languagePair;
-      const modelLoadedEventData: ModelLoadedEventData = {
-        requestId,
-        loadModelParams,
-        loadModelResults,
-      };
-      this.dispatchEvent(
-        new CustomEvent("modelLoaded", {
-          detail: modelLoadedEventData,
-        }),
-      );
+
+      // Resolve the translation request
+      this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
+    } catch (error) {
+      // Reject the translation request
+      this.queuedRequestsByRequestId.get(requestId).reject(error);
     }
-
-    // Send the translation request
-    const start = performance.now();
-    const translationResults = await workerManager.translate(
-      translateRequestWorkerMessage,
-    );
-
-    // Summarize performance stats
-    const end = performance.now();
-    const translationWallTimeMs = end - start;
-    const originalTextsTranslationPerformanceStats = translationPerformanceStats(
-      translationResults.originalTexts,
-      translationWallTimeMs,
-    );
-    const translationFinishedEventData: TranslationFinishedEventData = {
-      requestId,
-      translationWallTimeMs,
-      originalTextsTranslationPerformanceStats,
-    };
-    this.dispatchEvent(
-      new CustomEvent("translationFinished", {
-        detail: translationFinishedEventData,
-      }),
-    );
-
-    // Resolve the translation request
-    this.queuedRequestsByRequestId.get(requestId).resolve(translationResults);
   }
 
   translate(
@@ -402,9 +430,11 @@ class TranslationRequestDispatcher extends EventTarget {
         detail: translationRequestQueuedEventData,
       }),
     );
-    const requestPromise: Promise<TranslationResults> = new Promise(resolve => {
-      this.queuedRequestsByRequestId.set(requestId, { resolve });
-    });
+    const requestPromise: Promise<TranslationResults> = new Promise(
+      (resolve, reject) => {
+        this.queuedRequestsByRequestId.set(requestId, { resolve, reject });
+      },
+    );
     // Kick off queue processing async
     /* eslint-disable no-unused-vars */
     this.processQueue().then(_r => void 0);
@@ -545,12 +575,10 @@ export const BergamotTranslatorAPI = {
         from,
         to,
       );
-      const [translationResults] = await Promise.all([requestPromise]);
+      const [translationResults]: TranslationResults[] = await Promise.all([
+        requestPromise,
+      ]);
       return translationResults;
-    } catch (error) {
-      console.debug(`BergamotTranslatorAPI[${requestId}]: Error`, error);
-      // TODO emit error event?
-      throw error;
     } finally {
       translationRequestDispatcher.removeEventListener(
         "translationRequestQueued",

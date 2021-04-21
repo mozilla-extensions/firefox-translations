@@ -38,6 +38,7 @@ export class ContentScriptBergamotApiClient {
           const {
             results,
             translationRequestProgress,
+            error,
           } = translationRequestUpdate;
           if (translationRequestProgress) {
             translationRequestProgressCallback(translationRequestProgress);
@@ -48,6 +49,13 @@ export class ContentScriptBergamotApiClient {
               resultsMessageListener,
             );
             resolve(translationRequestUpdate.results);
+            return;
+          }
+          if (error) {
+            this.backgroundContextPort.onMessage.removeListener(
+              resultsMessageListener,
+            );
+            reject(error);
             return;
           }
         }

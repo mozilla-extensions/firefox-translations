@@ -200,6 +200,7 @@ export class DomTranslationManager {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
+    console.info("Translating web page");
     this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
       TranslationStatus.TRANSLATING,
     );
@@ -241,11 +242,12 @@ export class DomTranslationManager {
         } translation items)`,
         { from, to },
       );
+      console.info("Translated web page");
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATED,
       );
     } catch (ex) {
-      console.error("Translation error", ex);
+      console.warn("Translation error occurred: ", ex);
       translationDocument.translationError = true;
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.ERROR,

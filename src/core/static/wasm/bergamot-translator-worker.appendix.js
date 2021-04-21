@@ -1,8 +1,4 @@
 /* global addOnPreMain, Module */
-Module.onAbort = what => {
-  console.error("Abort handler", { what });
-};
-
 addOnPreMain(function() {
   let model;
 
@@ -140,8 +136,16 @@ shortlist:
           loadModelResults,
         });
       } catch (error) {
-        console.error(error);
-        log(`Error/exception caught in worker: `, error.toString());
+        console.info(
+          "Error/exception caught in worker during loadModel:",
+          error,
+        );
+        postMessage({
+          type: "error",
+          message: `Error/exception caught in worker during loadModel: ${error.toString()}`,
+          requestId,
+          sourceMethod: "loadModel",
+        });
       }
     } else if (data.type === "translate") {
       try {
@@ -153,8 +157,16 @@ shortlist:
           translationResults,
         });
       } catch (error) {
-        console.error(error);
-        log(`Error/exception caught in worker: `, error.toString());
+        console.info(
+          "Error/exception caught in worker during translate:",
+          error,
+        );
+        postMessage({
+          type: "error",
+          message: `Error/exception caught in worker during translate: ${error.toString()}`,
+          requestId,
+          sourceMethod: "translate",
+        });
       }
     } else {
       throw new Error(

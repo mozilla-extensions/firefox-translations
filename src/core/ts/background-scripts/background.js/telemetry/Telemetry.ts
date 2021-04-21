@@ -134,7 +134,7 @@ export class Telemetry {
    * A translation attempt starts when a translation is requested in a
    * specific tab and ends when all translations in that tab has completed
    */
-  public onTranslationAttemptConcluded(
+  public onTranslationFinished(
     from: string,
     to: string,
     modelLoadWallTimeMs: number,

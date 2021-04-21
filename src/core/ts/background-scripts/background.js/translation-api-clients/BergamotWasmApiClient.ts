@@ -37,49 +37,60 @@ export class BergamotWasmApiClient implements TranslationApiClient {
       modelLoadWallTimeMs: undefined,
       translationFinished: false,
       translationWallTimeMs: undefined,
+      errorOccurred: false,
     };
 
-    const translationResults = await BergamotTranslatorAPI.translate(
-      texts,
-      from,
-      to,
-      (
-        translationRequestQueuedEventData: TranslationRequestQueuedEventData,
-      ) => {
-        translationRequestProgress.requestId =
-          translationRequestQueuedEventData.requestId;
-        translationRequestProgress.queued = true;
-        translationRequestProgressCallback(
-          Object.assign({}, translationRequestProgress),
-        );
-      },
-      (_modelWillLoadEventData: ModelWillLoadEventData) => {
-        translationRequestProgress.modelLoadNecessary = true;
-        translationRequestProgress.modelLoading = true;
-        translationRequestProgressCallback(
-          Object.assign({}, translationRequestProgress),
-        );
-      },
-      (modelLoadedEventData: ModelLoadedEventData) => {
-        translationRequestProgress.modelLoading = false;
-        translationRequestProgress.modelLoaded = true;
-        translationRequestProgress.modelLoadWallTimeMs =
-          modelLoadedEventData.loadModelResults.modelLoadWallTimeMs;
-        translationRequestProgressCallback(
-          Object.assign({}, translationRequestProgress),
-        );
-      },
-      (translationFinishedEventData: TranslationFinishedEventData) => {
-        translationRequestProgress.queued = false;
-        translationRequestProgress.translationFinished = true;
-        translationRequestProgress.translationWallTimeMs =
-          translationFinishedEventData.translationWallTimeMs;
-        translationRequestProgressCallback(
-          Object.assign({}, translationRequestProgress),
-        );
-      },
-    );
-    console.log({ translationResults });
-    return translationResults;
+    try {
+      const translationResults: TranslationResults = await BergamotTranslatorAPI.translate(
+        texts,
+        from,
+        to,
+        (
+          translationRequestQueuedEventData: TranslationRequestQueuedEventData,
+        ) => {
+          translationRequestProgress.requestId =
+            translationRequestQueuedEventData.requestId;
+          translationRequestProgress.queued = true;
+          translationRequestProgressCallback(
+            Object.assign({}, translationRequestProgress),
+          );
+        },
+        (_modelWillLoadEventData: ModelWillLoadEventData) => {
+          translationRequestProgress.modelLoadNecessary = true;
+          translationRequestProgress.modelLoading = true;
+          translationRequestProgressCallback(
+            Object.assign({}, translationRequestProgress),
+          );
+        },
+        (modelLoadedEventData: ModelLoadedEventData) => {
+          translationRequestProgress.modelLoading = false;
+          translationRequestProgress.modelLoaded = true;
+          translationRequestProgress.modelLoadWallTimeMs =
+            modelLoadedEventData.loadModelResults.modelLoadWallTimeMs;
+          translationRequestProgressCallback(
+            Object.assign({}, translationRequestProgress),
+          );
+        },
+        (translationFinishedEventData: TranslationFinishedEventData) => {
+          translationRequestProgress.queued = false;
+          translationRequestProgress.translationFinished = true;
+          translationRequestProgress.translationWallTimeMs =
+            translationFinishedEventData.translationWallTimeMs;
+          translationRequestProgressCallback(
+            Object.assign({}, translationRequestProgress),
+          );
+        },
+      );
+      console.log({ translationResults });
+      return translationResults;
+    } catch (error) {
+      translationRequestProgress.queued = false;
+      translationRequestProgress.translationFinished = false;
+      translationRequestProgress.errorOccurred = true;
+      translationRequestProgressCallback(
+        Object.assign({}, translationRequestProgress),
+      );
+      throw error;
+    }
   };
 }
