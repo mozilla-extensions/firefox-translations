@@ -11,6 +11,7 @@ import { telemetry } from "../../../../core/ts/background-scripts/background.js/
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
 import { getSnapshot } from "mobx-keystone";
 import { reaction, when } from "mobx";
+import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -34,7 +35,7 @@ enum NativeTranslateUiStateInfobarState {
  */
 interface NativeTranslateUiState {
   acceptedTargetLanguages: string[];
-  detectedLanguage: string;
+  detectedLanguageResults: DetectedLanguageResults;
   defaultTargetLanguage: string;
   infobarState: NativeTranslateUiStateInfobarState;
   translatedFrom: string;
@@ -132,7 +133,7 @@ export class NativeTranslateUiBroker {
         tts.translationStatus,
       );
 
-      const detectedLanguage = tts.detectedLanguageResults?.language;
+      const detectedLanguageResults = getSnapshot(tts.detectedLanguageResults);
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -140,14 +141,14 @@ export class NativeTranslateUiBroker {
         supportedSourceLanguages,
         // supportedTargetLanguagesGivenDefaultSourceLanguage,
         allPossiblySupportedTargetLanguages,
-      } = await summarizeLanguageSupport(detectedLanguage);
+      } = await summarizeLanguageSupport(detectedLanguageResults);
 
       const translationDurationMs =
         Date.now() - tts.translationInitiationTimestamp;
 
       return {
         acceptedTargetLanguages,
-        detectedLanguage,
+        detectedLanguageResults,
         // defaultSourceLanguage,
         defaultTargetLanguage,
         infobarState,

@@ -124,7 +124,7 @@ export class DomTranslationManager {
       supportedSourceLanguages,
       supportedTargetLanguagesGivenDefaultSourceLanguage,
       allPossiblySupportedTargetLanguages,
-    } = await summarizeLanguageSupport(detectedLanguage);
+    } = await summarizeLanguageSupport(detectedLanguageResults);
 
     if (acceptedTargetLanguages.includes(detectedLanguage)) {
       // Detected language is the same as the user's accepted target languages.

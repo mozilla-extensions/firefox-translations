@@ -156,6 +156,22 @@ class TranslationBrowserChromeUi {
       return false;
     }
 
+    // Don't show the infobar if we have no language detection results yet
+    if (
+      !this.translationBrowserChromeUiNotificationManager.uiState
+        .detectedLanguageResults
+    ) {
+      return false;
+    }
+
+    // Don't show the infobar if we couldn't confidently detect the language
+    if (
+      !this.translationBrowserChromeUiNotificationManager.uiState
+        .detectedLanguageResults.confident
+    ) {
+      return false;
+    }
+
     // Check if we should never show the infobar for this language.
     const neverForLangs = this.Services.prefs.getCharPref(
       "browser.translation.neverForLanguages",

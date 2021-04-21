@@ -170,7 +170,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       detectedLanguage.appendItem(name, code);
       fromLanguage.appendItem(name, code);
     }
-    detectedLanguage.value = this.translation.uiState.detectedLanguage;
+    detectedLanguage.value = this.translation.uiState.detectedLanguageResults.language;
 
     // translatedFrom is only set if we have already translated this page.
     if (translationBrowserChromeUiNotificationManager.uiState.translatedFrom) {
@@ -372,7 +372,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
         this.translation.uiState.infobarState ===
           this.translation.TranslationInfoBarStates.STATE_UNAVAILABLE
       ) {
-        lang = this.translation.uiState.detectedLanguage;
+        lang = this.translation.uiState.defaultTargetLanguage;
       }
     }
     if (!lang) {
