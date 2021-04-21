@@ -129,15 +129,20 @@ shortlist:
     }
     const requestId = data.requestId;
     if (data.type === "loadModel") {
-      const loadModelResults = loadModel(
-        data.loadModelParams.from,
-        data.loadModelParams.to,
-      );
-      postMessage({
-        type: "loadModelResults",
-        requestId,
-        loadModelResults,
-      });
+      try {
+        const loadModelResults = loadModel(
+          data.loadModelParams.from,
+          data.loadModelParams.to,
+        );
+        postMessage({
+          type: "loadModelResults",
+          requestId,
+          loadModelResults,
+        });
+      } catch (error) {
+        console.error(error);
+        log(`Error/exception caught in worker: `, error.toString());
+      }
     } else if (data.type === "translate") {
       try {
         console.log("Messages to translate: ", data.translateParams.texts);
@@ -148,6 +153,7 @@ shortlist:
           translationResults,
         });
       } catch (error) {
+        console.error(error);
         log(`Error/exception caught in worker: `, error.toString());
       }
     } else {
