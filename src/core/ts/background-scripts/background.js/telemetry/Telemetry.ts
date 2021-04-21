@@ -136,10 +136,10 @@ export class Telemetry {
 
   /**
    * Submits all collected metrics in a custom ping.
+   * TODO: Always include the fx telemetry id uuid metric in pings
    */
   public submit = () => {
     try {
-      // TODO: Always include the fx telemetry id string metric in pings
       custom.submit();
       console.info("Telemetry: the ping is submitted.");
     } catch (err) {
