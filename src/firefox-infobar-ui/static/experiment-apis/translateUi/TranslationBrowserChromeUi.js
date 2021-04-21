@@ -181,7 +181,7 @@ class TranslationBrowserChromeUi {
         .split(",")
         .includes(
           this.translationBrowserChromeUiNotificationManager.uiState
-            .detectedLanguage,
+            .detectedLanguageResults.language,
         )
     ) {
       // TranslationTelemetry.recordAutoRejectedTranslationOffer();
