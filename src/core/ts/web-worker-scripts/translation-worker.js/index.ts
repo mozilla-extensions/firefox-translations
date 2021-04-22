@@ -1,4 +1,10 @@
-/* global addOnPreMain, Module, FS, WORKERFS */
+import {
+  addOnPreMain,
+  Module,
+  FS,
+  WORKERFS,
+} from "./bergamot-translator-worker";
+
 addOnPreMain(function() {
   let model;
 
@@ -55,7 +61,7 @@ addOnPreMain(function() {
 
     // Mount the downloaded files in emscripten's worker file system
     const modelDir = `/${languagePair}`;
-    FS.mkdir(modelDir);
+    FS.mkdir(modelDir, undefined);
     FS.mount(WORKERFS, { blobs }, modelDir);
   };
 
@@ -71,7 +77,7 @@ addOnPreMain(function() {
 
     // Download model files if not already locally present
     const modelDir = `/${languagePair}`;
-    const { exists } = FS.analyzePath(modelDir);
+    const { exists } = FS.analyzePath(modelDir, undefined);
     if (!exists) {
       await downloadModel(from, to, bergamotModelsBaseUrl);
     }

@@ -21,6 +21,8 @@ const entry = {
   background: `./src/${ui}/ts/background-scripts/background.js/index.ts`,
   "dom-translation-content-script":
     "./src/core/ts/content-scripts/dom-translation-content-script.js/index.ts",
+  "translation-worker":
+    "./src/core/ts/web-worker-scripts/translation-worker.js/index.ts",
 };
 if (ui === "cross-browser-ui") {
   entry["options-ui"] =

@@ -22,7 +22,7 @@ import { config } from "../../../config";
 // const FOO_LIMIT = X * 1024 * 1024;
 const IDLE_TIMEOUT = 10 * 1000;
 
-const WORKER_URL = browser.runtime.getURL(`wasm/bergamot-translator-worker.js`);
+const WORKER_URL = browser.runtime.getURL(`translation-worker.js`);
 
 interface WorkerMessage {
   requestId: string;

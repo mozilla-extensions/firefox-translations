@@ -17,7 +17,13 @@ else
   ARTIFACTS_DIRECTORY=./bergamot-translator/build-wasm/wasm
 fi
 
-cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" src/core/static/wasm/bergamot-translator-worker.appendix.js > src/core/static/wasm/bergamot-translator-worker.js
+# Construct a TypeScript module from the emscripten JS glue code
+TS_FILE=src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts
+echo "// @ts-nocheck" > $TS_FILE
+cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" | sed 's/wasmBinaryFile = "/wasmBinaryFile = "wasm\//g' >> $TS_FILE
+echo "export { addOnPreMain, Module, FS, WORKERFS };" >> $TS_FILE
+
+# Copy wasm artifact as is
 cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/core/static/wasm/bergamot-translator-worker.wasm
 
 # Download models

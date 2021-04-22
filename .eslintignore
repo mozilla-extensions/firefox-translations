@@ -6,7 +6,7 @@ stats.json
 yarn-error.log
 *.map
 package-lock.json
-src/core/static/wasm/bergamot-translator-worker.js
+src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts
 src/core/static/wasm/bergamot-translator-worker.wasm
 src/core/static/wasm/cld-worker.*
 # currently not maintaining these source files
