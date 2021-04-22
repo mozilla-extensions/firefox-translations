@@ -6,6 +6,7 @@
 
 import { browser } from "webextension-polyfill-ts";
 import { nanoid } from "nanoid";
+import { config } from "../../../config";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've loaded/processed large models/translations
@@ -30,6 +31,7 @@ interface WorkerMessage {
 export interface LoadModelParams {
   from: string;
   to: string;
+  bergamotModelsBaseUrl: string;
 }
 
 interface LoadModelRequestWorkerMessage extends WorkerMessage {
@@ -409,6 +411,7 @@ class TranslationRequestDispatcher extends EventTarget {
     const loadModelParams = {
       from,
       to,
+      bergamotModelsBaseUrl: config.bergamotModelsBaseUrl,
     };
     const translateParams: TranslateParams = {
       texts,

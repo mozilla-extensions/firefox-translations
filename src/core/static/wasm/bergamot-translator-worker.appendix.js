@@ -13,14 +13,14 @@ addOnPreMain(function() {
    * Automatically download the appropriate translation models, vocabularies and lexical shortlists if not already locally present
    * @param from
    * @param to
+   * @param bergamotModelsBaseUrl
    * @returns {Promise<void>}
    */
-  const downloadModel = async (from, to) => {
-    log(`downloadModel(${from}, ${to})`);
+  const downloadModel = async (from, to, bergamotModelsBaseUrl) => {
+    log(`downloadModel(${from}, ${to}, ${bergamotModelsBaseUrl})`);
 
     const languagePair = `${from}${to}`;
 
-    const bergamotModelsBaseUrl = "http://0.0.0.0:4000/models";
     const modelFiles = [
       {
         url: `${bergamotModelsBaseUrl}/${languagePair}/lex.${languagePair}.s2t`,
@@ -59,7 +59,7 @@ addOnPreMain(function() {
     FS.mount(WORKERFS, { blobs }, modelDir);
   };
 
-  const loadModel = async (from, to) => {
+  const loadModel = async (from, to, bergamotModelsBaseUrl) => {
     log(`loadModel(${from}, ${to})`);
 
     const languagePair = `${from}${to}`;
@@ -73,7 +73,7 @@ addOnPreMain(function() {
     const modelDir = `/${languagePair}`;
     const { exists } = FS.analyzePath(modelDir);
     if (!exists) {
-      await downloadModel(from, to);
+      await downloadModel(from, to, bergamotModelsBaseUrl);
     }
 
     const loadModelStart = performance.now();
@@ -180,15 +180,17 @@ shortlist:
     const requestId = data.requestId;
     if (data.type === "loadModel") {
       try {
-        loadModel(data.loadModelParams.from, data.loadModelParams.to).then(
-          loadModelResults => {
-            postMessage({
-              type: "loadModelResults",
-              requestId,
-              loadModelResults,
-            });
-          },
-        );
+        loadModel(
+          data.loadModelParams.from,
+          data.loadModelParams.to,
+          data.loadModelParams.bergamotModelsBaseUrl,
+        ).then(loadModelResults => {
+          postMessage({
+            type: "loadModelResults",
+            requestId,
+            loadModelResults,
+          });
+        });
       } catch (error) {
         console.info(
           "Error/exception caught in worker during loadModel:",

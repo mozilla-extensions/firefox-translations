@@ -1,9 +1,13 @@
+const developmentBuild = process.env.NODE_ENV !== "production";
 export const config = {
   bergamotRestApiUrl: process.env.BERGAMOT_REST_API_INBOUND_URL,
   useBergamotRestApi: process.env.USE_BERGAMOT_REST_API === "1",
   sentryDsn: process.env.SENTRY_DSN,
+  bergamotModelsBaseUrl: developmentBuild
+    ? "http://0.0.0.0:4000/models"
+    : "http://0.0.0.0:4001/models",
   telemetryAppId: process.env.TELEMETRY_APP_ID,
-  telemetryDebugMode: process.env.NODE_ENV !== "production",
+  telemetryDebugMode: developmentBuild,
   supportedLanguagePairs: [
     // "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
     // ISO 639-1 codes
