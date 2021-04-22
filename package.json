@@ -8,6 +8,7 @@
     "@mozilla/glean": "^0.8.1",
     "@popperjs/core": "^2.4.4",
     "@sentry/browser": "^5.15.5",
+    "cache-polyfill": "jimmywarting/cache-polyfill",
     "classnames": "^2.2.6",
     "flat": "^5.0.0",
     "mobx": "^6.0.3",

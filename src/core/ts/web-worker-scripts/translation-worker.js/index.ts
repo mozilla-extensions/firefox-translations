@@ -5,6 +5,9 @@ import {
   WORKERFS,
 } from "./bergamot-translator-worker";
 
+// Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
+import { caches } from "cache-polyfill";
+
 addOnPreMain(function() {
   let model;
 
@@ -42,18 +45,27 @@ addOnPreMain(function() {
       },
     ];
 
-    // Use of persistent Cache API in web extensions BLOCKED BY https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
-    // const cache = await caches.open('bergamot-models');
+    const cache = await caches.open("bergamot-models");
     const blobs = await Promise.all(
       modelFiles.map(async ({ url, name }) => {
-        /*
         let response = await cache.match(url);
         if (!response) {
-          await cache.add(url);
+          log(`Downloading model file from ${url}`);
+          try {
+            await cache.add(url);
+          } catch (err) {
+            if (err.name === "QuotaExceededError") {
+              // Don't bail just because we can't persist the model file across browser restarts
+              console.warn(err);
+              log("Ran into and ignored a QuotaExceededError");
+            } else {
+              throw err;
+            }
+          }
           response = await cache.match(url);
+        } else {
+          log(`Model file from ${url} previously downloaded already`);
         }
-        */
-        const response = await fetch(url);
         const blob = await response.blob();
         return { name, data: blob };
       }),

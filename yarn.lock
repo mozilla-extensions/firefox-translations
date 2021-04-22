@@ -3178,6 +3178,10 @@ cache-base@^1.0.1:
     union-value "^1.0.0"
     unset-value "^1.0.0"
 
+cache-polyfill@jimmywarting/cache-polyfill:
+  version "1.0.1"
+  resolved "https://codeload.github.com/jimmywarting/cache-polyfill/tar.gz/bda23f4937afbb6efe2d7fccb9d359b2abda9112"
+
 cacheable-request@^6.0.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/cacheable-request/-/cacheable-request-6.1.0.tgz#20ffb8bd162ba4be11e9567d823db651052ca912"
