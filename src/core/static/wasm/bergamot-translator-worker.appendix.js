@@ -1,4 +1,4 @@
-/* global addOnPreMain, Module */
+/* global addOnPreMain, Module, FS, WORKERFS */
 addOnPreMain(function() {
   let model;
 
@@ -9,7 +9,57 @@ addOnPreMain(function() {
     });
   };
 
-  const loadModel = (from, to) => {
+  /**
+   * Automatically download the appropriate translation models, vocabularies and lexical shortlists if not already locally present
+   * @param from
+   * @param to
+   * @returns {Promise<void>}
+   */
+  const downloadModel = async (from, to) => {
+    log(`downloadModel(${from}, ${to})`);
+
+    const languagePair = `${from}${to}`;
+
+    const bergamotModelsBaseUrl = "http://0.0.0.0:4000/models";
+    const modelFiles = [
+      {
+        url: `${bergamotModelsBaseUrl}/${languagePair}/lex.${languagePair}.s2t`,
+        name: `lex.${languagePair}.s2t`,
+      },
+      {
+        url: `${bergamotModelsBaseUrl}/${languagePair}/model.${languagePair}.intgemm.alphas.bin`,
+        name: `model.${languagePair}.intgemm.alphas.bin`,
+      },
+      {
+        url: `${bergamotModelsBaseUrl}/${languagePair}/vocab.${languagePair}.spm`,
+        name: `vocab.${languagePair}.spm`,
+      },
+    ];
+
+    // Use of persistent Cache API in web extensions BLOCKED BY https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
+    // const cache = await caches.open('bergamot-models');
+    const blobs = await Promise.all(
+      modelFiles.map(async ({ url, name }) => {
+        /*
+        let response = await cache.match(url);
+        if (!response) {
+          await cache.add(url);
+          response = await cache.match(url);
+        }
+        */
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return { name, data: blob };
+      }),
+    );
+
+    // Mount the downloaded files in emscripten's worker file system
+    const modelDir = `/${languagePair}`;
+    FS.mkdir(modelDir);
+    FS.mount(WORKERFS, { blobs }, modelDir);
+  };
+
+  const loadModel = async (from, to) => {
     log(`loadModel(${from}, ${to})`);
 
     const languagePair = `${from}${to}`;
@@ -19,10 +69,14 @@ addOnPreMain(function() {
       model.delete();
     }
 
-    const loadModelStart = performance.now();
+    // Download model files if not already locally present
+    const modelDir = `/${languagePair}`;
+    const { exists } = FS.analyzePath(modelDir);
+    if (!exists) {
+      await downloadModel(from, to);
+    }
 
-    // Vocab files are re-used in both translation directions
-    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+    const loadModelStart = performance.now();
 
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
@@ -30,8 +84,8 @@ addOnPreMain(function() {
     const modelConfig = `models:
   - /${languagePair}/model.${languagePair}.intgemm.alphas.bin
 vocabs:
-  - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
-  - /${vocabLanguagePair}/vocab.${vocabLanguagePair}.spm
+  - /${languagePair}/vocab.${languagePair}.spm
+  - /${languagePair}/vocab.${languagePair}.spm
 beam-size: 1
 normalize: 1.0
 word-penalty: 0
@@ -126,15 +180,15 @@ shortlist:
     const requestId = data.requestId;
     if (data.type === "loadModel") {
       try {
-        const loadModelResults = loadModel(
-          data.loadModelParams.from,
-          data.loadModelParams.to,
+        loadModel(data.loadModelParams.from, data.loadModelParams.to).then(
+          loadModelResults => {
+            postMessage({
+              type: "loadModelResults",
+              requestId,
+              loadModelResults,
+            });
+          },
         );
-        postMessage({
-          type: "loadModelResults",
-          requestId,
-          loadModelResults,
-        });
       } catch (error) {
         console.info(
           "Error/exception caught in worker during loadModel:",
