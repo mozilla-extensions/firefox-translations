@@ -37,6 +37,7 @@ export interface TranslationRequestProgress {
   modelLoadWallTimeMs: number;
   translationFinished: boolean;
   translationWallTimeMs: number;
+  errorOccurred: boolean;
 }
 
 export type TranslationRequestProgressCallback = (
@@ -152,6 +153,8 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       TranslationRequestProgress
     > = new Map();
 
+    const errorsEncountered = [];
+
     // Split the document into various requests to be sent to the translation API
     for (
       let currentRequestOrdinal = 0;
@@ -209,8 +212,9 @@ export class BaseDomTranslator extends MinimalDomTranslator {
           }
         })
         .catch(err => {
-          console.error("DomTranslator fireRequest error", err);
+          errorsEncountered.push(err);
         });
+
       console.info(
         `Fired off request with ${domTranslationChunk.translationRoots.length} translation roots to the translation backend`,
         { domTranslationChunk },
@@ -231,16 +235,14 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       `Fired off ${chunksBeingProcessed.length} requests to the translation backend`,
     );
 
-    // Resolve promise when all requests have finished
-    await Promise.all(chunksBeingProcessed);
+    // Wait for all requests to settle
+    await Promise.allSettled(chunksBeingProcessed);
 
     // If at least one chunk was successful, the
     // translation should be displayed, albeit incomplete.
     // Otherwise, the "Error" state will appear.
     if (!this.partialSuccess) {
-      throw new Error(
-        "DomTranslator ended up with no more pending chunks being processed and zero successful requests",
-      );
+      throw new Error("No content was translated");
     }
     return {
       characterCount: this.translatedCharacterCount,

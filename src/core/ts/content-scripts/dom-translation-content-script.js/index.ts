@@ -88,12 +88,10 @@ const init = async () => {
         ) {
           */
 
-          console.info("Translating web page");
-          await domTranslationManager.doTranslation(
+          const translationPromise = domTranslationManager.doTranslation(
             currentTabFrameDocumentTranslationState.translateFrom,
             currentTabFrameDocumentTranslationState.translateTo,
           );
-          console.info("Translated web page");
           extensionState.patchDocumentTranslationStateByFrameInfo(frameInfo, [
             {
               op: "replace",
@@ -101,6 +99,7 @@ const init = async () => {
               value: false,
             },
           ]);
+          await translationPromise;
         }
       }
 

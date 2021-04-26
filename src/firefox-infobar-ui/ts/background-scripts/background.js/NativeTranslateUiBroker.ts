@@ -11,6 +11,7 @@ import { telemetry } from "../../../../core/ts/background-scripts/background.js/
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
 import { getSnapshot } from "mobx-keystone";
 import { reaction, when } from "mobx";
+import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -34,7 +35,7 @@ enum NativeTranslateUiStateInfobarState {
  */
 interface NativeTranslateUiState {
   acceptedTargetLanguages: string[];
-  detectedLanguage: string;
+  detectedLanguageResults: DetectedLanguageResults;
   defaultTargetLanguage: string;
   infobarState: NativeTranslateUiStateInfobarState;
   translatedFrom: string;
@@ -132,7 +133,7 @@ export class NativeTranslateUiBroker {
         tts.translationStatus,
       );
 
-      const detectedLanguage = tts.detectedLanguageResults?.language;
+      const detectedLanguageResults = getSnapshot(tts.detectedLanguageResults);
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -140,14 +141,14 @@ export class NativeTranslateUiBroker {
         supportedSourceLanguages,
         // supportedTargetLanguagesGivenDefaultSourceLanguage,
         allPossiblySupportedTargetLanguages,
-      } = await summarizeLanguageSupport(detectedLanguage);
+      } = await summarizeLanguageSupport(detectedLanguageResults);
 
       const translationDurationMs =
         Date.now() - tts.translationInitiationTimestamp;
 
       return {
         acceptedTargetLanguages,
-        detectedLanguage,
+        detectedLanguageResults,
         // defaultSourceLanguage,
         defaultTargetLanguage,
         infobarState,
@@ -232,7 +233,6 @@ export class NativeTranslateUiBroker {
     const end = performance.now();
     const translationWallTimeMs = end - start;
 
-    // Record "translation attempt concluded" telemetry
     const { tabTranslationStates } = this.extensionState;
     const currentTabTranslationState = getSnapshot(
       tabTranslationStates.get(tabId),
@@ -243,25 +243,31 @@ export class NativeTranslateUiBroker {
       totalTranslationEngineRequestCount,
       totalTranslationWallTimeMs,
       wordCount,
+      translationStatus,
     } = currentTabTranslationState;
 
-    const perceivedSeconds = translationWallTimeMs / 1000;
-    const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
-    const translationEngineWordsPerSecond = Math.round(
-      wordCount / (totalTranslationWallTimeMs / 1000),
-    );
-    console.info(
-      `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
-        1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
-        1000} seconds.`,
-    );
-    telemetry.onTranslationAttemptConcluded(
-      from,
-      to,
-      totalModelLoadWallTimeMs,
-      totalTranslationWallTimeMs,
-      translationEngineWordsPerSecond,
-    );
+    if (translationStatus === TranslationStatus.TRANSLATED) {
+      // Record "translation attempt concluded" telemetry
+      const perceivedSeconds = translationWallTimeMs / 1000;
+      const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
+      const translationEngineWordsPerSecond = Math.round(
+        wordCount / (totalTranslationWallTimeMs / 1000),
+      );
+      console.info(
+        `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
+          1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
+          1000} seconds.`,
+      );
+      telemetry.onTranslationFinished(
+        from,
+        to,
+        totalModelLoadWallTimeMs,
+        totalTranslationWallTimeMs,
+        translationEngineWordsPerSecond,
+      );
+    } else {
+      // TODO: Record error telemetry
+    }
   }
 
   onInfoBarDisplayed(tabId: number, from: string, to: string) {

@@ -1,8 +1,4 @@
 /* global addOnPreMain, Module */
-Module.onAbort = what => {
-  console.error("Abort handler", { what });
-};
-
 addOnPreMain(function() {
   let model;
 
@@ -129,15 +125,28 @@ shortlist:
     }
     const requestId = data.requestId;
     if (data.type === "loadModel") {
-      const loadModelResults = loadModel(
-        data.loadModelParams.from,
-        data.loadModelParams.to,
-      );
-      postMessage({
-        type: "loadModelResults",
-        requestId,
-        loadModelResults,
-      });
+      try {
+        const loadModelResults = loadModel(
+          data.loadModelParams.from,
+          data.loadModelParams.to,
+        );
+        postMessage({
+          type: "loadModelResults",
+          requestId,
+          loadModelResults,
+        });
+      } catch (error) {
+        console.info(
+          "Error/exception caught in worker during loadModel:",
+          error,
+        );
+        postMessage({
+          type: "error",
+          message: `Error/exception caught in worker during loadModel: ${error.toString()}`,
+          requestId,
+          sourceMethod: "loadModel",
+        });
+      }
     } else if (data.type === "translate") {
       try {
         console.log("Messages to translate: ", data.translateParams.texts);
@@ -148,7 +157,16 @@ shortlist:
           translationResults,
         });
       } catch (error) {
-        log(`Error/exception caught in worker: `, error.toString());
+        console.info(
+          "Error/exception caught in worker during translate:",
+          error,
+        );
+        postMessage({
+          type: "error",
+          message: `Error/exception caught in worker during translate: ${error.toString()}`,
+          requestId,
+          sourceMethod: "translate",
+        });
       }
     } else {
       throw new Error(

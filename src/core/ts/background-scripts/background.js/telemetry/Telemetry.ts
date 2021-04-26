@@ -27,44 +27,55 @@ import {
  * Synchronous methods here is important, since it is the only way to guarantee that multiple Glean API calls are
  * executed sequentially and not interleaved with other asynchronous Telemetry recording.
  * For more information, see: https://github.com/mozilla-extensions/bergamot-browser-extension/pull/76#discussion_r602128568
+ *
+ * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
+ * For this reason we surround all code invoking Glean.js in try/catch blocks.
  */
 export class Telemetry {
   constructor() {
     const appId = config.telemetryAppId;
-    Glean.initialize(appId, true, {
-      debug: { logPings: config.telemetryDebugMode },
-    });
-    console.info(
-      `Telemetry: initialization completed with application ID ${appId}.`,
-    );
+    try {
+      Glean.initialize(appId, true, {
+        debug: { logPings: config.telemetryDebugMode },
+      });
+      console.info(
+        `Telemetry: initialization completed with application ID ${appId}.`,
+      );
+    } catch (err) {
+      console.error(`Telemetry initialization error`, err);
+    }
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    displayed.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      displayed.record();
+    });
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
-    fromLang.set(newFrom);
-    toLang.set(to);
-    changeLang.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(newFrom);
+      toLang.set(to);
+      changeLang.record();
+    });
   }
 
   public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
-    fromLang.set(from);
-    toLang.set(newTo);
-    changeLang.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(newTo);
+      changeLang.record();
+    });
   }
 
   public onInfoBarClosed(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    closed.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      closed.record();
+    });
   }
 
   public onNeverTranslateSelectedLanguage(
@@ -72,17 +83,19 @@ export class Telemetry {
     from: string,
     to: string,
   ) {
-    fromLang.set(from);
-    toLang.set(to);
-    neverTranslateLang.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      neverTranslateLang.record();
+    });
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    neverTranslateSite.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      neverTranslateSite.record();
+    });
   }
 
   public onShowOriginalButtonPressed(
@@ -102,49 +115,56 @@ export class Telemetry {
   }
 
   public onTranslateButtonPressed(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    translate.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      translate.record();
+    });
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
-    fromLang.set(from);
-    toLang.set(to);
-    notNow.record();
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      notNow.record();
+    });
   }
 
   /**
    * A translation attempt starts when a translation is requested in a
    * specific tab and ends when all translations in that tab has completed
    */
-  public onTranslationAttemptConcluded(
+  public onTranslationFinished(
     from: string,
     to: string,
     modelLoadWallTimeMs: number,
     translationWallTimeMs: number,
     $wordsPerSecond: number,
   ) {
-    fromLang.set(from);
-    toLang.set(to);
-    modelLoadTime.set(String(modelLoadWallTimeMs));
-    translationTime.set(String(translationWallTimeMs));
-    wordsPerSecond.set(String(Math.round($wordsPerSecond)));
-    this.submit();
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      modelLoadTime.set(String(modelLoadWallTimeMs));
+      translationTime.set(String(translationWallTimeMs));
+      wordsPerSecond.set(String(Math.round($wordsPerSecond)));
+    });
   }
 
   /**
    * Submits all collected metrics in a custom ping.
+   * TODO: Always include the fx telemetry id uuid metric in pings
    */
-  public submit = () => {
+  public submit = (
+    telemetryRecordingFunction: false | (() => void) = false,
+  ) => {
     try {
-      // TODO: Always include the fx telemetry id string metric in pings
+      if (telemetryRecordingFunction) {
+        telemetryRecordingFunction();
+      }
       custom.submit();
-      console.info("Telemetry: the ping is submitted.");
+      console.info("Telemetry: the ping has been dispatched to Glean.js");
     } catch (err) {
-      // telemetry error shouldn't crash the app
-      console.error(`Telemetry: Error. The ping was not submitted.`, err);
+      console.error(`Telemetry dispatch error`, err);
     }
   };
 }
