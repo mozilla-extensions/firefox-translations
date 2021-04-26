@@ -34,7 +34,7 @@ export interface LoadModelParams {
   bergamotModelsBaseUrl: string;
 }
 
-interface LoadModelRequestWorkerMessage extends WorkerMessage {
+export interface LoadModelRequestWorkerMessage extends WorkerMessage {
   type: "loadModel";
   loadModelParams: LoadModelParams;
 }
@@ -54,7 +54,7 @@ export interface TranslateParams {
   loadModelParams: LoadModelParams;
 }
 
-interface TranslateRequestWorkerMessage extends WorkerMessage {
+export interface TranslateRequestWorkerMessage extends WorkerMessage {
   type: "translate";
   translateParams: TranslateParams;
 }

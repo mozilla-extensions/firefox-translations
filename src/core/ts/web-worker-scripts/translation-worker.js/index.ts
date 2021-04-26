@@ -5,8 +5,17 @@ import {
   WORKERFS,
 } from "./bergamot-translator-worker";
 
+import {
+  LoadModelRequestWorkerMessage,
+  TranslateRequestWorkerMessage,
+} from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
 import { caches } from "cache-polyfill";
+
+type IncomingBergamotTranslatorAPIMessage =
+  | LoadModelRequestWorkerMessage
+  | TranslateRequestWorkerMessage;
 
 addOnPreMain(function() {
   let model;
@@ -20,12 +29,12 @@ addOnPreMain(function() {
 
   /**
    * Automatically download the appropriate translation models, vocabularies and lexical shortlists if not already locally present
-   * @param from
-   * @param to
-   * @param bergamotModelsBaseUrl
-   * @returns {Promise<void>}
    */
-  const downloadModel = async (from, to, bergamotModelsBaseUrl) => {
+  const downloadModel = async (
+    from: string,
+    to: string,
+    bergamotModelsBaseUrl: string,
+  ) => {
     log(`downloadModel(${from}, ${to}, ${bergamotModelsBaseUrl})`);
 
     const languagePair = `${from}${to}`;
@@ -77,7 +86,11 @@ addOnPreMain(function() {
     FS.mount(WORKERFS, { blobs }, modelDir);
   };
 
-  const loadModel = async (from, to, bergamotModelsBaseUrl) => {
+  const loadModel = async (
+    from: string,
+    to: string,
+    bergamotModelsBaseUrl: string,
+  ) => {
     log(`loadModel(${from}, ${to})`);
 
     const languagePair = `${from}${to}`;
@@ -134,10 +147,7 @@ shortlist:
     return { alignmentIsSupported, modelLoadWallTimeMs };
   };
 
-  /**
-   * @param texts string[]
-   */
-  const translate = texts => {
+  const translate = (texts: string[]) => {
     log(`translate()`);
     if (!model) {
       throw new Error("Translate attempted before model was loaded");
@@ -190,7 +200,7 @@ shortlist:
     return translationResults;
   };
 
-  onmessage = function(msg) {
+  onmessage = function(msg: { data: IncomingBergamotTranslatorAPIMessage }) {
     const { data } = msg;
     if (!data.type || !data.requestId) {
       return;
@@ -244,7 +254,9 @@ shortlist:
       }
     } else {
       throw new Error(
-        `Unexpected message type: "${data.type}. Request id: ${data.requestId}"`,
+        `Unexpected message data payload sent to translation worker: "${JSON.stringify(
+          data,
+        )}"`,
       );
     }
   };
