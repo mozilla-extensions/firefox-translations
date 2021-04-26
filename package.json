@@ -10,7 +10,6 @@
     "@sentry/browser": "^5.15.5",
     "cache-polyfill": "jimmywarting/cache-polyfill",
     "classnames": "^2.2.6",
-    "fetch-progress": "^1.3.0",
     "flat": "^5.0.0",
     "mobx": "^6.0.3",
     "mobx-keystone": "^0.48.0",
