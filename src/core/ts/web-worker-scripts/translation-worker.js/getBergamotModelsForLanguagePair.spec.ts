@@ -45,4 +45,20 @@ describe("getBergamotModelsForLanguagePair", function() {
 
     assert.equal(blobs.length, 3);
   });
+
+  it("eten", async function() {
+    const languagePair = "eten";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      cache,
+      log,
+    );
+
+    assert.equal(blobs.length, 3);
+  });
 });
