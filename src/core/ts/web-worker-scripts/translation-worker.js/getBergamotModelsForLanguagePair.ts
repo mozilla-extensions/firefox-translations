@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import fetchProgress, { FetchProgressData } from "fetch-progress";
+
 export const getBergamotModelsForLanguagePair = async (
   languagePair: string,
   bergamotModelsBaseUrl: string,
@@ -23,12 +25,23 @@ export const getBergamotModelsForLanguagePair = async (
     },
   ];
 
+  const downloadStart = performance.now();
+  let totalBytesTransferred = 0;
+
   const blobs = await Promise.all(
     modelFiles.map(async ({ url, name }) => {
       let response = await cache.match(url);
+      let latestProgress;
       if (!response) {
         log(`Downloading model file ${name} from ${url}`);
-        const downloadResponse = await fetch(url);
+        const responsePromise = fetch(url).then(
+          fetchProgress({
+            onProgress(progress: FetchProgressData) {
+              latestProgress = progress;
+            },
+          }),
+        );
+        const downloadResponse = await responsePromise;
 
         log(`Response for ${url} from network is: ${downloadResponse.status}`);
 
@@ -57,9 +70,25 @@ export const getBergamotModelsForLanguagePair = async (
       } else {
         log(`${name}: Model file from ${url} previously downloaded already`);
       }
+      if (latestProgress?.transferred) {
+        console.log(
+          `${name} total bytes transferred: ${latestProgress.transferred}`,
+        );
+        totalBytesTransferred += latestProgress.transferred;
+      }
+
       const blob = await response.blob();
       return { name, data: blob };
     }),
+  );
+
+  // Measure the time it takes to download model files
+  const downloadEnd = performance.now();
+  const downloadDuration = downloadEnd - downloadStart;
+  log(
+    `All model files for ${languagePair} downloaded / restored from persistent cache in ${downloadDuration /
+      1000} seconds (${Math.round((totalBytesTransferred / 1024 / 1024) * 10) /
+      10} medibytes transferred over the network)`,
   );
 
   return blobs;
