@@ -1,5 +1,8 @@
 // @ts-nocheck
 
+// Note: The source code in this file is imported from bergamot-translator via
+// the import-bergamot-translator.sh script in the root of this repo. 
+// Changes will be overwritten on each import!
 
 // Support for growable heap + pthreads, where the buffer may change, so JS views
 // must be updated.
