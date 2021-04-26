@@ -8,14 +8,34 @@ import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguage
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
 import { caches } from "cache-polyfill";
 import { config } from "../../config";
+import { nanoid } from "nanoid";
 
 const log = console.info;
+const testSuiteExecutionUuid = nanoid();
 
 describe("getBergamotModelsForLanguagePair", function() {
   it("esen", async function() {
     const languagePair = "esen";
 
-    const cache = await caches.open("tests:bergamot-models");
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      cache,
+      log,
+    );
+
+    assert.equal(blobs.length, 3);
+  });
+
+  it("esen again", async function() {
+    const languagePair = "esen";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
