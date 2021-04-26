@@ -9,6 +9,7 @@ import {
   LoadModelRequestWorkerMessage,
   TranslateRequestWorkerMessage,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
 import { caches } from "cache-polyfill";
@@ -39,45 +40,12 @@ addOnPreMain(function() {
 
     const languagePair = `${from}${to}`;
 
-    const modelFiles = [
-      {
-        url: `${bergamotModelsBaseUrl}/${languagePair}/lex.${languagePair}.s2t`,
-        name: `lex.${languagePair}.s2t`,
-      },
-      {
-        url: `${bergamotModelsBaseUrl}/${languagePair}/model.${languagePair}.intgemm.alphas.bin`,
-        name: `model.${languagePair}.intgemm.alphas.bin`,
-      },
-      {
-        url: `${bergamotModelsBaseUrl}/${languagePair}/vocab.${languagePair}.spm`,
-        name: `vocab.${languagePair}.spm`,
-      },
-    ];
-
     const cache = await caches.open("bergamot-models");
-    const blobs = await Promise.all(
-      modelFiles.map(async ({ url, name }) => {
-        let response = await cache.match(url);
-        if (!response) {
-          log(`Downloading model file from ${url}`);
-          try {
-            await cache.add(url);
-          } catch (err) {
-            if (err.name === "QuotaExceededError") {
-              // Don't bail just because we can't persist the model file across browser restarts
-              console.warn(err);
-              log("Ran into and ignored a QuotaExceededError");
-            } else {
-              throw err;
-            }
-          }
-          response = await cache.match(url);
-        } else {
-          log(`Model file from ${url} previously downloaded already`);
-        }
-        const blob = await response.blob();
-        return { name, data: blob };
-      }),
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      bergamotModelsBaseUrl,
+      cache,
+      log,
     );
 
     // Mount the downloaded files in emscripten's worker file system
