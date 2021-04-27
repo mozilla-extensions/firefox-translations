@@ -2,32 +2,33 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { digestSha256 } from "./digestSha256";
+import { ModelRegistry } from "../../config";
+
 export const getBergamotModelsForLanguagePair = async (
   languagePair: string,
   bergamotModelsBaseUrl: string,
+  modelRegistry: ModelRegistry,
   cache: Cache,
   log: (message: string) => void,
 ): Promise<{ name: string; data: Blob }[]> => {
-  const modelFiles = [
-    {
-      url: `${bergamotModelsBaseUrl}/${languagePair}/lex.${languagePair}.s2t`,
-      name: `lex.${languagePair}.s2t`,
+  if (!modelRegistry[languagePair]) {
+    throw new Error(`Language pair '${languagePair}' not supported`);
+  }
+
+  const modelFiles = Object.keys(modelRegistry[languagePair]).map(
+    (type: string) => {
+      const { name, expectedSha256Hash } = modelRegistry[languagePair][type];
+      const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
+      return { type, url, name, expectedSha256Hash };
     },
-    {
-      url: `${bergamotModelsBaseUrl}/${languagePair}/model.${languagePair}.intgemm.alphas.bin`,
-      name: `model.${languagePair}.intgemm.alphas.bin`,
-    },
-    {
-      url: `${bergamotModelsBaseUrl}/${languagePair}/vocab.${languagePair}.spm`,
-      name: `vocab.${languagePair}.spm`,
-    },
-  ];
+  );
 
   const downloadStart = performance.now();
   let totalBytesTransferred = 0;
 
   const blobs = await Promise.all(
-    modelFiles.map(async ({ url, name }) => {
+    modelFiles.map(async ({ type, url, name, expectedSha256Hash }) => {
       let response = await cache.match(url);
       if (!response || response.status >= 400) {
         log(`Downloading model file ${name} from ${url}`);
@@ -124,7 +125,23 @@ export const getBergamotModelsForLanguagePair = async (
       }
 
       const blob = await response.blob();
-      return { name, data: blob };
+
+      // Verify the hash of downloaded model files
+      const sha256Hash = await digestSha256(await blob.arrayBuffer());
+      if (sha256Hash !== expectedSha256Hash) {
+        console.warn(
+          `Model file download integrity check failed for ${languagePair}'s ${type} file`,
+          {
+            sha256Hash,
+            expectedSha256Hash,
+          },
+        );
+        throw new Error(
+          `Model file download integrity check failed for ${languagePair}'s ${type} file`,
+        );
+      }
+
+      return { name, data: blob, sha256Hash };
     }),
   );
 

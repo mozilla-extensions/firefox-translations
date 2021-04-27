@@ -17,6 +17,7 @@ import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguage
 
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
 import { caches } from "cache-polyfill";
+import { modelRegistry } from "../../config";
 
 type IncomingBergamotTranslatorAPIMessage =
   | LoadModelRequestWorkerMessage
@@ -48,6 +49,7 @@ addOnPreMain(function() {
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       bergamotModelsBaseUrl,
+      modelRegistry,
       cache,
       log,
     );

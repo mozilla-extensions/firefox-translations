@@ -11,7 +11,7 @@ import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguage
 
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
 import { caches } from "cache-polyfill";
-import { config } from "../../config";
+import { config, modelRegistry } from "../../config";
 import { nanoid } from "nanoid";
 
 const log = console.info;
@@ -27,6 +27,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
+      modelRegistry,
       cache,
       log,
     );
@@ -43,6 +44,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
+      modelRegistry,
       cache,
       log,
     );
@@ -59,6 +61,58 @@ describe("getBergamotModelsForLanguagePair", function() {
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
+      modelRegistry,
+      cache,
+      log,
+    );
+
+    assert.equal(blobs.length, 3);
+  });
+
+  it("ende", async function() {
+    const languagePair = "ende";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      modelRegistry,
+      cache,
+      log,
+    );
+
+    assert.equal(blobs.length, 3);
+  });
+
+  it("enes", async function() {
+    const languagePair = "enes";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      modelRegistry,
+      cache,
+      log,
+    );
+
+    assert.equal(blobs.length, 3);
+  });
+
+  it("enet", async function() {
+    const languagePair = "enet";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      modelRegistry,
       cache,
       log,
     );
@@ -76,6 +130,23 @@ describe("getBergamotModelsForLanguagePair", function() {
       getBergamotModelsForLanguagePair(
         languagePair,
         config.bergamotModelsBaseUrl,
+        {
+          ...modelRegistry,
+          xyz: {
+            lex: {
+              name: "foo",
+              expectedSha256Hash: "foo",
+            },
+            model: {
+              name: "foo",
+              expectedSha256Hash: "foo",
+            },
+            vocab: {
+              name: "foo",
+              expectedSha256Hash: "foo",
+            },
+          },
+        },
         cache,
         log,
       ),
