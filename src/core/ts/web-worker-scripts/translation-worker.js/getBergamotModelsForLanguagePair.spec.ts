@@ -2,7 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { assert } from "chai";
+import chai from "chai";
+import chaiAsPromised from "chai-as-promised";
+chai.use(chaiAsPromised);
+const { assert, expect } = chai;
+
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
 // Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
@@ -60,5 +64,21 @@ describe("getBergamotModelsForLanguagePair", function() {
     );
 
     assert.equal(blobs.length, 3);
+  });
+
+  it("a non-existent language pair", async function() {
+    const languagePair = "xyz";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    expect(
+      getBergamotModelsForLanguagePair(
+        languagePair,
+        config.bergamotModelsBaseUrl,
+        cache,
+        log,
+      ),
+    ).to.be.rejectedWith(Error);
   });
 });

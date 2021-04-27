@@ -29,7 +29,7 @@ export const getBergamotModelsForLanguagePair = async (
   const blobs = await Promise.all(
     modelFiles.map(async ({ url, name }) => {
       let response = await cache.match(url);
-      if (!response) {
+      if (!response || response.status >= 400) {
         log(`Downloading model file ${name} from ${url}`);
 
         try {
@@ -46,6 +46,10 @@ export const getBergamotModelsForLanguagePair = async (
             resolve => {
               downloadResponsePromise.then(function($response) {
                 const { body, headers, status } = $response;
+                // Only attempt to track download progress on valid responses
+                if (status >= 400) {
+                  return $response;
+                }
                 const reader = body.getReader();
                 let bytesTransferred = 0;
                 const stream = new ReadableStream({
@@ -84,16 +88,6 @@ export const getBergamotModelsForLanguagePair = async (
             try {
               // Store fetched contents in cache
               await cache.put(url, downloadResponse.clone());
-
-              // Await onComplete callback from the response progress tracker so that we get bytes transferred
-              const bytesTransferred = await allBytesTransferredPromise;
-              console.log(
-                `${name} total bytes transferred: ${bytesTransferred}`,
-              );
-              totalBytesTransferred += bytesTransferred;
-
-              // Populate the response from the cache
-              response = await cache.match(url);
             } catch (err) {
               console.warn({ err });
               if (err && err.name === "QuotaExceededError") {
@@ -105,15 +99,28 @@ export const getBergamotModelsForLanguagePair = async (
                 throw err;
               }
             }
+
+            // Await onComplete callback from the response progress tracker so that we get bytes transferred
+            const bytesTransferred = await allBytesTransferredPromise;
+            console.log(`${name} total bytes transferred: ${bytesTransferred}`);
+            totalBytesTransferred += bytesTransferred;
+
+            // Populate the response from the cache
+            response = await cache.match(url);
           } else {
             log(`${name}: Not caching the response to ${url}`);
             response = downloadResponse;
           }
         } catch ($$err) {
           console.warn({ $$err });
+          throw $$err;
         }
       } else {
         log(`${name}: Model file from ${url} previously downloaded already`);
+      }
+
+      if (response.status >= 400) {
+        throw new Error("Model file download failed");
       }
 
       const blob = await response.blob();
