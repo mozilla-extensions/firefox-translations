@@ -49,7 +49,6 @@ if [ "$MODELS_UPDATED" == "1" ]; then
   mkdir -p test/fixtures/models
   rm -rf test/fixtures/models/*
   cp -rf bergamot-models/prod/* test/fixtures/models
-  gunzip test/fixtures/models/*/*
 fi
 
 exit 0
