@@ -4,6 +4,7 @@
 
 import { digestSha256 } from "./digestSha256";
 import { ModelRegistry } from "../../config";
+const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
 export const getBergamotModelsForLanguagePair = async (
   languagePair: string,
@@ -18,99 +19,121 @@ export const getBergamotModelsForLanguagePair = async (
 
   const modelFiles = Object.keys(modelRegistry[languagePair]).map(
     (type: string) => {
-      const { name, expectedSha256Hash } = modelRegistry[languagePair][type];
+      const { name, size, expectedSha256Hash } = modelRegistry[languagePair][
+        type
+      ];
       const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
-      return { type, url, name, expectedSha256Hash };
+      return { type, url, name, size, expectedSha256Hash };
     },
   );
 
   const downloadStart = performance.now();
-  let totalBytesTransferred = 0;
+
+  // Check remaining storage quota
+  const quota = await navigator.storage.estimate();
+  const percentageUsed = (quota.usage / quota.quota) * 100;
+  console.info(
+    `${Math.round(percentageUsed * 100) /
+      100}% used of the available storage (${mb(quota.quota)} mb).`,
+  );
+  const approximateRemainingQuota = quota.quota - quota.usage;
+  console.info(`Remaining storage quota: ${mb(approximateRemainingQuota)} mb.`);
+
+  // Don't attempt to persist model files if remaining quota suggest that it won't work
+  let persistFiles = true;
+  const modelFilesSize = modelFiles
+    .map(({ size }) => size)
+    .reduce((a, b) => a + b, 0);
+  if (modelFilesSize > approximateRemainingQuota) {
+    persistFiles = false;
+    log(
+      `${languagePair}: Will not attempt to persist the model files (${mb(
+        modelFilesSize,
+      )} mb) since approximate remaining quota (${mb(
+        approximateRemainingQuota,
+      )} mb) is too small`,
+    );
+  }
 
   const blobs = await Promise.all(
-    modelFiles.map(async ({ type, url, name, expectedSha256Hash }) => {
+    modelFiles.map(async ({ type, url, name, size, expectedSha256Hash }) => {
       let response = await cache.match(url);
+      let downloaded = false;
       if (!response || response.status >= 400) {
         log(`Downloading model file ${name} from ${url}`);
+        downloaded = true;
 
         try {
           const downloadResponsePromise = fetch(url);
 
           // Await initial response headers before continuing
-          const downloadResponse = await downloadResponsePromise;
+          const downloadResponseRaw = await downloadResponsePromise;
 
           // Hook up progress callbacks to track actual download of the model files
           const onProgress = (_bytesTransferred: number) => {
             // console.debug("onProgress", {bytesTransferred})
           };
-          const allBytesTransferredPromise: Promise<number> = new Promise(
-            resolve => {
-              downloadResponsePromise.then(function($response) {
-                const { body, headers, status } = $response;
-                // Only attempt to track download progress on valid responses
-                if (status >= 400) {
-                  return $response;
-                }
-                const reader = body.getReader();
-                let bytesTransferred = 0;
-                const stream = new ReadableStream({
-                  start(controller) {
-                    function push() {
-                      reader.read().then(({ done, value }) => {
-                        if (done) {
-                          resolve(bytesTransferred);
-                          controller.close();
-                          return;
-                        }
-                        if (value) {
-                          onProgress(bytesTransferred);
-                          bytesTransferred += value.length;
-                        }
-                        controller.enqueue(value);
-                        push();
-                      });
-                    }
-                    push();
-                  },
-                });
-                return new Response(stream, { headers, status });
-              });
-            },
-          );
 
-          log(
-            `Response for ${url} from network is: ${downloadResponse.status}`,
-          );
-
-          // This avoids caching responses that we know are errors (i.e. HTTP status code of 4xx or 5xx).
-          if (downloadResponse.status < 400) {
-            // Both fetch() and cache.put() "consume" the request, so we need to make a copy.
-            // (see https://developer.mozilla.org/en-US/docs/Web/API/Request/clone)
-            try {
-              // Store fetched contents in cache
-              await cache.put(url, downloadResponse.clone());
-            } catch (err) {
-              console.warn({ err });
-              if (err && err.name === "QuotaExceededError") {
-                // Don't bail just because we can't persist the model file across browser restarts
-                console.warn(err);
-                log(`${name}: Ran into and ignored a QuotaExceededError`);
-                response = downloadResponse;
-              } else {
-                throw err;
-              }
+          const instrumentResponseWithProgressCallback = function($response) {
+            const { body, headers, status } = $response;
+            // Only attempt to track download progress on valid responses
+            if (status >= 400) {
+              return $response;
             }
+            const reader = body.getReader();
+            let bytesTransferred = 0;
+            const stream = new ReadableStream({
+              start(controller) {
+                function push() {
+                  reader.read().then(({ done, value }) => {
+                    if (done) {
+                      controller.close();
+                      return;
+                    }
+                    if (value) {
+                      onProgress(bytesTransferred);
+                      bytesTransferred += value.length;
+                    }
+                    controller.enqueue(value);
+                    push();
+                  });
+                }
+                push();
+              },
+            });
+            return new Response(stream, { headers, status });
+          };
 
-            // Await onComplete callback from the response progress tracker so that we get bytes transferred
-            const bytesTransferred = await allBytesTransferredPromise;
-            console.log(`${name} total bytes transferred: ${bytesTransferred}`);
-            totalBytesTransferred += bytesTransferred;
+          response = instrumentResponseWithProgressCallback(
+            downloadResponseRaw,
+          );
 
-            // Populate the response from the cache
-            response = await cache.match(url);
-          } else {
-            log(`${name}: Not caching the response to ${url}`);
-            response = downloadResponse;
+          log(`Response for ${url} from network is: ${response.status}`);
+
+          if (persistFiles) {
+            // This avoids caching responses that we know are errors (i.e. HTTP status code of 4xx or 5xx).
+            if (response.status < 400) {
+              // Both fetch() and cache.put() "consume" the request, so we need to make a copy.
+              // (see https://developer.mozilla.org/en-US/docs/Web/API/Request/clone)
+              try {
+                // Store fetched contents in cache
+                await cache.put(url, response.clone());
+              } catch (err) {
+                console.warn("Error occurred during cache.put()", { err });
+                // Note that this error is currently not thrown at all due to https://github.com/jimmywarting/cache-polyfill/issues/4
+                if (err && err.name === "QuotaExceededError") {
+                  // Don't bail just because we can't persist the model file across browser restarts
+                  console.warn(err);
+                  log(`${name}: Ran into and ignored a QuotaExceededError`);
+                } else {
+                  throw err;
+                }
+              }
+            } else {
+              log(
+                `${name}: Not caching the response to ${url} since the status was >= 400`,
+              );
+            }
           }
         } catch ($$err) {
           console.warn({ $$err });
@@ -141,7 +164,7 @@ export const getBergamotModelsForLanguagePair = async (
         );
       }
 
-      return { name, data: blob, sha256Hash };
+      return { name, data: blob, downloaded, sha256Hash };
     }),
   );
 
@@ -149,17 +172,28 @@ export const getBergamotModelsForLanguagePair = async (
   const downloadEnd = performance.now();
   const downloadDuration = downloadEnd - downloadStart;
   const totalBytes = blobs
-    .map(({ name, data }) => data.size)
+    .map(({ data }) => data.size)
     .reduce((a, b) => a + b, 0);
-  const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
+  const totalBytesDownloaded = blobs
+    .filter(({ downloaded }) => downloaded)
+    .map(({ data }) => data.size)
+    .reduce((a, b) => a + b, 0);
   log(
     `All model files for ${languagePair} downloaded / restored from persistent cache in ${downloadDuration /
-      1000} seconds (total size of model files: ${mb(
+      1000} seconds (total uncompressed size of model files: ${mb(
       totalBytes,
-    )} medibytes, of which ${mb(
-      totalBytesTransferred,
-    )} medibytes was transferred over the network)`,
+    )} mb, of which ${mb(totalBytesDownloaded)} mb was downloaded)`,
   );
+
+  /*
+
+Use non-local models base url (bergamot-models Github repo) for production-build model downloads
+Add e2e tests
+For UI:
+Add progress callbacks
+   */
+  // TODO: verify sum etc
+  console.log({ blobs });
 
   return blobs;
 };

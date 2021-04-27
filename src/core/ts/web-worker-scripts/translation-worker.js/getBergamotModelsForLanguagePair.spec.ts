@@ -120,6 +120,37 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.equal(blobs.length, 3);
   });
 
+  it("download still works (albeit not persisted) when files to download exceeds available storage quota", async function() {
+    const languagePair = "enet";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const blobs = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      {
+        enet: {
+          lex: {
+            ...modelRegistry.enet.lex,
+            size: 1024 * 1024 * 1024 * 100, // 100gb
+          },
+          model: {
+            ...modelRegistry.enet.model,
+            size: 1024 * 1024 * 1024 * 100, // 100gb
+          },
+          vocab: {
+            ...modelRegistry.enet.vocab,
+            size: 1024 * 1024 * 1024 * 100, // 100gb
+          },
+        },
+      },
+      cache,
+      log,
+    );
+    assert.equal(blobs.length, 3);
+  });
+
   it("a non-existent language pair", async function() {
     const languagePair = "xyz";
 
@@ -135,14 +166,17 @@ describe("getBergamotModelsForLanguagePair", function() {
           xyz: {
             lex: {
               name: "foo",
+              size: 0,
               expectedSha256Hash: "foo",
             },
             model: {
               name: "foo",
+              size: 0,
               expectedSha256Hash: "foo",
             },
             vocab: {
               name: "foo",
+              size: 0,
               expectedSha256Hash: "foo",
             },
           },
