@@ -151,6 +151,38 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.equal(blobs.length, 3);
   });
 
+  it("failing download integrity checks", async function() {
+    const languagePair = "enet";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    expect(
+      getBergamotModelsForLanguagePair(
+        languagePair,
+        config.bergamotModelsBaseUrl,
+        {
+          enet: {
+            lex: {
+              ...modelRegistry.enet.lex,
+              expectedSha256Hash: "foo",
+            },
+            model: {
+              ...modelRegistry.enet.model,
+              expectedSha256Hash: "foo",
+            },
+            vocab: {
+              ...modelRegistry.enet.vocab,
+              expectedSha256Hash: "foo",
+            },
+          },
+        },
+        cache,
+        log,
+      ),
+    ).to.be.rejectedWith(Error);
+  });
+
   it("a non-existent language pair", async function() {
     const languagePair = "xyz";
 
