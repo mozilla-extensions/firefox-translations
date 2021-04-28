@@ -32,19 +32,18 @@ cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/core/static/wasm/b
 
 # Download models
 MODELS_UPDATED=0
+MODELS_GIT_REV="c163547f0bbe0c3f9015e78612ef98601f0d0c68"
 if [ ! -d "bergamot-models" ]; then
-  git clone --depth 1 --branch main --single-branch https://github.com/mozilla-applied-ml/bergamot-models
+  git clone --branch main --single-branch https://github.com/mozilla-applied-ml/bergamot-models
   MODELS_UPDATED=1
-else
-  cd bergamot-models
-  git fetch
-  # Only pull if necessary
-  if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
-    git pull --ff-only
-    MODELS_UPDATED=1
-  fi
-  cd -
 fi
+cd bergamot-models
+if [ $(git rev-parse HEAD) != "$MODELS_GIT_REV" ]; then
+  git fetch
+  git checkout $MODELS_GIT_REV
+  MODELS_UPDATED=1
+fi
+cd -
 if [ "$MODELS_UPDATED" == "1" ]; then
   mkdir -p test/fixtures/models
   rm -rf test/fixtures/models/*
