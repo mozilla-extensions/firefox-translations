@@ -4,6 +4,8 @@
 
 import { digestSha256 } from "./digestSha256";
 import { ModelRegistry } from "../../config";
+import { instrumentResponseWithProgressCallback } from "./instrumentResponseWithProgressCallback";
+import { persistResponse } from "./persistResponse";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
 export const getBergamotModelsForLanguagePair = async (
@@ -73,39 +75,9 @@ export const getBergamotModelsForLanguagePair = async (
           const onProgress = (_bytesTransferred: number) => {
             // console.debug("onProgress", {bytesTransferred})
           };
-
-          const instrumentResponseWithProgressCallback = function($response) {
-            const { body, headers, status } = $response;
-            // Only attempt to track download progress on valid responses
-            if (status >= 400) {
-              return $response;
-            }
-            const reader = body.getReader();
-            let bytesTransferred = 0;
-            const stream = new ReadableStream({
-              start(controller) {
-                function push() {
-                  reader.read().then(({ done, value }) => {
-                    if (done) {
-                      controller.close();
-                      return;
-                    }
-                    if (value) {
-                      onProgress(bytesTransferred);
-                      bytesTransferred += value.length;
-                    }
-                    controller.enqueue(value);
-                    push();
-                  });
-                }
-                push();
-              },
-            });
-            return new Response(stream, { headers, status });
-          };
-
           response = instrumentResponseWithProgressCallback(
             downloadResponseRaw,
+            onProgress,
           );
 
           log(`Response for ${url} from network is: ${response.status}`);
@@ -113,22 +85,7 @@ export const getBergamotModelsForLanguagePair = async (
           if (persistFiles) {
             // This avoids caching responses that we know are errors (i.e. HTTP status code of 4xx or 5xx).
             if (response.status < 400) {
-              // Both fetch() and cache.put() "consume" the request, so we need to make a copy.
-              // (see https://developer.mozilla.org/en-US/docs/Web/API/Request/clone)
-              try {
-                // Store fetched contents in cache
-                await cache.put(url, response.clone());
-              } catch (err) {
-                console.warn("Error occurred during cache.put()", { err });
-                // Note that this error is currently not thrown at all due to https://github.com/jimmywarting/cache-polyfill/issues/4
-                if (err && err.name === "QuotaExceededError") {
-                  // Don't bail just because we can't persist the model file across browser restarts
-                  console.warn(err);
-                  log(`${name}: Ran into and ignored a QuotaExceededError`);
-                } else {
-                  throw err;
-                }
-              }
+              await persistResponse(cache, url, response, log);
             } else {
               log(
                 `${name}: Not caching the response to ${url} since the status was >= 400`,
@@ -136,7 +93,10 @@ export const getBergamotModelsForLanguagePair = async (
             }
           }
         } catch ($$err) {
-          console.warn({ $$err });
+          console.warn(
+            `${name}: An error occurred while downloading/persisting the file`,
+            { $$err },
+          );
           throw $$err;
         }
       } else {
@@ -168,7 +128,7 @@ export const getBergamotModelsForLanguagePair = async (
     }),
   );
 
-  // Measure the time it takes to download model files
+  // Measure the time it takes to acquire model files
   const downloadEnd = performance.now();
   const downloadDuration = downloadEnd - downloadStart;
   const totalBytes = blobs
@@ -184,16 +144,6 @@ export const getBergamotModelsForLanguagePair = async (
       totalBytes,
     )} mb, of which ${mb(totalBytesDownloaded)} mb was downloaded)`,
   );
-
-  /*
-
-Use non-local models base url (bergamot-models Github repo) for production-build model downloads
-Add e2e tests
-For UI:
-Add progress callbacks
-   */
-  // TODO: verify sum etc
-  console.log({ blobs });
 
   return blobs;
 };

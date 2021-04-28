@@ -174,6 +174,20 @@ shortlist:
     return translationResults;
   };
 
+  const handleError = (error, requestId, sourceMethod) => {
+    console.info(
+      `Error/exception caught in worker during ${sourceMethod}:`,
+      error,
+    );
+    log(`Error/exception caught in worker during ${sourceMethod}: ${error}`);
+    postMessage({
+      type: `error`,
+      message: `Error/exception caught in worker during ${sourceMethod}: ${error.toString()}`,
+      requestId,
+      sourceMethod,
+    });
+  };
+
   onmessage = function(msg: { data: IncomingBergamotTranslatorAPIMessage }) {
     const { data } = msg;
     if (!data.type || !data.requestId) {
@@ -194,16 +208,7 @@ shortlist:
           });
         });
       } catch (error) {
-        console.info(
-          "Error/exception caught in worker during loadModel:",
-          error,
-        );
-        postMessage({
-          type: "error",
-          message: `Error/exception caught in worker during loadModel: ${error.toString()}`,
-          requestId,
-          sourceMethod: "loadModel",
-        });
+        handleError(error, requestId, "loadModel");
       }
     } else if (data.type === "translate") {
       try {
@@ -215,16 +220,7 @@ shortlist:
           translationResults,
         });
       } catch (error) {
-        console.info(
-          "Error/exception caught in worker during translate:",
-          error,
-        );
-        postMessage({
-          type: "error",
-          message: `Error/exception caught in worker during translate: ${error.toString()}`,
-          requestId,
-          sourceMethod: "translate",
-        });
+        handleError(error, requestId, "translate");
       }
     } else {
       throw new Error(
