@@ -200,13 +200,17 @@ shortlist:
           data.loadModelParams.from,
           data.loadModelParams.to,
           data.loadModelParams.bergamotModelsBaseUrl,
-        ).then(loadModelResults => {
-          postMessage({
-            type: "loadModelResults",
-            requestId,
-            loadModelResults,
+        )
+          .then(loadModelResults => {
+            postMessage({
+              type: "loadModelResults",
+              requestId,
+              loadModelResults,
+            });
+          })
+          .catch(error => {
+            handleError(error, requestId, "loadModel");
           });
-        });
       } catch (error) {
         handleError(error, requestId, "loadModel");
       }
