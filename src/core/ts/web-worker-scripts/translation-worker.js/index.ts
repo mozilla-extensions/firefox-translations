@@ -10,8 +10,11 @@ import {
 } from "./bergamot-translator-worker";
 
 import {
+  ErrorWorkerMessage,
   LoadModelRequestWorkerMessage,
+  LoadModelResultsWorkerMessage,
   TranslateRequestWorkerMessage,
+  TranslationResultsWorkerMessage,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
@@ -183,12 +186,13 @@ shortlist:
       error,
     );
     log(`Error/exception caught in worker during ${sourceMethod}: ${error}`);
-    postMessage({
+    const message: ErrorWorkerMessage = {
       type: `error`,
       message: `Error/exception caught in worker during ${sourceMethod}: ${error.toString()}`,
       requestId,
       sourceMethod,
-    });
+    };
+    postMessage(message);
   };
 
   onmessage = function(msg: { data: IncomingBergamotTranslatorAPIMessage }) {
@@ -205,11 +209,12 @@ shortlist:
           data.loadModelParams.bergamotModelsBaseUrl,
         )
           .then(loadModelResults => {
-            postMessage({
+            const message: LoadModelResultsWorkerMessage = {
               type: "loadModelResults",
               requestId,
               loadModelResults,
-            });
+            };
+            postMessage(message);
           })
           .catch(error => {
             handleError(error, requestId, "loadModel");
@@ -221,11 +226,12 @@ shortlist:
       try {
         console.log("Messages to translate: ", data.translateParams.texts);
         const translationResults = translate(data.translateParams.texts);
-        postMessage({
+        const message: TranslationResultsWorkerMessage = {
           type: "translationResults",
           requestId,
           translationResults,
-        });
+        };
+        postMessage(message);
       } catch (error) {
         handleError(error, requestId, "translate");
       }

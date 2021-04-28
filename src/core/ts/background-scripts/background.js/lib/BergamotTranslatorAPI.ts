@@ -44,7 +44,7 @@ export interface LoadModelResults {
   modelLoadWallTimeMs: number;
 }
 
-interface LoadModelResultsWorkerMessage extends WorkerMessage {
+export interface LoadModelResultsWorkerMessage extends WorkerMessage {
   type: "loadModelResults";
   loadModelResults: LoadModelResults;
 }
@@ -73,7 +73,7 @@ interface PendingRequest<T> {
 }
 /* eslint-enable no-unused-vars, no-shadow */
 
-interface TranslationResultsWorkerMessage extends WorkerMessage {
+export interface TranslationResultsWorkerMessage extends WorkerMessage {
   type: "translationResults";
   translationResults: TranslationResults;
 }
@@ -83,7 +83,7 @@ interface LogWorkerMessage extends WorkerMessage {
   message: string;
 }
 
-interface ErrorWorkerMessage extends WorkerMessage {
+export interface ErrorWorkerMessage extends WorkerMessage {
   type: "error";
   message: string;
   requestId: string;
