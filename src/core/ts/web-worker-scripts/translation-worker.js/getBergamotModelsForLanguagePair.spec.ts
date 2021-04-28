@@ -199,16 +199,19 @@ describe("getBergamotModelsForLanguagePair", function() {
             lex: {
               name: "foo",
               size: 0,
+              estimatedCompressedSize: 0,
               expectedSha256Hash: "foo",
             },
             model: {
               name: "foo",
               size: 0,
+              estimatedCompressedSize: 0,
               expectedSha256Hash: "foo",
             },
             vocab: {
               name: "foo",
               size: 0,
+              estimatedCompressedSize: 0,
               expectedSha256Hash: "foo",
             },
           },

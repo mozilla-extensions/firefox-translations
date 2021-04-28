@@ -6,6 +6,7 @@ import { digestSha256 } from "./digestSha256";
 import { ModelRegistry } from "../../config";
 import { instrumentResponseWithProgressCallback } from "./instrumentResponseWithProgressCallback";
 import { persistResponse } from "./persistResponse";
+import { throttle } from "./throttle";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
 export const getBergamotModelsForLanguagePair = async (
@@ -55,6 +56,53 @@ export const getBergamotModelsForLanguagePair = async (
     );
   }
 
+  // Summarize periodical updates on total language pair download progress
+  const bytesTransferredByType = {
+    lex: 0,
+    model: 0,
+    vocab: 0,
+  };
+  const filesToTransferByType = {
+    lex: false,
+    model: false,
+    vocab: false,
+  };
+  const sumLanguagePairFileToTransferSize = attribute => {
+    return ["lex", "model", "vocab"]
+      .map(type =>
+        filesToTransferByType[type] ? modelRegistryEntry[type][attribute] : 0,
+      )
+      .reduce((a, b) => a + b, 0);
+  };
+  const broadcastDownloadProgressUpdate = () => {
+    const languagePairBytesTransferred =
+      bytesTransferredByType.lex +
+      bytesTransferredByType.model +
+      bytesTransferredByType.vocab;
+    const languagePairBytesToTransfer = sumLanguagePairFileToTransferSize(
+      "size",
+    );
+    const languagePairEstimatedCompressedBytesToTransfer = sumLanguagePairFileToTransferSize(
+      "estimatedCompressedSize",
+    );
+    const percentTransferred =
+      languagePairBytesToTransfer > 0
+        ? languagePairBytesTransferred / languagePairBytesToTransfer
+        : 1.0;
+    console.debug(
+      `${languagePair}: onDownloadProgressUpdate - ${Math.round(
+        percentTransferred * 100,
+      )}% out of ${mb(languagePairEstimatedCompressedBytesToTransfer)} mb (${mb(
+        languagePairBytesToTransfer,
+      )} mb uncompressed) transferred`,
+    );
+  };
+  const throttledBroadcastDownloadProgressUpdate = throttle(
+    broadcastDownloadProgressUpdate,
+    100,
+  );
+
+  // Download or restore model files from persistent cache
   const blobs = await Promise.all(
     modelFiles.map(async ({ type, url, name, size, expectedSha256Hash }) => {
       let response = await cache.match(url);
@@ -62,6 +110,7 @@ export const getBergamotModelsForLanguagePair = async (
       if (!response || response.status >= 400) {
         log(`Downloading model file ${name} from ${url}`);
         downloaded = true;
+        filesToTransferByType[type] = true;
 
         try {
           const downloadResponsePromise = fetch(url);
@@ -70,8 +119,10 @@ export const getBergamotModelsForLanguagePair = async (
           const downloadResponseRaw = await downloadResponsePromise;
 
           // Hook up progress callbacks to track actual download of the model files
-          const onProgress = (_bytesTransferred: number) => {
-            // console.debug("onProgress", {bytesTransferred})
+          const onProgress = (bytesTransferred: number) => {
+            // console.debug(`${name}: onProgress - ${mb(bytesTransferred)} mb out of ${mb(size)} mb transferred`);
+            bytesTransferredByType[type] = bytesTransferred;
+            throttledBroadcastDownloadProgressUpdate();
           };
           response = instrumentResponseWithProgressCallback(
             downloadResponseRaw,
