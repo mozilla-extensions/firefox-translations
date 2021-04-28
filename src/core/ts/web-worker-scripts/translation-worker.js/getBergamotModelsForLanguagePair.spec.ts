@@ -183,7 +183,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     ).to.be.rejectedWith(Error);
   });
 
-  it("a non-existent language pair", async function() {
+  it("a language pair that is missing on the remote server", async function() {
     const languagePair = "xyz";
 
     const cache = await caches.open(

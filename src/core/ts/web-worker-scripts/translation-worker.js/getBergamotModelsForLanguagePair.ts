@@ -19,15 +19,13 @@ export const getBergamotModelsForLanguagePair = async (
     throw new Error(`Language pair '${languagePair}' not supported`);
   }
 
-  const modelFiles = Object.keys(modelRegistry[languagePair]).map(
-    (type: string) => {
-      const { name, size, expectedSha256Hash } = modelRegistry[languagePair][
-        type
-      ];
-      const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
-      return { type, url, name, size, expectedSha256Hash };
-    },
-  );
+  const modelRegistryEntry = modelRegistry[languagePair];
+
+  const modelFiles = Object.keys(modelRegistryEntry).map((type: string) => {
+    const { name, size, expectedSha256Hash } = modelRegistryEntry[type];
+    const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
+    return { type, url, name, size, expectedSha256Hash };
+  });
 
   const downloadStart = performance.now();
 
@@ -128,7 +126,7 @@ export const getBergamotModelsForLanguagePair = async (
     }),
   );
 
-  // Measure the time it takes to acquire model files
+  // Measure the time it took to acquire model files
   const downloadEnd = performance.now();
   const downloadDuration = downloadEnd - downloadStart;
   const totalBytes = blobs
