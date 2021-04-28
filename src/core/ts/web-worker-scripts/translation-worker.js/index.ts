@@ -83,14 +83,17 @@ addOnPreMain(function() {
 
     const loadModelStart = performance.now();
 
+    // Vocab files are re-used in both translation directions
+    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
+
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
     const modelConfig = `models:
   - /${languagePair}/model.${languagePair}.intgemm.alphas.bin
 vocabs:
-  - /${languagePair}/vocab.${languagePair}.spm
-  - /${languagePair}/vocab.${languagePair}.spm
+  - /${languagePair}/vocab.${vocabLanguagePair}.spm
+  - /${languagePair}/vocab.${vocabLanguagePair}.spm
 beam-size: 1
 normalize: 1.0
 word-penalty: 0
