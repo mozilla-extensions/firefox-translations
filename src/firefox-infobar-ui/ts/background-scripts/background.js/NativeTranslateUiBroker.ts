@@ -225,8 +225,11 @@ export class NativeTranslateUiBroker {
     await when(() => {
       const { tabTranslationStates } = this.extensionState;
       const currentTabTranslationState = tabTranslationStates.get(tabId);
-      return [TranslationStatus.TRANSLATED, TranslationStatus.ERROR].includes(
-        currentTabTranslationState.translationStatus,
+      return (
+        currentTabTranslationState &&
+        [TranslationStatus.TRANSLATED, TranslationStatus.ERROR].includes(
+          currentTabTranslationState.translationStatus,
+        )
       );
     });
     // End timing

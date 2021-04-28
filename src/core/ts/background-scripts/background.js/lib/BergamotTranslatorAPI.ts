@@ -179,8 +179,12 @@ class WorkerManager {
 
   get workerReady() {
     if (!this._workerReadyPromise) {
-      this._workerReadyPromise = new Promise(resolve => {
+      this._workerReadyPromise = new Promise((resolve, reject) => {
         const worker = new Worker(WORKER_URL);
+        worker.onerror = err => {
+          console.warn("Worker onerror callback fired", err);
+          reject(err);
+        };
         worker.onmessage = (msg: { data: "ready" | IncomingWorkerMessage }) => {
           // console.debug("Incoming message from worker", { msg });
           if (msg.data === "ready") {
