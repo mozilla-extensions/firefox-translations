@@ -9,6 +9,7 @@ import {
   modelLoadTime,
   translationTime,
   wordsPerSecond,
+  modelDownloadTime,
 } from "./generated/performance";
 import { fromLang, toLang } from "./generated/metadata";
 import {
@@ -140,6 +141,7 @@ export class Telemetry {
     modelLoadWallTimeMs: number,
     translationWallTimeMs: number,
     $wordsPerSecond: number,
+    $modelDownloadTime: number,
   ) {
     this.submit(() => {
       fromLang.set(from);
@@ -147,6 +149,7 @@ export class Telemetry {
       modelLoadTime.set(String(modelLoadWallTimeMs));
       translationTime.set(String(translationWallTimeMs));
       wordsPerSecond.set(String(Math.round($wordsPerSecond)));
+      modelDownloadTime.set(String(Math.round($modelDownloadTime)));
     });
   }
 

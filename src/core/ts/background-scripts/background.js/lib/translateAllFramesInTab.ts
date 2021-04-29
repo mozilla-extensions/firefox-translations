@@ -40,6 +40,7 @@ export const translateAllFramesInTab = async (
     totalTranslationWallTimeMs,
     wordCount,
     translationStatus,
+    modelDownloadProgress,
   } = currentTabTranslationState;
 
   if (translationStatus === TranslationStatus.TRANSLATED) {
@@ -49,10 +50,12 @@ export const translateAllFramesInTab = async (
     const translationEngineWordsPerSecond = Math.round(
       wordCount / (totalTranslationWallTimeMs / 1000),
     );
+    const modelDownloadTimeMs = modelDownloadProgress.durationMs || 0;
     console.info(
       `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
         1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
-        1000} seconds.`,
+        1000} seconds, of which ${modelDownloadTimeMs /
+        1000} seconds was spent downloading model files.`,
     );
     telemetry.onTranslationFinished(
       from,
@@ -60,6 +63,7 @@ export const translateAllFramesInTab = async (
       totalModelLoadWallTimeMs,
       totalTranslationWallTimeMs,
       translationEngineWordsPerSecond,
+      modelDownloadTimeMs,
     );
   } else {
     // TODO: Record error telemetry
