@@ -574,8 +574,17 @@ export const BergamotTranslatorAPI = {
         return;
       }
       const languagePair = `${from}${to}`;
+      const { modelDownloadProgress } = e.detail;
       console.info(
-        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} will load`,
+        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} download progress: `,
+        `${languagePair}: onDownloadProgressUpdate - ${Math.round(
+          (modelDownloadProgress.bytesDownloaded /
+            modelDownloadProgress.bytesToDownload) *
+            100,
+        )}% out of ${Math.round(
+          (modelDownloadProgress.bytesToDownload / 1024 / 1024) * 10,
+        ) / 10} mb downloaded`,
+        { modelDownloadProgress },
       );
       onModelDownloadProgress(e.detail);
     };

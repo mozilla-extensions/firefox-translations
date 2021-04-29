@@ -202,21 +202,26 @@ export const getBergamotModelsForLanguagePair = async (
     .filter(({ downloaded }) => downloaded)
     .map(({ data }) => data.size)
     .reduce((a, b) => a + b, 0);
-  const finalModelDownloadProgress: ModelDownloadProgress = {
-    bytesDownloaded: totalBytesDownloaded,
-    bytesToDownload: totalBytesDownloaded,
-    startTs: downloadStart,
-    durationMs: downloadDurationMs,
-    endTs: downloadEnd,
-  };
-  onModelDownloadProgress(finalModelDownloadProgress);
+  if (totalBytesDownloaded > 0) {
+    const languagePairEstimatedCompressedBytesToTransfer = sumLanguagePairFileToTransferSize(
+      "estimatedCompressedSize",
+    );
+    const finalModelDownloadProgress: ModelDownloadProgress = {
+      bytesDownloaded: languagePairEstimatedCompressedBytesToTransfer,
+      bytesToDownload: languagePairEstimatedCompressedBytesToTransfer,
+      startTs: downloadStart,
+      durationMs: downloadDurationMs,
+      endTs: downloadEnd,
+    };
+    onModelDownloadProgress(finalModelDownloadProgress);
+  }
   log(
     `All model files for ${languagePair} downloaded / restored from persistent cache in ${downloadDurationMs /
       1000} seconds (total uncompressed size of model files: ${mb(
       totalBytes,
     )} mb, of which ${Math.round(
       (totalBytesDownloaded / totalBytes) * 100,
-    )} % was downloaded)`,
+    )}% was downloaded)`,
   );
 
   return blobs;
