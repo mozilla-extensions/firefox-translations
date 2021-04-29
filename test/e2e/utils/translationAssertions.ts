@@ -96,7 +96,7 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     expectedToLang,
     "The telemetry payload's string metrics 'metadata.to_lang' is correct",
   );
-  // Check telemetry for: Translated words per second, Model load time, Translation time
+  // Check telemetry for: Translated words per second, Model load time, Translation time, Model download time
   assert(
     parseInt(
       telemetryPayload.metrics.string["performance.model_load_time"],
@@ -117,5 +117,12 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
       10,
     ) > 0,
     "The telemetry payload's string metrics 'performance.words_per_second' is a string that when parsed evaluates to more than 0",
+  );
+  assert(
+    parseInt(
+      telemetryPayload.metrics.string["performance.model_download_time"],
+      10,
+    ) >= 0,
+    "The telemetry payload's string metrics 'performance.model_download_time' is a string that when parsed evaluates to 0 or greater",
   );
 };
