@@ -14,7 +14,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 } else {
   options.plugins.push(
     require("@fullhuman/postcss-purgecss")({
-      content: ["./ts/**/*.tsx"],
+      content: ["./src/cross-browser-ui/ts/**/*.tsx"],
       defaultExtractor: content => content.match(/[\w-/:.]+(?<!:)/g) || [],
     }),
   );
