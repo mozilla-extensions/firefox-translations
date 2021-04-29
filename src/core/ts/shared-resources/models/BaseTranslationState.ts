@@ -26,7 +26,7 @@ export enum TranslationStatus {
 
 @model("bergamotTranslate/BaseTranslationState")
 export class BaseTranslationState extends Model({
-  documentIsVisible: prop<boolean>({ setterAction: true }),
+  isVisible: prop<boolean>({ setterAction: true }),
   displayQualityEstimation: prop<boolean>({ setterAction: true }),
   translationRequested: prop<boolean>({ setterAction: true }),
   cancellationRequested: prop<boolean>({ setterAction: true }),
@@ -40,6 +40,17 @@ export class BaseTranslationState extends Model({
   }),
   tabId: prop<number>(),
   wordCount: prop<number>(),
+  wordCountVisible: prop<number>(),
+  wordCountVisibleInViewport: prop<number>(),
+  translationInitiationTimestamp: prop<number>(),
+  totalModelLoadWallTimeMs: prop<number>(),
+  totalTranslationWallTimeMs: prop<number>(),
+  totalTranslationEngineRequestCount: prop<number>(),
+  queuedTranslationEngineRequestCount: prop<number>(),
+  modelLoadNecessary: prop<boolean>(),
+  modelLoading: prop<boolean>(),
+  modelLoaded: prop<boolean>(),
+  translationFinished: prop<boolean>(),
 }) {
   @computed
   get effectiveTranslateFrom() {

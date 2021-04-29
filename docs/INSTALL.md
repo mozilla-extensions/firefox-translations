@@ -8,13 +8,6 @@
     - [Preparations](#preparations)
     - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension)
     - [Demo](#demo)
-<!--
-  - [Chrome - Cross-browser UI](#chrome---cross-browser-ui)
-  - [Firefox - Cross-browser UI](#firefox---cross-browser-ui)
-    - [Preparations](#preparations-1)
-    - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension-1)
-    - [Demo](#demo-1)
--->
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -47,6 +40,8 @@ Screen recording: https://youtu.be/WPLCH84J0is
   - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to install pre-release versions of the extension)
   - `browser.proton.enabled` (This enables the preview of the updated Firefox appearance)
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
+- Make sure that the following preferences are set to `false` in `about:config`:
+  - `xpinstall.signatures.required` (This enables the use of ordinary extensions in the same profile)
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-infobar-ui.dev-root-signed.xpi) to start the download and installation of the extension
 - Wait for the extension to be downloaded
 - Click `Add` in the popup that comes up

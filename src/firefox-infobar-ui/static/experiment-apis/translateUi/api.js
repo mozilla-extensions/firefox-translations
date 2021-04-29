@@ -146,16 +146,17 @@ this.translateUi = class extends ExtensionAPI {
           },
 
           /* Event boilerplate with listeners that forwards all but the first argument to the web extension event */
+          onInfoBarDisplayed: eventManagerFactory("onInfoBarDisplayed").api(),
           onSelectTranslateTo: eventManagerFactory("onSelectTranslateTo").api(),
           onSelectTranslateFrom: eventManagerFactory(
             "onSelectTranslateFrom",
           ).api(),
           onInfoBarClosed: eventManagerFactory("onInfoBarClosed").api(),
+          onNeverTranslateSelectedLanguage: eventManagerFactory(
+            "onNeverTranslateSelectedLanguage",
+          ).api(),
           onNeverTranslateThisSite: eventManagerFactory(
             "onNeverTranslateThisSite",
-          ).api(),
-          onNotNowButtonPressed: eventManagerFactory(
-            "onNotNowButtonPressed",
           ).api(),
           onShowOriginalButtonPressed: eventManagerFactory(
             "onShowOriginalButtonPressed",
@@ -165,6 +166,9 @@ this.translateUi = class extends ExtensionAPI {
           ).api(),
           onTranslateButtonPressed: eventManagerFactory(
             "onTranslateButtonPressed",
+          ).api(),
+          onNotNowButtonPressed: eventManagerFactory(
+            "onNotNowButtonPressed",
           ).api(),
         },
       },

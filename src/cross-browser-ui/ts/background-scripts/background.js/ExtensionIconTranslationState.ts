@@ -4,7 +4,7 @@
 
 import { browser } from "webextension-polyfill-ts";
 import { DynamicActionIcon } from "./DynamicActionIcon";
-import { ModelInstanceData, onSnapshot } from "mobx-keystone";
+import { onSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
 import { DocumentTranslationState } from "../../../../core/ts/shared-resources/models/DocumentTranslationState";
@@ -27,13 +27,15 @@ export class ExtensionIconTranslationState {
       async (documentTranslationStates, _previousDocumentTranslationStates) => {
         // console.log("documentTranslationStates snapshot HAS CHANGED", {documentTranslationStates});
 
+        // To make things a bit simpler, we let the ui reflect only the translation state of the top frame in each tab
+        // and assume that child frames (if present) are in a similar state
+        // TODO: Update to use TabTranslationState like firefox-infobar-ui does
         const tabTopFrameStates = Object.keys(documentTranslationStates)
           .map(
             (tabAndFrameId: string) => documentTranslationStates[tabAndFrameId],
           )
           .filter(
-            (dts: ModelInstanceData<DocumentTranslationState>) =>
-              dts.frameId === 0,
+            (dts: SnapshotOutOf<DocumentTranslationState>) => dts.frameId === 0,
           );
 
         for (const dts of tabTopFrameStates) {

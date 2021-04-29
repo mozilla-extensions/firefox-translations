@@ -4,6 +4,7 @@
 
 import { browser as crossBrowser } from "webextension-polyfill-ts";
 import { config } from "../config";
+import { DetectedLanguageResults } from "../background-scripts/background.js/lib/LanguageDetector";
 
 export class LanguageSupport {
   getAcceptedTargetLanguages = async (): Promise<string[]> => {
@@ -60,11 +61,13 @@ export class LanguageSupport {
     return null;
   };
 
-  summarizeLanguageSupport = async detectedLanguage => {
+  summarizeLanguageSupport = async (
+    detectedLanguageResults: DetectedLanguageResults,
+  ) => {
     const acceptedTargetLanguages = await this.getAcceptedTargetLanguages();
     const defaultSourceLanguage = this.getDefaultSourceLanguage(
       null,
-      detectedLanguage,
+      detectedLanguageResults?.language,
     );
     const defaultTargetLanguage = this.getDefaultTargetLanguage(
       defaultSourceLanguage,
