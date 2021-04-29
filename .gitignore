@@ -15,4 +15,5 @@ src/core/static/wasm/bergamot-translator-worker.js
 src/core/static/wasm/bergamot-translator-worker.wasm
 firefox-nightly-linux
 downloaded-bergamot-translator-wasm-artifacts
-test/fixtures/models/
+test/fixtures/models/*
+!test/fixtures/models/dummy

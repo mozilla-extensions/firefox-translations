@@ -13,9 +13,34 @@ import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguage
 import { caches } from "cache-polyfill";
 import { config, modelRegistry } from "../../config";
 import { nanoid } from "nanoid";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 const log = console.info;
 const testSuiteExecutionUuid = nanoid();
+
+const dummyModelRegistryEntry = {
+  lex: {
+    name: "1.txt",
+    size: 120,
+    estimatedCompressedSize: 35,
+    expectedSha256Hash:
+      "3691becc4609d21e032657c902df09d8501132357d74b1a4cad408ada0add13d",
+  },
+  model: {
+    name: "2.txt",
+    size: 120,
+    estimatedCompressedSize: 35,
+    expectedSha256Hash:
+      "3691becc4609d21e032657c902df09d8501132357d74b1a4cad408ada0add13d",
+  },
+  vocab: {
+    name: "3.txt",
+    size: 120,
+    estimatedCompressedSize: 35,
+    expectedSha256Hash:
+      "3691becc4609d21e032657c902df09d8501132357d74b1a4cad408ada0add13d",
+  },
+};
 
 describe("getBergamotModelsForLanguagePair", function() {
   it("esen", async function() {
@@ -24,16 +49,24 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
+    let latestModelDownloadProgressSeen: ModelDownloadProgress;
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
       cache,
       log,
-      _modelDownloadProgress => {},
+      modelDownloadProgress => {
+        latestModelDownloadProgressSeen = modelDownloadProgress;
+      },
     );
 
     assert.equal(blobs.length, 3);
+    assert.equal(
+      latestModelDownloadProgressSeen.bytesDownloaded,
+      latestModelDownloadProgressSeen.bytesToDownload,
+    );
+    assert.isAtLeast(latestModelDownloadProgressSeen.bytesDownloaded, 1);
   });
 
   it("esen again", async function() {
@@ -42,16 +75,20 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
+    let latestModelDownloadProgressSeen: ModelDownloadProgress;
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
       cache,
       log,
-      _modelDownloadProgress => {},
+      modelDownloadProgress => {
+        latestModelDownloadProgressSeen = modelDownloadProgress;
+      },
     );
 
     assert.equal(blobs.length, 3);
+    assert.equal(latestModelDownloadProgressSeen, undefined);
   });
 
   it("eten", async function() {
@@ -127,39 +164,47 @@ describe("getBergamotModelsForLanguagePair", function() {
   });
 
   it("download still works (albeit not persisted) when files to download exceeds available storage quota", async function() {
-    const languagePair = "enet";
+    const languagePair = "dummy";
 
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
+    let latestModelDownloadProgressSeen: ModelDownloadProgress;
     const blobs = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       {
-        enet: {
+        dummy: {
           lex: {
-            ...modelRegistry.enet.lex,
+            ...dummyModelRegistryEntry.lex,
             size: 1024 * 1024 * 1024 * 100, // 100gb
           },
           model: {
-            ...modelRegistry.enet.model,
+            ...dummyModelRegistryEntry.model,
             size: 1024 * 1024 * 1024 * 100, // 100gb
           },
           vocab: {
-            ...modelRegistry.enet.vocab,
+            ...dummyModelRegistryEntry.vocab,
             size: 1024 * 1024 * 1024 * 100, // 100gb
           },
         },
       },
       cache,
       log,
-      _modelDownloadProgress => {},
+      modelDownloadProgress => {
+        latestModelDownloadProgressSeen = modelDownloadProgress;
+      },
     );
     assert.equal(blobs.length, 3);
+    assert.equal(
+      latestModelDownloadProgressSeen.bytesDownloaded,
+      latestModelDownloadProgressSeen.bytesToDownload,
+    );
+    assert.isAtLeast(latestModelDownloadProgressSeen.bytesDownloaded, 1);
   });
 
   it("failing download integrity checks", async function() {
-    const languagePair = "enet";
+    const languagePair = "dummy";
 
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
@@ -169,17 +214,17 @@ describe("getBergamotModelsForLanguagePair", function() {
         languagePair,
         config.bergamotModelsBaseUrl,
         {
-          enet: {
+          dummy: {
             lex: {
-              ...modelRegistry.enet.lex,
+              ...dummyModelRegistryEntry.lex,
               expectedSha256Hash: "foo",
             },
             model: {
-              ...modelRegistry.enet.model,
+              ...dummyModelRegistryEntry.model,
               expectedSha256Hash: "foo",
             },
             vocab: {
-              ...modelRegistry.enet.vocab,
+              ...dummyModelRegistryEntry.vocab,
               expectedSha256Hash: "foo",
             },
           },

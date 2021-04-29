@@ -104,6 +104,7 @@ export const getBergamotModelsForLanguagePair = async (
       endTs: undefined,
     };
     onModelDownloadProgress(modelDownloadProgress);
+    /*
     console.debug(
       `${languagePair}: onDownloadProgressUpdate - ${Math.round(
         percentTransferred * 100,
@@ -111,6 +112,7 @@ export const getBergamotModelsForLanguagePair = async (
         languagePairBytesToTransfer,
       )} mb uncompressed) transferred`,
     );
+    */
   };
   const throttledBroadcastDownloadProgressUpdate = throttle(
     broadcastDownloadProgressUpdate,
