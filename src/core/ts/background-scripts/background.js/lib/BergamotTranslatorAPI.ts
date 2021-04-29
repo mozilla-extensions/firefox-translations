@@ -49,6 +49,19 @@ export interface LoadModelResultsWorkerMessage extends WorkerMessage {
   loadModelResults: LoadModelResults;
 }
 
+export interface ModelDownloadProgress {
+  bytesDownloaded: number;
+  bytesToDownload: number;
+  startTs: number;
+  durationMs: number;
+  endTs: number;
+}
+
+export interface ModelDownloadProgressWorkerMessage extends WorkerMessage {
+  type: "modelDownloadProgress";
+  modelDownloadProgress: ModelDownloadProgress;
+}
+
 export interface TranslateParams {
   texts: string[];
   loadModelParams: LoadModelParams;
@@ -70,6 +83,7 @@ export interface TranslationResults {
 interface PendingRequest<T> {
   resolve: (T) => void;
   reject: (T) => void;
+  onModelDownloadProgress?: (T) => void;
 }
 /* eslint-enable no-unused-vars, no-shadow */
 
@@ -92,6 +106,7 @@ export interface ErrorWorkerMessage extends WorkerMessage {
 
 type IncomingWorkerMessage =
   | LoadModelResultsWorkerMessage
+  | ModelDownloadProgressWorkerMessage
   | TranslationResultsWorkerMessage
   | LogWorkerMessage
   | ErrorWorkerMessage;
@@ -109,12 +124,19 @@ class WorkerManager {
 
   async loadModel(
     loadModelRequestWorkerMessage: LoadModelRequestWorkerMessage,
+    onModelDownloadProgress: (
+      modelDownloadProgress: ModelDownloadProgress,
+    ) => void,
   ): Promise<LoadModelResults> {
     const worker = await this.workerReady;
     const loadModelResults: LoadModelResults = await new Promise(
       (resolve, reject) => {
         const { requestId } = loadModelRequestWorkerMessage;
-        this.pendingRequests.set(requestId, { resolve, reject });
+        this.pendingRequests.set(requestId, {
+          resolve,
+          reject,
+          onModelDownloadProgress,
+        });
         worker.postMessage(loadModelRequestWorkerMessage);
       },
     );
@@ -167,6 +189,18 @@ class WorkerManager {
     this.pendingRequests.get(requestId).resolve(translationResults);
   }
 
+  onModelDownloadProgress(
+    modelDownloadProgressWorkerMessage: ModelDownloadProgressWorkerMessage,
+  ) {
+    const {
+      requestId,
+      modelDownloadProgress,
+    } = modelDownloadProgressWorkerMessage;
+    this.pendingRequests
+      .get(requestId)
+      .onModelDownloadProgress(modelDownloadProgress);
+  }
+
   onError(errorWorkerMessage: ErrorWorkerMessage) {
     const { requestId, message } = errorWorkerMessage;
     this.pendingRequests
@@ -193,6 +227,8 @@ class WorkerManager {
             this.onLoadModelResults(msg.data);
           } else if (msg.data.type === "translationResults") {
             this.onTranslateWorkerResult(msg.data);
+          } else if (msg.data.type === "modelDownloadProgress") {
+            this.onModelDownloadProgress(msg.data);
           } else if (msg.data.type === "log") {
             console.log(`Relayed log message from worker: ${msg.data.message}`);
           } else if (msg.data.type === "error") {
@@ -295,6 +331,11 @@ export interface ModelWillLoadEventData {
   loadModelParams: LoadModelParams;
 }
 
+export interface ModelDownloadProgressEventData {
+  requestId: string;
+  modelDownloadProgress: ModelDownloadProgress;
+}
+
 export interface TranslationFinishedEventData {
   requestId: string;
   translationWallTimeMs: number;
@@ -360,6 +401,17 @@ class TranslationRequestDispatcher extends EventTarget {
         };
         const loadModelResults = await workerManager.loadModel(
           loadModelRequestWorkerMessage,
+          (modelDownloadProgress: ModelDownloadProgress) => {
+            const modelDownloadProgressEventData: ModelDownloadProgressEventData = {
+              requestId,
+              modelDownloadProgress,
+            };
+            this.dispatchEvent(
+              new CustomEvent("modelDownloadProgress", {
+                detail: modelDownloadProgressEventData,
+              }),
+            );
+          },
         );
         this.loadedLanguagePair = languagePair;
         const modelLoadedEventData: ModelLoadedEventData = {
@@ -465,6 +517,9 @@ export const BergamotTranslatorAPI = {
       translationRequestQueuedEventData: TranslationRequestQueuedEventData,
     ) => void,
     onModelWillLoad: (modelWillLoadEventData: ModelWillLoadEventData) => void,
+    onModelDownloadProgress: (
+      modelDownloadProgress: ModelDownloadProgressEventData,
+    ) => void,
     onModelLoaded: (modelLoadedEventData: ModelLoadedEventData) => void,
     onTranslationFinished: (
       translationFinishedEventData: TranslationFinishedEventData,
@@ -510,6 +565,19 @@ export const BergamotTranslatorAPI = {
         `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} will load`,
       );
       onModelWillLoad(e.detail);
+    };
+    const modelDownloadProgressListener = (
+      e: CustomEvent & { detail: ModelDownloadProgressEventData },
+    ) => {
+      // console.debug('Listener received "modelDownloadProgress".', e.detail);
+      if (e.detail.requestId !== requestId) {
+        return;
+      }
+      const languagePair = `${from}${to}`;
+      console.info(
+        `BergamotTranslatorAPI[${requestId}]: Model ${languagePair} will load`,
+      );
+      onModelDownloadProgress(e.detail);
     };
     const modelLoadedListener = (
       e: CustomEvent & { detail: ModelLoadedEventData },
@@ -569,6 +637,10 @@ export const BergamotTranslatorAPI = {
         modelWillLoadListener,
       );
       translationRequestDispatcher.addEventListener(
+        "modelDownloadProgress",
+        modelDownloadProgressListener,
+      );
+      translationRequestDispatcher.addEventListener(
         "modelLoaded",
         modelLoadedListener,
       );
@@ -594,6 +666,10 @@ export const BergamotTranslatorAPI = {
       translationRequestDispatcher.removeEventListener(
         "modelWillLoad",
         modelWillLoadListener,
+      );
+      translationRequestDispatcher.removeEventListener(
+        "modelDownloadProgress",
+        modelDownloadProgressListener,
       );
       translationRequestDispatcher.removeEventListener(
         "modelLoaded",

@@ -30,6 +30,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -47,6 +48,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -64,6 +66,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -81,6 +84,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -98,6 +102,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -115,6 +120,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       modelRegistry,
       cache,
       log,
+      _modelDownloadProgress => {},
     );
 
     assert.equal(blobs.length, 3);
@@ -147,6 +153,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       },
       cache,
       log,
+      _modelDownloadProgress => {},
     );
     assert.equal(blobs.length, 3);
   });
@@ -179,6 +186,7 @@ describe("getBergamotModelsForLanguagePair", function() {
         },
         cache,
         log,
+        _modelDownloadProgress => {},
       ),
     ).to.be.rejectedWith(Error);
   });
@@ -218,6 +226,7 @@ describe("getBergamotModelsForLanguagePair", function() {
         },
         cache,
         log,
+        _modelDownloadProgress => {},
       ),
     ).to.be.rejectedWith(Error);
   });

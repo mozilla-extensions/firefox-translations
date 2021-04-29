@@ -9,9 +9,10 @@ import { TranslationStatus } from "../../../../core/ts/shared-resources/models/B
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
 import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
-import { getSnapshot } from "mobx-keystone";
+import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { reaction, when } from "mobx";
 import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
+import { ModelDownloadProgress } from "../../../../core/ts/background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -48,6 +49,8 @@ interface NativeTranslateUiState {
   translationDurationMs: number;
   modelLoading: boolean;
   queuedTranslationEngineRequestCount: number;
+  modelDownloading: boolean;
+  modelDownloadProgress: ModelDownloadProgress;
 }
 
 type StandardInfobarInteractionEvent = Event<
@@ -127,13 +130,13 @@ export class NativeTranslateUiBroker {
 
     // Boils down extension state to the subset relevant for the native translate ui
     const nativeTranslateUiStateFromTabTranslationState = async (
-      tts: TabTranslationState,
+      tts: SnapshotOutOf<TabTranslationState>,
     ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         tts.translationStatus,
       );
 
-      const detectedLanguageResults = getSnapshot(tts.detectedLanguageResults);
+      const detectedLanguageResults = tts.detectedLanguageResults;
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -163,6 +166,8 @@ export class NativeTranslateUiBroker {
         modelLoading: tts.modelLoading,
         queuedTranslationEngineRequestCount:
           tts.queuedTranslationEngineRequestCount,
+        modelDownloading: tts.modelDownloading,
+        modelDownloadProgress: tts.modelDownloadProgress,
       };
     };
     const nativeTranslateUiStateInfobarStateFromTranslationStatus = (
@@ -203,7 +208,7 @@ export class NativeTranslateUiBroker {
         tabTranslationStates.forEach(
           async (tts: TabTranslationState, tabId) => {
             const uiState = await nativeTranslateUiStateFromTabTranslationState(
-              tts,
+              getSnapshot(tts),
             );
             browserWithExperimentAPIs.experiments.translateUi.setUiState(
               tabId,

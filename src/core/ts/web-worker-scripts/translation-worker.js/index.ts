@@ -13,6 +13,8 @@ import {
   ErrorWorkerMessage,
   LoadModelRequestWorkerMessage,
   LoadModelResultsWorkerMessage,
+  ModelDownloadProgress,
+  ModelDownloadProgressWorkerMessage,
   TranslateRequestWorkerMessage,
   TranslationResultsWorkerMessage,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
@@ -43,6 +45,9 @@ addOnPreMain(function() {
     from: string,
     to: string,
     bergamotModelsBaseUrl: string,
+    onModelDownloadProgress: (
+      modelDownloadProgress: ModelDownloadProgress,
+    ) => void,
   ) => {
     log(`downloadModel(${from}, ${to}, ${bergamotModelsBaseUrl})`);
 
@@ -55,6 +60,7 @@ addOnPreMain(function() {
       modelRegistry,
       cache,
       log,
+      onModelDownloadProgress,
     );
 
     // Mount the downloaded files in emscripten's worker file system
@@ -67,6 +73,9 @@ addOnPreMain(function() {
     from: string,
     to: string,
     bergamotModelsBaseUrl: string,
+    onModelDownloadProgress: (
+      modelDownloadProgress: ModelDownloadProgress,
+    ) => void,
   ) => {
     log(`loadModel(${from}, ${to})`);
 
@@ -81,7 +90,12 @@ addOnPreMain(function() {
     const modelDir = `/${languagePair}`;
     const { exists } = FS.analyzePath(modelDir, undefined);
     if (!exists) {
-      await downloadModel(from, to, bergamotModelsBaseUrl);
+      await downloadModel(
+        from,
+        to,
+        bergamotModelsBaseUrl,
+        onModelDownloadProgress,
+      );
     }
 
     const loadModelStart = performance.now();
@@ -207,6 +221,14 @@ shortlist:
           data.loadModelParams.from,
           data.loadModelParams.to,
           data.loadModelParams.bergamotModelsBaseUrl,
+          (modelDownloadProgress: ModelDownloadProgress) => {
+            const message: ModelDownloadProgressWorkerMessage = {
+              type: "modelDownloadProgress",
+              requestId,
+              modelDownloadProgress,
+            };
+            postMessage(message);
+          },
         )
           .then(loadModelResults => {
             const message: LoadModelResultsWorkerMessage = {

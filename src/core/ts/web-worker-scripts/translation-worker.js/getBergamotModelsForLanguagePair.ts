@@ -7,6 +7,7 @@ import { ModelRegistry } from "../../config";
 import { instrumentResponseWithProgressCallback } from "./instrumentResponseWithProgressCallback";
 import { persistResponse } from "./persistResponse";
 import { throttle } from "./throttle";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
 export const getBergamotModelsForLanguagePair = async (
@@ -15,6 +16,9 @@ export const getBergamotModelsForLanguagePair = async (
   modelRegistry: ModelRegistry,
   cache: Cache,
   log: (message: string) => void,
+  onModelDownloadProgress: (
+    modelDownloadProgress: ModelDownloadProgress,
+  ) => void,
 ): Promise<{ name: string; data: Blob }[]> => {
   if (!modelRegistry[languagePair]) {
     throw new Error(`Language pair '${languagePair}' not supported`);
@@ -28,7 +32,7 @@ export const getBergamotModelsForLanguagePair = async (
     return { type, url, name, size, expectedSha256Hash };
   });
 
-  const downloadStart = performance.now();
+  const downloadStart = Date.now();
 
   // Check remaining storage quota
   const quota = await navigator.storage.estimate();
@@ -89,6 +93,17 @@ export const getBergamotModelsForLanguagePair = async (
       languagePairBytesToTransfer > 0
         ? languagePairBytesTransferred / languagePairBytesToTransfer
         : 1.0;
+    const downloadDurationMs = Date.now() - downloadStart;
+    const modelDownloadProgress: ModelDownloadProgress = {
+      bytesDownloaded: Math.round(
+        percentTransferred * languagePairEstimatedCompressedBytesToTransfer,
+      ),
+      bytesToDownload: languagePairEstimatedCompressedBytesToTransfer,
+      startTs: downloadStart,
+      durationMs: downloadDurationMs,
+      endTs: undefined,
+    };
+    onModelDownloadProgress(modelDownloadProgress);
     console.debug(
       `${languagePair}: onDownloadProgressUpdate - ${Math.round(
         percentTransferred * 100,
@@ -178,8 +193,8 @@ export const getBergamotModelsForLanguagePair = async (
   );
 
   // Measure the time it took to acquire model files
-  const downloadEnd = performance.now();
-  const downloadDuration = downloadEnd - downloadStart;
+  const downloadEnd = Date.now();
+  const downloadDurationMs = downloadEnd - downloadStart;
   const totalBytes = blobs
     .map(({ data }) => data.size)
     .reduce((a, b) => a + b, 0);
@@ -187,11 +202,21 @@ export const getBergamotModelsForLanguagePair = async (
     .filter(({ downloaded }) => downloaded)
     .map(({ data }) => data.size)
     .reduce((a, b) => a + b, 0);
+  const finalModelDownloadProgress: ModelDownloadProgress = {
+    bytesDownloaded: totalBytesDownloaded,
+    bytesToDownload: totalBytesDownloaded,
+    startTs: downloadStart,
+    durationMs: downloadDurationMs,
+    endTs: downloadEnd,
+  };
+  onModelDownloadProgress(finalModelDownloadProgress);
   log(
-    `All model files for ${languagePair} downloaded / restored from persistent cache in ${downloadDuration /
+    `All model files for ${languagePair} downloaded / restored from persistent cache in ${downloadDurationMs /
       1000} seconds (total uncompressed size of model files: ${mb(
       totalBytes,
-    )} mb, of which ${mb(totalBytesDownloaded)} mb was downloaded)`,
+    )} mb, of which ${Math.round(
+      (totalBytesDownloaded / totalBytes) * 100,
+    )} % was downloaded)`,
   );
 
   return blobs;
