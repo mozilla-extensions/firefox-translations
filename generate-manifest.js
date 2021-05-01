@@ -20,7 +20,7 @@ async function generateManifest({ dotEnvPath }) {
   require("dotenv").config({ path: dotEnvPath });
   const manifest = {
     manifest_version: 2,
-    name: `Bergamot Translate${
+    name: `Firefox Translations${
       targetEnvironment !== "production" ? " (DEV)" : ""
     }`,
     description: "__MSG_extensionDescription__",
