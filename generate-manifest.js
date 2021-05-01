@@ -13,7 +13,7 @@ const {
 // Using native UI requires a special build and signing process, restricted to specific extension ids
 const extensionId =
   targetBrowser === "firefox" && ui === "firefox-infobar-ui"
-    ? "bergamot-browser-extension@mozilla.org"
+    ? "firefox-translations@mozilla.org"
     : "bergamot-browser-extension@browser.mt";
 
 async function generateManifest({ dotEnvPath }) {
