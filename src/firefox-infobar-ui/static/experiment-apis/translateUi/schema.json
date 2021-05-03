@@ -36,6 +36,12 @@
     ],
     "events": [
       {
+        "name": "onInfoBarDisplayed",
+        "type": "function",
+        "description": "Foo",
+        "parameters": []
+      },
+      {
         "name": "onSelectTranslateTo",
         "type": "function",
         "description": "Foo",
@@ -49,6 +55,12 @@
       },
       {
         "name": "onInfoBarClosed",
+        "type": "function",
+        "description": "Foo",
+        "parameters": []
+      },
+      {
+        "name": "onNeverTranslateSelectedLanguage",
         "type": "function",
         "description": "Foo",
         "parameters": []
@@ -73,6 +85,12 @@
       },
       {
         "name": "onTranslateButtonPressed",
+        "type": "function",
+        "description": "Foo",
+        "parameters": []
+      },
+      {
+        "name": "onNotNowButtonPressed",
         "type": "function",
         "description": "Foo",
         "parameters": []

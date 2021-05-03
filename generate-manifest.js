@@ -57,7 +57,7 @@ async function generateManifest({ dotEnvPath }) {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
   }
   if (ui === "firefox-infobar-ui") {
-    manifest.hidden = true;
+    manifest.hidden = false; // TODO: Set to true for Normandy-deployed builds
     manifest.experiment_apis = {
       translateUi: {
         schema: "./experiment-apis/translateUi/schema.json",

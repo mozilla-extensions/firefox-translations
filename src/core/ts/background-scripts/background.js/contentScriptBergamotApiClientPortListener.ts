@@ -8,11 +8,19 @@ import { Runtime } from "webextension-polyfill-ts";
 import Port = Runtime.Port;
 import { TranslationResults } from "./lib/BergamotTranslatorAPI";
 import { config } from "../../config";
+import { TranslationRequestProgress } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 
 // Currently it is possible build variants of the extension that uses the REST API - eg for performance testing / research
 const bergamotApiClient = config.useBergamotRestApi
   ? new BergamotRestApiClient()
   : new BergamotWasmApiClient();
+
+export interface TranslationRequestUpdate {
+  requestId: string;
+  results?: TranslationResults;
+  translationRequestProgress?: TranslationRequestProgress;
+  error?: string;
+}
 
 export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   if (port.name !== "port-from-content-script-bergamot-api-client") {
@@ -26,18 +34,28 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
   }) {
     // console.debug("Message from content-script-bergamot-api-client:", {m});
     const { texts, from, to, requestId } = m;
-    const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
-      texts,
-      from,
-      to,
-    );
-    // console.log({ results });
     try {
-      port.postMessage({
-        translationRequestResults: {
-          results,
-          requestId,
+      const results: TranslationResults = await bergamotApiClient.sendTranslationRequest(
+        texts,
+        from,
+        to,
+        (translationRequestProgress: TranslationRequestProgress) => {
+          const translationRequestUpdate: TranslationRequestUpdate = {
+            translationRequestProgress,
+            requestId,
+          };
+          port.postMessage({
+            translationRequestUpdate,
+          });
         },
+      );
+      // console.log({ results });
+      const translationRequestUpdate: TranslationRequestUpdate = {
+        results,
+        requestId,
+      };
+      port.postMessage({
+        translationRequestUpdate,
       });
     } catch (err) {
       if (err.message === "Attempt to postMessage on disconnected port") {
@@ -46,7 +64,17 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
           err,
         );
       } else {
-        throw err;
+        console.info(
+          `Caught exception/error in content script bergamot api client port listener:`,
+          err,
+        );
+        const translationRequestUpdate: TranslationRequestUpdate = {
+          error: err.message || err,
+          requestId,
+        };
+        port.postMessage({
+          translationRequestUpdate,
+        });
       }
     }
   });

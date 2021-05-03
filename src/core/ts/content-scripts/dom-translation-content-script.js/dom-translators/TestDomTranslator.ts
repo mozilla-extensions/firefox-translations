@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { MinimalDomTranslator } from "./MinimalDomTranslator";
+import { FrameTranslationProgressCallback } from "./BaseDomTranslator";
 
 export class TestDomTranslator extends MinimalDomTranslator {
   private texts = {
@@ -60,7 +61,9 @@ export class TestDomTranslator extends MinimalDomTranslator {
     this.normalizeWhitespace,
   );
 
-  async translate(): Promise<{
+  async translate(
+    _translationProgressCallback: FrameTranslationProgressCallback,
+  ): Promise<{
     characterCount: number;
   }> {
     // Gather translation texts to send for translation

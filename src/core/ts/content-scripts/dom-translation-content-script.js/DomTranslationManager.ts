@@ -11,6 +11,7 @@ import { TranslationStatus } from "../../shared-resources/models/BaseTranslation
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 import { detag } from "./dom-translators/detagAndProject";
+import { FrameTranslationProgress } from "./dom-translators/BaseDomTranslator";
 
 export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
@@ -123,7 +124,7 @@ export class DomTranslationManager {
       supportedSourceLanguages,
       supportedTargetLanguagesGivenDefaultSourceLanguage,
       allPossiblySupportedTargetLanguages,
-    } = await summarizeLanguageSupport(detectedLanguage);
+    } = await summarizeLanguageSupport(detectedLanguageResults);
 
     if (acceptedTargetLanguages.includes(detectedLanguage)) {
       // Detected language is the same as the user's accepted target languages.
@@ -199,6 +200,7 @@ export class DomTranslationManager {
       this.contentWindow.translationDocument ||
       new TranslationDocument(this.document);
 
+    console.info("Translating web page");
     this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
       TranslationStatus.TRANSLATING,
     );
@@ -219,7 +221,15 @@ export class DomTranslationManager {
         `About to translate web page document (${translationDocument.translationRoots.length} translation items)`,
         { from, to },
       );
-      await domTranslator.translate();
+
+      // TODO: Timeout here to be able to abort UI in case translation hangs
+      await domTranslator.translate(
+        (frameTranslationProgress: FrameTranslationProgress) => {
+          this.documentTranslationStateCommunicator.broadcastUpdatedFrameTranslationProgress(
+            frameTranslationProgress,
+          );
+        },
+      );
 
       console.info(
         `Translation of web page document completed (translated ${
@@ -232,27 +242,12 @@ export class DomTranslationManager {
         } translation items)`,
         { from, to },
       );
+      console.info("Translated web page");
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATED,
       );
-
-      /*
-      // TODO: Restore telemetry
-      const translateResult = await domTranslator.translate();
-      result = {
-        characterCount: translateResult.characterCount,
-        from: from,
-        to: to,
-      };
-      // Record the number of characters translated.
-      this.translationTelemetry.recordTranslation(
-        result.from,
-        result.to,
-        result.characterCount,
-      );
-       */
     } catch (ex) {
-      console.error("Translation error", ex);
+      console.warn("Translation error occurred: ", ex);
       translationDocument.translationError = true;
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.ERROR,

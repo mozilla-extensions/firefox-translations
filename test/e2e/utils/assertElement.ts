@@ -12,5 +12,5 @@ export const assertElementDoesNotExist = (
   element: WebElement | null,
   ref: string,
 ) => {
-  assert.strictEqual(element, null, `Element ${ref} does not exist`);
+  assert.strictEqual(element, null, `Element ${ref} should not exist`);
 };

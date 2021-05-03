@@ -100,6 +100,15 @@ this.translateUi = class extends ExtensionAPI {
             try {
               console.log("Called start()");
 
+              console.log(
+                "Inactivating legacy built-in translation feature (by setting browser.translation.ui.show and browser.translation.detectLanguage to false)",
+              );
+              Services.prefs.setBoolPref(`browser.translation.ui.show`, false);
+              Services.prefs.setBoolPref(
+                `browser.translation.detectLanguage`,
+                false,
+              );
+
               return undefined;
             } catch (error) {
               // Surface otherwise silent or obscurely reported errors
@@ -137,16 +146,17 @@ this.translateUi = class extends ExtensionAPI {
           },
 
           /* Event boilerplate with listeners that forwards all but the first argument to the web extension event */
+          onInfoBarDisplayed: eventManagerFactory("onInfoBarDisplayed").api(),
           onSelectTranslateTo: eventManagerFactory("onSelectTranslateTo").api(),
           onSelectTranslateFrom: eventManagerFactory(
             "onSelectTranslateFrom",
           ).api(),
           onInfoBarClosed: eventManagerFactory("onInfoBarClosed").api(),
+          onNeverTranslateSelectedLanguage: eventManagerFactory(
+            "onNeverTranslateSelectedLanguage",
+          ).api(),
           onNeverTranslateThisSite: eventManagerFactory(
             "onNeverTranslateThisSite",
-          ).api(),
-          onNotNowButtonPressed: eventManagerFactory(
-            "onNotNowButtonPressed",
           ).api(),
           onShowOriginalButtonPressed: eventManagerFactory(
             "onShowOriginalButtonPressed",
@@ -156,6 +166,9 @@ this.translateUi = class extends ExtensionAPI {
           ).api(),
           onTranslateButtonPressed: eventManagerFactory(
             "onTranslateButtonPressed",
+          ).api(),
+          onNotNowButtonPressed: eventManagerFactory(
+            "onNotNowButtonPressed",
           ).api(),
         },
       },

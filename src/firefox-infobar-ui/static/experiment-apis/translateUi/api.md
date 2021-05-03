@@ -35,6 +35,12 @@ Stop reacting to translation state updates
 
 ## Events
 
+### `browser.experiments.translateUi.onInfoBarDisplayed ()` Event
+
+Foo
+
+**Parameters**
+
 ### `browser.experiments.translateUi.onSelectTranslateTo ()` Event
 
 Foo
@@ -48,6 +54,12 @@ Foo
 **Parameters**
 
 ### `browser.experiments.translateUi.onInfoBarClosed ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onNeverTranslateSelectedLanguage ()` Event
 
 Foo
 
@@ -72,6 +84,12 @@ Foo
 **Parameters**
 
 ### `browser.experiments.translateUi.onTranslateButtonPressed ()` Event
+
+Foo
+
+**Parameters**
+
+### `browser.experiments.translateUi.onNotNowButtonPressed ()` Event
 
 Foo
 

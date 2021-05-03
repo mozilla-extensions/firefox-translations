@@ -16,6 +16,7 @@ export class Translator {
       [text],
       originLanguage,
       targetLanguage,
+      _translationRequestProgress => {},
     );
     return translationResults.translatedTexts[0];
   }
