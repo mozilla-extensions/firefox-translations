@@ -68,7 +68,7 @@ if (targetBrowser === "firefox") {
   ];
   defaultConfig.filename =
     ui === "firefox-infobar-ui"
-      ? `bergamot-browser-extension-{version}-firefox-infobar-ui.xpi`
+      ? `firefox-translations-{version}.xpi`
       : `bergamot-browser-extension-{version}-firefox-cross-browser-ui.xpi`;
 }
 
