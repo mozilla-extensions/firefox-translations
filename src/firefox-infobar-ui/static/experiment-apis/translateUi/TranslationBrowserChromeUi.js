@@ -24,6 +24,7 @@ class TranslationBrowserChromeUi {
     this.uiState = null;
     this.browser = browser;
     this.context = context;
+    this.translationInfoBarShown = false;
     this.shouldShowTranslationProgressTimer = undefined;
     this.importTranslationNotification();
 
@@ -286,7 +287,7 @@ class TranslationBrowserChromeUi {
     const translationNotification = this.notificationBox.getNotificationWithValue(
       "translation",
     );
-    if (!translationNotification) {
+    if (!translationNotification && !this.translationInfoBarShown) {
       this.showTranslationInfoBar();
     }
     this.showURLBarIcon();
@@ -300,10 +301,12 @@ class TranslationBrowserChromeUi {
       translationNotification.close();
     }
     this.hideURLBarIcon();
+    this.translationInfoBarShown = false;
   }
 
   showTranslationInfoBar() {
     console.debug("showTranslationInfoBar");
+    this.translationInfoBarShown = true;
     const notificationBox = this.notificationBox;
     const chromeWin = this.browser.ownerGlobal;
     const notif = notificationBox.appendNotification(
