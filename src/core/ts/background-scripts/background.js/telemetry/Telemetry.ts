@@ -25,6 +25,7 @@ import {
   neverTranslateLang,
   notNow,
 } from "./generated/infobar";
+import { langMismatch, notSupported } from "./generated/service";
 
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
@@ -189,6 +190,14 @@ export class Telemetry {
       // Always include the fx telemetry id uuid metric in pings
       firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
+  }
+
+  public onTranslationStatusOffer() {
+    langMismatch.add(1);
+  }
+
+  public onTranslationStatusTranslationUnsupported() {
+    notSupported.add(1);
   }
 
   /**

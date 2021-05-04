@@ -247,6 +247,27 @@ export class NativeTranslateUiBroker {
               tabId,
               uiState,
             );
+            // Send telemetry on some translation status changes
+            const hasChanged = property => {
+              const previousTabTranslationState = _previousTabTranslationStates.get(
+                tabId,
+              );
+              return (
+                !previousTabTranslationState ||
+                tts[property] !== previousTabTranslationState[property]
+              );
+            };
+            if (hasChanged("translationStatus")) {
+              if (tts.translationStatus === TranslationStatus.OFFER) {
+                telemetry.onTranslationStatusOffer();
+              }
+              if (
+                tts.translationStatus ===
+                TranslationStatus.TRANSLATION_UNSUPPORTED
+              ) {
+                telemetry.onTranslationStatusTranslationUnsupported();
+              }
+            }
           },
         );
         // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
