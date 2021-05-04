@@ -8,13 +8,8 @@ const {
   targetEnvironment,
   targetBrowser,
   ui,
+  extensionId,
 } = require("./build-config.js");
-
-// Using native UI requires a special build and signing process, restricted to specific extension ids
-const extensionId =
-  targetBrowser === "firefox" && ui === "firefox-infobar-ui"
-    ? "firefox-translations@mozilla.org"
-    : "bergamot-browser-extension@browser.mt";
 
 async function generateManifest({ dotEnvPath }) {
   require("dotenv").config({ path: dotEnvPath });
@@ -59,7 +54,7 @@ async function generateManifest({ dotEnvPath }) {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
   }
   if (ui === "firefox-infobar-ui") {
-    manifest.hidden = false; // TODO: Set to true for Normandy-deployed builds
+    manifest.hidden = false;
     manifest.experiment_apis = {
       translateUi: {
         schema: "./experiment-apis/translateUi/schema.json",

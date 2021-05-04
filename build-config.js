@@ -13,6 +13,11 @@ const targetEnvironment =
 const targetBrowser = process.env.TARGET_BROWSER;
 const ui = process.env.UI;
 
+const extensionId =
+  ui === "firefox-infobar-ui"
+    ? "firefox-translations@mozilla.org"
+    : "bergamot-browser-extension@browser.mt";
+
 const buildPath = path.join(
   __dirname,
   "build",
@@ -25,5 +30,6 @@ module.exports = {
   targetEnvironment,
   targetBrowser,
   ui,
+  extensionId,
   buildPath,
 };
