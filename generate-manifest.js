@@ -44,16 +44,15 @@ async function generateManifest({ dotEnvPath }) {
       },
     ],
     permissions: ["<all_urls>", "storage", "alarms"],
-    icons: {
-      48: "icons/extension-icon.48x48.png",
-      96: "icons/extension-icon.96x96.png",
-      128: "icons/extension-icon.128x128.png",
-    },
   };
   if (process.env.USE_BERGAMOT_REST_API === "1") {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
   }
   if (ui === "firefox-infobar-ui") {
+    manifest.icons = {
+      16: "icons/translation.16x16.png",
+      32: "icons/translation.32x32.png",
+    };
     manifest.hidden = false;
     manifest.experiment_apis = {
       translateUi: {
@@ -66,6 +65,11 @@ async function generateManifest({ dotEnvPath }) {
       },
     };
   } else {
+    manifest.icons = {
+      48: "icons/extension-icon.48x48.png",
+      96: "icons/extension-icon.96x96.png",
+      128: "icons/extension-icon.128x128.png",
+    };
     manifest.browser_action = {
       default_icon: "icons/extension-icon.inactive.38x38.png",
       default_title: "__MSG_browserActionButtonTitle__",
