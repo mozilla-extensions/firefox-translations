@@ -5,7 +5,10 @@
 import { TranslationDocument } from "../TranslationDocument";
 import { TranslationItem } from "../TranslationItem";
 import { MinimalDomTranslator } from "./MinimalDomTranslator";
-import { TranslationResults } from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import {
+  ModelDownloadProgress,
+  TranslationResults,
+} from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export interface TranslationRequestData {
   markupsToTranslate: string[];
@@ -32,6 +35,9 @@ export interface TranslationRequestProgress {
   initiationTimestamp: number;
   queued: boolean;
   modelLoadNecessary: boolean;
+  modelDownloadNecessary: boolean;
+  modelDownloading: boolean;
+  modelDownloadProgress: ModelDownloadProgress;
   modelLoading: boolean;
   modelLoaded: boolean;
   modelLoadWallTimeMs: number;

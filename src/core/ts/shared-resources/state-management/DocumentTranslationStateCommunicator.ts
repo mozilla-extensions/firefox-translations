@@ -9,6 +9,7 @@ import {
   FrameTranslationProgress,
   TranslationRequestProgress,
 } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 /**
  * Helper class to communicate updated document translation states.
@@ -87,6 +88,12 @@ export class DocumentTranslationStateCommunicator {
     const modelLoadNecessary = !!translationRequestProgressEntries.filter(
       (trp: TranslationRequestProgress) => trp.modelLoadNecessary,
     ).length;
+    const modelDownloadNecessary = !!translationRequestProgressEntries.filter(
+      (trp: TranslationRequestProgress) => trp.modelDownloadNecessary,
+    ).length;
+    const modelDownloading = !!translationRequestProgressEntries.filter(
+      (trp: TranslationRequestProgress) => trp.modelDownloading,
+    ).length;
     const modelLoading = modelLoadNecessary
       ? !!translationRequestProgressEntries.find(
           (trp: TranslationRequestProgress) => trp.modelLoading,
@@ -102,6 +109,30 @@ export class DocumentTranslationStateCommunicator {
         (trp: TranslationRequestProgress) => !trp.translationFinished,
       ).length === 0;
 
+    // Merge model download progress
+    const emptyDownloadProgress: ModelDownloadProgress = {
+      bytesDownloaded: 0,
+      bytesToDownload: 0,
+      startTs: undefined,
+      durationMs: 0,
+      endTs: undefined,
+    };
+    const modelDownloadProgress = translationRequestProgressEntries
+      .map((trp: TranslationRequestProgress) => trp.modelDownloadProgress)
+      .filter((mdp: ModelDownloadProgress | undefined) => mdp)
+      .reduce((a: ModelDownloadProgress, b: ModelDownloadProgress) => {
+        const startTs =
+          a.startTs && a.startTs <= b.startTs ? a.startTs : b.startTs;
+        const endTs = a.endTs && a.endTs >= b.endTs ? a.endTs : b.endTs;
+        return {
+          bytesDownloaded: a.bytesDownloaded + b.bytesDownloaded,
+          bytesToDownload: a.bytesToDownload + b.bytesToDownload,
+          startTs,
+          durationMs: endTs ? endTs - startTs : Date.now() - startTs,
+          endTs,
+        };
+      }, emptyDownloadProgress);
+
     setTimeout(() => {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
         this.frameInfo,
@@ -115,6 +146,21 @@ export class DocumentTranslationStateCommunicator {
             op: "replace",
             path: ["totalModelLoadWallTimeMs"],
             value: totalModelLoadWallTimeMs,
+          },
+          {
+            op: "replace",
+            path: ["modelDownloadNecessary"],
+            value: modelDownloadNecessary,
+          },
+          {
+            op: "replace",
+            path: ["modelDownloading"],
+            value: modelDownloading,
+          },
+          {
+            op: "replace",
+            path: ["modelDownloadProgress"],
+            value: modelDownloadProgress,
           },
           {
             op: "replace",

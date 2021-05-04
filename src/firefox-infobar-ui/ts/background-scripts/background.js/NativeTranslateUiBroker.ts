@@ -9,9 +9,11 @@ import { TranslationStatus } from "../../../../core/ts/shared-resources/models/B
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
 import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
-import { getSnapshot } from "mobx-keystone";
-import { reaction, when } from "mobx";
+import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
+import { reaction } from "mobx";
 import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
+import { translateAllFramesInTab } from "../../../../core/ts/background-scripts/background.js/lib/translateAllFramesInTab";
+import { ModelDownloadProgress } from "../../../../core/ts/background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -48,6 +50,8 @@ interface NativeTranslateUiState {
   translationDurationMs: number;
   modelLoading: boolean;
   queuedTranslationEngineRequestCount: number;
+  modelDownloading: boolean;
+  modelDownloadProgress: ModelDownloadProgress;
 }
 
 type StandardInfobarInteractionEvent = Event<
@@ -127,13 +131,13 @@ export class NativeTranslateUiBroker {
 
     // Boils down extension state to the subset relevant for the native translate ui
     const nativeTranslateUiStateFromTabTranslationState = async (
-      tts: TabTranslationState,
+      tts: SnapshotOutOf<TabTranslationState>,
     ): Promise<NativeTranslateUiState> => {
       const infobarState = nativeTranslateUiStateInfobarStateFromTranslationStatus(
         tts.translationStatus,
       );
 
-      const detectedLanguageResults = getSnapshot(tts.detectedLanguageResults);
+      const detectedLanguageResults = tts.detectedLanguageResults;
       const {
         acceptedTargetLanguages,
         // defaultSourceLanguage,
@@ -163,6 +167,8 @@ export class NativeTranslateUiBroker {
         modelLoading: tts.modelLoading,
         queuedTranslationEngineRequestCount:
           tts.queuedTranslationEngineRequestCount,
+        modelDownloading: tts.modelDownloading,
+        modelDownloadProgress: tts.modelDownloadProgress,
       };
     };
     const nativeTranslateUiStateInfobarStateFromTranslationStatus = (
@@ -203,7 +209,7 @@ export class NativeTranslateUiBroker {
         tabTranslationStates.forEach(
           async (tts: TabTranslationState, tabId) => {
             const uiState = await nativeTranslateUiStateFromTabTranslationState(
-              tts,
+              getSnapshot(tts),
             );
             browserWithExperimentAPIs.experiments.translateUi.setUiState(
               tabId,
@@ -214,60 +220,6 @@ export class NativeTranslateUiBroker {
         // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
       },
     );
-  }
-
-  async translateAllFramesInTab(tabId: number, from: string, to: string) {
-    // Start timing
-    const start = performance.now();
-    // Request translation of all frames in a specific tab
-    this.extensionState.requestTranslationOfAllFramesInTab(tabId, from, to);
-    // Wait for translation in all frames in tab to complete
-    await when(() => {
-      const { tabTranslationStates } = this.extensionState;
-      const currentTabTranslationState = tabTranslationStates.get(tabId);
-      return [TranslationStatus.TRANSLATED, TranslationStatus.ERROR].includes(
-        currentTabTranslationState.translationStatus,
-      );
-    });
-    // End timing
-    const end = performance.now();
-    const translationWallTimeMs = end - start;
-
-    const { tabTranslationStates } = this.extensionState;
-    const currentTabTranslationState = getSnapshot(
-      tabTranslationStates.get(tabId),
-    );
-
-    const {
-      totalModelLoadWallTimeMs,
-      totalTranslationEngineRequestCount,
-      totalTranslationWallTimeMs,
-      wordCount,
-      translationStatus,
-    } = currentTabTranslationState;
-
-    if (translationStatus === TranslationStatus.TRANSLATED) {
-      // Record "translation attempt concluded" telemetry
-      const perceivedSeconds = translationWallTimeMs / 1000;
-      const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
-      const translationEngineWordsPerSecond = Math.round(
-        wordCount / (totalTranslationWallTimeMs / 1000),
-      );
-      console.info(
-        `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
-          1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
-          1000} seconds.`,
-      );
-      telemetry.onTranslationFinished(
-        from,
-        to,
-        totalModelLoadWallTimeMs,
-        totalTranslationWallTimeMs,
-        translationEngineWordsPerSecond,
-      );
-    } else {
-      // TODO: Record error telemetry
-    }
   }
 
   onInfoBarDisplayed(tabId: number, from: string, to: string) {
@@ -315,7 +267,7 @@ export class NativeTranslateUiBroker {
   onTranslateButtonPressed(tabId: number, from: string, to: string) {
     console.debug("onTranslateButtonPressed", { tabId, from, to });
     telemetry.onTranslateButtonPressed(tabId, from, to);
-    this.translateAllFramesInTab(tabId, from, to);
+    translateAllFramesInTab(tabId, from, to, this.extensionState);
   }
 
   onNotNowButtonPressed(tabId: number, from: string, to: string) {

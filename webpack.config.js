@@ -21,6 +21,8 @@ const entry = {
   background: `./src/${ui}/ts/background-scripts/background.js/index.ts`,
   "dom-translation-content-script":
     "./src/core/ts/content-scripts/dom-translation-content-script.js/index.ts",
+  "translation-worker":
+    "./src/core/ts/web-worker-scripts/translation-worker.js/index.ts",
 };
 if (ui === "cross-browser-ui") {
   entry["options-ui"] =
@@ -175,7 +177,16 @@ module.exports = {
       cacheGroups: {
         commons: {
           name: "commons",
-          chunks: "initial",
+          chunks(chunk) {
+            // exclude 'translation-worker' from split chunks since chunks
+            // are not loaded in web workers (https://github.com/webpack/webpack/issues/7879)
+            if (chunk.name === "translation-worker") {
+              return false;
+            }
+            // simulate the "initial" configuration value as per
+            // https://github.com/webpack/webpack/blob/4837c3ddb9da8e676c73d97460e19689dd9d4691/lib/optimize/SplitChunksPlugin.js#L248
+            return chunk.canBeInitial();
+          },
           minChunks: 2,
         },
       },

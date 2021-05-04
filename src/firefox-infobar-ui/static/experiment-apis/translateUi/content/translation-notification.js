@@ -97,10 +97,24 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     shouldShowTranslationProgress,
     modelLoading,
     queuedTranslationEngineRequestCount,
+    modelDownloading,
+    modelDownloadProgress,
   ) {
     let progressLabelValue;
     if (!shouldShowTranslationProgress) {
       progressLabelValue = "";
+    } else if (modelDownloading) {
+      progressLabelValue = `(Currently downloading language model... ${
+        modelDownloadProgress
+          ? `${Math.round(
+              (modelDownloadProgress.bytesDownloaded /
+                modelDownloadProgress.bytesToDownload) *
+                100,
+            )}% out of ${Math.round(
+              (modelDownloadProgress.bytesToDownload / 1024 / 1024) * 10,
+            ) / 10} mb downloaded`
+          : ``
+      })`;
     } else if (modelLoading) {
       progressLabelValue = "(Currently loading language model...)";
     } else if (queuedTranslationEngineRequestCount > 0) {

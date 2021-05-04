@@ -19,6 +19,7 @@ import { FrameInfo } from "../types/bergamot.types";
 import { computed } from "mobx";
 import { TabTranslationState } from "./TabTranslationState";
 import { TranslationStatus } from "./BaseTranslationState";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;
@@ -174,6 +175,12 @@ export class ExtensionState extends Model({
         const modelLoadNecessary = !!documentTranslationStates.filter(
           (dts: DocumentTranslationState) => dts.modelLoadNecessary,
         ).length;
+        const modelDownloadNecessary = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloadNecessary,
+        ).length;
+        const modelDownloading = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloading,
+        ).length;
         const modelLoading = modelLoadNecessary
           ? !!documentTranslationStates.find(
               (dts: DocumentTranslationState) => dts.modelLoading,
@@ -188,6 +195,32 @@ export class ExtensionState extends Model({
           documentTranslationStates.filter(
             (dts: DocumentTranslationState) => !dts.translationFinished,
           ).length === 0;
+
+        // Merge model download progress as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
+        const emptyDownloadProgress: ModelDownloadProgress = {
+          bytesDownloaded: 0,
+          bytesToDownload: 0,
+          startTs: undefined,
+          durationMs: 0,
+          endTs: undefined,
+        };
+        const modelDownloadProgress = documentTranslationStates
+          .map((dts: DocumentTranslationState) =>
+            getSnapshot(dts.modelDownloadProgress),
+          )
+          .filter((mdp: ModelDownloadProgress | undefined) => mdp)
+          .reduce((a: ModelDownloadProgress, b: ModelDownloadProgress) => {
+            const startTs =
+              a.startTs && a.startTs <= b.startTs ? a.startTs : b.startTs;
+            const endTs = a.endTs && a.endTs >= b.endTs ? a.endTs : b.endTs;
+            return {
+              bytesDownloaded: a.bytesDownloaded + b.bytesDownloaded,
+              bytesToDownload: a.bytesToDownload + b.bytesToDownload,
+              startTs,
+              durationMs: endTs ? endTs - startTs : Date.now() - startTs,
+              endTs,
+            };
+          }, emptyDownloadProgress);
 
         // Special merging of translation status
         const anyTabHasTranslationStatus = (
@@ -241,6 +274,9 @@ export class ExtensionState extends Model({
           totalTranslationEngineRequestCount,
           queuedTranslationEngineRequestCount,
           modelLoadNecessary,
+          modelDownloadNecessary,
+          modelDownloading,
+          modelDownloadProgress,
           modelLoading,
           modelLoaded,
           translationFinished,

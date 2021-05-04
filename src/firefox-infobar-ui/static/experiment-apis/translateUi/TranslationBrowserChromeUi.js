@@ -106,6 +106,8 @@ class TranslationBrowserChromeUi {
         translationDurationMs,
         modelLoading,
         queuedTranslationEngineRequestCount,
+        modelDownloading,
+        modelDownloadProgress,
       } = uiState;
 
       // Always cancel ongoing timers so that we start from a clean state
@@ -128,6 +130,8 @@ class TranslationBrowserChromeUi {
             true,
             modelLoading,
             queuedTranslationEngineRequestCount,
+            modelDownloading,
+            modelDownloadProgress,
           );
           clearTimeout(this.shouldShowTranslationProgressTimer);
         }, thresholdMsAfterWhichToShouldTranslationProgress - translationDurationMs);
@@ -138,6 +142,8 @@ class TranslationBrowserChromeUi {
         shouldShowTranslationProgress,
         modelLoading,
         queuedTranslationEngineRequestCount,
+        modelDownloading,
+        modelDownloadProgress,
       );
     }
   }

@@ -63,7 +63,7 @@ export const launchTestServer = (
 export const launchFixturesServer = () => {
   return launchTestServer(
     "yarn",
-    ["serve-fixtures", "--port", "4001"],
+    ["serve-fixtures", "-p", "4001"],
     "fixtures-server",
     {},
   );
