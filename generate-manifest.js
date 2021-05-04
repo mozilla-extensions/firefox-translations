@@ -8,21 +8,18 @@ const {
   targetEnvironment,
   targetBrowser,
   ui,
+  extensionId,
 } = require("./build-config.js");
-
-// Using native UI requires a special build and signing process, restricted to specific extension ids
-const extensionId =
-  targetBrowser === "firefox" && ui === "firefox-infobar-ui"
-    ? "bergamot-browser-extension@mozilla.org"
-    : "bergamot-browser-extension@browser.mt";
 
 async function generateManifest({ dotEnvPath }) {
   require("dotenv").config({ path: dotEnvPath });
   const manifest = {
     manifest_version: 2,
-    name: `Bergamot Translate${
-      targetEnvironment !== "production" ? " (DEV)" : ""
-    }`,
+    name: `${
+      ui === "firefox-infobar-ui"
+        ? `Firefox Translations`
+        : `Bergamot Browser Extension`
+    }${targetEnvironment !== "production" ? " (DEV)" : ""}`,
     description: "__MSG_extensionDescription__",
     version: `${packageJson.version}`,
     incognito: "spanning", // Share context between private and non-private windows
@@ -47,17 +44,16 @@ async function generateManifest({ dotEnvPath }) {
       },
     ],
     permissions: ["<all_urls>", "storage", "alarms"],
-    icons: {
-      48: "icons/extension-icon.48x48.png",
-      96: "icons/extension-icon.96x96.png",
-      128: "icons/extension-icon.128x128.png",
-    },
   };
   if (process.env.USE_BERGAMOT_REST_API === "1") {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
   }
   if (ui === "firefox-infobar-ui") {
-    manifest.hidden = false; // TODO: Set to true for Normandy-deployed builds
+    manifest.icons = {
+      16: "icons/translation.16x16.png",
+      32: "icons/translation.32x32.png",
+    };
+    manifest.hidden = false;
     manifest.experiment_apis = {
       translateUi: {
         schema: "./experiment-apis/translateUi/schema.json",
@@ -69,6 +65,11 @@ async function generateManifest({ dotEnvPath }) {
       },
     };
   } else {
+    manifest.icons = {
+      48: "icons/extension-icon.48x48.png",
+      96: "icons/extension-icon.96x96.png",
+      128: "icons/extension-icon.128x128.png",
+    };
     manifest.browser_action = {
       default_icon: "icons/extension-icon.inactive.38x38.png",
       default_title: "__MSG_browserActionButtonTitle__",

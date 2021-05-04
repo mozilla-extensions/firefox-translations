@@ -21,6 +21,7 @@ const {
   targetEnvironment,
   targetBrowser,
   ui,
+  extensionId,
 } = require("./build-config.js");
 const sourceDir = buildPath;
 const artifactsDir = path.join(
@@ -30,13 +31,6 @@ const artifactsDir = path.join(
   targetBrowser,
   ui,
 );
-
-// Using native UI requires a special build and signing process, restricted to specific extension ids
-const firefoxInfobarUi =
-  targetBrowser === "firefox" && ui === "firefox-infobar-ui";
-const extensionId = firefoxInfobarUi
-  ? "bergamot-browser-extension@mozilla.org"
-  : "bergamot-browser-extension@browser.mt";
 
 const defaultConfig = {
   // Global options:
@@ -72,9 +66,10 @@ if (targetBrowser === "firefox") {
     "browser.aboutConfig.showWarning=false",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];
-  defaultConfig.filename = firefoxInfobarUi
-    ? `bergamot-browser-extension-{version}-firefox-infobar-ui.xpi`
-    : `bergamot-browser-extension-{version}-firefox-cross-browser-ui.xpi`;
+  defaultConfig.filename =
+    ui === "firefox-infobar-ui"
+      ? `firefox-translations-{version}.xpi`
+      : `bergamot-browser-extension-{version}-firefox-cross-browser-ui.xpi`;
 }
 
 if (targetBrowser === "chrome") {
@@ -85,7 +80,7 @@ if (targetBrowser === "chrome") {
     `http://localhost:${process.env.REMOTE_DEV_SERVER_PORT}/`,
     ...urlsToOpenOnRun,
   ];
-  defaultConfig.filename = `${extensionId}-{version}-chrome-cross-browser-ui.zip`;
+  defaultConfig.filename = `bergamot-browser-extension-{version}-chrome-cross-browser-ui.zip`;
 }
 
 module.exports = defaultConfig;
