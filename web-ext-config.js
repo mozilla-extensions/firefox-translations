@@ -67,6 +67,7 @@ if (targetBrowser === "firefox") {
     "extensions.experiments.enabled=true",
     "browser.proton.enabled=true",
     "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled=true",
+    "extensions.backgroundServiceWorker.enabled=true",
     "javascript.options.wasm_simd=true",
     "javascript.options.wasm_simd_wormhole=true",
     "browser.aboutConfig.showWarning=false",
