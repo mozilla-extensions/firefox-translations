@@ -9138,4 +9138,7 @@ if (!ENVIRONMENT_IS_PTHREAD) {
 } else {
   PThread.initWorker();
 }
+function addOnPreMain(cb) {
+  __ATMAIN__.unshift(cb);
+}
 export { addOnPreMain, Module, FS, WORKERFS };
