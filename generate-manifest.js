@@ -20,9 +20,11 @@ async function generateManifest({ dotEnvPath }) {
   require("dotenv").config({ path: dotEnvPath });
   const manifest = {
     manifest_version: 2,
-    name: `Firefox Translations${
-      targetEnvironment !== "production" ? " (DEV)" : ""
-    }`,
+    name: `${
+      ui === "firefox-infobar-ui"
+        ? `Firefox Translations`
+        : `Bergamot Browser Extension`
+    }${targetEnvironment !== "production" ? " (DEV)" : ""}`,
     description: "__MSG_extensionDescription__",
     version: `${packageJson.version}`,
     incognito: "spanning", // Share context between private and non-private windows
