@@ -11,6 +11,9 @@ export const defaultFirefoxTestPreferences = {
   // Make the Firefox telemetry client id assertable in tests
   "toolkit.telemetry.cachedClientID": "12345678-90ab-cdef-1234-567890abcdef",
 
+  // Set the preference that signals that the user has Firefox telemetry enabled
+  "datareporting.healthreport.uploadEnabled": true,
+
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
   "browser.proton.enabled": true,
