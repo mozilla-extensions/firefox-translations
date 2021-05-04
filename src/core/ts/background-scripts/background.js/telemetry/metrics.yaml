@@ -260,7 +260,7 @@ infobar:
     expires: 2021-08-10
 
 service:
-  not_suppported:
+  not_supported:
     type: counter
     lifetime: ping
     send_in_pings:

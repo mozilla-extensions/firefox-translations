@@ -11,11 +11,11 @@ import CounterMetricType from "@mozilla/glean/webext/private/metrics/counter";
 /**
  * Language pair of user and website languages is not supported.
  *
- * Generated from `service.not_suppported`.
+ * Generated from `service.not_supported`.
  */
-export const notSuppported = new CounterMetricType({
+export const notSupported = new CounterMetricType({
   category: "service",
-  name: "not_suppported",
+  name: "not_supported",
   sendInPings: ["custom"],
   lifetime: "ping",
   disabled: false,
