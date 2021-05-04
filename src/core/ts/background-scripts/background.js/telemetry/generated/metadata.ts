@@ -33,3 +33,16 @@ export const toLang = new StringMetricType({
   lifetime: "ping",
   disabled: false,
 });
+
+/**
+ * Firefox Telemetry client id.
+ *
+ * Generated from `metadata.firefox_telemetry_client_id`.
+ */
+export const firefoxTelemetryClientId = new StringMetricType({
+  category: "metadata",
+  name: "firefox_telemetry_client_id",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});

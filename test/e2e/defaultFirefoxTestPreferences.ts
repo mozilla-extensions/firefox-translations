@@ -8,6 +8,9 @@ export const defaultFirefoxTestPreferences = {
   // Removing warning for `about:config`
   "general.warnOnAboutConfig": false,
 
+  // Make the Firefox telemetry client id assertable in tests
+  "toolkit.telemetry.cachedClientID": "12345678-90ab-cdef-1234-567890abcdef",
+
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
   "browser.proton.enabled": true,

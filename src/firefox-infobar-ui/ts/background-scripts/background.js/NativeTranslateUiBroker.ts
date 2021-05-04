@@ -61,6 +61,12 @@ type StandardInfobarInteractionEvent = Event<
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {
   experiments: {
+    telemetryPreferences: {
+      onUploadEnabledPrefChange: Event<() => void>;
+      onCachedClientIDPrefChange: Event<() => void>;
+      getUploadEnabledPref: () => Promise<boolean>;
+      getCachedClientIDPref: () => Promise<string>;
+    };
     translateUi: {
       start: () => Promise<void>;
       stop: () => Promise<void>;
@@ -87,6 +93,10 @@ interface BrowserWithExperimentAPIs extends browserInterface {
 }
 const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
+type TelemetryPreferencesEventRef =
+  | "onUploadEnabledPrefChange"
+  | "onCachedClientIDPrefChange";
+
 type NativeTranslateUiEventRef =
   | "onInfoBarDisplayed"
   | "onSelectTranslateTo"
@@ -101,11 +111,16 @@ type NativeTranslateUiEventRef =
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;
-  private eventsToObserve: NativeTranslateUiEventRef[];
+  private telemetryPreferencesEventsToObserve: TelemetryPreferencesEventRef[];
+  private translateUiEventsToObserve: NativeTranslateUiEventRef[];
 
   constructor(extensionState) {
     this.extensionState = extensionState;
-    this.eventsToObserve = [
+    this.telemetryPreferencesEventsToObserve = [
+      "onUploadEnabledPrefChange",
+      "onCachedClientIDPrefChange",
+    ];
+    this.translateUiEventsToObserve = [
       "onInfoBarDisplayed",
       "onSelectTranslateTo",
       "onSelectTranslateFrom",
@@ -120,11 +135,28 @@ export class NativeTranslateUiBroker {
   }
 
   async start() {
-    this.eventsToObserve.map((eventRef: NativeTranslateUiEventRef) => {
-      browserWithExperimentAPIs.experiments.translateUi[eventRef].addListener(
-        this[eventRef].bind(this),
-      );
-    });
+    // Current value of Telemetry preferences
+    const uploadEnabled = await browserWithExperimentAPIs.experiments.telemetryPreferences.getUploadEnabledPref();
+    const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
+
+    // Initialize telemetry
+    telemetry.initialize(uploadEnabled, cachedClientID);
+
+    // Hook up experiment API events with listeners in this class
+    this.telemetryPreferencesEventsToObserve.map(
+      (eventRef: TelemetryPreferencesEventRef) => {
+        browserWithExperimentAPIs.experiments.telemetryPreferences[
+          eventRef
+        ].addListener(this[eventRef].bind(this));
+      },
+    );
+    this.translateUiEventsToObserve.map(
+      (eventRef: NativeTranslateUiEventRef) => {
+        browserWithExperimentAPIs.experiments.translateUi[eventRef].addListener(
+          this[eventRef].bind(this),
+        );
+      },
+    );
     await browserWithExperimentAPIs.experiments.translateUi.start();
 
     const { summarizeLanguageSupport } = new LanguageSupport();
@@ -222,6 +254,18 @@ export class NativeTranslateUiBroker {
     );
   }
 
+  async onUploadEnabledPrefChange() {
+    const uploadEnabled = await browserWithExperimentAPIs.experiments.telemetryPreferences.getUploadEnabledPref();
+    // console.debug("onUploadEnabledPrefChange", { uploadEnabled });
+    telemetry.uploadEnabledPreferenceUpdated(uploadEnabled);
+  }
+
+  async onCachedClientIDPrefChange() {
+    const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
+    // console.debug("onCachedClientIDPrefChange", { cachedClientID });
+    telemetry.setFirefoxTelemetryClientId(cachedClientID);
+  }
+
   onInfoBarDisplayed(tabId: number, from: string, to: string) {
     console.debug("onInfoBarDisplayed", { tabId, from, to });
     telemetry.onInfoBarDisplayed(tabId, from, to);
@@ -277,7 +321,12 @@ export class NativeTranslateUiBroker {
 
   async stop() {
     await browserWithExperimentAPIs.experiments.translateUi.stop();
-    this.eventsToObserve.map(eventRef => {
+    this.telemetryPreferencesEventsToObserve.map(eventRef => {
+      browserWithExperimentAPIs.experiments.telemetryPreferences[
+        eventRef
+      ].removeListener(this[eventRef] as any);
+    });
+    this.translateUiEventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[
         eventRef
       ].removeListener(this[eventRef] as any);

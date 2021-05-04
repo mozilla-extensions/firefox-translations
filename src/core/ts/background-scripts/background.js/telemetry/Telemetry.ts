@@ -11,7 +11,11 @@ import {
   wordsPerSecond,
   modelDownloadTime,
 } from "./generated/performance";
-import { fromLang, toLang } from "./generated/metadata";
+import {
+  fromLang,
+  toLang,
+  firefoxTelemetryClientId,
+} from "./generated/metadata";
 import {
   displayed,
   changeLang,
@@ -33,18 +37,34 @@ import {
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  */
 export class Telemetry {
-  constructor() {
+  private initialized: boolean;
+  private firefoxTelemetryClientId: string;
+  public initialize(uploadEnabled: boolean, $firefoxTelemetryClientId: string) {
     const appId = config.telemetryAppId;
+    this.setFirefoxTelemetryClientId($firefoxTelemetryClientId);
     try {
-      Glean.initialize(appId, true, {
+      Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
       });
       console.info(
         `Telemetry: initialization completed with application ID ${appId}.`,
       );
+      this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
     }
+  }
+
+  public uploadEnabledPreferenceUpdated(uploadEnabled: boolean) {
+    console.log(
+      "Telemetry: communicating updated uploadEnabled preference to Glean.js",
+      { uploadEnabled },
+    );
+    Glean.setUploadEnabled(uploadEnabled);
+  }
+
+  public setFirefoxTelemetryClientId($firefoxTelemetryClientId: string) {
+    this.firefoxTelemetryClientId = $firefoxTelemetryClientId;
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
@@ -52,6 +72,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       displayed.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -60,6 +82,8 @@ export class Telemetry {
       fromLang.set(newFrom);
       toLang.set(to);
       changeLang.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -68,6 +92,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(newTo);
       changeLang.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -76,6 +102,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       closed.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -88,6 +116,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       neverTranslateLang.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -96,6 +126,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       neverTranslateSite.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -120,6 +152,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       translate.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -128,6 +162,8 @@ export class Telemetry {
       fromLang.set(from);
       toLang.set(to);
       notNow.record();
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
@@ -150,16 +186,23 @@ export class Telemetry {
       translationTime.set(String(translationWallTimeMs));
       wordsPerSecond.set(String(Math.round($wordsPerSecond)));
       modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
     });
   }
 
   /**
    * Submits all collected metrics in a custom ping.
-   * TODO: Always include the fx telemetry id uuid metric in pings
    */
   public submit = (
     telemetryRecordingFunction: false | (() => void) = false,
   ) => {
+    if (!this.initialized) {
+      console.warn(
+        "Telemetry: ignoring ping that was submitted before Telemetry was initialized",
+      );
+      return;
+    }
     try {
       if (telemetryRecordingFunction) {
         telemetryRecordingFunction();
