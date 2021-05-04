@@ -9,8 +9,6 @@ const { assert, expect } = chai;
 
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
-// Using cache-polyfill to work around https://bugzilla.mozilla.org/show_bug.cgi?id=1575625
-import { caches } from "cache-polyfill";
 import { config, modelRegistry } from "../../config";
 import { nanoid } from "nanoid";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";

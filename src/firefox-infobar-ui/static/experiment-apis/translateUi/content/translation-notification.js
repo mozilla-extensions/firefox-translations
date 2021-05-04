@@ -104,9 +104,11 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     if (!shouldShowTranslationProgress) {
       progressLabelValue = "";
     } else if (modelDownloading) {
-      progressLabelValue = `(Currently downloading language model... ${
-        modelDownloadProgress
-          ? `${Math.round(
+      const showDetailedProgress =
+        modelDownloadProgress && modelDownloadProgress.bytesDownloaded > 0;
+      progressLabelValue = `(Currently downloading language model...${
+        showDetailedProgress
+          ? ` ${Math.round(
               (modelDownloadProgress.bytesDownloaded /
                 modelDownloadProgress.bytesToDownload) *
                 100,
