@@ -16,6 +16,7 @@ fi
 
 echo "* Constructing a TypeScript module from the emscripten JS glue code"
 TS_FILE=src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts
+yarn prettier "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" --write
 echo "// @ts-nocheck" > $TS_FILE
 echo "" >> $TS_FILE
 echo "// Note: The source code in this file is imported from bergamot-translator via" >> $TS_FILE

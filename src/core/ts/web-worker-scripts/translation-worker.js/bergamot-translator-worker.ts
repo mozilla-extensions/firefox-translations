@@ -667,7 +667,7 @@ function isDataURI(filename) {
   return hasPrefix(filename, dataURIPrefix);
 }
 var fileURIPrefix = "file://";
-var wasmBinaryFile = "bergamot-translator-worker.wasm";
+var wasmBinaryFile = "wasm/bergamot-translator-worker.wasm";
 if (!isDataURI(wasmBinaryFile)) {
   wasmBinaryFile = locateFile(wasmBinaryFile);
 }
