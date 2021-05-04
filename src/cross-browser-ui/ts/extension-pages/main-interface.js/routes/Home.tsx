@@ -19,6 +19,7 @@ import { TranslationStatus } from "../../../../../core/ts/shared-resources/model
 import { ExtensionState } from "../../../../../core/ts/shared-resources/models/ExtensionState";
 import { DocumentTranslationState } from "../../../../../core/ts/shared-resources/models/DocumentTranslationState";
 import { config } from "../../../../../core/ts/config";
+import { translateAllFramesInTab } from "../../../../../core/ts/background-scripts/background.js/lib/translateAllFramesInTab";
 
 interface HomeProps {
   extensionState: ExtensionState;
@@ -66,16 +67,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
     } = topFrameDocumentTranslationState;
 
     const requestTranslation = () => {
-      currentTabDocumentTranslationStates.forEach(
-        (dts: DocumentTranslationState) => {
-          extensionState.patchDocumentTranslationStateByFrameInfo(dts, [
-            {
-              op: "replace",
-              path: ["translationRequested"],
-              value: true,
-            },
-          ]);
-        },
+      translateAllFramesInTab(
+        tabId,
+        effectiveTranslateFrom,
+        effectiveTranslateTo,
+        extensionState,
       );
     };
 
