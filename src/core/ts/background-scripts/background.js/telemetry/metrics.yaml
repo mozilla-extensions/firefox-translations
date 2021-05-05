@@ -46,7 +46,7 @@ metadata:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  firefox_telemetry_client_id:
+  firefox_client_id:
     type: string
     lifetime: ping
     send_in_pings:

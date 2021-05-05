@@ -11,11 +11,7 @@ import {
   wordsPerSecond,
   modelDownloadTime,
 } from "./generated/performance";
-import {
-  fromLang,
-  toLang,
-  firefoxTelemetryClientId,
-} from "./generated/metadata";
+import { fromLang, toLang, firefoxClientId } from "./generated/metadata";
 import {
   displayed,
   changeLang,
@@ -39,10 +35,10 @@ import { langMismatch, notSupported } from "./generated/service";
  */
 export class Telemetry {
   private initialized: boolean;
-  private firefoxTelemetryClientId: string;
-  public initialize(uploadEnabled: boolean, $firefoxTelemetryClientId: string) {
+  private firefoxClientId: string;
+  public initialize(uploadEnabled: boolean, $firefoxClientId: string) {
     const appId = config.telemetryAppId;
-    this.setFirefoxTelemetryClientId($firefoxTelemetryClientId);
+    this.setFirefoxClientId($firefoxClientId);
     try {
       Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
@@ -64,8 +60,8 @@ export class Telemetry {
     Glean.setUploadEnabled(uploadEnabled);
   }
 
-  public setFirefoxTelemetryClientId($firefoxTelemetryClientId: string) {
-    this.firefoxTelemetryClientId = $firefoxTelemetryClientId;
+  public setFirefoxClientId($firefoxClientId: string) {
+    this.firefoxClientId = $firefoxClientId;
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
@@ -74,7 +70,7 @@ export class Telemetry {
       toLang.set(to);
       displayed.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -84,7 +80,7 @@ export class Telemetry {
       toLang.set(to);
       changeLang.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -94,7 +90,7 @@ export class Telemetry {
       toLang.set(newTo);
       changeLang.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -104,7 +100,7 @@ export class Telemetry {
       toLang.set(to);
       closed.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -118,7 +114,7 @@ export class Telemetry {
       toLang.set(to);
       neverTranslateLang.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -128,7 +124,7 @@ export class Telemetry {
       toLang.set(to);
       neverTranslateSite.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -154,7 +150,7 @@ export class Telemetry {
       toLang.set(to);
       translate.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -164,7 +160,7 @@ export class Telemetry {
       toLang.set(to);
       notNow.record();
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
@@ -188,7 +184,7 @@ export class Telemetry {
       wordsPerSecond.set(String(Math.round($wordsPerSecond)));
       modelDownloadTime.set(String(Math.round($modelDownloadTime)));
       // Always include the fx telemetry id uuid metric in pings
-      firefoxTelemetryClientId.set(this.firefoxTelemetryClientId);
+      firefoxClientId.set(this.firefoxClientId);
     });
   }
 
