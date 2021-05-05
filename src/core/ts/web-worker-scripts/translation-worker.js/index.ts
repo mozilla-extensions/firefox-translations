@@ -192,12 +192,14 @@ shortlist:
     return translationResults;
   };
 
-  const handleError = (error, requestId, sourceMethod) => {
+  const handleError = (error: Error, requestId, sourceMethod) => {
     console.info(
       `Error/exception caught in worker during ${sourceMethod}:`,
       error,
     );
-    log(`Error/exception caught in worker during ${sourceMethod}: ${error}`);
+    log(
+      `Error/exception caught in worker during ${sourceMethod}: ${error} ${error.stack}`,
+    );
     const message: ErrorWorkerMessage = {
       type: `error`,
       message: `Error/exception caught in worker during ${sourceMethod}: ${error.toString()}`,
