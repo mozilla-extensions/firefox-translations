@@ -290,7 +290,7 @@ export class NativeTranslateUiBroker {
   async onCachedClientIDPrefChange() {
     const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
     // console.debug("onCachedClientIDPrefChange", { cachedClientID });
-    telemetry.setFirefoxTelemetryClientId(cachedClientID);
+    telemetry.setFirefoxClientId(cachedClientID);
   }
 
   onInfoBarDisplayed(tabId: number, from: string, to: string) {
