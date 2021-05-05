@@ -27,7 +27,7 @@ export const translateAllFramesInTab = async (
   });
   // End timing
   const end = performance.now();
-  const translationWallTimeMs = end - start;
+  const perceivedTranslationWallTimeMs = end - start;
 
   const { tabTranslationStates } = extensionState;
   const currentTabTranslationState = getSnapshot(
@@ -45,17 +45,25 @@ export const translateAllFramesInTab = async (
 
   if (translationStatus === TranslationStatus.TRANSLATED) {
     // Record "translation attempt concluded" telemetry
-    const perceivedSeconds = translationWallTimeMs / 1000;
+    const perceivedSeconds = perceivedTranslationWallTimeMs / 1000;
     const perceivedWordsPerSecond = Math.round(wordCount / perceivedSeconds);
     const translationEngineWordsPerSecond = Math.round(
       wordCount / (totalTranslationWallTimeMs / 1000),
     );
     const modelDownloadTimeMs = modelDownloadProgress.durationMs || 0;
+    const unaccountedTimeMs =
+      perceivedTranslationWallTimeMs -
+      modelDownloadTimeMs -
+      totalTranslationWallTimeMs;
     console.info(
       `Translation of all text in tab with id ${tabId} (${wordCount} words) took ${perceivedSeconds} secs (perceived as ${perceivedWordsPerSecond} words per second) across ${totalTranslationEngineRequestCount} translation engine requests (which took ${totalTranslationWallTimeMs /
         1000} seconds, operating at ${translationEngineWordsPerSecond} words per second). Model loading took ${totalModelLoadWallTimeMs /
-        1000} seconds, of which ${modelDownloadTimeMs /
-        1000} seconds was spent downloading model files.`,
+        1000} seconds, after spending ${modelDownloadTimeMs / 1000} seconds ${
+        modelDownloadProgress.bytesToDownload === 0
+          ? "hydrating"
+          : "downloading and persisting"
+      } model files. The remaining ${unaccountedTimeMs /
+        1000} seconds where spent elsewhere.`,
     );
     telemetry.onTranslationFinished(
       from,

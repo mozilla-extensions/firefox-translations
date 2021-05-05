@@ -24,6 +24,8 @@ export const getBergamotModelsForLanguagePair = async (
     throw new Error(`Language pair '${languagePair}' not supported`);
   }
 
+  const downloadStart = Date.now();
+
   const modelRegistryEntry = modelRegistry[languagePair];
 
   const modelFiles = Object.keys(modelRegistryEntry).map((type: string) => {
@@ -31,8 +33,6 @@ export const getBergamotModelsForLanguagePair = async (
     const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
     return { type, url, name, size, expectedSha256Hash };
   });
-
-  const downloadStart = Date.now();
 
   // Check remaining storage quota
   const quota = await navigator.storage.estimate();
@@ -204,6 +204,7 @@ export const getBergamotModelsForLanguagePair = async (
     .filter(({ downloaded }) => downloaded)
     .map(({ data }) => data.size)
     .reduce((a, b) => a + b, 0);
+  // Either report the total time for downloading or the time it has taken to load cached model files
   if (totalBytesDownloaded > 0) {
     const languagePairEstimatedCompressedBytesToTransfer = sumLanguagePairFileToTransferSize(
       "estimatedCompressedSize",
@@ -211,6 +212,15 @@ export const getBergamotModelsForLanguagePair = async (
     const finalModelDownloadProgress: ModelDownloadProgress = {
       bytesDownloaded: languagePairEstimatedCompressedBytesToTransfer,
       bytesToDownload: languagePairEstimatedCompressedBytesToTransfer,
+      startTs: downloadStart,
+      durationMs: downloadDurationMs,
+      endTs: downloadEnd,
+    };
+    onModelDownloadProgress(finalModelDownloadProgress);
+  } else {
+    const finalModelDownloadProgress: ModelDownloadProgress = {
+      bytesDownloaded: 0,
+      bytesToDownload: 0,
       startTs: downloadStart,
       durationMs: downloadDurationMs,
       endTs: downloadEnd,
