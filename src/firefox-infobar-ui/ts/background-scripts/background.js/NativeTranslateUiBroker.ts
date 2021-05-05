@@ -259,13 +259,19 @@ export class NativeTranslateUiBroker {
             };
             if (hasChanged("translationStatus")) {
               if (tts.translationStatus === TranslationStatus.OFFER) {
-                telemetry.onTranslationStatusOffer();
+                telemetry.onTranslationStatusOffer(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
               }
               if (
                 tts.translationStatus ===
                 TranslationStatus.TRANSLATION_UNSUPPORTED
               ) {
-                telemetry.onTranslationStatusTranslationUnsupported();
+                telemetry.onTranslationStatusTranslationUnsupported(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
               }
             }
           },

@@ -188,12 +188,24 @@ export class Telemetry {
     });
   }
 
-  public onTranslationStatusOffer() {
-    langMismatch.add(1);
+  public onTranslationStatusOffer(from: string, to: string) {
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      langMismatch.add(1);
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxClientId.set(this.firefoxClientId);
+    });
   }
 
-  public onTranslationStatusTranslationUnsupported() {
-    notSupported.add(1);
+  public onTranslationStatusTranslationUnsupported(from: string, to: string) {
+    this.submit(() => {
+      fromLang.set(from);
+      toLang.set(to);
+      notSupported.add(1);
+      // Always include the fx telemetry id uuid metric in pings
+      firefoxClientId.set(this.firefoxClientId);
+    });
   }
 
   /**
