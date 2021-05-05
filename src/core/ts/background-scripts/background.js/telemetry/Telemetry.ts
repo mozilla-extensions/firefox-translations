@@ -64,43 +64,37 @@ export class Telemetry {
     this.firefoxClientId = $firefoxClientId;
   }
 
+  public recordCommonMetadata(from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    firefoxClientId.set(this.firefoxClientId);
+  }
+
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       displayed.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
     this.submit(() => {
-      fromLang.set(newFrom);
-      toLang.set(to);
       changeLang.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(newFrom, to);
     });
   }
 
   public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(newTo);
       changeLang.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, newTo);
     });
   }
 
   public onInfoBarClosed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       closed.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -110,21 +104,15 @@ export class Telemetry {
     to: string,
   ) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       neverTranslateLang.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       neverTranslateSite.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -146,21 +134,15 @@ export class Telemetry {
 
   public onTranslateButtonPressed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       translate.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       notNow.record();
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -177,34 +159,25 @@ export class Telemetry {
     $modelDownloadTime: number,
   ) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       modelLoadTime.set(String(modelLoadWallTimeMs));
       translationTime.set(String(translationWallTimeMs));
       wordsPerSecond.set(String(Math.round($wordsPerSecond)));
       modelDownloadTime.set(String(Math.round($modelDownloadTime)));
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onTranslationStatusOffer(from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       langMismatch.add(1);
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onTranslationStatusTranslationUnsupported(from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       notSupported.add(1);
-      // Always include the fx telemetry id uuid metric in pings
-      firefoxClientId.set(this.firefoxClientId);
+      this.recordCommonMetadata(from, to);
     });
   }
 
