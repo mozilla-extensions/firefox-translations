@@ -18,13 +18,22 @@ import {
   TranslateRequestWorkerMessage,
   TranslationResultsWorkerMessage,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
-import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
+import {
+  DownloadedModelFile,
+  getBergamotModelsForLanguagePair,
+} from "./getBergamotModelsForLanguagePair";
 
 import { modelRegistry } from "../../config";
 
 type IncomingBergamotTranslatorAPIMessage =
   | LoadModelRequestWorkerMessage
   | TranslateRequestWorkerMessage;
+
+interface DownloadedModelFilesByType {
+  lex: DownloadedModelFile;
+  model: DownloadedModelFile;
+  vocab: DownloadedModelFile;
+}
 
 addOnPreMain(function() {
   let model;
@@ -46,13 +55,13 @@ addOnPreMain(function() {
     onModelDownloadProgress: (
       modelDownloadProgress: ModelDownloadProgress,
     ) => void,
-  ) => {
+  ): Promise<DownloadedModelFilesByType> => {
     log(`downloadModel(${from}, ${to}, ${bergamotModelsBaseUrl})`);
 
     const languagePair = `${from}${to}`;
 
     const cache = await caches.open("bergamot-models");
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles: DownloadedModelFile[] = await getBergamotModelsForLanguagePair(
       languagePair,
       bergamotModelsBaseUrl,
       modelRegistry,
@@ -61,10 +70,33 @@ addOnPreMain(function() {
       onModelDownloadProgress,
     );
 
-    // Mount the downloaded files in emscripten's worker file system
+    const downloadedModelFilesByType: DownloadedModelFilesByType = {
+      lex: undefined,
+      model: undefined,
+      vocab: undefined,
+    };
+
+    downloadedModelFiles.forEach(downloadedModelFile => {
+      downloadedModelFilesByType[
+        downloadedModelFile.type
+      ] = downloadedModelFile;
+    });
+
+    // Mount the downloaded vocab file in emscripten's worker file system if not already mounted
     const modelDir = `/${languagePair}`;
-    FS.mkdir(modelDir, undefined);
-    FS.mount(WORKERFS, { blobs }, modelDir);
+    const { exists } = FS.analyzePath(modelDir, undefined);
+    if (!exists) {
+      const blobs = [
+        {
+          name: downloadedModelFilesByType.vocab.name,
+          data: new Blob([downloadedModelFilesByType.vocab.arrayBuffer]),
+        },
+      ];
+      FS.mkdir(modelDir, undefined);
+      FS.mount(WORKERFS, { blobs }, modelDir);
+    }
+
+    return downloadedModelFilesByType;
   };
 
   const loadModel = async (
@@ -84,19 +116,31 @@ addOnPreMain(function() {
       model.delete();
     }
 
-    // Download model files if not already locally present
-    const modelDir = `/${languagePair}`;
-    const { exists } = FS.analyzePath(modelDir, undefined);
-    if (!exists) {
-      await downloadModel(
-        from,
-        to,
-        bergamotModelsBaseUrl,
-        onModelDownloadProgress,
-      );
-    }
+    // Download or hydrate model files to/from persistent storage
+    const downloadedModelFilesByType: DownloadedModelFilesByType = await downloadModel(
+      from,
+      to,
+      bergamotModelsBaseUrl,
+      onModelDownloadProgress,
+    );
 
     const loadModelStart = performance.now();
+
+    // This function constructs the AlignedMemory from the array buffer and the alignment size
+    const constructAlignedMemoryFromBuffer = (
+      buffer: ArrayBuffer,
+      alignmentSize: number,
+    ) => {
+      const byteArray = new Int8Array(buffer);
+      console.debug("byteArray size: ", byteArray.byteLength);
+      const alignedMemory = new Module.AlignedMemory(
+        byteArray.byteLength,
+        alignmentSize,
+      );
+      const alignedByteArrayView = alignedMemory.getByteArrayView();
+      alignedByteArrayView.set(byteArray);
+      return alignedMemory;
+    };
 
     // Vocab files are re-used in both translation directions
     const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
@@ -104,9 +148,7 @@ addOnPreMain(function() {
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
-    const modelConfig = `models:
-  - /${languagePair}/model.${languagePair}.intgemm.alphas.bin
-vocabs:
+    const modelConfigWithoutModelAndShortList = `vocabs:
   - /${languagePair}/vocab.${vocabLanguagePair}.spm
   - /${languagePair}/vocab.${vocabLanguagePair}.spm
 beam-size: 1
@@ -120,16 +162,34 @@ skip-cost: true
 cpu-threads: 0
 quiet: true
 quiet-translation: true
-shortlist:
-    - /${languagePair}/lex.${languagePair}.s2t
-    - 50
-    - 50
+gemm-precision: int8shift
 `;
 
-    console.log("modelConfig: ", modelConfig);
+    console.log(
+      "modelConfigWithoutModelAndShortList: ",
+      modelConfigWithoutModelAndShortList,
+    );
 
     // Instantiate the TranslationModel
-    model = new Module.TranslationModel(modelConfig);
+    const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
+    const shortListBuffer = downloadedModelFilesByType.lex.arrayBuffer;
+
+    console.debug({ modelBuffer, shortListBuffer });
+
+    // Construct AlignedMemory objects with downloaded buffers
+    const alignedModelMemory = constructAlignedMemoryFromBuffer(
+      modelBuffer,
+      256,
+    );
+    const alignedShortlistMemory = constructAlignedMemoryFromBuffer(
+      shortListBuffer,
+      64,
+    );
+    model = new Module.TranslationModel(
+      modelConfigWithoutModelAndShortList,
+      alignedModelMemory,
+      alignedShortlistMemory,
+    );
     const loadModelEnd = performance.now();
     const modelLoadWallTimeMs = loadModelEnd - loadModelStart;
 

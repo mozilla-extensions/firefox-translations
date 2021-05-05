@@ -48,7 +48,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
     let latestModelDownloadProgressSeen: ModelDownloadProgress;
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -59,7 +59,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       },
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
     assert.equal(
       latestModelDownloadProgressSeen.bytesDownloaded,
       latestModelDownloadProgressSeen.bytesToDownload,
@@ -74,7 +74,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
     let latestModelDownloadProgressSeen: ModelDownloadProgress;
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -85,7 +85,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       },
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
     assert.equal(latestModelDownloadProgressSeen.bytesDownloaded, 0);
   });
 
@@ -95,7 +95,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -104,7 +104,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       _modelDownloadProgress => {},
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
   });
 
   it("ende", async function() {
@@ -113,7 +113,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -122,7 +122,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       _modelDownloadProgress => {},
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
   });
 
   it("enes", async function() {
@@ -131,7 +131,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -140,7 +140,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       _modelDownloadProgress => {},
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
   });
 
   it("enet", async function() {
@@ -149,7 +149,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       modelRegistry,
@@ -158,7 +158,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       _modelDownloadProgress => {},
     );
 
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
   });
 
   it("download still works (albeit not persisted) when files to download exceeds available storage quota", async function() {
@@ -168,7 +168,7 @@ describe("getBergamotModelsForLanguagePair", function() {
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
     );
     let latestModelDownloadProgressSeen: ModelDownloadProgress;
-    const blobs = await getBergamotModelsForLanguagePair(
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
       languagePair,
       config.bergamotModelsBaseUrl,
       {
@@ -193,7 +193,7 @@ describe("getBergamotModelsForLanguagePair", function() {
         latestModelDownloadProgressSeen = modelDownloadProgress;
       },
     );
-    assert.equal(blobs.length, 3);
+    assert.equal(downloadedModelFiles.length, 3);
     assert.equal(
       latestModelDownloadProgressSeen.bytesDownloaded,
       latestModelDownloadProgressSeen.bytesToDownload,

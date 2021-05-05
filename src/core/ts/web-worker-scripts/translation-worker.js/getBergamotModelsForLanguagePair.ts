@@ -10,6 +10,14 @@ import { throttle } from "./throttle";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
+export interface DownloadedModelFile {
+  type: string;
+  name: string;
+  arrayBuffer: ArrayBuffer;
+  downloaded: boolean;
+  sha256Hash: string;
+}
+
 export const getBergamotModelsForLanguagePair = async (
   languagePair: string,
   bergamotModelsBaseUrl: string,
@@ -19,7 +27,7 @@ export const getBergamotModelsForLanguagePair = async (
   onModelDownloadProgress: (
     modelDownloadProgress: ModelDownloadProgress,
   ) => void,
-): Promise<{ name: string; data: Blob }[]> => {
+): Promise<DownloadedModelFile[]> => {
   if (!modelRegistry[languagePair]) {
     throw new Error(`Language pair '${languagePair}' not supported`);
   }
@@ -120,8 +128,8 @@ export const getBergamotModelsForLanguagePair = async (
   );
 
   // Download or restore model files from persistent cache
-  const blobs = await Promise.all(
-    modelFiles.map(async ({ type, url, name, size, expectedSha256Hash }) => {
+  const downloadedModelFiles: DownloadedModelFile[] = await Promise.all(
+    modelFiles.map(async ({ type, url, name, expectedSha256Hash }) => {
       let response = await cache.match(url);
       let downloaded = false;
       if (!response || response.status >= 400) {
@@ -173,10 +181,10 @@ export const getBergamotModelsForLanguagePair = async (
         throw new Error("Model file download failed");
       }
 
-      const blob = await response.blob();
+      const arrayBuffer = await response.arrayBuffer();
 
       // Verify the hash of downloaded model files
-      const sha256Hash = await digestSha256(await blob.arrayBuffer());
+      const sha256Hash = await digestSha256(arrayBuffer);
       if (sha256Hash !== expectedSha256Hash) {
         console.warn(
           `Model file download integrity check failed for ${languagePair}'s ${type} file`,
@@ -190,19 +198,19 @@ export const getBergamotModelsForLanguagePair = async (
         );
       }
 
-      return { name, data: blob, downloaded, sha256Hash };
+      return { type, name, arrayBuffer, downloaded, sha256Hash };
     }),
   );
 
   // Measure the time it took to acquire model files
   const downloadEnd = Date.now();
   const downloadDurationMs = downloadEnd - downloadStart;
-  const totalBytes = blobs
-    .map(({ data }) => data.size)
+  const totalBytes = downloadedModelFiles
+    .map(({ arrayBuffer }) => arrayBuffer.byteLength)
     .reduce((a, b) => a + b, 0);
-  const totalBytesDownloaded = blobs
+  const totalBytesDownloaded = downloadedModelFiles
     .filter(({ downloaded }) => downloaded)
-    .map(({ data }) => data.size)
+    .map(({ arrayBuffer }) => arrayBuffer.byteLength)
     .reduce((a, b) => a + b, 0);
   // Either report the total time for downloading or the time it has taken to load cached model files
   if (totalBytesDownloaded > 0) {
@@ -236,5 +244,5 @@ export const getBergamotModelsForLanguagePair = async (
     )}% was downloaded)`,
   );
 
-  return blobs;
+  return downloadedModelFiles;
 };
