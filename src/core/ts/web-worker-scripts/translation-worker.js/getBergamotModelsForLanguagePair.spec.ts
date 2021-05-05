@@ -86,7 +86,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     );
 
     assert.equal(blobs.length, 3);
-    assert.equal(latestModelDownloadProgressSeen, undefined);
+    assert.equal(latestModelDownloadProgressSeen.bytesDownloaded, 0);
   });
 
   it("eten", async function() {
