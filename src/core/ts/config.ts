@@ -5,7 +5,7 @@ export const config = {
   sentryDsn: process.env.SENTRY_DSN,
   bergamotModelsBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/models"
-    : "https://storage.googleapis.com/bergamot-models-maml/0.1.0",
+    : "https://storage.googleapis.com/bergamot-models-maml/0.2.0",
   telemetryAppId: process.env.TELEMETRY_APP_ID,
   telemetryDebugMode: developmentBuild,
   supportedLanguagePairs: [
@@ -44,11 +44,11 @@ export interface ModelRegistry {
 export const modelRegistry: ModelRegistry = {
   esen: {
     lex: {
-      name: "lex.esen.s2t",
-      size: 44239459,
-      estimatedCompressedSize: 11651603,
+      name: "lex.50.50.esen.s2t.bin",
+      size: 3860888,
+      estimatedCompressedSize: 1978538,
       expectedSha256Hash:
-        "7571baf6a7d49531b9aaecc998ebc5d84307ddce064a8c175b30de8c427f4854",
+        "f11a2c23ef85ab1fee1c412b908d69bc20d66fd59faa8f7da5a5f0347eddf969",
     },
     model: {
       name: "model.esen.intgemm.alphas.bin",
@@ -67,11 +67,11 @@ export const modelRegistry: ModelRegistry = {
   },
   eten: {
     lex: {
-      name: "lex.eten.s2t",
-      size: 74458669,
-      estimatedCompressedSize: 18419387,
+      name: "lex.50.50.eten.s2t.bin",
+      size: 3974944,
+      estimatedCompressedSize: 1920655,
       expectedSha256Hash:
-        "ad7c24f4d8e0064ec2d5cae220eedf8a39396c2f9c785c22b0a183c9087d814a",
+        "6992bedc590e60e610a28129c80746fe5f33144a4520e2c5508d87db14ca54f8",
     },
     model: {
       name: "model.eten.intgemm.alphas.bin",
@@ -90,11 +90,11 @@ export const modelRegistry: ModelRegistry = {
   },
   ende: {
     lex: {
-      name: "lex.ende.s2t",
-      size: 41478119,
-      estimatedCompressedSize: 10746500,
+      name: "lex.50.50.ende.s2t.bin",
+      size: 3062492,
+      estimatedCompressedSize: 1575385,
       expectedSha256Hash:
-        "0a4045f058d0427af0371a7861fa7856603dbae9513387f01ef2452da54d7cb4",
+        "764797d075f0642c0b079cce6547348d65fe4e92ac69fa6a8605cd8b53dacb3f",
     },
     model: {
       name: "model.ende.intgemm.alphas.bin",
@@ -113,11 +113,11 @@ export const modelRegistry: ModelRegistry = {
   },
   enes: {
     lex: {
-      name: "lex.enes.s2t",
-      size: 42197493,
-      estimatedCompressedSize: 11016547,
+      name: "lex.50.50.enes.s2t.bin",
+      size: 3347104,
+      estimatedCompressedSize: 1720700,
       expectedSha256Hash:
-        "2f58dc562258d84b6b06d8814f8693d8bc6f73f62c7a026e9567a91ed197a33b",
+        "3a113d713dec3cf1d12bba5b138ae616e28bba4bbc7fe7fd39ba145e26b86d7f",
     },
     model: {
       name: "model.enes.intgemm.alphas.bin",
@@ -136,11 +136,11 @@ export const modelRegistry: ModelRegistry = {
   },
   enet: {
     lex: {
-      name: "lex.enet.s2t",
-      size: 47472490,
-      estimatedCompressedSize: 11814371,
+      name: "lex.50.50.enet.s2t.bin",
+      size: 2700780,
+      estimatedCompressedSize: 1336443,
       expectedSha256Hash:
-        "6751165b3a4a2d7412bd46b42bcb2fc32900f8d2b041465a8a86086559350f60",
+        "3d1b40ff43ebef82cf98d416a88a1ea19eb325a85785eef102f59878a63a829d",
     },
     model: {
       name: "model.enet.intgemm.alphas.bin",
