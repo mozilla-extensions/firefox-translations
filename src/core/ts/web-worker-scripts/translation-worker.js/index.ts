@@ -132,7 +132,7 @@ addOnPreMain(function() {
       alignmentSize: number,
     ) => {
       const byteArray = new Int8Array(buffer);
-      console.debug("byteArray size: ", byteArray.byteLength);
+      // console.debug("byteArray size: ", byteArray.byteLength);
       const alignedMemory = new Module.AlignedMemory(
         byteArray.byteLength,
         alignmentSize,
@@ -173,8 +173,6 @@ gemm-precision: int8shift
     // Instantiate the TranslationModel
     const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
     const shortListBuffer = downloadedModelFilesByType.lex.arrayBuffer;
-
-    console.debug({ modelBuffer, shortListBuffer });
 
     // Construct AlignedMemory objects with downloaded buffers
     const alignedModelMemory = constructAlignedMemoryFromBuffer(
