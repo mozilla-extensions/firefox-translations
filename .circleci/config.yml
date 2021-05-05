@@ -12,7 +12,7 @@ jobs:
       # Download and cache dependencies (update the numerical cache key suffix manually to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-7
+            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-8
 
       - run:
           name: Download and import Bergamot Translator build artifacts
@@ -39,7 +39,7 @@ jobs:
             - node_modules
             - firefox-nightly-linux
             - test/e2e/venv
-          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-7
+          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-8
 
       - run:
           name: Print which version of Firefox is installed
