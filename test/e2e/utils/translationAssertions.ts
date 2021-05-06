@@ -99,9 +99,9 @@ export const assertTranslationTelemetryMetadata = (
     "The telemetry payload's string metrics 'metadata.to_lang' is correct",
   );
   assert.strictEqual(
-    telemetryPayload.metrics.string["metadata.firefox_telemetry_client_id"],
+    telemetryPayload.metrics.string["metadata.firefox_client_id"],
     expectedFirefoxTelemetryClientId,
-    "The telemetry payload's string metrics 'metadata.firefox_telemetry_client_id' is correct",
+    "The telemetry payload's string metrics 'metadata.firefox_client_id' is correct",
   );
 };
 

@@ -64,7 +64,7 @@ describe("Never translate language", function() {
 
   it("Telemetry checks after: The translation infobar can be closed via the 'Never translate [Language]' menu item", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(2, 3, proxyInstanceId);
     assertOnNeverTranslateSelectedLanguageTelemetry(
       seenTelemetry[0],
       seenTelemetry[1],
