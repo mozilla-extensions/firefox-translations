@@ -10,13 +10,16 @@ import {
   TranslationRequestProgress,
 } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
+import { Patch } from "mobx-keystone";
 
 /**
  * Helper class to communicate updated document translation states.
  *
- * Method implementations are wrapped in setTimeout to prevent
- * automatic (by mobx) batching of updates - we want status indicators
- * to get the updated translation status immediately.
+ * State patching code is wrapped in setTimeout to prevent
+ * automatic (by mobx) batching of updates which leads to much less frequent
+ * state updates communicated to subscribers. No state updates during a translation
+ * session is not useful since we want to communicate the translation progress)
  */
 export class DocumentTranslationStateCommunicator {
   private frameInfo: FrameInfo;
@@ -26,19 +29,27 @@ export class DocumentTranslationStateCommunicator {
     this.extensionState = extensionState;
   }
 
-  broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
+  patchDocumentTranslationState(patches: Patch[]) {
     setTimeout(() => {
       this.extensionState.patchDocumentTranslationStateByFrameInfo(
         this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationStatus"],
-            value: translationStatus,
-          },
-        ],
+        patches,
       );
     }, 0);
+  }
+
+  broadcastUpdatedAttributeValue(attribute: string, value: any) {
+    this.patchDocumentTranslationState([
+      {
+        op: "replace",
+        path: [attribute],
+        value,
+      },
+    ]);
+  }
+
+  broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
+    this.broadcastUpdatedAttributeValue("translationStatus", translationStatus);
   }
 
   /**
@@ -133,73 +144,68 @@ export class DocumentTranslationStateCommunicator {
         };
       }, emptyDownloadProgress);
 
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "replace",
-            path: ["translationInitiationTimestamp"],
-            value: translationInitiationTimestamp,
-          },
-          {
-            op: "replace",
-            path: ["totalModelLoadWallTimeMs"],
-            value: totalModelLoadWallTimeMs,
-          },
-          {
-            op: "replace",
-            path: ["modelDownloadNecessary"],
-            value: modelDownloadNecessary,
-          },
-          {
-            op: "replace",
-            path: ["modelDownloading"],
-            value: modelDownloading,
-          },
-          {
-            op: "replace",
-            path: ["modelDownloadProgress"],
-            value: modelDownloadProgress,
-          },
-          {
-            op: "replace",
-            path: ["totalTranslationWallTimeMs"],
-            value: totalTranslationWallTimeMs,
-          },
-          {
-            op: "replace",
-            path: ["totalTranslationEngineRequestCount"],
-            value: totalTranslationEngineRequestCount,
-          },
-          {
-            op: "replace",
-            path: ["queuedTranslationEngineRequestCount"],
-            value: queuedTranslationEngineRequestCount,
-          },
-          {
-            op: "replace",
-            path: ["modelLoadNecessary"],
-            value: modelLoadNecessary,
-          },
-          {
-            op: "replace",
-            path: ["modelLoading"],
-            value: modelLoading,
-          },
-          {
-            op: "replace",
-            path: ["modelLoaded"],
-            value: modelLoaded,
-          },
-          {
-            op: "replace",
-            path: ["translationFinished"],
-            value: translationFinished,
-          },
-        ],
-      );
-    }, 0);
+    this.patchDocumentTranslationState([
+      {
+        op: "replace",
+        path: ["translationInitiationTimestamp"],
+        value: translationInitiationTimestamp,
+      },
+      {
+        op: "replace",
+        path: ["totalModelLoadWallTimeMs"],
+        value: totalModelLoadWallTimeMs,
+      },
+      {
+        op: "replace",
+        path: ["modelDownloadNecessary"],
+        value: modelDownloadNecessary,
+      },
+      {
+        op: "replace",
+        path: ["modelDownloading"],
+        value: modelDownloading,
+      },
+      {
+        op: "replace",
+        path: ["modelDownloadProgress"],
+        value: modelDownloadProgress,
+      },
+      {
+        op: "replace",
+        path: ["totalTranslationWallTimeMs"],
+        value: totalTranslationWallTimeMs,
+      },
+      {
+        op: "replace",
+        path: ["totalTranslationEngineRequestCount"],
+        value: totalTranslationEngineRequestCount,
+      },
+      {
+        op: "replace",
+        path: ["queuedTranslationEngineRequestCount"],
+        value: queuedTranslationEngineRequestCount,
+      },
+      {
+        op: "replace",
+        path: ["modelLoadNecessary"],
+        value: modelLoadNecessary,
+      },
+      {
+        op: "replace",
+        path: ["modelLoading"],
+        value: modelLoading,
+      },
+      {
+        op: "replace",
+        path: ["modelLoaded"],
+        value: modelLoaded,
+      },
+      {
+        op: "replace",
+        path: ["translationFinished"],
+        value: translationFinished,
+      },
+    ]);
   }
 
   clear() {
@@ -210,18 +216,12 @@ export class DocumentTranslationStateCommunicator {
     }, 0);
   }
 
-  updatedDetectedLanguageResults(detectedLanguageResults) {
-    setTimeout(() => {
-      this.extensionState.patchDocumentTranslationStateByFrameInfo(
-        this.frameInfo,
-        [
-          {
-            op: "add",
-            path: ["detectedLanguageResults"],
-            value: detectedLanguageResults,
-          },
-        ],
-      );
-    }, 0);
+  updatedDetectedLanguageResults(
+    detectedLanguageResults: DetectedLanguageResults,
+  ) {
+    this.broadcastUpdatedAttributeValue(
+      "detectedLanguageResults",
+      detectedLanguageResults,
+    );
   }
 }

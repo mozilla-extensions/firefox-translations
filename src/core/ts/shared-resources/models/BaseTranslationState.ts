@@ -55,6 +55,10 @@ export class BaseTranslationState extends Model({
   modelLoading: prop<boolean>(),
   modelLoaded: prop<boolean>(),
   translationFinished: prop<boolean>(),
+  modelLoadErrorOccurred: prop<boolean>(),
+  modelDownloadErrorOccurred: prop<boolean>(),
+  translationErrorOccurred: prop<boolean>(),
+  otherErrorOccurred: prop<boolean>(),
 }) {
   @computed
   get effectiveTranslateFrom() {

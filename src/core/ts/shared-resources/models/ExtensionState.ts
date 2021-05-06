@@ -222,6 +222,20 @@ export class ExtensionState extends Model({
             };
           }, emptyDownloadProgress);
 
+        // Merge errorOccurred attributes
+        const modelLoadErrorOccurred = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelLoadErrorOccurred,
+        ).length;
+        const modelDownloadErrorOccurred = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloadErrorOccurred,
+        ).length;
+        const translationErrorOccurred = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.translationErrorOccurred,
+        ).length;
+        const otherErrorOccurred = !!documentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.otherErrorOccurred,
+        ).length;
+
         // Special merging of translation status
         const anyTabHasTranslationStatus = (
           translationStatus: TranslationStatus,
@@ -280,6 +294,10 @@ export class ExtensionState extends Model({
           modelLoading,
           modelLoaded,
           translationFinished,
+          modelLoadErrorOccurred,
+          modelDownloadErrorOccurred,
+          translationErrorOccurred,
+          otherErrorOccurred,
         };
 
         const tabTranslationState = new TabTranslationState(

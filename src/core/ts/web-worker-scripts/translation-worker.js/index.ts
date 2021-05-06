@@ -250,19 +250,19 @@ gemm-precision: int8shift
     return translationResults;
   };
 
-  const handleError = (error: Error, requestId, sourceMethod) => {
+  const handleError = (error: Error, requestId, errorSource) => {
     console.info(
-      `Error/exception caught in worker during ${sourceMethod}:`,
+      `Error/exception caught in worker during ${errorSource}:`,
       error,
     );
     log(
-      `Error/exception caught in worker during ${sourceMethod}: ${error} ${error.stack}`,
+      `Error/exception caught in worker during ${errorSource}: ${error} ${error.stack}`,
     );
     const message: ErrorWorkerMessage = {
       type: `error`,
-      message: `Error/exception caught in worker during ${sourceMethod}: ${error.toString()}`,
+      message: `Error/exception caught in worker during ${errorSource}: ${error.toString()}`,
       requestId,
-      sourceMethod,
+      errorSource,
     };
     postMessage(message);
   };
@@ -297,7 +297,11 @@ gemm-precision: int8shift
             postMessage(message);
           })
           .catch(error => {
-            handleError(error, requestId, "loadModel");
+            if (error.name === "ModelDownloadError") {
+              handleError(error, requestId, "downloadModel");
+            } else {
+              handleError(error, requestId, "loadModel");
+            }
           });
       } catch (error) {
         handleError(error, requestId, "loadModel");

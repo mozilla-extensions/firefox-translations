@@ -12,6 +12,11 @@ import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
 import { detag } from "./dom-translators/detagAndProject";
 import { FrameTranslationProgress } from "./dom-translators/BaseDomTranslator";
+import {
+  BergamotTranslatorAPIModelDownloadError,
+  BergamotTranslatorAPIModelLoadError,
+  BergamotTranslatorAPITranslationError,
+} from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
@@ -246,11 +251,46 @@ export class DomTranslationManager {
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.TRANSLATED,
       );
-    } catch (ex) {
-      console.warn("Translation error occurred: ", ex);
+    } catch (err) {
+      console.warn("Translation error occurred: ", err);
       translationDocument.translationError = true;
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.ERROR,
+      );
+    } finally {
+      // Communicate that errors occurred
+      // Positioned in finally-clause so that it gets communicated whether the
+      // translation attempt resulted in some translated content or not
+      domTranslator.errorsEncountered.forEach(
+        (
+          error:
+            | Error
+            | BergamotTranslatorAPIModelDownloadError
+            | BergamotTranslatorAPIModelLoadError
+            | BergamotTranslatorAPITranslationError,
+        ) => {
+          if (error.name === "BergamotTranslatorAPIModelLoadError") {
+            this.documentTranslationStateCommunicator.broadcastUpdatedAttributeValue(
+              "modelLoadErrorOccurred",
+              true,
+            );
+          } else if (error.name === "BergamotTranslatorAPIModelDownloadError") {
+            this.documentTranslationStateCommunicator.broadcastUpdatedAttributeValue(
+              "modelDownloadErrorOccurred",
+              true,
+            );
+          } else if (error.name === "BergamotTranslatorAPITranslationError") {
+            this.documentTranslationStateCommunicator.broadcastUpdatedAttributeValue(
+              "translationErrorOccurred",
+              true,
+            );
+          } else {
+            this.documentTranslationStateCommunicator.broadcastUpdatedAttributeValue(
+              "otherErrorOccurred",
+              true,
+            );
+          }
+        },
       );
     }
   }

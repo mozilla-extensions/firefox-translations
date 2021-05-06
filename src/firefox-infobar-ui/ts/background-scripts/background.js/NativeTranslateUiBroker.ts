@@ -274,6 +274,38 @@ export class NativeTranslateUiBroker {
                 );
               }
             }
+            if (hasChanged("modelLoadErrorOccurred")) {
+              if (tts.modelLoadErrorOccurred) {
+                telemetry.onModelLoadErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("modelDownloadErrorOccurred")) {
+              if (tts.modelDownloadErrorOccurred) {
+                telemetry.onModelDownloadErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("translationErrorOccurred")) {
+              if (tts.translationErrorOccurred) {
+                telemetry.onTranslationErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("otherErrorOccurred")) {
+              if (tts.otherErrorOccurred) {
+                telemetry.onOtherErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
           },
         );
         // TODO: check _previousTabTranslationStates for those that had something and now should be inactive

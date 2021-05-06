@@ -22,6 +22,7 @@ import {
   notNow,
 } from "./generated/infobar";
 import { langMismatch, notSupported } from "./generated/service";
+import { modelDownload, translation } from "./generated/errors";
 
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
@@ -179,6 +180,28 @@ export class Telemetry {
       notSupported.add(1);
       this.recordCommonMetadata(from, to);
     });
+  }
+
+  public onModelLoadErrorOccurred(from: string, to: string) {
+    // TODO?
+  }
+
+  public onModelDownloadErrorOccurred(from: string, to: string) {
+    this.submit(() => {
+      modelDownload.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onTranslationErrorOccurred(from: string, to: string) {
+    this.submit(() => {
+      translation.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onOtherErrorOccurred(from: string, to: string) {
+    // TODO?
   }
 
   /**

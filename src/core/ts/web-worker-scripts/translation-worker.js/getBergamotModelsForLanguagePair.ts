@@ -18,6 +18,10 @@ export interface DownloadedModelFile {
   sha256Hash: string;
 }
 
+export class ModelDownloadError extends Error {
+  public name = "ModelDownloadError";
+}
+
 export const getBergamotModelsForLanguagePair = async (
   languagePair: string,
   bergamotModelsBaseUrl: string,
@@ -29,7 +33,9 @@ export const getBergamotModelsForLanguagePair = async (
   ) => void,
 ): Promise<DownloadedModelFile[]> => {
   if (!modelRegistry[languagePair]) {
-    throw new Error(`Language pair '${languagePair}' not supported`);
+    throw new ModelDownloadError(
+      `Language pair '${languagePair}' not supported`,
+    );
   }
 
   const downloadStart = Date.now();
@@ -171,14 +177,16 @@ export const getBergamotModelsForLanguagePair = async (
             `${name}: An error occurred while downloading/persisting the file`,
             { $$err },
           );
-          throw $$err;
+          const errorToThrow = new ModelDownloadError($$err.message);
+          errorToThrow.stack = $$err.stack;
+          throw errorToThrow;
         }
       } else {
         log(`${name}: Model file from ${url} previously downloaded already`);
       }
 
       if (response.status >= 400) {
-        throw new Error("Model file download failed");
+        throw new ModelDownloadError("Model file download failed");
       }
 
       const arrayBuffer = await response.arrayBuffer();
@@ -193,7 +201,7 @@ export const getBergamotModelsForLanguagePair = async (
             expectedSha256Hash,
           },
         );
-        throw new Error(
+        throw new ModelDownloadError(
           `Model file download integrity check failed for ${languagePair}'s ${type} file`,
         );
       }
