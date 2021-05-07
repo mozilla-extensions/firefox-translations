@@ -46,6 +46,28 @@ addOnPreMain(function() {
   };
 
   /**
+   * If we end up in a situation where we want to make sure that an instance is deleted
+   * and the instance was in fact already deleted, then let that happen without throwing
+   * a fatal error.
+   *
+   * @param instance
+   */
+  const safelyDeleteInstance = instance => {
+    try {
+      instance.delete();
+    } catch (err) {
+      if (
+        err.name === "BindingError" &&
+        err.message.includes("instance already deleted")
+      ) {
+        // ignore
+        return;
+      }
+      throw err;
+    }
+  };
+
+  /**
    * Automatically download the appropriate translation models, vocabularies and lexical shortlists if not already locally present
    */
   const downloadModel = async (
@@ -113,7 +135,7 @@ addOnPreMain(function() {
 
     // Delete previous instance if a model is already loaded
     if (model) {
-      model.delete();
+      safelyDeleteInstance(model);
     }
 
     // Download or hydrate model files to/from persistent storage
@@ -244,8 +266,8 @@ gemm-precision: int8shift
     }
 
     // Clean up the instances
-    request.delete();
-    input.delete();
+    safelyDeleteInstance(request);
+    safelyDeleteInstance(input);
 
     return translationResults;
   };
