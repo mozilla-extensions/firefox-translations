@@ -55,6 +55,14 @@ async function generateManifest({ dotEnvPath }) {
     };
     manifest.hidden = false;
     manifest.experiment_apis = {
+      telemetryPreferences: {
+        schema: "./experiment-apis/telemetryPreferences/schema.json",
+        parent: {
+          scopes: ["addon_parent"],
+          script: "./experiment-apis/telemetryPreferences/api.js",
+          paths: [["experiments", "telemetryPreferences"]],
+        },
+      },
       translateUi: {
         schema: "./experiment-apis/translateUi/schema.json",
         parent: {

@@ -91,12 +91,17 @@ interface TranslationApiLimits {
   MAX_REQUESTS: number;
 }
 
+export class DomTranslatorError extends Error {
+  public name = "DomTranslatorError";
+}
+
 /**
  * Base class for DOM translators that splits the document into several chunks
  * respecting the data limits of the backing API.
  */
 export class BaseDomTranslator extends MinimalDomTranslator {
   public translatedCharacterCount: number;
+  public errorsEncountered: Error[];
   public partialSuccess: boolean;
   private translationApiClient: TranslationApiClient;
   private parseChunkResult: TranslationParseChunkResultFunction;
@@ -125,6 +130,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   ) {
     super(translationDocument, sourceLanguage, targetLanguage);
     this.translatedCharacterCount = 0;
+    this.errorsEncountered = [];
     this.partialSuccess = false;
     this.translationApiClient = translationApiClient;
     this.parseChunkResult = parseChunkResult;
@@ -158,8 +164,6 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       string,
       TranslationRequestProgress
     > = new Map();
-
-    const errorsEncountered = [];
 
     // Split the document into various requests to be sent to the translation API
     for (
@@ -213,12 +217,12 @@ export class BaseDomTranslator extends MinimalDomTranslator {
             );
           } else {
             throw new Error(
-              "The returned translationResonseData was false/empty",
+              "The returned translationResponseData was false/empty",
             );
           }
         })
         .catch(err => {
-          errorsEncountered.push(err);
+          this.errorsEncountered.push(err);
         });
 
       console.info(
@@ -244,11 +248,17 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     // Wait for all requests to settle
     await Promise.allSettled(chunksBeingProcessed);
 
+    // Surface encountered errors
+    console.warn(
+      "Errors were encountered during translation",
+      this.errorsEncountered,
+    );
+
     // If at least one chunk was successful, the
     // translation should be displayed, albeit incomplete.
     // Otherwise, the "Error" state will appear.
     if (!this.partialSuccess) {
-      throw new Error("No content was translated");
+      throw new DomTranslatorError("No content was translated");
     }
     return {
       characterCount: this.translatedCharacterCount,

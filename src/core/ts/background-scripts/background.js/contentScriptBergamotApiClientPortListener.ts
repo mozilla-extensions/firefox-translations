@@ -68,8 +68,16 @@ export const contentScriptBergamotApiClientPortListener = (port: Port) => {
           `Caught exception/error in content script bergamot api client port listener:`,
           err,
         );
+        // Make possibly unserializable errors serializable by only sending name, message and stack
+        let communicatedError;
+        if (err instanceof Error) {
+          const { name, message, stack } = err;
+          communicatedError = { name, message, stack };
+        } else {
+          communicatedError = err;
+        }
         const translationRequestUpdate: TranslationRequestUpdate = {
-          error: err.message || err,
+          error: communicatedError,
           requestId,
         };
         port.postMessage({

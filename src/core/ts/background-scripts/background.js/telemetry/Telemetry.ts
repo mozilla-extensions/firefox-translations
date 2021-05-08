@@ -11,7 +11,7 @@ import {
   wordsPerSecond,
   modelDownloadTime,
 } from "./generated/performance";
-import { fromLang, toLang } from "./generated/metadata";
+import { fromLang, toLang, firefoxClientId } from "./generated/metadata";
 import {
   displayed,
   changeLang,
@@ -21,6 +21,8 @@ import {
   neverTranslateLang,
   notNow,
 } from "./generated/infobar";
+import { langMismatch, notSupported } from "./generated/service";
+import { modelDownload, translation } from "./generated/errors";
 
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
@@ -33,49 +35,67 @@ import {
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  */
 export class Telemetry {
-  constructor() {
+  private initialized: boolean;
+  private firefoxClientId: string;
+  public initialize(uploadEnabled: boolean, $firefoxClientId: string) {
     const appId = config.telemetryAppId;
+    this.setFirefoxClientId($firefoxClientId);
     try {
-      Glean.initialize(appId, true, {
+      Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
       });
       console.info(
         `Telemetry: initialization completed with application ID ${appId}.`,
       );
+      this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
     }
   }
 
+  public uploadEnabledPreferenceUpdated(uploadEnabled: boolean) {
+    console.log(
+      "Telemetry: communicating updated uploadEnabled preference to Glean.js",
+      { uploadEnabled },
+    );
+    Glean.setUploadEnabled(uploadEnabled);
+  }
+
+  public setFirefoxClientId($firefoxClientId: string) {
+    this.firefoxClientId = $firefoxClientId;
+  }
+
+  public recordCommonMetadata(from: string, to: string) {
+    fromLang.set(from);
+    toLang.set(to);
+    firefoxClientId.set(this.firefoxClientId);
+  }
+
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       displayed.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
     this.submit(() => {
-      fromLang.set(newFrom);
-      toLang.set(to);
       changeLang.record();
+      this.recordCommonMetadata(newFrom, to);
     });
   }
 
   public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(newTo);
       changeLang.record();
+      this.recordCommonMetadata(from, newTo);
     });
   }
 
   public onInfoBarClosed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       closed.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -85,17 +105,15 @@ export class Telemetry {
     to: string,
   ) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       neverTranslateLang.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       neverTranslateSite.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -117,17 +135,15 @@ export class Telemetry {
 
   public onTranslateButtonPressed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       translate.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       notNow.record();
+      this.recordCommonMetadata(from, to);
     });
   }
 
@@ -144,22 +160,62 @@ export class Telemetry {
     $modelDownloadTime: number,
   ) {
     this.submit(() => {
-      fromLang.set(from);
-      toLang.set(to);
       modelLoadTime.set(String(modelLoadWallTimeMs));
       translationTime.set(String(translationWallTimeMs));
       wordsPerSecond.set(String(Math.round($wordsPerSecond)));
       modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+      this.recordCommonMetadata(from, to);
     });
+  }
+
+  public onTranslationStatusOffer(from: string, to: string) {
+    this.submit(() => {
+      langMismatch.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onTranslationStatusTranslationUnsupported(from: string, to: string) {
+    this.submit(() => {
+      notSupported.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onModelLoadErrorOccurred(from: string, to: string) {
+    // TODO?
+  }
+
+  public onModelDownloadErrorOccurred(from: string, to: string) {
+    this.submit(() => {
+      modelDownload.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onTranslationErrorOccurred(from: string, to: string) {
+    this.submit(() => {
+      translation.add(1);
+      this.recordCommonMetadata(from, to);
+    });
+  }
+
+  public onOtherErrorOccurred(from: string, to: string) {
+    // TODO?
   }
 
   /**
    * Submits all collected metrics in a custom ping.
-   * TODO: Always include the fx telemetry id uuid metric in pings
    */
   public submit = (
     telemetryRecordingFunction: false | (() => void) = false,
   ) => {
+    if (!this.initialized) {
+      console.warn(
+        "Telemetry: ignoring ping that was submitted before Telemetry was initialized",
+      );
+      return;
+    }
     try {
       if (telemetryRecordingFunction) {
         telemetryRecordingFunction();

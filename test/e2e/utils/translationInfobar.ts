@@ -5,6 +5,7 @@ import {
 import { assert } from "chai";
 import { By, until } from "selenium-webdriver";
 import { lookForBrowserElement } from "./lookForElement";
+import { assertTranslationTelemetryMetadata } from "./translationAssertions";
 
 const cssSelectorForInfobarDeck = `#tab-notification-deck > vbox`;
 
@@ -177,13 +178,10 @@ export const assertOnInfoBarDisplayedTelemetry = (
     "displayed",
     "The telemetry payload's event name is 'displayed'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload,
+    expectedFromLang,
+    expectedToLang,
   );
 };
 
@@ -208,13 +206,10 @@ export const assertOnInfoBarClosedTelemetry = (
     "closed",
     "The telemetry payload's event name is 'closed'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload,
+    expectedFromLang,
+    expectedToLang,
   );
 };
 
@@ -240,13 +235,10 @@ export const assertOnNeverTranslateSelectedLanguageTelemetry = (
     "never_translate_lang",
     "The first telemetry payload's event name is 'never_translate_lang'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload1.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload1,
+    expectedFromLang,
+    expectedToLang,
   );
   assertOnInfoBarClosedTelemetry(
     telemetryPayload2,
@@ -277,13 +269,10 @@ export const assertOnNeverTranslateThisSiteTelemetry = (
     "never_translate_site",
     "The first telemetry payload's event name is 'never_translate_site'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload1.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload1,
+    expectedFromLang,
+    expectedToLang,
   );
   assertOnInfoBarClosedTelemetry(
     telemetryPayload2,
@@ -313,13 +302,10 @@ export const assertOnTranslateButtonPressedTelemetry = (
     "translate",
     "The telemetry payload's event name is 'translate'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload,
+    expectedFromLang,
+    expectedToLang,
   );
 };
 
@@ -345,13 +331,10 @@ export const assertOnNotNowButtonPressedTelemetry = (
     "not_now",
     "The first telemetry payload's event name is 'not_now'",
   );
-  assert.deepStrictEqual(
-    telemetryPayload1.metrics.string,
-    {
-      "metadata.from_lang": expectedFromLang,
-      "metadata.to_lang": expectedToLang,
-    },
-    "The telemetry payload's string metrics are correct",
+  assertTranslationTelemetryMetadata(
+    telemetryPayload1,
+    expectedFromLang,
+    expectedToLang,
   );
   assertOnInfoBarClosedTelemetry(
     telemetryPayload2,

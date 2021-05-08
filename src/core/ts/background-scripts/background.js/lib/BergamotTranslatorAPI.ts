@@ -101,7 +101,7 @@ export interface ErrorWorkerMessage extends WorkerMessage {
   type: "error";
   message: string;
   requestId: string;
-  sourceMethod: "loadModel" | "translate";
+  errorSource: "loadModel" | "downloadModel" | "translate";
 }
 
 type IncomingWorkerMessage =
@@ -110,6 +110,18 @@ type IncomingWorkerMessage =
   | TranslationResultsWorkerMessage
   | LogWorkerMessage
   | ErrorWorkerMessage;
+
+export class BergamotTranslatorAPITranslationError extends Error {
+  public name = "BergamotTranslatorAPITranslationError";
+}
+
+export class BergamotTranslatorAPIModelLoadError extends Error {
+  public name = "BergamotTranslatorAPIModelLoadError";
+}
+
+export class BergamotTranslatorAPIModelDownloadError extends Error {
+  public name = "BergamotTranslatorAPIModelDownloadError";
+}
 
 /**
  * Class responsible for instantiating and communicating between this script
@@ -202,10 +214,19 @@ class WorkerManager {
   }
 
   onError(errorWorkerMessage: ErrorWorkerMessage) {
-    const { requestId, message } = errorWorkerMessage;
-    this.pendingRequests
-      .get(requestId)
-      .reject(`Error event in worker: ${message}`);
+    const { requestId, message, errorSource } = errorWorkerMessage;
+    const apiErrorMessage = `Error event occurred during ${errorSource} in worker (requestId=${requestId}): ${message}`;
+    let error;
+    if (errorSource === "loadModel") {
+      error = new BergamotTranslatorAPIModelLoadError(apiErrorMessage);
+    } else if (errorSource === "downloadModel") {
+      error = new BergamotTranslatorAPIModelDownloadError(apiErrorMessage);
+    } else if (errorSource === "translate") {
+      error = new BergamotTranslatorAPITranslationError(apiErrorMessage);
+    } else {
+      error = new Error(apiErrorMessage);
+    }
+    this.pendingRequests.get(requestId).reject(error);
   }
 
   private _worker;

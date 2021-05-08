@@ -32,6 +32,8 @@ export const fixtures: { [k: string]: Fixture } = {
 
 export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
 
+const expectedFirefoxTelemetryClientId = "12345678-90ab-cdef-1234-567890abcdef";
+
 async function lookForFixturePageOriginalContent(
   driver: WebDriver,
   fixture: Fixture,
@@ -81,7 +83,7 @@ export const assertTranslationSucceeded = async (
   assertElementExists(translatedPageElement, "translatedPageElement");
 };
 
-export const assertOnTranslationAttemptConcludedTelemetry = (
+export const assertTranslationTelemetryMetadata = (
   telemetryPayload,
   expectedFromLang: string,
   expectedToLang: string,
@@ -95,6 +97,23 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     telemetryPayload.metrics.string["metadata.to_lang"],
     expectedToLang,
     "The telemetry payload's string metrics 'metadata.to_lang' is correct",
+  );
+  assert.strictEqual(
+    telemetryPayload.metrics.string["metadata.firefox_client_id"],
+    expectedFirefoxTelemetryClientId,
+    "The telemetry payload's string metrics 'metadata.firefox_client_id' is correct",
+  );
+};
+
+export const assertOnTranslationAttemptConcludedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
+  assertTranslationTelemetryMetadata(
+    telemetryPayload,
+    expectedFromLang,
+    expectedToLang,
   );
   // Check telemetry for: Translated words per second, Model load time, Translation time, Model download time
   assert(

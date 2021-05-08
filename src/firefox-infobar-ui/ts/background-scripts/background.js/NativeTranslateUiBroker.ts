@@ -61,6 +61,12 @@ type StandardInfobarInteractionEvent = Event<
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {
   experiments: {
+    telemetryPreferences: {
+      onUploadEnabledPrefChange: Event<() => void>;
+      onCachedClientIDPrefChange: Event<() => void>;
+      getUploadEnabledPref: () => Promise<boolean>;
+      getCachedClientIDPref: () => Promise<string>;
+    };
     translateUi: {
       start: () => Promise<void>;
       stop: () => Promise<void>;
@@ -87,6 +93,10 @@ interface BrowserWithExperimentAPIs extends browserInterface {
 }
 const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
 
+type TelemetryPreferencesEventRef =
+  | "onUploadEnabledPrefChange"
+  | "onCachedClientIDPrefChange";
+
 type NativeTranslateUiEventRef =
   | "onInfoBarDisplayed"
   | "onSelectTranslateTo"
@@ -101,11 +111,16 @@ type NativeTranslateUiEventRef =
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;
-  private eventsToObserve: NativeTranslateUiEventRef[];
+  private telemetryPreferencesEventsToObserve: TelemetryPreferencesEventRef[];
+  private translateUiEventsToObserve: NativeTranslateUiEventRef[];
 
   constructor(extensionState) {
     this.extensionState = extensionState;
-    this.eventsToObserve = [
+    this.telemetryPreferencesEventsToObserve = [
+      "onUploadEnabledPrefChange",
+      "onCachedClientIDPrefChange",
+    ];
+    this.translateUiEventsToObserve = [
       "onInfoBarDisplayed",
       "onSelectTranslateTo",
       "onSelectTranslateFrom",
@@ -120,11 +135,28 @@ export class NativeTranslateUiBroker {
   }
 
   async start() {
-    this.eventsToObserve.map((eventRef: NativeTranslateUiEventRef) => {
-      browserWithExperimentAPIs.experiments.translateUi[eventRef].addListener(
-        this[eventRef].bind(this),
-      );
-    });
+    // Current value of Telemetry preferences
+    const uploadEnabled = await browserWithExperimentAPIs.experiments.telemetryPreferences.getUploadEnabledPref();
+    const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
+
+    // Initialize telemetry
+    telemetry.initialize(uploadEnabled, cachedClientID);
+
+    // Hook up experiment API events with listeners in this class
+    this.telemetryPreferencesEventsToObserve.map(
+      (eventRef: TelemetryPreferencesEventRef) => {
+        browserWithExperimentAPIs.experiments.telemetryPreferences[
+          eventRef
+        ].addListener(this[eventRef].bind(this));
+      },
+    );
+    this.translateUiEventsToObserve.map(
+      (eventRef: NativeTranslateUiEventRef) => {
+        browserWithExperimentAPIs.experiments.translateUi[eventRef].addListener(
+          this[eventRef].bind(this),
+        );
+      },
+    );
     await browserWithExperimentAPIs.experiments.translateUi.start();
 
     const { summarizeLanguageSupport } = new LanguageSupport();
@@ -215,11 +247,82 @@ export class NativeTranslateUiBroker {
               tabId,
               uiState,
             );
+            // Send telemetry on some translation status changes
+            const hasChanged = property => {
+              const previousTabTranslationState = _previousTabTranslationStates.get(
+                tabId,
+              );
+              return (
+                !previousTabTranslationState ||
+                tts[property] !== previousTabTranslationState[property]
+              );
+            };
+            if (hasChanged("translationStatus")) {
+              if (tts.translationStatus === TranslationStatus.OFFER) {
+                telemetry.onTranslationStatusOffer(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+              if (
+                tts.translationStatus ===
+                TranslationStatus.TRANSLATION_UNSUPPORTED
+              ) {
+                telemetry.onTranslationStatusTranslationUnsupported(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("modelLoadErrorOccurred")) {
+              if (tts.modelLoadErrorOccurred) {
+                telemetry.onModelLoadErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("modelDownloadErrorOccurred")) {
+              if (tts.modelDownloadErrorOccurred) {
+                telemetry.onModelDownloadErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("translationErrorOccurred")) {
+              if (tts.translationErrorOccurred) {
+                telemetry.onTranslationErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
+            if (hasChanged("otherErrorOccurred")) {
+              if (tts.otherErrorOccurred) {
+                telemetry.onOtherErrorOccurred(
+                  tts.effectiveTranslateFrom,
+                  tts.effectiveTranslateTo,
+                );
+              }
+            }
           },
         );
         // TODO: check _previousTabTranslationStates for those that had something and now should be inactive
       },
     );
+  }
+
+  async onUploadEnabledPrefChange() {
+    const uploadEnabled = await browserWithExperimentAPIs.experiments.telemetryPreferences.getUploadEnabledPref();
+    // console.debug("onUploadEnabledPrefChange", { uploadEnabled });
+    telemetry.uploadEnabledPreferenceUpdated(uploadEnabled);
+  }
+
+  async onCachedClientIDPrefChange() {
+    const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
+    // console.debug("onCachedClientIDPrefChange", { cachedClientID });
+    telemetry.setFirefoxClientId(cachedClientID);
   }
 
   onInfoBarDisplayed(tabId: number, from: string, to: string) {
@@ -277,7 +380,12 @@ export class NativeTranslateUiBroker {
 
   async stop() {
     await browserWithExperimentAPIs.experiments.translateUi.stop();
-    this.eventsToObserve.map(eventRef => {
+    this.telemetryPreferencesEventsToObserve.map(eventRef => {
+      browserWithExperimentAPIs.experiments.telemetryPreferences[
+        eventRef
+      ].removeListener(this[eventRef] as any);
+    });
+    this.translateUiEventsToObserve.map(eventRef => {
       browserWithExperimentAPIs.experiments.translateUi[
         eventRef
       ].removeListener(this[eventRef] as any);

@@ -5,7 +5,7 @@
   "author": "Mozilla",
   "dependencies": {
     "@ant-design/colors": "^4.0.5",
-    "@mozilla/glean": "^0.8.1",
+    "@mozilla/glean": "^0.11.0",
     "@popperjs/core": "^2.4.4",
     "@sentry/browser": "^5.15.5",
     "classnames": "^2.2.6",
@@ -115,7 +115,7 @@
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">=1.21.1",
-    "node": ">=10.18.0"
+    "node": ">=12.20.0"
   },
   "husky": {
     "hooks": {
@@ -176,8 +176,9 @@
     "format:eslint": "npm run lint:eslint -- --fix",
     "format:fixpack": "fixpack",
     "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --ignore-path=.eslintignore --write",
-    "generate-glean": "npm-run-all generate-glean:metrics generate-glean:docs format",
+    "generate-glean": "npm-run-all generate-glean:metrics generate-glean:glinter generate-glean:docs format",
     "generate-glean:docs": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean translate -o ./generated -f markdown metrics.yaml pings.yaml",
+    "generate-glean:glinter": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean glinter metrics.yaml pings.yaml",
     "generate-glean:metrics": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean translate -o ./generated -f typescript metrics.yaml pings.yaml",
     "generate-manifest": "node generate-manifest.js",
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",

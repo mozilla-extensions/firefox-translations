@@ -1122,10 +1122,10 @@
   dependencies:
     extend "3.0.2"
 
-"@mozilla/glean@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.8.1.tgz#c54f4da452df48e45cf5d52ebbdc279b29bed8b8"
-  integrity sha512-k46urhMPTT8S6Rb6a5AYjP+sSW4seXu22zxOhZ91x10EgXlpl+Z9U/HaK9HYhNW854pty//p0O1Qx4SEXCZQvQ==
+"@mozilla/glean@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.11.0.tgz#48f00acfd4d55bb88af511fd7075220d45fc6bb4"
+  integrity sha512-ApVv0yF293WQ2hupnaEa7C+R6DrBIr8mqUUey0Rx0RIvV4mlgDSmmWUROdlUZQn0TR5EchAWwNfIJh5LgetHBg==
   dependencies:
     jose "^3.7.0"
     uuid "^8.3.2"

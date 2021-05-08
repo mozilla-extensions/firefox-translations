@@ -46,6 +46,22 @@ metadata:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
+  firefox_client_id:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Firefox Telemetry client id.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/92
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
 
 performance:
   translation_time:
@@ -244,7 +260,7 @@ infobar:
     expires: 2021-08-10
 
 service:
-  not_suppported:
+  not_supported:
     type: counter
     lifetime: ping
     send_in_pings:
