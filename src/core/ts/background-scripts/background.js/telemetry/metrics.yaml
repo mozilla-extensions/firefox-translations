@@ -58,7 +58,7 @@ metadata:
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
-      - interaction
+      - technical
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
