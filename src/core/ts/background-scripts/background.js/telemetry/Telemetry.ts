@@ -23,6 +23,7 @@ import {
 } from "./generated/infobar";
 import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
+import { nanoid } from "nanoid";
 
 type TelemetryRecordingFunction = () => void;
 
@@ -232,6 +233,9 @@ export class Telemetry {
         translationWallTimeMs,
         $wordsPerSecond,
         $modelDownloadTime,
+        // Force this ping not to be grouped with other pings since there are no events nor counters which would
+        // allows us to distinguish translation finished events with identical metadata from each other
+        uuid: nanoid(),
       },
     );
   }
