@@ -67,6 +67,9 @@ interface BrowserWithExperimentAPIs extends browserInterface {
       getUploadEnabledPref: () => Promise<boolean>;
       getCachedClientIDPref: () => Promise<string>;
     };
+    extensionPreferences: {
+      getTelemetryDispatchIntervalInSecondsOverridePref: () => Promise<number>;
+    };
     translateUi: {
       start: () => Promise<void>;
       stop: () => Promise<void>;
@@ -140,7 +143,12 @@ export class NativeTranslateUiBroker {
     const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
 
     // Initialize telemetry
-    telemetry.initialize(uploadEnabled, cachedClientID);
+    const telemetryDispatchIntervalInSecondsOverride = await browserWithExperimentAPIs.experiments.extensionPreferences.getTelemetryDispatchIntervalInSecondsOverridePref();
+    telemetry.initialize(
+      uploadEnabled,
+      cachedClientID,
+      telemetryDispatchIntervalInSecondsOverride,
+    );
 
     // Hook up experiment API events with listeners in this class
     this.telemetryPreferencesEventsToObserve.map(
@@ -390,5 +398,6 @@ export class NativeTranslateUiBroker {
         eventRef
       ].removeListener(this[eventRef] as any);
     });
+    await telemetry.cleanup();
   }
 }

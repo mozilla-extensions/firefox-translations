@@ -83,7 +83,7 @@ describe("Translation: Multiple frames", function() {
 
   it("Telemetry checks after: Translation of all frames", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(2, 3, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(0, 1, proxyInstanceId);
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
     assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1], "es", "en");
   });

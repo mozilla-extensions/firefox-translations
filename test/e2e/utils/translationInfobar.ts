@@ -163,20 +163,18 @@ export const assertOnInfoBarDisplayedTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: Record when the infobar is displayed - with language pair information as metadata
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload.events.length,
     1,
-    "The telemetry payload contains one Glean event",
+    "The telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].category,
-    "infobar",
-    "The telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload.events.filter(
+    event => event.category === "infobar" && event.name === "displayed",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].name,
-    "displayed",
-    "The telemetry payload's event name is 'displayed'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The telemetry payload has at least one infobar displayed event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload,
@@ -191,20 +189,18 @@ export const assertOnInfoBarClosedTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Close'
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload.events.length,
     1,
-    "The telemetry payload contains one Glean event",
+    "The telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].category,
-    "infobar",
-    "The telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload.events.filter(
+    event => event.category === "infobar" && event.name === "closed",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].name,
-    "closed",
-    "The telemetry payload's event name is 'closed'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The telemetry payload has at least one infobar closed event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload,
@@ -220,20 +216,19 @@ export const assertOnNeverTranslateSelectedLanguageTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Never translate language'"
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload1.events.length,
     1,
-    "The first telemetry payload contains one Glean event",
+    "The first telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].category,
-    "infobar",
-    "The first telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload1.events.filter(
+    event =>
+      event.category === "infobar" && event.name === "never_translate_lang",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].name,
-    "never_translate_lang",
-    "The first telemetry payload's event name is 'never_translate_lang'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The first telemetry payload has at least one infobar never_translate_lang event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload1,
@@ -254,20 +249,19 @@ export const assertOnNeverTranslateThisSiteTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Never translate site'"
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload1.events.length,
     1,
-    "The first telemetry payload contains one Glean event",
+    "The first telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].category,
-    "infobar",
-    "The first telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload1.events.filter(
+    event =>
+      event.category === "infobar" && event.name === "never_translate_site",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].name,
-    "never_translate_site",
-    "The first telemetry payload's event name is 'never_translate_site'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The first telemetry payload has at least one infobar never_translate_site event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload1,
@@ -287,20 +281,18 @@ export const assertOnTranslateButtonPressedTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Translate'
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload.events.length,
     1,
-    "The telemetry payload contains one Glean event",
+    "The telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].category,
-    "infobar",
-    "The telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload.events.filter(
+    event => event.category === "infobar" && event.name === "translate",
   );
-  assert.strictEqual(
-    telemetryPayload.events[0].name,
-    "translate",
-    "The telemetry payload's event name is 'translate'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The telemetry payload has at least one infobar translate event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload,
@@ -316,20 +308,18 @@ export const assertOnNotNowButtonPressedTelemetry = (
   expectedToLang: string,
 ) => {
   // Check telemetry for: When the user hits the infobar button or menu item 'Not Now'"
-  assert.strictEqual(
+  assert.isAtLeast(
     telemetryPayload1.events.length,
     1,
-    "The first telemetry payload contains one Glean event",
+    "The first telemetry payload contains at least one Glean event",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].category,
-    "infobar",
-    "The first telemetry payload's event category is 'infobar'",
+  const infobarEvents = telemetryPayload1.events.filter(
+    event => event.category === "infobar" && event.name === "not_now",
   );
-  assert.strictEqual(
-    telemetryPayload1.events[0].name,
-    "not_now",
-    "The first telemetry payload's event name is 'not_now'",
+  assert.isAtLeast(
+    infobarEvents.length,
+    1,
+    "The telemetry payload has at least one infobar not_now event",
   );
   assertTranslationTelemetryMetadata(
     telemetryPayload1,

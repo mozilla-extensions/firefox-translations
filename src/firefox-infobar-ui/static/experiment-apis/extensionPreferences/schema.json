@@ -1,0 +1,15 @@
+[
+  {
+    "namespace": "experiments.extensionPreferences",
+    "description": "Enables read-only access to specific Extensions-related about:config preferences",
+    "functions": [
+      {
+        "name": "getTelemetryDispatchIntervalInSecondsOverridePref",
+        "type": "function",
+        "description": "Get the `extensions.translations.telemetryDispatchIntervalInSecondsOverride` preference's value",
+        "parameters": [],
+        "async": true
+      }
+    ]
+  }
+]

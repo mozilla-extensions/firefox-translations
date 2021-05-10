@@ -83,7 +83,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(1, 1, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
     assertOnInfoBarDisplayedTelemetry(seenTelemetry[0], "es", "en");
   });
 
@@ -96,8 +96,8 @@ describe("Basic infobar interactions", function() {
   });
 
   it("Telemetry checks after: Translation via the infobar works", async function() {
-    // ... this test continues the sessiAn from the previous test
-    const seenTelemetry = await readSeenTelemetry(2, 3, proxyInstanceId);
+    // ... this test continues the session from the previous test
+    const seenTelemetry = await readSeenTelemetry(1, 2, proxyInstanceId);
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
     assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1], "es", "en");
   });
@@ -111,7 +111,7 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(6, 6, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(3, 3, proxyInstanceId);
     assertOnInfoBarClosedTelemetry(seenTelemetry[0], "es", "en");
   });
 
@@ -124,10 +124,10 @@ describe("Basic infobar interactions", function() {
 
   it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(9, 10, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(4, 4, proxyInstanceId);
     assertOnNotNowButtonPressedTelemetry(
       seenTelemetry[0],
-      seenTelemetry[1],
+      seenTelemetry[0],
       "es",
       "en",
     );

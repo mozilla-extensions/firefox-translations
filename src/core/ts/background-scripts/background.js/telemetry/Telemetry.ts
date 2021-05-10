@@ -24,6 +24,8 @@ import {
 import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
 
+type TelemetryRecordingFunction = () => void;
+
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
  *
@@ -33,11 +35,22 @@ import { modelDownload, translation } from "./generated/errors";
  *
  * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
+ *
+ * Pings are grouped by from/to metadata combination and submitted every hour in order to avoid
+ * sending one ping per application event. The "one hour" period can be overridden to facilitate testing by setting
+ * the telemetryDispatchIntervalInSecondsOverride string argument at initialization
  */
 export class Telemetry {
   private initialized: boolean;
   private firefoxClientId: string;
-  public initialize(uploadEnabled: boolean, $firefoxClientId: string) {
+  private queuedPingsByMetadataHash: {
+    [metadataHash: string]: TelemetryRecordingFunction[];
+  } = {};
+  public initialize(
+    uploadEnabled: boolean,
+    $firefoxClientId: string,
+    telemetryDispatchIntervalInSecondsOverride: number,
+  ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
     try {
@@ -47,6 +60,27 @@ export class Telemetry {
       console.info(
         `Telemetry: initialization completed with application ID ${appId}.`,
       );
+
+      // Submit queued pings every hour, or as dictated by telemetryDispatchIntervalInSecondsOverride
+      const periodInSeconds = telemetryDispatchIntervalInSecondsOverride
+        ? telemetryDispatchIntervalInSecondsOverride
+        : 60 * 60;
+      console.debug(
+        `Setting up the "${this.periodicAlarmName}" periodic callback to fire every ${periodInSeconds} seconds`,
+      );
+      const alarmListener = async alarm => {
+        if (alarm.name === this.periodicAlarmName) {
+          console.debug(
+            `The "${this.periodicAlarmName}" periodic callback fired`,
+          );
+          await this.submitQueuedPings();
+        }
+      };
+      browser.alarms.onAlarm.addListener(alarmListener);
+      browser.alarms.create(this.periodicAlarmName, {
+        periodInMinutes: periodInSeconds / 60,
+      });
+
       this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
@@ -72,31 +106,43 @@ export class Telemetry {
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
-    this.submit(() => {
-      displayed.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        displayed.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
-    this.submit(() => {
-      changeLang.record();
-      this.recordCommonMetadata(newFrom, to);
-    });
+    this.queuePing(
+      () => {
+        changeLang.record();
+        this.recordCommonMetadata(newFrom, to);
+      },
+      { from: newFrom, to },
+    );
   }
 
   public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
-    this.submit(() => {
-      changeLang.record();
-      this.recordCommonMetadata(from, newTo);
-    });
+    this.queuePing(
+      () => {
+        changeLang.record();
+        this.recordCommonMetadata(from, newTo);
+      },
+      { from, to: newTo },
+    );
   }
 
   public onInfoBarClosed(tabId: number, from: string, to: string) {
-    this.submit(() => {
-      closed.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        closed.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onNeverTranslateSelectedLanguage(
@@ -104,17 +150,23 @@ export class Telemetry {
     from: string,
     to: string,
   ) {
-    this.submit(() => {
-      neverTranslateLang.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        neverTranslateLang.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
-    this.submit(() => {
-      neverTranslateSite.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        neverTranslateSite.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onShowOriginalButtonPressed(
@@ -134,17 +186,23 @@ export class Telemetry {
   }
 
   public onTranslateButtonPressed(tabId: number, from: string, to: string) {
-    this.submit(() => {
-      translate.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        translate.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
-    this.submit(() => {
-      notNow.record();
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        notNow.record();
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   /**
@@ -159,27 +217,43 @@ export class Telemetry {
     $wordsPerSecond: number,
     $modelDownloadTime: number,
   ) {
-    this.submit(() => {
-      modelLoadTime.set(String(modelLoadWallTimeMs));
-      translationTime.set(String(translationWallTimeMs));
-      wordsPerSecond.set(String(Math.round($wordsPerSecond)));
-      modelDownloadTime.set(String(Math.round($modelDownloadTime)));
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        modelLoadTime.set(String(modelLoadWallTimeMs));
+        translationTime.set(String(translationWallTimeMs));
+        wordsPerSecond.set(String(Math.round($wordsPerSecond)));
+        modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+        this.recordCommonMetadata(from, to);
+      },
+      {
+        from,
+        to,
+        modelLoadWallTimeMs,
+        translationWallTimeMs,
+        $wordsPerSecond,
+        $modelDownloadTime,
+      },
+    );
   }
 
   public onTranslationStatusOffer(from: string, to: string) {
-    this.submit(() => {
-      langMismatch.add(1);
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        langMismatch.add(1);
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onTranslationStatusTranslationUnsupported(from: string, to: string) {
-    this.submit(() => {
-      notSupported.add(1);
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        notSupported.add(1);
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onModelLoadErrorOccurred(from: string, to: string) {
@@ -187,17 +261,23 @@ export class Telemetry {
   }
 
   public onModelDownloadErrorOccurred(from: string, to: string) {
-    this.submit(() => {
-      modelDownload.add(1);
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        modelDownload.add(1);
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onTranslationErrorOccurred(from: string, to: string) {
-    this.submit(() => {
-      translation.add(1);
-      this.recordCommonMetadata(from, to);
-    });
+    this.queuePing(
+      () => {
+        translation.add(1);
+        this.recordCommonMetadata(from, to);
+      },
+      { from, to },
+    );
   }
 
   public onOtherErrorOccurred(from: string, to: string) {
@@ -207,8 +287,9 @@ export class Telemetry {
   /**
    * Submits all collected metrics in a custom ping.
    */
-  public submit = (
-    telemetryRecordingFunction: false | (() => void) = false,
+  public queuePing = (
+    telemetryRecordingFunction: () => void,
+    metadata: { [k: string]: any },
   ) => {
     if (!this.initialized) {
       console.warn(
@@ -216,16 +297,48 @@ export class Telemetry {
       );
       return;
     }
-    try {
-      if (telemetryRecordingFunction) {
-        telemetryRecordingFunction();
-      }
-      custom.submit();
-      console.info("Telemetry: the ping has been dispatched to Glean.js");
-    } catch (err) {
-      console.error(`Telemetry dispatch error`, err);
+    const metadataHash = JSON.stringify({
+      ...metadata,
+      firefoxClientId: this.firefoxClientId,
+    });
+    if (!this.queuedPingsByMetadataHash[metadataHash]) {
+      this.queuedPingsByMetadataHash[metadataHash] = [];
     }
+    this.queuedPingsByMetadataHash[metadataHash].push(
+      telemetryRecordingFunction,
+    );
+    console.info(`Telemetry: Queued a ping for metadata ${metadataHash}`);
   };
+
+  private periodicAlarmName = `${browser.runtime.id}:periodicTelemetryDispatch`;
+  public submitQueuedPings() {
+    Object.keys(this.queuedPingsByMetadataHash).forEach(
+      (metadataHash: string) => {
+        const pings: TelemetryRecordingFunction[] = this
+          .queuedPingsByMetadataHash[metadataHash];
+        try {
+          pings.forEach(telemetryRecordingFunction => {
+            telemetryRecordingFunction();
+          });
+          custom.submit();
+          console.info(
+            `Telemetry: ${pings.length} pings for metadata ${metadataHash} have been dispatched to Glean.js`,
+          );
+        } catch (err) {
+          console.error(`Telemetry dispatch error`, err);
+        } finally {
+          // We only attempt to dispatch pings once, regardless of errors encountered
+          delete this.queuedPingsByMetadataHash[metadataHash];
+        }
+      },
+    );
+  }
+
+  public async cleanup() {
+    await browser.alarms.clear(this.periodicAlarmName);
+    // Make sure to send buffered telemetry events
+    this.submitQueuedPings();
+  }
 }
 
 // Expose singleton instances
