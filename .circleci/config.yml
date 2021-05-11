@@ -73,15 +73,8 @@ jobs:
 
       - run:
           name: Run tests
-          command: yarn e2e-tests
-          environment:
-            FIREFOX_BINARY: ./firefox-nightly-linux/firefox-bin
-            MOCHA_REPORTER: mocha-junit-reporter
-          when: always
+          command: FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn e2e-tests
 
       - store_artifacts:
           path: "test/e2e/results"
           destination: "test/e2e/results"
-
-      - store_test_results:
-          path: "test/e2e/results/test-results"
