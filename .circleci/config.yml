@@ -74,6 +74,10 @@ jobs:
           destination: "dist"
 
       - run:
+          name: Add-ons Linter
+          command: yarn addons-linter
+
+      - run:
           name: Run tests
           command: FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn e2e-tests
 
