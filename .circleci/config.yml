@@ -20,7 +20,6 @@ jobs:
 
       - run:
           name: Download and import Bergamot Translator build artifacts
-          # Note: the import step runs again before building the extensions, which ensures that the latest .appendix.js is used despite cached artifacts
           command: yarn bergamot-translator:download-and-import
 
       - run:
@@ -51,11 +50,6 @@ jobs:
       - run:
           name: Lint
           command: yarn lint
-
-      - run:
-          name: Import Bergamot Translator build artifacts
-          # The import step runs again here to ensure that the latest .appendix.js is used despite cached artifacts
-          command: yarn bergamot-translator:download-and-import
 
       - run:
           name: Build extension - Firefox Infobar UI
