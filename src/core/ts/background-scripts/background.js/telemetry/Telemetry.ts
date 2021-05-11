@@ -38,8 +38,7 @@ type TelemetryRecordingFunction = () => void;
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  *
  * Pings are grouped by from/to metadata combination and submitted every 5 seconds in order to avoid
- * sending one ping per application event. The "5 seconds" period can be overridden to facilitate testing by setting
- * the telemetryDispatchIntervalInSecondsOverride string argument at initialization
+ * sending one ping per application event.
  */
 export class Telemetry {
   private initialized: boolean;
@@ -47,11 +46,7 @@ export class Telemetry {
   private queuedPingsByMetadataHash: {
     [metadataHash: string]: TelemetryRecordingFunction[];
   } = {};
-  public initialize(
-    uploadEnabled: boolean,
-    $firefoxClientId: string,
-    telemetryDispatchIntervalInSecondsOverride: number,
-  ) {
+  public initialize(uploadEnabled: boolean, $firefoxClientId: string) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
     try {
@@ -62,10 +57,8 @@ export class Telemetry {
         `Telemetry: initialization completed with application ID ${appId}.`,
       );
 
-      // Submit queued pings every 5 seconds, or as dictated by telemetryDispatchIntervalInSecondsOverride
-      const periodInSeconds = telemetryDispatchIntervalInSecondsOverride
-        ? telemetryDispatchIntervalInSecondsOverride
-        : 5;
+      // Submit queued pings every 5 seconds
+      const periodInSeconds = 5;
       console.debug(
         `Setting up the "${this.periodicAlarmName}" periodic callback to fire every ${periodInSeconds} seconds`,
       );
