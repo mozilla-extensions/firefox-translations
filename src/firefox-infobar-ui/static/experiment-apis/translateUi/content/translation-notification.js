@@ -93,39 +93,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
-  updateTranslationProgress(
+  async updateTranslationProgress(
     shouldShowTranslationProgress,
-    modelLoading,
-    queuedTranslationEngineRequestCount,
-    modelDownloading,
-    modelDownloadProgress,
+    localizedTranslationProgressText,
   ) {
-    let progressLabelValue;
-    if (!shouldShowTranslationProgress) {
-      progressLabelValue = "";
-    } else if (modelDownloading) {
-      const showDetailedProgress =
-        modelDownloadProgress && modelDownloadProgress.bytesDownloaded > 0;
-      progressLabelValue = `(Currently downloading language model...${
-        showDetailedProgress
-          ? ` ${Math.round(
-              (modelDownloadProgress.bytesDownloaded /
-                modelDownloadProgress.bytesToDownload) *
-                100,
-            )}% out of ${Math.round(
-              (modelDownloadProgress.bytesToDownload / 1024 / 1024) * 10,
-            ) / 10} mb downloaded`
-          : ``
-      })`;
-    } else if (modelLoading) {
-      progressLabelValue = "(Currently loading language model...)";
-    } else if (queuedTranslationEngineRequestCount > 0) {
-      progressLabelValue = `(Language model loaded. ${queuedTranslationEngineRequestCount} part${
-        queuedTranslationEngineRequestCount > 1 ? "s" : ""
-      } left to translate)`;
-    } else {
-      progressLabelValue = "";
-    }
+    const progressLabelValue = shouldShowTranslationProgress
+      ? localizedTranslationProgressText
+      : "";
     this._getAnonElt("progress-label").setAttribute(
       "value",
       progressLabelValue,
@@ -168,6 +142,18 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
   init(translationBrowserChromeUiNotificationManager) {
     this.translation = translationBrowserChromeUiNotificationManager;
+
+    // Localize some strings in this component using Fluent
+    // Temporary approach pending re-merge into gecko-dev and full migration to Fluent
+    /*
+    const { Localization } =
+      ChromeUtils.import("resource://gre/modules/Localization.jsm", {});
+    console.log({Localization})
+    this.tmpL10n = Localization.getLocalization([
+      "translations.ftl",
+    ]);
+    console.log("this.tmpL10n", this.tmpL10n)
+    */
 
     const sortByLocalizedName = function(list) {
       const names = Services.intl.getLanguageDisplayNames(undefined, list);
