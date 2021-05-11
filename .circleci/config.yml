@@ -49,7 +49,8 @@ jobs:
 
       - run:
           name: Lint
-          command: yarn lint
+          command: yarn ci:lint:eslint
+          when: always
 
       - run:
           name: Build extension - Firefox Infobar UI
@@ -73,8 +74,15 @@ jobs:
 
       - run:
           name: Run tests
-          command: FIREFOX_BINARY=./firefox-nightly-linux/firefox-bin yarn e2e-tests
+          command: yarn e2e-tests
+          environment:
+            FIREFOX_BINARY: ./firefox-nightly-linux/firefox-bin
+            MOCHA_REPORTER: mocha-junit-reporter
+          when: always
 
       - store_artifacts:
           path: "test/e2e/results"
           destination: "test/e2e/results"
+
+      - store_test_results:
+          path: "test/e2e/results/test-results"
