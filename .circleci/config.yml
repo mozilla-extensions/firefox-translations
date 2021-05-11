@@ -49,8 +49,7 @@ jobs:
 
       - run:
           name: Lint
-          command: yarn ci:lint:eslint
-          when: always
+          command: yarn lint
 
       - run:
           name: Build extension - Firefox Infobar UI

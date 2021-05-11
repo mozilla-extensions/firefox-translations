@@ -171,7 +171,6 @@
     "build:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui NODE_ENV=production; npm-run-all just-build",
     "build:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=production; npm-run-all just-build",
     "ci:install-firefox:linux": "[ ! -d \"./firefox-nightly-linux\" ] && get-firefox --branch nightly --platform linux --extract && mv firefox firefox-nightly-linux || true",
-    "ci:lint:eslint": "npm run lint:eslint -- --format junit --output-file test/e2e/results/test-results/eslint/eslint.xml",
     "clean": "trash build/${NODE_ENV}/${TARGET_BROWSER}/${UI}/",
     "clean:test": "trash test/build",
     "e2e-tests": "concurrently --success first --kill-others 'npm-run-all -n e2e-tests:test-infra e2e-tests:firefox-infobar-ui e2e-tests:cross-browser-ui:firefox' 'yarn geckodriver -vv 1> test/e2e/results/logs/geckodriver.log 2> test/e2e/results/logs/geckodriver.errors.log'",
