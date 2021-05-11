@@ -37,8 +37,8 @@ type TelemetryRecordingFunction = () => void;
  * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  *
- * Pings are grouped by from/to metadata combination and submitted every hour in order to avoid
- * sending one ping per application event. The "one hour" period can be overridden to facilitate testing by setting
+ * Pings are grouped by from/to metadata combination and submitted every 5 seconds in order to avoid
+ * sending one ping per application event. The "5 seconds" period can be overridden to facilitate testing by setting
  * the telemetryDispatchIntervalInSecondsOverride string argument at initialization
  */
 export class Telemetry {
@@ -62,10 +62,10 @@ export class Telemetry {
         `Telemetry: initialization completed with application ID ${appId}.`,
       );
 
-      // Submit queued pings every hour, or as dictated by telemetryDispatchIntervalInSecondsOverride
+      // Submit queued pings every 5 seconds, or as dictated by telemetryDispatchIntervalInSecondsOverride
       const periodInSeconds = telemetryDispatchIntervalInSecondsOverride
         ? telemetryDispatchIntervalInSecondsOverride
-        : 60 * 60;
+        : 5;
       console.debug(
         `Setting up the "${this.periodicAlarmName}" periodic callback to fire every ${periodInSeconds} seconds`,
       );
