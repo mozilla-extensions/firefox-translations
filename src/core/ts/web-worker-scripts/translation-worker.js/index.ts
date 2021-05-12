@@ -2,12 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  addOnPreMain,
-  Module,
-  FS,
-  WORKERFS,
-} from "./bergamot-translator-worker";
+import { addOnPreMain, Module } from "./bergamot-translator-worker";
 
 import {
   ErrorWorkerMessage,
@@ -170,10 +165,7 @@ quiet-translation: true
 gemm-precision: int8shift
 `;
 
-    console.log(
-      "modelConfig: ",
-      modelConfig,
-    );
+    console.log("modelConfig: ", modelConfig);
 
     // Instantiate the TranslationModel
     const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
@@ -189,8 +181,12 @@ gemm-precision: int8shift
       shortListBuffer,
       64,
     );
-    const alignedVocabsMemoryList = new Module.AlignedMemoryList;
-    vocabBuffers.forEach(item => alignedVocabsMemoryList.push_back(constructAlignedMemoryFromBuffer(item, 64)));
+    const alignedVocabsMemoryList = new Module.AlignedMemoryList();
+    vocabBuffers.forEach(item =>
+      alignedVocabsMemoryList.push_back(
+        constructAlignedMemoryFromBuffer(item, 64),
+      ),
+    );
     model = new Module.TranslationModel(
       modelConfig,
       alignedModelMemory,
