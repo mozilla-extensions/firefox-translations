@@ -112,8 +112,6 @@ addOnPreMain(function() {
   ) => {
     log(`loadModel(${from}, ${to})`);
 
-    const languagePair = `${from}${to}`;
-
     // Delete previous instance if a model is already loaded
     if (model) {
       safelyDeleteInstance(model);
