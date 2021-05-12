@@ -170,10 +170,7 @@ addOnPreMain(function() {
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
-    const modelConfigWithoutModelAndShortList = `vocabs:
-  - /${languagePair}/vocab.${vocabLanguagePair}.spm
-  - /${languagePair}/vocab.${vocabLanguagePair}.spm
-beam-size: 1
+    const modelConfig = `beam-size: 1
 normalize: 1.0
 word-penalty: 0
 max-length-break: 128
@@ -188,13 +185,14 @@ gemm-precision: int8shift
 `;
 
     console.log(
-      "modelConfigWithoutModelAndShortList: ",
-      modelConfigWithoutModelAndShortList,
+      "modelConfig: ",
+      modelConfig,
     );
 
     // Instantiate the TranslationModel
     const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
     const shortListBuffer = downloadedModelFilesByType.lex.arrayBuffer;
+    const vocabBuffers = [downloadedModelFilesByType.vocab.arrayBuffer];
 
     // Construct AlignedMemory objects with downloaded buffers
     const alignedModelMemory = constructAlignedMemoryFromBuffer(
@@ -205,10 +203,13 @@ gemm-precision: int8shift
       shortListBuffer,
       64,
     );
+    const alignedVocabsMemoryList = new Module.AlignedMemoryList;
+    vocabBuffers.forEach(item => alignedVocabsMemoryList.push_back(constructAlignedMemoryFromBuffer(item, 64)));
     model = new Module.TranslationModel(
-      modelConfigWithoutModelAndShortList,
+      modelConfig,
       alignedModelMemory,
       alignedShortlistMemory,
+      alignedVocabsMemoryList,
     );
     const loadModelEnd = performance.now();
     const modelLoadWallTimeMs = loadModelEnd - loadModelStart;
