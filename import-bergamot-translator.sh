@@ -23,7 +23,6 @@ echo "// Note: The source code in this file is imported from bergamot-translator
 echo "// the import-bergamot-translator.sh script in the root of this repo. " >> $TS_FILE
 echo "// Changes will be overwritten on each import!" >> $TS_FILE
 cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" | sed 's/wasmBinaryFile = "/wasmBinaryFile = "wasm\//g' >> $TS_FILE
-echo "function addOnPreMain(cb) {__ATMAIN__.unshift(cb);}" >> $TS_FILE
 echo "export { addOnPreMain, Module, FS, WORKERFS };" >> $TS_FILE
 
 echo "* Autoformatting imported TypeScript module"

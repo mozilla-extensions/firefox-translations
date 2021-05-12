@@ -722,6 +722,10 @@ function addOnPreRun(cb) {
   __ATPRERUN__.unshift(cb);
 }
 
+function addOnPreMain(cb) {
+  __ATMAIN__.unshift(cb);
+}
+
 function addOnPostRun(cb) {
   __ATPOSTRUN__.unshift(cb);
 }
@@ -912,10 +916,10 @@ var tempDouble;
 var tempI64;
 
 var ASM_CONSTS = {
-  1446400: function() {
+  1447664: function() {
     throw "Canceled!";
   },
-  1446620: function($0, $1) {
+  1447884: function($0, $1) {
     setTimeout(function() {
       _do_emscripten_dispatch_to_thread($0, $1);
     }, 0);
@@ -8797,7 +8801,9 @@ var dynCall_iiiiiijj = (Module["dynCall_iiiiiijj"] = function() {
     Module["asm"]["dynCall_iiiiiijj"]).apply(null, arguments);
 });
 
-var _main_thread_futex = (Module["_main_thread_futex"] = 1542160);
+var _main_thread_futex = (Module["_main_thread_futex"] = 1544464);
+
+Module["addOnPreMain"] = addOnPreMain;
 
 Module["addRunDependency"] = addRunDependency;
 
@@ -8899,8 +8905,5 @@ if (!ENVIRONMENT_IS_PTHREAD) {
   run();
 } else {
   PThread.initWorker();
-}
-function addOnPreMain(cb) {
-  __ATMAIN__.unshift(cb);
 }
 export { addOnPreMain, Module, FS, WORKERFS };
