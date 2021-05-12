@@ -8906,4 +8906,4 @@ if (!ENVIRONMENT_IS_PTHREAD) {
 } else {
   PThread.initWorker();
 }
-export { addOnPreMain, Module, FS, WORKERFS };
+export { addOnPreMain, Module };
