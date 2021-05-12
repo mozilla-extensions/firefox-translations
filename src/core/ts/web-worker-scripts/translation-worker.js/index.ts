@@ -2,12 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {
-  addOnPreMain,
-  Module,
-  FS,
-  WORKERFS,
-} from "./bergamot-translator-worker";
+import { addOnPreMain, Module } from "./bergamot-translator-worker";
 
 import {
   ErrorWorkerMessage,
@@ -104,20 +99,6 @@ addOnPreMain(function() {
       ] = downloadedModelFile;
     });
 
-    // Mount the downloaded vocab file in emscripten's worker file system if not already mounted
-    const modelDir = `/${languagePair}`;
-    const { exists } = FS.analyzePath(modelDir, undefined);
-    if (!exists) {
-      const blobs = [
-        {
-          name: downloadedModelFilesByType.vocab.name,
-          data: new Blob([downloadedModelFilesByType.vocab.arrayBuffer]),
-        },
-      ];
-      FS.mkdir(modelDir, undefined);
-      FS.mount(WORKERFS, { blobs }, modelDir);
-    }
-
     return downloadedModelFilesByType;
   };
 
@@ -130,8 +111,6 @@ addOnPreMain(function() {
     ) => void,
   ) => {
     log(`loadModel(${from}, ${to})`);
-
-    const languagePair = `${from}${to}`;
 
     // Delete previous instance if a model is already loaded
     if (model) {
@@ -164,16 +143,10 @@ addOnPreMain(function() {
       return alignedMemory;
     };
 
-    // Vocab files are re-used in both translation directions
-    const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
-
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     // This example captures the most relevant options: model file, vocabulary files and shortlist file
-    const modelConfigWithoutModelAndShortList = `vocabs:
-  - /${languagePair}/vocab.${vocabLanguagePair}.spm
-  - /${languagePair}/vocab.${vocabLanguagePair}.spm
-beam-size: 1
+    const modelConfig = `beam-size: 1
 normalize: 1.0
 word-penalty: 0
 max-length-break: 128
@@ -187,14 +160,12 @@ quiet-translation: true
 gemm-precision: int8shift
 `;
 
-    console.log(
-      "modelConfigWithoutModelAndShortList: ",
-      modelConfigWithoutModelAndShortList,
-    );
+    console.log("modelConfig: ", modelConfig);
 
     // Instantiate the TranslationModel
     const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
     const shortListBuffer = downloadedModelFilesByType.lex.arrayBuffer;
+    const vocabBuffers = [downloadedModelFilesByType.vocab.arrayBuffer];
 
     // Construct AlignedMemory objects with downloaded buffers
     const alignedModelMemory = constructAlignedMemoryFromBuffer(
@@ -205,10 +176,17 @@ gemm-precision: int8shift
       shortListBuffer,
       64,
     );
+    const alignedVocabsMemoryList = new Module.AlignedMemoryList();
+    vocabBuffers.forEach(item =>
+      alignedVocabsMemoryList.push_back(
+        constructAlignedMemoryFromBuffer(item, 64),
+      ),
+    );
     model = new Module.TranslationModel(
-      modelConfigWithoutModelAndShortList,
+      modelConfig,
       alignedModelMemory,
       alignedShortlistMemory,
+      alignedVocabsMemoryList,
     );
     const loadModelEnd = performance.now();
     const modelLoadWallTimeMs = loadModelEnd - loadModelStart;
