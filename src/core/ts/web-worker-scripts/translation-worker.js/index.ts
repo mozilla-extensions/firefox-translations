@@ -104,20 +104,6 @@ addOnPreMain(function() {
       ] = downloadedModelFile;
     });
 
-    // Mount the downloaded vocab file in emscripten's worker file system if not already mounted
-    const modelDir = `/${languagePair}`;
-    const { exists } = FS.analyzePath(modelDir, undefined);
-    if (!exists) {
-      const blobs = [
-        {
-          name: downloadedModelFilesByType.vocab.name,
-          data: new Blob([downloadedModelFilesByType.vocab.arrayBuffer]),
-        },
-      ];
-      FS.mkdir(modelDir, undefined);
-      FS.mount(WORKERFS, { blobs }, modelDir);
-    }
-
     return downloadedModelFilesByType;
   };
 
