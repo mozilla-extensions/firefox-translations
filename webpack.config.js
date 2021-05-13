@@ -173,6 +173,7 @@ module.exports = {
   mode: "development",
   devtool: "source-map",
   optimization: {
+    minimize: ui !== "firefox-infobar-ui",
     splitChunks: {
       cacheGroups: {
         commons: {
