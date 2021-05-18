@@ -43,6 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^4.17.0",
     "@typescript-eslint/parser": "^4.17.0",
     "abortcontroller-polyfill": "^1.4.0",
+    "addons-linter": "^3.4.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.1.0",
     "babel-plugin-istanbul": "^5.1.4",
@@ -158,6 +159,10 @@
   },
   "private": true,
   "scripts": {
+    "addons-linter": "npm-run-all addons-linter:firefox-infobar-ui addons-linter:cross-browser-ui:* ",
+    "addons-linter:cross-browser-ui:chrome": "addons-linter build/production/chrome/cross-browser-ui",
+    "addons-linter:cross-browser-ui:firefox": "addons-linter build/production/firefox/cross-browser-ui",
+    "addons-linter:firefox-infobar-ui": "addons-linter build/production/firefox/firefox-infobar-ui",
     "bergamot-translator:build-and-import": "git submodule update --init --recursive && ./bergamot-translator/build-wasm.sh && ./import-bergamot-translator.sh ./bergamot-translator/build-wasm/wasm/",
     "bergamot-translator:download-and-import": "./download-bergamot-translator-wasm-artifacts.sh && ./import-bergamot-translator.sh ./downloaded-bergamot-translator-wasm-artifacts",
     "build": "npm-run-all bergamot-translator:download-and-import build:firefox-infobar-ui make-build-artifact-available-for-dep-signing",
