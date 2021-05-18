@@ -67,6 +67,7 @@ Artifacts built via CircleCI are unsigned (just like developer-created local bui
   - `extensions.experiments.enabled`
   - `javascript.options.wasm_simd`
   - `javascript.options.wasm_simd_wormhole`
+  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required`
 
