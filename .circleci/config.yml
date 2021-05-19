@@ -34,7 +34,7 @@ jobs:
           key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-3
 
       - run:
-          name: Move the build WASM artifacts to a separate directory
+          name: Move the built WASM artifacts to a separate directory
           command: |
             mkdir built-bergamot-translator-wasm-artifacts
             cp bergamot-translator/build-wasm/bergamot*.wasm built-bergamot-translator-wasm-artifacts/
@@ -119,7 +119,7 @@ jobs:
               echo "The imported Bergamot Translator's glue code matches the versioned code contents"
             else
               echo "The imported Bergamot Translator's glue code does not match the versioned code contents. This means that the code that was reviewed differs from the code that ends up in the extension builds. Current changes:"
-              git diff --exit-code src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts
+              git diff --exit-code src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts || true
             fi
 
       - run:
