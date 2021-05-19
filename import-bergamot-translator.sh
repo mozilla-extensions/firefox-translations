@@ -23,7 +23,11 @@ echo "// Note: The source code in this file is imported from bergamot-translator
 echo "// the import-bergamot-translator.sh script in the root of this repo. " >> $TS_FILE
 echo "// Changes will be overwritten on each import!" >> $TS_FILE
 cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" | sed 's/wasmBinaryFile = "/wasmBinaryFile = "wasm\//g' >> $TS_FILE
-echo "export { addOnPreMain, Module, BERGAMOT_VERSION_FULL };" >> $TS_FILE
+echo "export { addOnPreMain, Module };" >> $TS_FILE
+
+echo "* Extracting the bergamot-translator version info to a separate file"
+VERSION_FILE=src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-version.ts
+cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" | grep 'BERGAMOT_VERSION_FULL' | sed 's/var BERGAMOT_VERSION_FULL/export const BERGAMOT_VERSION_FULL/g' > $VERSION_FILE
 
 echo "* Autoformatting imported TypeScript module"
 yarn prettier src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts --write

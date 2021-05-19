@@ -8711,4 +8711,4 @@ if (!ENVIRONMENT_IS_PTHREAD) {
 } else {
   PThread.initWorker();
 }
-export { addOnPreMain, Module, BERGAMOT_VERSION_FULL };
+export { addOnPreMain, Module };
