@@ -20,9 +20,9 @@ jobs:
             - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-2
 
       - run:
-          name: Checkout the bergamot-translator submodule
+          name: Checkout the bergamot-translator submodule if not already available
           command: |
-            git submodule update --init --recursive
+            [ -d bergamot-translator ] || git submodule update --init --recursive
 
       - run:
           name: Build WASM
