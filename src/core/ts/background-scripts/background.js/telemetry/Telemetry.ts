@@ -71,7 +71,7 @@ export class Telemetry {
       });
       this.telemetryInactivityThresholdInSeconds = telemetryInactivityThresholdInSecondsOverride
         ? telemetryInactivityThresholdInSecondsOverride
-        : 60*10;
+        : 60 * 10;
       console.info(
         `Telemetry: initialization completed with application ID ${appId}. Inactivity threshold is set to ${this.telemetryInactivityThresholdInSeconds} seconds.`,
       );
