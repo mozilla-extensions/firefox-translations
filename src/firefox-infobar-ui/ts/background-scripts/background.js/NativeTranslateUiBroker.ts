@@ -363,7 +363,7 @@ export class NativeTranslateUiBroker {
             }
             if (hasChanged("modelDownloadProgress")) {
               if (tts.modelDownloadProgress) {
-                telemetry.updateInactivityTimerForTab(tabId);
+                telemetry.updateInactivityTimerForAllTabs();
               }
             }
           },

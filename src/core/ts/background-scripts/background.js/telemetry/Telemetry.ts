@@ -36,9 +36,9 @@ type TelemetryRecordingFunction = () => void;
  * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  *
- * Pings are grouped by tab id and submitted on specific triggers (see below), or after 10 minutes of inactivity.
+ * Pings are grouped by tab id and submitted on specific triggers (see below), or after 1 minute of inactivity.
  *
- * The "10 minutes" period can be overridden to facilitate testing by setting
+ * The "1 minute" period can be overridden to facilitate testing by setting
  * the telemetryInactivityThresholdInSecondsOverride string argument at initialization.
  *
  * Submit triggers:
@@ -71,7 +71,7 @@ export class Telemetry {
       });
       this.telemetryInactivityThresholdInSeconds = telemetryInactivityThresholdInSecondsOverride
         ? telemetryInactivityThresholdInSecondsOverride
-        : 60 * 10;
+        : 60;
       console.info(
         `Telemetry: initialization completed with application ID ${appId}. Inactivity threshold is set to ${this.telemetryInactivityThresholdInSeconds} seconds.`,
       );
@@ -104,7 +104,7 @@ export class Telemetry {
       displayed.record();
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
@@ -140,7 +140,7 @@ export class Telemetry {
       neverTranslateLang.record();
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
@@ -148,7 +148,7 @@ export class Telemetry {
       neverTranslateSite.record();
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onShowOriginalButtonPressed(
@@ -156,7 +156,7 @@ export class Telemetry {
     _from: string,
     _to: string,
   ) {
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
     // TODO?
   }
 
@@ -165,7 +165,7 @@ export class Telemetry {
     _from: string,
     _to: string,
   ) {
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
     // TODO?
   }
 
@@ -174,7 +174,7 @@ export class Telemetry {
       translate.record();
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
@@ -182,7 +182,7 @@ export class Telemetry {
       notNow.record();
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   /**
@@ -213,7 +213,7 @@ export class Telemetry {
       langMismatch.add(1);
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onTranslationStatusTranslationUnsupported(
@@ -225,7 +225,7 @@ export class Telemetry {
       notSupported.add(1);
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForTab(tabId);
+    this.updateInactivityTimerForAllTabs();
   }
 
   public onModelLoadErrorOccurred(tabId: number, from: string, to: string) {
@@ -272,7 +272,7 @@ export class Telemetry {
       this.queuedRecordingsByTabId[tabIdString] = [];
     }
     this.queuedRecordingsByTabId[tabIdString].push(telemetryRecordingFunction);
-    console.info(`Telemetry: Queued an recording in tab ${tabId}`);
+    console.info(`Telemetry: Queued a recording in tab ${tabId}`);
   };
 
   public updateInactivityTimerForTab = (tabId: number | string) => {
@@ -285,6 +285,12 @@ export class Telemetry {
       }, this.telemetryInactivityThresholdInSeconds * 1000))
     );
     // console.debug(`Telemetry: Inactivity timer ${this.inactivityDispatchTimersByTabId[tabIdString]} for tab ${tabId} set to fire in ${this.telemetryInactivityThresholdInSeconds} seconds.`, new Error())
+  };
+
+  public updateInactivityTimerForAllTabs = () => {
+    Object.keys(this.queuedRecordingsByTabId).forEach((tabId: string) => {
+      this.updateInactivityTimerForTab(tabId);
+    });
   };
 
   public clearInactivityTimerForTab = (tabId: number | string) => {
