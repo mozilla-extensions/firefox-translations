@@ -109,10 +109,7 @@ class TranslationBrowserChromeUi {
     if (notif) {
       const {
         translationDurationMs,
-        modelLoading,
-        queuedTranslationEngineRequestCount,
-        modelDownloading,
-        modelDownloadProgress,
+        localizedTranslationProgressText,
       } = uiState;
 
       // Always cancel ongoing timers so that we start from a clean state
@@ -133,10 +130,7 @@ class TranslationBrowserChromeUi {
         this.shouldShowTranslationProgressTimer = setTimeout(() => {
           notif.updateTranslationProgress(
             true,
-            modelLoading,
-            queuedTranslationEngineRequestCount,
-            modelDownloading,
-            modelDownloadProgress,
+            localizedTranslationProgressText,
           );
           clearTimeout(this.shouldShowTranslationProgressTimer);
         }, thresholdMsAfterWhichToShouldTranslationProgress - translationDurationMs);
@@ -145,10 +139,7 @@ class TranslationBrowserChromeUi {
       }
       notif.updateTranslationProgress(
         shouldShowTranslationProgress,
-        modelLoading,
-        queuedTranslationEngineRequestCount,
-        modelDownloading,
-        modelDownloadProgress,
+        localizedTranslationProgressText,
       );
     }
   }

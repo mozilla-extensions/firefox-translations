@@ -12,7 +12,7 @@ jobs:
       # Download and cache dependencies (update the numerical cache key suffix manually to force a newer version)
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-9
+            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-10
 
       - run:
           name: Install dependencies
@@ -20,7 +20,6 @@ jobs:
 
       - run:
           name: Download and import Bergamot Translator build artifacts
-          # Note: the import step runs again before building the extensions, which ensures that the latest .appendix.js is used despite cached artifacts
           command: yarn bergamot-translator:download-and-import
 
       - run:
@@ -39,7 +38,7 @@ jobs:
             - node_modules
             - firefox-nightly-linux
             - test/e2e/venv
-          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-9
+          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-10
 
       - run:
           name: Print which version of Firefox is installed
@@ -51,11 +50,6 @@ jobs:
       - run:
           name: Lint
           command: yarn lint
-
-      - run:
-          name: Import Bergamot Translator build artifacts
-          # The import step runs again here to ensure that the latest .appendix.js is used despite cached artifacts
-          command: yarn bergamot-translator:download-and-import
 
       - run:
           name: Build extension - Firefox Infobar UI
@@ -72,6 +66,10 @@ jobs:
       - store_artifacts:
           path: "dist"
           destination: "dist"
+
+      - run:
+          name: Add-ons Linter
+          command: yarn addons-linter
 
       - run:
           name: Run tests

@@ -13,7 +13,6 @@ import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { reaction } from "mobx";
 import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
 import { translateAllFramesInTab } from "../../../../core/ts/background-scripts/background.js/lib/translateAllFramesInTab";
-import { ModelDownloadProgress } from "../../../../core/ts/background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -48,10 +47,7 @@ interface NativeTranslateUiState {
   supportedTargetLanguages: string[];
   // Translation progress
   translationDurationMs: number;
-  modelLoading: boolean;
-  queuedTranslationEngineRequestCount: number;
-  modelDownloading: boolean;
-  modelDownloadProgress: ModelDownloadProgress;
+  localizedTranslationProgressText: string;
 }
 
 type StandardInfobarInteractionEvent = Event<
@@ -182,6 +178,53 @@ export class NativeTranslateUiBroker {
       const translationDurationMs =
         Date.now() - tts.translationInitiationTimestamp;
 
+      // Localized translation progress text
+      const {
+        modelLoading,
+        queuedTranslationEngineRequestCount,
+        modelDownloading,
+        modelDownloadProgress,
+      } = tts;
+      let localizedTranslationProgressText;
+      if (modelDownloading) {
+        const showDetailedProgress =
+          modelDownloadProgress && modelDownloadProgress.bytesDownloaded > 0;
+        const percentDownloaded = Math.round(
+          (modelDownloadProgress.bytesDownloaded /
+            modelDownloadProgress.bytesToDownload) *
+            100,
+        );
+        const mbToDownload =
+          Math.round(
+            (modelDownloadProgress.bytesToDownload / 1024 / 1024) * 10,
+          ) / 10;
+        const localizedDetailedDownloadProgressText = browser.i18n.getMessage(
+          "detailedDownloadProgress",
+          [percentDownloaded, mbToDownload],
+        );
+        localizedTranslationProgressText = `(${browser.i18n.getMessage(
+          "currentlyDownloadingLanguageModel",
+        )}...${
+          showDetailedProgress
+            ? ` ${localizedDetailedDownloadProgressText}`
+            : ``
+        })`;
+      } else if (modelLoading) {
+        localizedTranslationProgressText = `(${browser.i18n.getMessage(
+          "currentlyLoadingLanguageModel",
+        )}...)`;
+      } else if (queuedTranslationEngineRequestCount > 0) {
+        // Using neutral plural form since there is no support for plural form in browser.i18n
+        localizedTranslationProgressText = `(${browser.i18n.getMessage(
+          "loadedLanguageModel",
+        )}. ${browser.i18n.getMessage(
+          "partsLeftToTranslate",
+          queuedTranslationEngineRequestCount,
+        )})`;
+      } else {
+        localizedTranslationProgressText = "";
+      }
+
       return {
         acceptedTargetLanguages,
         detectedLanguageResults,
@@ -196,11 +239,7 @@ export class NativeTranslateUiBroker {
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
         // Translation progress
         translationDurationMs,
-        modelLoading: tts.modelLoading,
-        queuedTranslationEngineRequestCount:
-          tts.queuedTranslationEngineRequestCount,
-        modelDownloading: tts.modelDownloading,
-        modelDownloadProgress: tts.modelDownloadProgress,
+        localizedTranslationProgressText,
       };
     };
     const nativeTranslateUiStateInfobarStateFromTranslationStatus = (

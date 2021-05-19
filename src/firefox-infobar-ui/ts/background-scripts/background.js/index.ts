@@ -17,6 +17,7 @@ import { connectRootStoreToDevTools } from "../../../../core/ts/background-scrip
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { NativeTranslateUiBroker } from "./NativeTranslateUiBroker";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
+import { BERGAMOT_VERSION_FULL } from "../../../../core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -41,7 +42,7 @@ class ExtensionGlue {
     // Add version to extension log output to facilitate general troubleshooting
     const manifest = crossBrowser.runtime.getManifest();
     console.info(
-      `Extension ${manifest.name} version ${manifest.version} initializing.`,
+      `Extension ${manifest.name} version ${manifest.version} (with bergamot-translator ${BERGAMOT_VERSION_FULL}) initializing.`,
     );
 
     // Initiate the root extension state store

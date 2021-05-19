@@ -39,8 +39,6 @@ Screen recording: https://youtu.be/WPLCH84J0is
 - Make sure that the following preferences are set to `true` in `about:config`:
   - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to install pre-release versions of the extension)
   - `browser.proton.enabled` (This enables the preview of the updated Firefox appearance)
-  - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled` (Temporary requirement until https://github.com/mozilla/bergamot-translator/issues/37 or https://bugzilla.mozilla.org/show_bug.cgi?id=1674383 is resolved)
-  - `extensions.backgroundServiceWorker.enabled` (Temporary requirement until https://bugzilla.mozilla.org/show_bug.cgi?id=1575625 is resolved)
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required` (This enables the use of ordinary extensions in the same profile)
 - Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.3.0/bergamot-browser-extension-0.3.0-firefox-infobar-ui.dev-root-signed.xpi) to start the download and installation of the extension
