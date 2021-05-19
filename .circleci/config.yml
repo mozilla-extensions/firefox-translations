@@ -63,6 +63,12 @@ jobs:
       - checkout
 
       - run:
+          name: Print out parameters used for this Circle CI job
+          command: |
+            echo 'bergamot_translator_source: << parameters.bergamot_translator_source >>'
+            echo 'cache_buster: << parameters.cache_buster >>'
+
+      - run:
           name: Generate a file to use for the cache key that changes when dependencies change
           command: |
             cat yarn.lock > dependencies.txt
