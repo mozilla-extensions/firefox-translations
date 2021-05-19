@@ -57,7 +57,7 @@ jobs:
     parameters:
       bergamot_translator_source:
         type: string
-        default: 'imported'
+        default: 'downloaded'
 
       # Manually change/increase the following parameter to ensure that builds start without the Circle CI cache being populated
       # Useful eg to ensure that the latest Firefox Nightly is installed
@@ -105,7 +105,7 @@ jobs:
 
       - when:
           condition:
-            equal: [ << parameters.bergamot_translator_source >>, 'imported' ]
+            equal: [ << parameters.bergamot_translator_source >>, 'downloaded' ]
           steps:
           - run:
               name: Download and import Bergamot Translator build artifacts
