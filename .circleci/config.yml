@@ -21,16 +21,17 @@ jobs:
 
       - restore_cache:
           keys:
-            - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-2
+            - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-3
 
       - run:
-          name: Build WASM
-          command: ./bergamot-translator/build-wasm.sh
+          name: Build WASM artifacts if they are not already built for this submodule reference
+          command: |
+            [ -d bergamot-translator/build-wasm ] || ./bergamot-translator/build-wasm.sh
 
       - save_cache:
           paths:
             - bergamot-translator/build-wasm
-          key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-2
+          key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-3
 
       - run:
           name: Move the build WASM artifacts to a separate directory
