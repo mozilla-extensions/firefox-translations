@@ -49,8 +49,6 @@ To use artifacts that are known to work (built by bergamot-translator's CI):
 yarn bergamot-translator:download-and-import
 ```
 
-Re-run this command any time there has been an update to `src/core/static/wasm/bergamot-translator-worker.appendix.js`.
-
 Note: Once this command has run, it will create a folder called `downloaded-bergamot-translator-wasm-artifacts` and if this folder exists, it will not re-download the artifacts again. Thus, to make sure that you are using the most up to date WASM artifacts, remove the `downloaded-bergamot-translator-wasm-artifacts` folder, then re-run the command.
 
 ## Building Bergamot Translator WASM artifacts and importing them to the extension
@@ -61,7 +59,7 @@ If you are actively changing files in [bergamot-translator](../bergamot-translat
 yarn bergamot-translator:build-and-import
 ```
 
-Re-run this command any time there has been an update in the bergamot-translator submodule, or after `src/core/static/wasm/bergamot-translator-worker.appendix.js` has been changed.
+Re-run this command any time there has been an update in the bergamot-translator submodule.
 
 ## Creating extension builds for distribution
 

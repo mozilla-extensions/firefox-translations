@@ -1,18 +1,33 @@
 version: 2.1
+
 jobs:
   build:
     docker:
       - image: circleci/node:latest-browsers
+
+    parameters:
+      # Manually change/increase the following parameter to ensure that builds start without the Circle CI cache being populated
+      # Useful eg to ensure that the latest Firefox Nightly is installed
+      cache_buster:
+        type: string
+        default: '1'
 
     working_directory: ~/checkout
 
     steps:
       - checkout
 
-      # Download and cache dependencies (update the numerical cache key suffix manually to force a newer version)
+      - run:
+          name: Generate a file to use for the cache key that changes when dependencies change
+          command: |
+            cat yarn.lock > dependencies.txt
+            cat download-bergamot-translator-wasm-artifacts.sh >> dependencies.txt
+            cat test/e2e/requirements.txt >> dependencies.txt
+            cat .circleci/install-mitmproxy.sh >> dependencies.txt
+
       - restore_cache:
           keys:
-            - dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-10
+            - dependencies-and-browsers-{{ checksum "dependencies.txt" }}-<< parameters.cache_buster >>
 
       - run:
           name: Install dependencies
@@ -34,11 +49,10 @@ jobs:
 
       - save_cache:
           paths:
-            - downloaded-bergamot-translator-wasm-artifacts
             - node_modules
             - firefox-nightly-linux
             - test/e2e/venv
-          key: dependencies-and-browsers-{{ checksum "yarn.lock" }}-{{ checksum "download-bergamot-translator-wasm-artifacts.sh" }}-{{ checksum "test/e2e/requirements.txt" }}-{{ checksum ".circleci/install-mitmproxy.sh" }}-10
+          key: dependencies-and-browsers-{{ checksum "dependencies.txt" }}-<< parameters.cache_buster >>
 
       - run:
           name: Print which version of Firefox is installed

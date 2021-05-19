@@ -1,4 +1,3 @@
-# Using artifacts from https://github.com/mozilla/bergamot-translator/releases/tag/v0.3.0
 if [ ! -d downloaded-bergamot-translator-wasm-artifacts ]; then
   mkdir downloaded-bergamot-translator-wasm-artifacts
   cd downloaded-bergamot-translator-wasm-artifacts
