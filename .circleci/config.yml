@@ -12,6 +12,10 @@ jobs:
       - checkout
 
       - run:
+          name: Checkout submodules recursively
+          command: git submodule update --init --recursive
+
+      - run:
           name: Generate a file that changes when the bergamot-translator submodule changes
           command:  git submodule status bergamot-translator > bergamot-translator-submodule-status.txt
 
@@ -20,17 +24,12 @@ jobs:
             - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-2
 
       - run:
-          name: Checkout the bergamot-translator submodule if not already available
-          command: |
-            [ -d bergamot-translator ] || git submodule update --init --recursive
-
-      - run:
           name: Build WASM
           command: ./bergamot-translator/build-wasm.sh
 
       - save_cache:
           paths:
-            - bergamot-translator
+            - bergamot-translator/build-wasm
           key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-2
 
       - run:
