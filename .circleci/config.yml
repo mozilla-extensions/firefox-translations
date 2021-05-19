@@ -78,31 +78,34 @@ jobs:
           name: Install dependencies
           command: yarn install --frozen-lockfile
 
-      - attach_workspace:
-          if: parameters.bergamot_translator_source == 'built'
-          at: /tmp/workspace
+      - when:
+          condition:
+            equal: [ << parameters.bergamot_translator_source >>, 'built' ]
+          steps:
+          - attach_workspace:
+              if: parameters.bergamot_translator_source == 'built'
+              at: /tmp/workspace
+          - run:
+              name: Import recently built Bergamot Translator build artifacts
+              command: ./import-bergamot-translator.sh /tmp/workspace/bergamot-translator/build-wasm/
+          - run:
+              name: Double-check that the imported Bergamot Translator's glue code matches the versioned code contents
+              command: |
+                if $(git diff --exit-code src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts)
+                then
+                  echo "The imported Bergamot Translator's glue code matches the versioned code contents"
+                else
+                  echo "The imported Bergamot Translator's glue code does not match the versioned code contents. Please make sure that the glue code built locally and by CI are identical and match what is committed in the repo."
+                  exit 1
+                fi
 
-      - run:
-          if: parameters.bergamot_translator_source == 'built'
-          name: Import recently built Bergamot Translator build artifacts
-          command: ./import-bergamot-translator.sh /tmp/workspace/bergamot-translator/build-wasm/
-
-      - run:
-          if: parameters.bergamot_translator_source == 'built'
-          name: Double-check that the imported Bergamot Translator's glue code matches the versioned code contents
-          command: |
-            if $(git diff --exit-code src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts)
-            then
-              echo "The imported Bergamot Translator's glue code matches the versioned code contents"
-            else
-              echo "The imported Bergamot Translator's glue code does not match the versioned code contents. Please make sure that the glue code built locally and by CI are identical and match what is committed in the repo."
-              exit 1
-            fi
-
-      - run:
-          if: parameters.bergamot_translator_source == 'imported'
-          name: Download and import Bergamot Translator build artifacts
-          command: yarn bergamot-translator:download-and-import
+      - when:
+          condition:
+            equal: [ << parameters.bergamot_translator_source >>, 'imported' ]
+          steps:
+          - run:
+              name: Download and import Bergamot Translator build artifacts
+              command: yarn bergamot-translator:download-and-import
 
       - run:
           name:  Install Firefox
