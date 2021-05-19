@@ -161,13 +161,11 @@ workflows:
   build-and-test:
     jobs:
       - build_and_test_extension
-          parameters:
-            bergamot_translator_source: 'imported'
 
   build-and-test-using-bergamot-translator-built-from-source:
     jobs:
-      - build_and_test_extension
-          parameters:
-            bergamot_translator_source: 'built'
+      - build_bergamot_translator
+      - build_and_test_extension:
+          bergamot_translator_source: 'built'
           requires:
             - build_bergamot_translator
