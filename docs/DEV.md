@@ -53,7 +53,15 @@ Note: Once this command has run, it will create a folder called `downloaded-berg
 
 ## Building Bergamot Translator WASM artifacts and importing them to the extension
 
-If you are actively changing files in [bergamot-translator](../bergamot-translator/README.md), run the following to build and import locally built WASM artifacts:
+If you want to try out custom changes to [bergamot-translator](../bergamot-translator/README.md), first make sure that you have checked out the submodules:
+
+```
+git submodule update --init --recursive
+```
+
+Then, follow the upstream instructions ([bergamot-translator/README](../bergamot-translator/README.md) for setting up an environment that successfully builds bergamot-translator.
+
+When all is properly set-up, you should be able to run the following to build and import the custom WASM artifacts into the extension:
 
 ```bash
 yarn bergamot-translator:build-and-import
@@ -89,9 +97,15 @@ The build artifact will be created under `dist/production/firefox/firefox-infoba
 
 ## Development mode
 
-This will build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
+First, import bergamot models locally, since the extension downloads the models from a local endpoint when running in development mode:
+
+```bash
+yarn bergamot-models:import
+```
 
 If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) before running the below commands.
+
+Finally, use the commands below to build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
 
 ### Firefox - Infobar UI
 
