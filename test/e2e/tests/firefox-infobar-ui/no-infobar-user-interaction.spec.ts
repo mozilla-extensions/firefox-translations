@@ -7,14 +7,8 @@ import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
   assertInfobarIsNotShown,
   assertInfobarIsShown,
-  assertOnInfoBarClosedTelemetry,
   assertOnInfoBarDisplayedTelemetry,
-  assertOnNotNowButtonPressedTelemetry,
-  assertOnTranslateButtonPressedTelemetry,
-  closeInfobarViaCloseButton,
-  closeInfobarViaNotNowButton,
   lookForInfobarTranslateButton,
-  translateViaInfobar,
 } from "../../utils/translationInfobar";
 import { startTestServers } from "../../utils/setupServers";
 import {
@@ -22,9 +16,6 @@ import {
   readSeenTelemetry,
 } from "../../utils/telemetry";
 import {
-  assertOnTranslationAttemptConcludedTelemetry,
-  assertOriginalPageElementExists,
-  assertTranslationSucceeded,
   fixtures,
   maxToleratedModelLoadingDurationInSeconds,
   maxToleratedTranslationDurationInSeconds,
@@ -35,7 +26,7 @@ let shutdownTestServers;
 
 const tabsCurrentlyOpened = 1;
 
-describe("Basic infobar interactions", function() {
+describe("No infobar user interaction", function() {
   // This gives Firefox time to start, and us a bit longer during some of the tests.
   this.timeout(
     (15 +
@@ -81,50 +72,9 @@ describe("Basic infobar interactions", function() {
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
-  it("Translation via the infobar works", async function() {
-    // ... this test continues the session from the previous test
-    await assertOriginalPageElementExists(driver, fixtures.es);
-    await translateViaInfobar(driver, tabsCurrentlyOpened);
-    await assertTranslationSucceeded(driver, fixtures.es);
-    await takeScreenshot(driver, this.test.fullTitle());
-  });
-
-  it("Telemetry checks after: Translation via the infobar works", async function() {
+  it("Telemetry checks after: The translation infobar is shown on a web-page with Spanish content", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
     assertOnInfoBarDisplayedTelemetry(seenTelemetry[0], "es", "en");
-    assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
-    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[0], "es", "en");
-  });
-
-  it("The translation infobar can be closed via the close button", async function() {
-    // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtures.es.url);
-    await closeInfobarViaCloseButton(driver, tabsCurrentlyOpened);
-    await takeScreenshot(driver, this.test.fullTitle());
-  });
-
-  it("Telemetry checks after: The translation infobar can be closed via the close button", async function() {
-    // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(1, 1, proxyInstanceId);
-    assertOnInfoBarClosedTelemetry(seenTelemetry[0], "es", "en");
-  });
-
-  it("The translation infobar can be closed via the 'Not now' button", async function() {
-    // ... this test continues the session from the previous test
-    await navigateToURL(driver, fixtures.es.url);
-    await closeInfobarViaNotNowButton(driver, tabsCurrentlyOpened);
-    await takeScreenshot(driver, this.test.fullTitle());
-  });
-
-  it("Telemetry checks after: The translation infobar can be closed via the 'Not now' button", async function() {
-    // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(2, 2, proxyInstanceId);
-    assertOnNotNowButtonPressedTelemetry(
-      seenTelemetry[0],
-      seenTelemetry[0],
-      "es",
-      "en",
-    );
   });
 });

@@ -4,9 +4,9 @@
     "description": "Enables read-only access to specific Extensions-related about:config preferences",
     "functions": [
       {
-        "name": "getTelemetryDispatchIntervalInSecondsOverridePref",
+        "name": "getTelemetryInactivityThresholdInSecondsOverridePref",
         "type": "function",
-        "description": "Get the `extensions.translations.telemetryDispatchIntervalInSecondsOverride` preference's value",
+        "description": "Get the `extensions.translations.telemetryInactivityThresholdInSecondsOverride` preference's value",
         "parameters": [],
         "async": true
       }

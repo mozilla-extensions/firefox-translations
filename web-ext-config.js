@@ -63,7 +63,7 @@ if (targetBrowser === "firefox") {
     "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled=true",
     "javascript.options.wasm_simd=true",
     "javascript.options.wasm_simd_wormhole=true",
-    "extensions.translations.telemetryDispatchIntervalInSecondsOverride=5",
+    "extensions.translations.telemetryInactivityThresholdInSecondsOverride=60",
     "browser.aboutConfig.showWarning=false",
     "browser.ctrlTab.recentlyUsedOrder=false",
   ];

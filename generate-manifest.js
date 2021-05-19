@@ -43,7 +43,7 @@ async function generateManifest({ dotEnvPath }) {
         match_about_blank: false,
       },
     ],
-    permissions: ["<all_urls>", "storage", "alarms"],
+    permissions: ["<all_urls>", "storage"],
   };
   if (process.env.USE_BERGAMOT_REST_API === "1") {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);

@@ -17,14 +17,14 @@ this.extensionPreferences = class extends ExtensionAPI {
       {},
     );
     const { ExtensionError } = ExtensionUtils;
-    const telemetryDispatchIntervalInSecondsOverridePrefName = `extensions.translations.telemetryDispatchIntervalInSecondsOverride`;
+    const telemetryInactivityThresholdInSecondsOverridePrefName = `extensions.translations.telemetryInactivityThresholdInSecondsOverride`;
     return {
       experiments: {
         extensionPreferences: {
-          async getTelemetryDispatchIntervalInSecondsOverridePref() {
+          async getTelemetryInactivityThresholdInSecondsOverridePref() {
             try {
               const value = Preferences.get(
-                telemetryDispatchIntervalInSecondsOverridePrefName,
+                telemetryInactivityThresholdInSecondsOverridePrefName,
                 false,
               );
               if (!value) {

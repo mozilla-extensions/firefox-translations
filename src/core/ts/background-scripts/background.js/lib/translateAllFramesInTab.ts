@@ -66,6 +66,7 @@ export const translateAllFramesInTab = async (
         1000} seconds where spent elsewhere.`,
     );
     telemetry.onTranslationFinished(
+      tabId,
       from,
       to,
       totalModelLoadWallTimeMs,

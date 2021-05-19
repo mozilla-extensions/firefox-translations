@@ -23,7 +23,6 @@ import {
 } from "./generated/infobar";
 import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
-import { nanoid } from "nanoid";
 
 type TelemetryRecordingFunction = () => void;
 
@@ -37,20 +36,32 @@ type TelemetryRecordingFunction = () => void;
  * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
  *
- * Pings are grouped by from/to metadata combination and submitted every 5 seconds in order to avoid
- * sending one ping per application event. The "5 seconds" period can be overridden to facilitate testing by setting
- * the telemetryDispatchIntervalInSecondsOverride string argument at initialization
+ * Pings are grouped by tab id and submitted on specific triggers (see below), or after 10 minutes of inactivity.
+ *
+ * The "10 minutes" period can be overridden to facilitate testing by setting
+ * the telemetryInactivityThresholdInSecondsOverride string argument at initialization.
+ *
+ * Submit triggers:
+ * 1. Regular translation: infobar displayed -> translated pressed -> translation finished or error -> submit
+ * 2. Switch language: infobar displayed -> switch source or target lang -> submit (further actions will be submitted in translation scenario)
+ * 3. Reject: infobar displayed -> press never, not now or close -> submit
+ * 4. No action: infobar displayed -> no action -> submit on timer after a period of inactivity.
+ * 5. Language pair unsupported -> submit
  */
 export class Telemetry {
   private initialized: boolean;
   private firefoxClientId: string;
-  private queuedPingsByMetadataHash: {
-    [metadataHash: string]: TelemetryRecordingFunction[];
+  private telemetryInactivityThresholdInSeconds: number;
+  private queuedRecordingsByTabId: {
+    [tabId: string]: TelemetryRecordingFunction[];
+  } = {};
+  private inactivityDispatchTimersByTabId: {
+    [tabId: string]: number;
   } = {};
   public initialize(
     uploadEnabled: boolean,
     $firefoxClientId: string,
-    telemetryDispatchIntervalInSecondsOverride: number,
+    telemetryInactivityThresholdInSecondsOverride: number,
   ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
@@ -58,30 +69,12 @@ export class Telemetry {
       Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
       });
+      this.telemetryInactivityThresholdInSeconds = telemetryInactivityThresholdInSecondsOverride
+        ? telemetryInactivityThresholdInSecondsOverride
+        : 60*10;
       console.info(
-        `Telemetry: initialization completed with application ID ${appId}.`,
+        `Telemetry: initialization completed with application ID ${appId}. Inactivity threshold is set to ${this.telemetryInactivityThresholdInSeconds} seconds.`,
       );
-
-      // Submit queued pings every 5 seconds, or as dictated by telemetryDispatchIntervalInSecondsOverride
-      const periodInSeconds = telemetryDispatchIntervalInSecondsOverride
-        ? telemetryDispatchIntervalInSecondsOverride
-        : 5;
-      console.debug(
-        `Setting up the "${this.periodicAlarmName}" periodic callback to fire every ${periodInSeconds} seconds`,
-      );
-      const alarmListener = async alarm => {
-        if (alarm.name === this.periodicAlarmName) {
-          console.debug(
-            `The "${this.periodicAlarmName}" periodic callback fired`,
-          );
-          await this.submitQueuedPings();
-        }
-      };
-      browser.alarms.onAlarm.addListener(alarmListener);
-      browser.alarms.create(this.periodicAlarmName, {
-        periodInMinutes: periodInSeconds / 60,
-      });
-
       this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
@@ -107,43 +100,35 @@ export class Telemetry {
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
-    this.queuePing(
-      () => {
-        displayed.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      displayed.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
   public onSelectTranslateFrom(tabId: number, newFrom: string, to: string) {
-    this.queuePing(
-      () => {
-        changeLang.record();
-        this.recordCommonMetadata(newFrom, to);
-      },
-      { from: newFrom, to },
-    );
+    this.queueRecording(() => {
+      changeLang.record();
+      this.recordCommonMetadata(newFrom, to);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
   public onSelectTranslateTo(tabId: number, from: string, newTo: string) {
-    this.queuePing(
-      () => {
-        changeLang.record();
-        this.recordCommonMetadata(from, newTo);
-      },
-      { from, to: newTo },
-    );
+    this.queueRecording(() => {
+      changeLang.record();
+      this.recordCommonMetadata(from, newTo);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
   public onInfoBarClosed(tabId: number, from: string, to: string) {
-    this.queuePing(
-      () => {
-        closed.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      closed.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
   public onNeverTranslateSelectedLanguage(
@@ -151,59 +136,53 @@ export class Telemetry {
     from: string,
     to: string,
   ) {
-    this.queuePing(
-      () => {
-        neverTranslateLang.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      neverTranslateLang.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
   public onNeverTranslateThisSite(tabId: number, from: string, to: string) {
-    this.queuePing(
-      () => {
-        neverTranslateSite.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      neverTranslateSite.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
   public onShowOriginalButtonPressed(
-    _tabId: number,
+    tabId: number,
     _from: string,
     _to: string,
   ) {
+    this.updateInactivityTimerForTab(tabId);
     // TODO?
   }
 
   public onShowTranslatedButtonPressed(
-    _tabId: number,
+    tabId: number,
     _from: string,
     _to: string,
   ) {
+    this.updateInactivityTimerForTab(tabId);
     // TODO?
   }
 
   public onTranslateButtonPressed(tabId: number, from: string, to: string) {
-    this.queuePing(
-      () => {
-        translate.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      translate.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
   public onNotNowButtonPressed(tabId: number, from: string, to: string) {
-    this.queuePing(
-      () => {
-        notNow.record();
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+    this.queueRecording(() => {
+      notNow.record();
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
   /**
@@ -211,6 +190,7 @@ export class Telemetry {
    * specific tab and ends when all translations in that tab has completed
    */
   public onTranslationFinished(
+    tabId: number,
     from: string,
     to: string,
     modelLoadWallTimeMs: number,
@@ -218,82 +198,68 @@ export class Telemetry {
     $wordsPerSecond: number,
     $modelDownloadTime: number,
   ) {
-    this.queuePing(
-      () => {
-        modelLoadTime.set(String(modelLoadWallTimeMs));
-        translationTime.set(String(translationWallTimeMs));
-        wordsPerSecond.set(String(Math.round($wordsPerSecond)));
-        modelDownloadTime.set(String(Math.round($modelDownloadTime)));
-        this.recordCommonMetadata(from, to);
-      },
-      {
-        from,
-        to,
-        modelLoadWallTimeMs,
-        translationWallTimeMs,
-        $wordsPerSecond,
-        $modelDownloadTime,
-        // Force this ping not to be grouped with other pings since there are no events nor counters which would
-        // allows us to distinguish translation finished events with identical metadata from each other
-        uuid: nanoid(),
-      },
-    );
+    this.queueRecording(() => {
+      modelLoadTime.set(String(modelLoadWallTimeMs));
+      translationTime.set(String(translationWallTimeMs));
+      wordsPerSecond.set(String(Math.round($wordsPerSecond)));
+      modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
-  public onTranslationStatusOffer(from: string, to: string) {
-    this.queuePing(
-      () => {
-        langMismatch.add(1);
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+  public onTranslationStatusOffer(tabId: number, from: string, to: string) {
+    this.queueRecording(() => {
+      langMismatch.add(1);
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
-  public onTranslationStatusTranslationUnsupported(from: string, to: string) {
-    this.queuePing(
-      () => {
-        notSupported.add(1);
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+  public onTranslationStatusTranslationUnsupported(
+    tabId: number,
+    from: string,
+    to: string,
+  ) {
+    this.queueRecording(() => {
+      notSupported.add(1);
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.updateInactivityTimerForTab(tabId);
   }
 
-  public onModelLoadErrorOccurred(from: string, to: string) {
+  public onModelLoadErrorOccurred(tabId: number, from: string, to: string) {
+    this.submitQueuedRecordings(tabId);
     // TODO?
   }
 
-  public onModelDownloadErrorOccurred(from: string, to: string) {
-    this.queuePing(
-      () => {
-        modelDownload.add(1);
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+  public onModelDownloadErrorOccurred(tabId: number, from: string, to: string) {
+    this.queueRecording(() => {
+      modelDownload.add(1);
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
-  public onTranslationErrorOccurred(from: string, to: string) {
-    this.queuePing(
-      () => {
-        translation.add(1);
-        this.recordCommonMetadata(from, to);
-      },
-      { from, to },
-    );
+  public onTranslationErrorOccurred(tabId: number, from: string, to: string) {
+    this.queueRecording(() => {
+      translation.add(1);
+      this.recordCommonMetadata(from, to);
+    }, tabId);
+    this.submitQueuedRecordings(tabId);
   }
 
-  public onOtherErrorOccurred(from: string, to: string) {
+  public onOtherErrorOccurred(tabId: number, from: string, to: string) {
+    this.submitQueuedRecordings(tabId);
     // TODO?
   }
 
   /**
    * Submits all collected metrics in a custom ping.
    */
-  public queuePing = (
+  public queueRecording = (
     telemetryRecordingFunction: () => void,
-    metadata: { [k: string]: any },
+    tabId: number,
   ) => {
     if (!this.initialized) {
       console.warn(
@@ -301,47 +267,70 @@ export class Telemetry {
       );
       return;
     }
-    const metadataHash = JSON.stringify({
-      ...metadata,
-      firefoxClientId: this.firefoxClientId,
-    });
-    if (!this.queuedPingsByMetadataHash[metadataHash]) {
-      this.queuedPingsByMetadataHash[metadataHash] = [];
+    const tabIdString = String(tabId);
+    if (!this.queuedRecordingsByTabId[tabIdString]) {
+      this.queuedRecordingsByTabId[tabIdString] = [];
     }
-    this.queuedPingsByMetadataHash[metadataHash].push(
-      telemetryRecordingFunction,
-    );
-    console.info(`Telemetry: Queued a ping for metadata ${metadataHash}`);
+    this.queuedRecordingsByTabId[tabIdString].push(telemetryRecordingFunction);
+    console.info(`Telemetry: Queued an recording in tab ${tabId}`);
   };
 
-  private periodicAlarmName = `${browser.runtime.id}:periodicTelemetryDispatch`;
-  public submitQueuedPings() {
-    Object.keys(this.queuedPingsByMetadataHash).forEach(
-      (metadataHash: string) => {
-        const pings: TelemetryRecordingFunction[] = this
-          .queuedPingsByMetadataHash[metadataHash];
-        try {
-          pings.forEach(telemetryRecordingFunction => {
-            telemetryRecordingFunction();
-          });
-          custom.submit();
-          console.info(
-            `Telemetry: ${pings.length} pings for metadata ${metadataHash} have been dispatched to Glean.js`,
-          );
-        } catch (err) {
-          console.error(`Telemetry dispatch error`, err);
-        } finally {
-          // We only attempt to dispatch pings once, regardless of errors encountered
-          delete this.queuedPingsByMetadataHash[metadataHash];
-        }
-      },
+  public updateInactivityTimerForTab = (tabId: number | string) => {
+    const tabIdString = String(tabId);
+    this.clearInactivityTimerForTab(tabId);
+    // Submit queued recordings after a period of inactivity
+    this.inactivityDispatchTimersByTabId[tabIdString] = <number>(
+      (<unknown>setTimeout(() => {
+        this.submitQueuedRecordings(tabIdString);
+      }, this.telemetryInactivityThresholdInSeconds * 1000))
     );
+    // console.debug(`Telemetry: Inactivity timer ${this.inactivityDispatchTimersByTabId[tabIdString]} for tab ${tabId} set to fire in ${this.telemetryInactivityThresholdInSeconds} seconds.`, new Error())
+  };
+
+  public clearInactivityTimerForTab = (tabId: number | string) => {
+    const tabIdString = String(tabId);
+    if (this.inactivityDispatchTimersByTabId[tabIdString]) {
+      // console.debug(`Telemetry: Inactivity timer ${this.inactivityDispatchTimersByTabId[tabIdString]} for tab ${tabId} cleared.`)
+      clearTimeout(this.inactivityDispatchTimersByTabId[tabIdString]);
+      delete this.inactivityDispatchTimersByTabId[tabIdString];
+    }
+  };
+
+  public submitQueuedRecordings(tabId: number | string) {
+    const tabIdString = String(tabId);
+    const recordings: TelemetryRecordingFunction[] = this
+      .queuedRecordingsByTabId[tabIdString];
+    if (recordings.length === 0) {
+      // console.debug(`Telemetry: Submit of 0 recordings from tab ${tabId} requested. Ignoring.`)
+      return;
+    }
+    delete this.queuedRecordingsByTabId[tabIdString];
+    this.queuedRecordingsByTabId[tabIdString] = [];
+    this.clearInactivityTimerForTab(tabId);
+    try {
+      recordings.forEach(telemetryRecordingFunction => {
+        telemetryRecordingFunction();
+      });
+      custom.submit();
+      console.info(
+        `Telemetry: A ping based on ${recordings.length} recordings for tab ${tabId} have been dispatched to Glean.js`,
+      );
+    } catch (err) {
+      console.error(`Telemetry dispatch error`, err);
+    }
   }
 
   public async cleanup() {
-    await browser.alarms.clear(this.periodicAlarmName);
+    // Cancel ongoing timers
+    Object.keys(this.inactivityDispatchTimersByTabId).forEach(
+      (tabId: string) => {
+        this.clearInactivityTimerForTab(tabId);
+      },
+    );
     // Make sure to send buffered telemetry events
-    this.submitQueuedPings();
+    Object.keys(this.queuedRecordingsByTabId).forEach((tabId: string) => {
+      this.submitQueuedRecordings(tabId);
+    });
   }
 }
 

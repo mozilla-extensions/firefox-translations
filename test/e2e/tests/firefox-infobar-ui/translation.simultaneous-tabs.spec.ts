@@ -76,10 +76,10 @@ describe("Translation: Simultaneous tabs", function() {
 
   it("Telemetry checks after: Translation via the infobar works when translating in multiple tabs at the same time", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(0, 2, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(0, 1, proxyInstanceId);
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
-    assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[1], "es", "en");
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[0], "es", "en");
     assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1], "es", "en");
-    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[2], "es", "en");
   });
 });

@@ -99,10 +99,12 @@ describe("Translation: Subsequent navigations", function() {
 
   it("Telemetry checks after: Translation via the infobar works after subsequent navigations", async function() {
     // ... this test continues the session from the previous test
-    const seenTelemetry = await readSeenTelemetry(0, 3, proxyInstanceId);
+    const seenTelemetry = await readSeenTelemetry(0, 2, proxyInstanceId);
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[0], "es", "en");
+    assertOnTranslateButtonPressedTelemetry(seenTelemetry[1], "es", "en");
     assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[1], "es", "en");
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[2], "es", "en");
-    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[3], "es", "en");
+    assertOnTranslationAttemptConcludedTelemetry(seenTelemetry[2], "es", "en");
   });
 });
