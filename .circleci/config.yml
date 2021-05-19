@@ -33,15 +33,22 @@ jobs:
             - bergamot-translator
           key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}
 
+      - run:
+          name: Move the build WASM artifacts to a separate directory
+          command: |
+            mkdir built-bergamot-translator-wasm-artifacts
+            cp bergamot-translator/build-wasm/bergamot*.wasm built-bergamot-translator-wasm-artifacts/
+            cp bergamot-translator/build-wasm/bergamot*.js built-bergamot-translator-wasm-artifacts/
+
       - store_artifacts:
-          path: "bergamot-translator/build-wasm"
-          destination: "bergamot-translator/build-wasm"
+          path: "built-bergamot-translator-wasm-artifacts"
+          destination: "built-bergamot-translator-wasm-artifacts"
 
       - persist_to_workspace:
           root: ~/checkout
           # Must be relative path from root
           paths:
-            - bergamot-translator/build-wasm
+            - built-bergamot-translator-wasm-artifacts
 
   build_and_test_extension:
     docker:
@@ -94,7 +101,7 @@ jobs:
               at: /tmp/workspace
           - run:
               name: Import recently built Bergamot Translator build artifacts
-              command: ./import-bergamot-translator.sh /tmp/workspace/bergamot-translator/build-wasm/
+              command: ./import-bergamot-translator.sh /tmp/workspace/built-bergamot-translator-wasm-artifacts
           - run:
               name: Double-check that the imported Bergamot Translator's glue code matches the versioned code contents
               command: |
