@@ -30,7 +30,7 @@ jobs:
 
       - save_cache:
           paths:
-            - bergamot-translator/build-wasm
+            - bergamot-translator
           key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}
 
       - store_artifacts:
