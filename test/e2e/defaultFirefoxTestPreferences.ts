@@ -14,6 +14,9 @@ export const defaultFirefoxTestPreferences = {
   // Set the preference that signals that the user has Firefox telemetry enabled
   "datareporting.healthreport.uploadEnabled": true,
 
+  // Override the telemetry submission period to 5 seconds instead of 1 hour so that we can verify submitted telemetry
+  "extensions.translations.telemetryDispatchIntervalInSecondsOverride": "5",
+
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
   "browser.proton.enabled": true,
