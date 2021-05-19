@@ -1,11 +1,52 @@
 version: 2.1
 
 jobs:
-  build:
+  build_bergamot_translator:
+    docker:
+      - image: emscripten/emsdk:2.0.9
+    resource_class: medium
+
+    working_directory: ~/checkout
+
+    steps:
+      - checkout
+
+      - run:
+          name: Generate a file that changes when the bergamot-translator submodule changes
+          command:  git submodule status bergamot-translator > bergamot-translator-submodule-status.txt
+
+      - restore_cache:
+          keys:
+            - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}
+
+      - run:
+          name: Build WASM
+          command: ./bergamot-translator/build-wasm.sh
+
+      - save_cache:
+          paths:
+            - bergamot-translator/build-wasm
+          key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}
+
+      - store_artifacts:
+          path: "bergamot-translator/build-wasm"
+          destination: "bergamot-translator/build-wasm"
+
+      - persist_to_workspace:
+          root: ~/checkout
+          # Must be relative path from root
+          paths:
+            - bergamot-translator/build-wasm
+
+  build_and_test_extension:
     docker:
       - image: circleci/node:latest-browsers
 
     parameters:
+      bergamot_translator_source:
+        type: string
+        default: 'imported'
+
       # Manually change/increase the following parameter to ensure that builds start without the Circle CI cache being populated
       # Useful eg to ensure that the latest Firefox Nightly is installed
       cache_buster:
@@ -33,7 +74,29 @@ jobs:
           name: Install dependencies
           command: yarn install --frozen-lockfile
 
+      - attach_workspace:
+          if: parameters.bergamot_translator_source == 'built'
+          at: /tmp/workspace
+
       - run:
+          if: parameters.bergamot_translator_source == 'built'
+          name: Import recently built Bergamot Translator build artifacts
+          command: ./import-bergamot-translator.sh /tmp/workspace/bergamot-translator/build-wasm/
+
+      - run:
+          if: parameters.bergamot_translator_source == 'built'
+          name: Double-check that the imported Bergamot Translator's glue code matches the versioned code contents
+          command: |
+            if $(git diff --exit-code src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts)
+            then
+              echo "The imported Bergamot Translator's glue code matches the versioned code contents"
+            else
+              echo "The imported Bergamot Translator's glue code does not match the versioned code contents. Please make sure that the glue code built locally and by CI are identical and match what is committed in the repo."
+              exit 1
+            fi
+
+      - run:
+          if: parameters.bergamot_translator_source == 'imported'
           name: Download and import Bergamot Translator build artifacts
           command: yarn bergamot-translator:download-and-import
 
@@ -92,3 +155,19 @@ jobs:
       - store_artifacts:
           path: "test/e2e/results"
           destination: "test/e2e/results"
+
+workflows:
+
+  build-and-test:
+    jobs:
+      - build_and_test_extension
+          parameters:
+            bergamot_translator_source: 'imported'
+
+  build-and-test-using-bergamot-translator-built-from-source:
+    jobs:
+      - build_and_test_extension
+          parameters:
+            bergamot_translator_source: 'built'
+          requires:
+            - build_bergamot_translator

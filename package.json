@@ -163,7 +163,6 @@
     "addons-linter:cross-browser-ui:chrome": "addons-linter build/production/chrome/cross-browser-ui",
     "addons-linter:cross-browser-ui:firefox": "addons-linter build/production/firefox/cross-browser-ui",
     "addons-linter:firefox-infobar-ui": "addons-linter build/production/firefox/firefox-infobar-ui",
-    "bergamot-translator:build-and-import": "git submodule update --init --recursive && ./bergamot-translator/build-wasm.sh && ./import-bergamot-translator.sh ./bergamot-translator/build-wasm/wasm/",
     "bergamot-models:import": "./import-bergamot-models.sh",
     "bergamot-translator:download-and-import": "./download-bergamot-translator-wasm-artifacts.sh",
     "bergamot-translator:import": "./import-bergamot-translator.sh ./downloaded-bergamot-translator-wasm-artifacts",

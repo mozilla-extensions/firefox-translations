@@ -64,7 +64,8 @@ Then, follow the upstream instructions ([bergamot-translator/README](../bergamot
 When all is properly set-up, you should be able to run the following to build and import the custom WASM artifacts into the extension:
 
 ```bash
-yarn bergamot-translator:build-and-import
+./bergamot-translator/build-wasm.sh
+./import-bergamot-translator.sh ./bergamot-translator/build-wasm/
 ```
 
 Re-run this command any time there has been an update in the bergamot-translator submodule.
