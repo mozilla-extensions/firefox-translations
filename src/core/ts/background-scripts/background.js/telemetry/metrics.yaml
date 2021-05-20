@@ -64,13 +64,32 @@ metadata:
     expires: 2021-08-10
 
 performance:
-  translation_time:
-    type: string
+  full_page_translated_time:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on web page translation (ms).
+      Timing from "translation button pressed"
+      to "full page is translated".
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/94
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  full_page_translated_wps:
+    type: quantity
+    unit: words per second
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Speed of the translation from "translation button
+      pressed" to "full page is translated".
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -80,13 +99,13 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_download_time:
-    type: string
+  model_download_time_int:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on downloading a translation model for a language pair (ms).
+      Time spent on downloading a translation model for a language pair.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:
@@ -96,8 +115,8 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_load_time:
-    type: string
+  model_load_time_int:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
@@ -112,13 +131,30 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  words_per_second:
-    type: string
+  translation_engine_time:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Speed of translation.
+      Time spent on translation by the translation engine.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  translation_engine_wps:
+    type: quantity
+    unit: words per second
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Speed of translation as measured by the translation engine.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
     data_reviews:

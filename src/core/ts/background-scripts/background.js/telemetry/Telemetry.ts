@@ -6,10 +6,12 @@ import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { config } from "../../../config";
 import {
-  modelLoadTime,
-  translationTime,
-  wordsPerSecond,
-  modelDownloadTime,
+  fullPageTranslatedTime,
+  fullPageTranslatedWps,
+  modelDownloadTimeInt,
+  modelLoadTimeInt,
+  translationEngineTime,
+  translationEngineWps,
 } from "./generated/performance";
 import { fromLang, toLang, firefoxClientId } from "./generated/metadata";
 import {
@@ -193,16 +195,20 @@ export class Telemetry {
     tabId: number,
     from: string,
     to: string,
-    modelLoadWallTimeMs: number,
-    translationWallTimeMs: number,
-    $wordsPerSecond: number,
-    $modelDownloadTime: number,
+    timeToFullPageTranslatedMs: number,
+    timeToFullPageTranslatedWordsPerSecond: number,
+    modelDownloadTimeMs: number,
+    modelLoadTimeMs: number,
+    translationEngineTimeMs: number,
+    translationEngineWordsPerSecond: number,
   ) {
     this.queueRecording(() => {
-      modelLoadTime.set(String(modelLoadWallTimeMs));
-      translationTime.set(String(translationWallTimeMs));
-      wordsPerSecond.set(String(Math.round($wordsPerSecond)));
-      modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+      fullPageTranslatedTime.setRawNanos(timeToFullPageTranslatedMs * 1000000);
+      fullPageTranslatedWps.set(timeToFullPageTranslatedWordsPerSecond);
+      modelDownloadTimeInt.setRawNanos(modelDownloadTimeMs * 1000000);
+      modelLoadTimeInt.setRawNanos(modelLoadTimeMs * 1000000);
+      translationEngineTime.setRawNanos(translationEngineTimeMs * 1000000);
+      translationEngineWps.set(translationEngineWordsPerSecond);
       this.recordCommonMetadata(from, to);
     }, tabId);
     this.submitQueuedRecordings(tabId);
