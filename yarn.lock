@@ -1127,10 +1127,10 @@
   resolved "https://registry.yarnpkg.com/@mdn/browser-compat-data/-/browser-compat-data-3.3.3.tgz#139a151e98a7e91b43fc2900d0ccf7edb59bea5a"
   integrity sha512-ikDzSgs2SbBtKVXCNfU6GzVACpUuojZS8Vu/VhM1EwtWvtfGJsrRETLbV231ODMvWtfKJThzrsk2Hp88fv9+gA==
 
-"@mozilla/glean@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.11.0.tgz#48f00acfd4d55bb88af511fd7075220d45fc6bb4"
-  integrity sha512-ApVv0yF293WQ2hupnaEa7C+R6DrBIr8mqUUey0Rx0RIvV4mlgDSmmWUROdlUZQn0TR5EchAWwNfIJh5LgetHBg==
+"@mozilla/glean@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.13.0.tgz#7b132877b6f820e1b14416e2b238ba29c6678157"
+  integrity sha512-TIFwst0Qhr2I3riuzlvI/ap9SVkFBNyaSCk0ONdggMSgP3ECnw+n3zxysIkxNmXMKq6IWsthsLh+x7FGpJvCaw==
   dependencies:
     jose "^3.7.0"
     uuid "^8.3.2"
