@@ -8,7 +8,7 @@ export const config = {
     : "https://storage.googleapis.com/bergamot-models-maml/0.2.0",
   telemetryAppId: process.env.TELEMETRY_APP_ID,
   telemetryDebugMode: developmentBuild,
-  extensionBuildId: `${process.env.VERSION}-${process.env.LASTCOMMITDATETIME}-${process.env.BRANCH}`,
+  extensionBuildId: `${process.env.VERSION}-${process.env.BRANCH}`,
   supportedLanguagePairs: [
     // "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
     // ISO 639-1 codes
