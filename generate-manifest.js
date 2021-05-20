@@ -63,6 +63,14 @@ async function generateManifest({ dotEnvPath }) {
           paths: [["experiments", "extensionPreferences"]],
         },
       },
+      telemetryEnvironment: {
+        schema: "./experiment-apis/telemetryEnvironment/schema.json",
+        parent: {
+          scopes: ["addon_parent"],
+          script: "./experiment-apis/telemetryEnvironment/api.js",
+          paths: [["experiments", "telemetryEnvironment"]],
+        },
+      },
       telemetryPreferences: {
         schema: "./experiment-apis/telemetryPreferences/schema.json",
         parent: {

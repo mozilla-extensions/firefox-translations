@@ -13,6 +13,20 @@ const targetEnvironment =
 const targetBrowser = process.env.TARGET_BROWSER;
 const ui = process.env.UI;
 
+let extensionBuildEnvironment;
+if (process.env.CIRCLECI === "true") {
+  extensionBuildEnvironment = "circleci";
+} else if (process.env.XPI_NAME === "true") {
+  extensionBuildEnvironment = "taskcluster";
+} else if (process.env.CI === "true") {
+  extensionBuildEnvironment = "ci";
+} else {
+  extensionBuildEnvironment = "local";
+}
+if (targetEnvironment !== "production") {
+  extensionBuildEnvironment += `:${targetEnvironment}`;
+}
+
 const extensionId =
   ui === "firefox-infobar-ui"
     ? "firefox-translations@mozilla.org"
@@ -32,4 +46,5 @@ module.exports = {
   ui,
   extensionId,
   buildPath,
+  extensionBuildEnvironment,
 };

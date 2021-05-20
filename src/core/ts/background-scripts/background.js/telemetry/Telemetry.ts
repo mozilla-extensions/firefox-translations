@@ -6,12 +6,32 @@ import Glean from "@mozilla/glean/webext";
 import { custom } from "./generated/pings";
 import { config } from "../../../config";
 import {
-  modelLoadTime,
-  translationTime,
-  wordsPerSecond,
-  modelDownloadTime,
+  fullPageTranslatedTime,
+  fullPageTranslatedWps,
+  modelDownloadTimeNum,
+  modelLoadTimeNum,
+  translationEngineTime,
+  translationEngineWps,
 } from "./generated/performance";
-import { fromLang, toLang, firefoxClientId } from "./generated/metadata";
+import {
+  fromLang,
+  toLang,
+  firefoxClientId,
+  extensionVersion,
+  extensionBuildId,
+  bergamotTranslatorVersion,
+  systemMemory,
+  cpuCount,
+  cpuCoresCount,
+  cpuVendor,
+  cpuFamily,
+  cpuModel,
+  cpuStepping,
+  cpuL2Cache,
+  cpuL3Cache,
+  cpuSpeed,
+  cpuExtensions,
+} from "./generated/metadata";
 import {
   displayed,
   changeLang,
@@ -23,8 +43,24 @@ import {
 } from "./generated/infobar";
 import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
+import { browser as crossBrowser } from "webextension-polyfill-ts";
+import { BERGAMOT_VERSION_FULL } from "../../../web-worker-scripts/translation-worker.js/bergamot-translator-version";
 
 type TelemetryRecordingFunction = () => void;
+
+export interface TranslationRelevantFxTelemetryMetrics {
+  systemMemoryMb: number;
+  systemCpuCount: number;
+  systemCpuCores: number;
+  systemCpuVendor: string;
+  systemCpuFamily: string;
+  systemCpuModel: string;
+  systemCpuStepping: string;
+  systemCpuL2cacheKB: number;
+  systemCpuL3cacheKB: number;
+  systemCpuSpeedMhz: number;
+  systemCpuExtensions: string;
+}
 
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
@@ -52,6 +88,8 @@ export class Telemetry {
   private initialized: boolean;
   private firefoxClientId: string;
   private telemetryInactivityThresholdInSeconds: number;
+  private translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics;
+  private extensionVersion: string;
   private queuedRecordingsByTabId: {
     [tabId: string]: TelemetryRecordingFunction[];
   } = {};
@@ -65,6 +103,8 @@ export class Telemetry {
   ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
+    const manifest = crossBrowser.runtime.getManifest();
+    this.extensionVersion = manifest.version;
     try {
       Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
@@ -93,10 +133,45 @@ export class Telemetry {
     this.firefoxClientId = $firefoxClientId;
   }
 
+  public setTranslationRelevantFxTelemetryMetrics(
+    translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
+  ) {
+    this.translationRelevantFxTelemetryMetrics = translationRelevantFxTelemetryMetrics;
+  }
+
   public recordCommonMetadata(from: string, to: string) {
     fromLang.set(from);
     toLang.set(to);
     firefoxClientId.set(this.firefoxClientId);
+    extensionVersion.set(this.extensionVersion);
+    extensionBuildId.set(config.extensionBuildId.substring(0, 100));
+    bergamotTranslatorVersion.set(BERGAMOT_VERSION_FULL);
+    if (this.translationRelevantFxTelemetryMetrics) {
+      const {
+        systemMemoryMb,
+        systemCpuCount,
+        systemCpuCores,
+        systemCpuVendor,
+        systemCpuFamily,
+        systemCpuModel,
+        systemCpuStepping,
+        systemCpuL2cacheKB,
+        systemCpuL3cacheKB,
+        systemCpuSpeedMhz,
+        systemCpuExtensions,
+      } = this.translationRelevantFxTelemetryMetrics;
+      systemMemory.set(systemMemoryMb);
+      cpuCount.set(systemCpuCount);
+      cpuCoresCount.set(systemCpuCores);
+      cpuVendor.set(systemCpuVendor);
+      cpuFamily.set(systemCpuFamily);
+      cpuModel.set(systemCpuModel);
+      cpuStepping.set(systemCpuStepping);
+      cpuL2Cache.set(systemCpuL2cacheKB);
+      cpuL3Cache.set(systemCpuL3cacheKB);
+      cpuSpeed.set(systemCpuSpeedMhz);
+      cpuExtensions.set(systemCpuExtensions);
+    }
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
@@ -193,16 +268,20 @@ export class Telemetry {
     tabId: number,
     from: string,
     to: string,
-    modelLoadWallTimeMs: number,
-    translationWallTimeMs: number,
-    $wordsPerSecond: number,
-    $modelDownloadTime: number,
+    timeToFullPageTranslatedMs: number,
+    timeToFullPageTranslatedWordsPerSecond: number,
+    modelDownloadTimeMs: number,
+    modelLoadTimeMs: number,
+    translationEngineTimeMs: number,
+    translationEngineWordsPerSecond: number,
   ) {
     this.queueRecording(() => {
-      modelLoadTime.set(String(modelLoadWallTimeMs));
-      translationTime.set(String(translationWallTimeMs));
-      wordsPerSecond.set(String(Math.round($wordsPerSecond)));
-      modelDownloadTime.set(String(Math.round($modelDownloadTime)));
+      fullPageTranslatedTime.setRawNanos(timeToFullPageTranslatedMs * 1000000);
+      fullPageTranslatedWps.set(timeToFullPageTranslatedWordsPerSecond);
+      modelDownloadTimeNum.setRawNanos(modelDownloadTimeMs * 1000000);
+      modelLoadTimeNum.setRawNanos(modelLoadTimeMs * 1000000);
+      translationEngineTime.setRawNanos(translationEngineTimeMs * 1000000);
+      translationEngineWps.set(translationEngineWordsPerSecond);
       this.recordCommonMetadata(from, to);
     }, tabId);
     this.submitQueuedRecordings(tabId);

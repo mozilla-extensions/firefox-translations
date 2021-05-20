@@ -20,6 +20,7 @@
   - [Troubleshooting the extension when it is running](#troubleshooting-the-extension-when-it-is-running)
     - [Firefox - Infobar UI](#firefox---infobar-ui-1)
     - [Firefox - Cross-browser UI](#firefox---cross-browser-ui-1)
+  - [Upgrading Glean.js](#upgrading-gleanjs)
   - [Analyze webpack bundle size](#analyze-webpack-bundle-size)
     - [Firefox - Infobar UI](#firefox---infobar-ui-2)
     - [Chrome - Cross-browser UI](#chrome---cross-browser-ui-1)
@@ -193,6 +194,13 @@ Hint: To produce a clean log output for forwarding to developers / attaching to 
 
 1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40browser.mt`
 2. Click Console
+
+## Upgrading Glean.js
+
+1. Bump the `@mozilla/glean` version in `package.json`
+2. `yarn`
+3. `yarn generate-glean`
+4. Commit all changes. Use a commit message in the format of `Upgrade Glean.js to vx.y.z`
 
 ## Analyze webpack bundle size
 

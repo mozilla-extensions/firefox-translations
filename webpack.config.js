@@ -6,8 +6,18 @@ const CopyPlugin = require("copy-webpack-plugin");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
   .BundleAnalyzerPlugin;
+const { GitRevisionPlugin } = require("git-revision-webpack-plugin");
+const gitRevisionPlugin = new GitRevisionPlugin({
+  lightweightTags: true,
+  branch: true,
+});
 
-const { targetEnvironment, buildPath, ui } = require("./build-config.js");
+const {
+  targetEnvironment,
+  buildPath,
+  ui,
+  extensionBuildEnvironment,
+} = require("./build-config.js");
 
 const dotEnvPath =
   targetEnvironment === "production"
@@ -63,6 +73,8 @@ const plugins = [
   new CopyPlugin({
     patterns: copyPluginPatterns,
   }),
+  // Allows us to compile an extension build id that includes information about the build configuration
+  gitRevisionPlugin,
 ];
 
 //
@@ -89,9 +101,17 @@ if (targetEnvironment === "production" && ui === "firefox-infobar-ui") {
   telemetryAppId = "org-mozilla-bergamot";
 }
 
+// Make some constants available to the application
 plugins.push(
   new webpack.EnvironmentPlugin({
     TELEMETRY_APP_ID: telemetryAppId,
+    VERSION: gitRevisionPlugin.version(),
+    COMMITHASH: gitRevisionPlugin.commithash(),
+    BRANCH: gitRevisionPlugin.branch(),
+    LASTCOMMITDATETIME: gitRevisionPlugin.lastcommitdatetime(),
+    TARGET_BROWSER: process.env.TARGET_BROWSER,
+    UI: process.env.UI,
+    extensionBuildEnvironment,
   }),
 );
 

@@ -1127,10 +1127,10 @@
   resolved "https://registry.yarnpkg.com/@mdn/browser-compat-data/-/browser-compat-data-3.3.3.tgz#139a151e98a7e91b43fc2900d0ccf7edb59bea5a"
   integrity sha512-ikDzSgs2SbBtKVXCNfU6GzVACpUuojZS8Vu/VhM1EwtWvtfGJsrRETLbV231ODMvWtfKJThzrsk2Hp88fv9+gA==
 
-"@mozilla/glean@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.11.0.tgz#48f00acfd4d55bb88af511fd7075220d45fc6bb4"
-  integrity sha512-ApVv0yF293WQ2hupnaEa7C+R6DrBIr8mqUUey0Rx0RIvV4mlgDSmmWUROdlUZQn0TR5EchAWwNfIJh5LgetHBg==
+"@mozilla/glean@^0.14.0":
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/@mozilla/glean/-/glean-0.14.0.tgz#96238e989150ddf31f1f636edeb991a71a535b63"
+  integrity sha512-aYL6qzuEbRgHLPRl81nB2G39KX57SrBBYbOYHNMrlLLB5tYpp9SjakHErFaYiGMlIzQ2weYEJ4x+dMliXB4M1g==
   dependencies:
     jose "^3.7.0"
     uuid "^8.3.2"
@@ -6380,6 +6380,11 @@ getport@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/getport/-/getport-0.1.0.tgz#abddf3d5d1e77dd967ccfa2b036a0a1fb26fd7f7"
   integrity sha1-q93z1dHnfdlnzPorA2oKH7Jv1/c=
+
+git-revision-webpack-plugin@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/git-revision-webpack-plugin/-/git-revision-webpack-plugin-5.0.0.tgz#0683a6a110ece618499880431cd89e1eb597b536"
+  integrity sha512-RptQN/4UKcEPkCBmRy8kLPo5i8MnF8+XfAgFYN9gbwmKLTLx4YHsQw726H+C5+sIGDixDkmGL3IxPA2gKo+u4w==
 
 glob-parent@^3.1.0:
   version "3.1.0"

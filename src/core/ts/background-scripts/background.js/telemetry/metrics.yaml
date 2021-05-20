@@ -62,17 +62,249 @@ metadata:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
+  extension_version:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Extension version
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  extension_build_id:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Extension build id, indicating which git revision
+      and build config was used to produce this build
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  bergamot_translator_version:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Bergamot translator engine version
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  system_memory:
+    type: quantity
+    unit: mb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.memoryMB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_count:
+    type: quantity
+    unit: cpus
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.count` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_cores_count:
+    type: quantity
+    unit: cores
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.cores` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_vendor:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.vendor` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_family:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.family` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_model:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.model` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_stepping:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.stepping` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_l2_cache:
+    type: quantity
+    unit: kb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.l2cacheKB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_l3_cache:
+    type: quantity
+    unit: kb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.l3cacheKB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_speed:
+    type: quantity
+    unit: mhz
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.speedMHz` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_extensions:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.extensions` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
 
 performance:
-  translation_time:
-    type: string
+  full_page_translated_time:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on web page translation (ms).
+      Timing from "translation button pressed"
+      to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -80,15 +312,17 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_download_time:
-    type: string
+  full_page_translated_wps:
+    type: quantity
+    unit: words per second
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on downloading a translation model for a language pair (ms).
+      Speed of the translation from "translation button
+      pressed" to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -96,15 +330,18 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_load_time:
-    type: string
+  model_download_time_num:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on loading a model into memory to start translation (ms).
+      Time spent on downloading a translation model for a language pair.
+      (Renamed from model_download_time to model_download_time_num as part of
+      changing type from string to quantity)
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -112,15 +349,53 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  words_per_second:
-    type: string
+  model_load_time_num:
+    type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Speed of translation.
+      Time spent on loading a model into memory to start translation.
+      (Renamed from model_load_time to model_load_time_num as part of
+      changing type from string to quantity)
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  translation_engine_time:
+    type: timespan
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Time spent on translation by the translation engine.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  translation_engine_wps:
+    type: quantity
+    unit: words per second
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Speed of translation as measured by the translation engine.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:

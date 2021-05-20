@@ -7,7 +7,10 @@ import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
-import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import {
+  telemetry,
+  TranslationRelevantFxTelemetryMetrics,
+} from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
 import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { reaction } from "mobx";
@@ -57,6 +60,11 @@ type StandardInfobarInteractionEvent = Event<
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {
   experiments: {
+    telemetryEnvironment: {
+      getTranslationRelevantFxTelemetryMetrics: () => Promise<
+        TranslationRelevantFxTelemetryMetrics
+      >;
+    };
     telemetryPreferences: {
       onUploadEnabledPrefChange: Event<() => void>;
       onCachedClientIDPrefChange: Event<() => void>;
@@ -147,6 +155,18 @@ export class NativeTranslateUiBroker {
       cachedClientID,
       telemetryInactivityThresholdInSecondsOverride,
     );
+    // The translationRelevantFxTelemetryMetrics gets available first once the telemetry environment has initialized
+    browserWithExperimentAPIs.experiments.telemetryEnvironment
+      .getTranslationRelevantFxTelemetryMetrics()
+      .then(
+        (
+          translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
+        ) => {
+          telemetry.setTranslationRelevantFxTelemetryMetrics(
+            translationRelevantFxTelemetryMetrics,
+          );
+        },
+      );
 
     // Hook up experiment API events with listeners in this class
     this.telemetryPreferencesEventsToObserve.map(

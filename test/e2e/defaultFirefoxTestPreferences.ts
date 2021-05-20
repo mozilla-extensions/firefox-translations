@@ -14,8 +14,8 @@ export const defaultFirefoxTestPreferences = {
   // Set the preference that signals that the user has Firefox telemetry enabled
   "datareporting.healthreport.uploadEnabled": true,
 
-  // Override the telemetry inactivity threshold to 10 seconds instead of 1 minute so that we can verify submitted telemetry faster
-  "extensions.translations.telemetryInactivityThresholdInSecondsOverride": "10",
+  // Override the telemetry inactivity threshold to 20 seconds instead of 1 minute so that we can verify submitted telemetry faster
+  "extensions.translations.telemetryInactivityThresholdInSecondsOverride": "20",
 
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
