@@ -12,7 +12,12 @@ const gitRevisionPlugin = new GitRevisionPlugin({
   branch: true,
 });
 
-const { targetEnvironment, buildPath, ui } = require("./build-config.js");
+const {
+  targetEnvironment,
+  buildPath,
+  ui,
+  extensionBuildEnvironment,
+} = require("./build-config.js");
 
 const dotEnvPath =
   targetEnvironment === "production"
@@ -106,6 +111,7 @@ plugins.push(
     LASTCOMMITDATETIME: gitRevisionPlugin.lastcommitdatetime(),
     TARGET_BROWSER: process.env.TARGET_BROWSER,
     UI: process.env.UI,
+    extensionBuildEnvironment,
   }),
 );
 
