@@ -23,6 +23,9 @@ if (process.env.CIRCLECI === "true") {
 } else {
   extensionBuildEnvironment = "local";
 }
+if (targetEnvironment !== "production") {
+  extensionBuildEnvironment += `:${targetEnvironment}`;
+}
 
 const extensionId =
   ui === "firefox-infobar-ui"
