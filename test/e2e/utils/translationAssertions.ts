@@ -91,17 +91,33 @@ export const assertTranslationTelemetryMetadata = (
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.from_lang"],
     expectedFromLang,
-    "The telemetry payload's string metrics 'metadata.from_lang' is correct",
+    "The telemetry payload's string metric 'metadata.from_lang' is correct",
   );
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.to_lang"],
     expectedToLang,
-    "The telemetry payload's string metrics 'metadata.to_lang' is correct",
+    "The telemetry payload's string metric 'metadata.to_lang' is correct",
   );
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.firefox_client_id"],
     expectedFirefoxTelemetryClientId,
-    "The telemetry payload's string metrics 'metadata.firefox_client_id' is correct",
+    "The telemetry payload's string metric 'metadata.firefox_client_id' is correct",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.extension_version"].length,
+    1,
+    "The telemetry payload's string metric 'metadata.extension_version' is non-empty",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.extension_build_id"].length,
+    1,
+    "The telemetry payload's string metric 'metadata.extension_build_id' is non-empty",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.bergamot_translator_version"]
+      .length,
+    1,
+    "The telemetry payload's string metric 'metadata.bergamot_translator_version' is non-empty",
   );
 };
 
@@ -115,33 +131,35 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     expectedFromLang,
     expectedToLang,
   );
-  // Check telemetry for: Translated words per second, Model load time, Translation time, Model download time
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.model_load_time"],
-      10,
-    ) >= 0,
-    "The telemetry payload's string metrics 'performance.model_load_time' is a string that when parsed evaluates to 0 or greater",
+  // Check telemetry for translation performance metrics
+  assert.isAbove(
+    telemetryPayload.metrics.timespan["performance.full_page_translated_time"],
+    0,
+    "The telemetry payload's timespan metric 'performance.full_page_translated_time' is more than 0",
   );
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.translation_time"],
-      10,
-    ) > 0,
-    "The telemetry payload's string metrics 'performance.translation_time' is a string that when parsed evaluates to more than 0",
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.model_download_time_num"],
+    0,
+    "The telemetry payload's timespan metric 'performance.model_download_time_num' is at least 0",
   );
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.words_per_second"],
-      10,
-    ) > 0,
-    "The telemetry payload's string metrics 'performance.words_per_second' is a string that when parsed evaluates to more than 0",
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.model_load_time_num"],
+    0,
+    "The telemetry payload's timespan metric 'performance.model_load_time_num' is at least 0",
   );
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.model_download_time"],
-      10,
-    ) >= 0,
-    "The telemetry payload's string metrics 'performance.model_download_time' is a string that when parsed evaluates to 0 or greater",
+  assert.isAbove(
+    telemetryPayload.metrics.timespan["performance.translation_engine_time"],
+    0,
+    "The telemetry payload's timespan metric 'performance.translation_engine_time' is more than 0",
+  );
+  assert.isAbove(
+    telemetryPayload.metrics.quantity["performance.full_page_translated_wps"],
+    0,
+    "The telemetry payload's quantity metric 'performance.full_page_translated_wps' is more than 0",
+  );
+  assert.isAbove(
+    telemetryPayload.metrics.quantity["performance.translation_engine_wps"],
+    0,
+    "The telemetry payload's quantity metric 'performance.translation_engine_wps' is more than 0",
   );
 };
