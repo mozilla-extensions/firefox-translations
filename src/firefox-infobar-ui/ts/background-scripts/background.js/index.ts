@@ -17,7 +17,7 @@ import { connectRootStoreToDevTools } from "../../../../core/ts/background-scrip
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { NativeTranslateUiBroker } from "./NativeTranslateUiBroker";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
-import { BERGAMOT_VERSION_FULL } from "../../../../core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker";
+import { BERGAMOT_VERSION_FULL } from "../../../../core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-version";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
