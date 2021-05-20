@@ -8,8 +8,8 @@ import { config } from "../../../config";
 import {
   fullPageTranslatedTime,
   fullPageTranslatedWps,
-  modelDownloadTimeInt,
-  modelLoadTimeInt,
+  modelDownloadTimeNum,
+  modelLoadTimeNum,
   translationEngineTime,
   translationEngineWps,
 } from "./generated/performance";
@@ -220,8 +220,8 @@ export class Telemetry {
     this.queueRecording(() => {
       fullPageTranslatedTime.setRawNanos(timeToFullPageTranslatedMs * 1000000);
       fullPageTranslatedWps.set(timeToFullPageTranslatedWordsPerSecond);
-      modelDownloadTimeInt.setRawNanos(modelDownloadTimeMs * 1000000);
-      modelLoadTimeInt.setRawNanos(modelLoadTimeMs * 1000000);
+      modelDownloadTimeNum.setRawNanos(modelDownloadTimeMs * 1000000);
+      modelLoadTimeNum.setRawNanos(modelLoadTimeMs * 1000000);
       translationEngineTime.setRawNanos(translationEngineTimeMs * 1000000);
       translationEngineWps.set(translationEngineWordsPerSecond);
       this.recordCommonMetadata(from, to);
