@@ -150,13 +150,23 @@ export class NativeTranslateUiBroker {
 
     // Initialize telemetry
     const telemetryInactivityThresholdInSecondsOverride = await browserWithExperimentAPIs.experiments.extensionPreferences.getTelemetryInactivityThresholdInSecondsOverridePref();
-    const translationRelevantFxTelemetryMetrics = await browserWithExperimentAPIs.experiments.telemetryEnvironment.getTranslationRelevantFxTelemetryMetrics();
     telemetry.initialize(
       uploadEnabled,
       cachedClientID,
       telemetryInactivityThresholdInSecondsOverride,
-      translationRelevantFxTelemetryMetrics,
     );
+    // The translationRelevantFxTelemetryMetrics gets available first once the telemetry environment has initialized
+    browserWithExperimentAPIs.experiments.telemetryEnvironment
+      .getTranslationRelevantFxTelemetryMetrics()
+      .then(
+        (
+          translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
+        ) => {
+          telemetry.setTranslationRelevantFxTelemetryMetrics(
+            translationRelevantFxTelemetryMetrics,
+          );
+        },
+      );
 
     // Hook up experiment API events with listeners in this class
     this.telemetryPreferencesEventsToObserve.map(

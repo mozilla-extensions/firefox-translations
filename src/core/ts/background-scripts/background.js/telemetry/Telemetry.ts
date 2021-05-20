@@ -100,7 +100,6 @@ export class Telemetry {
     uploadEnabled: boolean,
     $firefoxClientId: string,
     telemetryInactivityThresholdInSecondsOverride: number,
-    translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
   ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
@@ -116,7 +115,6 @@ export class Telemetry {
       console.info(
         `Telemetry: initialization completed with application ID ${appId}. Inactivity threshold is set to ${this.telemetryInactivityThresholdInSeconds} seconds.`,
       );
-      this.translationRelevantFxTelemetryMetrics = translationRelevantFxTelemetryMetrics;
       this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
@@ -135,6 +133,12 @@ export class Telemetry {
     this.firefoxClientId = $firefoxClientId;
   }
 
+  public setTranslationRelevantFxTelemetryMetrics(
+    translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
+  ) {
+    this.translationRelevantFxTelemetryMetrics = translationRelevantFxTelemetryMetrics;
+  }
+
   public recordCommonMetadata(from: string, to: string) {
     fromLang.set(from);
     toLang.set(to);
@@ -142,27 +146,32 @@ export class Telemetry {
     extensionVersion.set(this.extensionVersion);
     extensionBuildId.set(config.extensionBuildId.substring(0, 100));
     bergamotTranslatorVersion.set(BERGAMOT_VERSION_FULL);
-    systemMemory.set(this.translationRelevantFxTelemetryMetrics.systemMemoryMb);
-    cpuCount.set(this.translationRelevantFxTelemetryMetrics.systemCpuCount);
-    cpuCoresCount.set(
-      this.translationRelevantFxTelemetryMetrics.systemCpuCores,
-    );
-    cpuVendor.set(this.translationRelevantFxTelemetryMetrics.systemCpuVendor);
-    cpuFamily.set(this.translationRelevantFxTelemetryMetrics.systemCpuFamily);
-    cpuModel.set(this.translationRelevantFxTelemetryMetrics.systemCpuModel);
-    cpuStepping.set(
-      this.translationRelevantFxTelemetryMetrics.systemCpuStepping,
-    );
-    cpuL2Cache.set(
-      this.translationRelevantFxTelemetryMetrics.systemCpuL2cacheKB,
-    );
-    cpuL3Cache.set(
-      this.translationRelevantFxTelemetryMetrics.systemCpuL3cacheKB,
-    );
-    cpuSpeed.set(this.translationRelevantFxTelemetryMetrics.systemCpuSpeedMhz);
-    cpuExtensions.set(
-      this.translationRelevantFxTelemetryMetrics.systemCpuExtensions,
-    );
+    if (this.translationRelevantFxTelemetryMetrics) {
+      const {
+        systemMemoryMb,
+        systemCpuCount,
+        systemCpuCores,
+        systemCpuVendor,
+        systemCpuFamily,
+        systemCpuModel,
+        systemCpuStepping,
+        systemCpuL2cacheKB,
+        systemCpuL3cacheKB,
+        systemCpuSpeedMhz,
+        systemCpuExtensions,
+      } = this.translationRelevantFxTelemetryMetrics;
+      systemMemory.set(systemMemoryMb);
+      cpuCount.set(systemCpuCount);
+      cpuCoresCount.set(systemCpuCores);
+      cpuVendor.set(systemCpuVendor);
+      cpuFamily.set(systemCpuFamily);
+      cpuModel.set(systemCpuModel);
+      cpuStepping.set(systemCpuStepping);
+      cpuL2Cache.set(systemCpuL2cacheKB);
+      cpuL3Cache.set(systemCpuL3cacheKB);
+      cpuSpeed.set(systemCpuSpeedMhz);
+      cpuExtensions.set(systemCpuExtensions);
+    }
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
