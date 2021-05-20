@@ -108,6 +108,7 @@ class TranslationBrowserChromeUi {
     const notif = this.notificationBox.getNotificationWithValue("translation");
     if (notif) {
       const {
+        modelDownloading,
         translationDurationMs,
         localizedTranslationProgressText,
       } = uiState;
@@ -118,11 +119,13 @@ class TranslationBrowserChromeUi {
       }
 
       // Only show progress if translation has been going on for at least 3 seconds
+      // or we are currently downloading a model
       let shouldShowTranslationProgress;
       const thresholdMsAfterWhichToShouldTranslationProgress = 3000;
       if (
         translationDurationMs >=
-        thresholdMsAfterWhichToShouldTranslationProgress
+          thresholdMsAfterWhichToShouldTranslationProgress ||
+        modelDownloading
       ) {
         shouldShowTranslationProgress = true;
       } else {

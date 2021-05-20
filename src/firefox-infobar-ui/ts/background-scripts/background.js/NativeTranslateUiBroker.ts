@@ -46,6 +46,7 @@ interface NativeTranslateUiState {
   supportedSourceLanguages: string[];
   supportedTargetLanguages: string[];
   // Translation progress
+  modelDownloading: boolean;
   translationDurationMs: number;
   localizedTranslationProgressText: string;
 }
@@ -248,6 +249,7 @@ export class NativeTranslateUiBroker {
         supportedSourceLanguages,
         supportedTargetLanguages: allPossiblySupportedTargetLanguages,
         // Translation progress
+        modelDownloading,
         translationDurationMs,
         localizedTranslationProgressText,
       };
