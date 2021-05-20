@@ -163,6 +163,7 @@
     "addons-linter:cross-browser-ui:chrome": "addons-linter build/production/chrome/cross-browser-ui",
     "addons-linter:cross-browser-ui:firefox": "addons-linter build/production/firefox/cross-browser-ui",
     "addons-linter:firefox-infobar-ui": "addons-linter build/production/firefox/firefox-infobar-ui",
+    "bergamot-models:import": "./import-bergamot-models.sh",
     "bergamot-translator:download-and-import": "./download-bergamot-translator-wasm-artifacts.sh && ./import-bergamot-translator.sh ./downloaded-bergamot-translator-wasm-artifacts",
     "build": "npm-run-all bergamot-translator:download-and-import build:firefox-infobar-ui make-build-artifact-available-for-dep-signing",
     "build:cross-browser-ui:chrome": "export TARGET_BROWSER=chrome UI=cross-browser-ui NODE_ENV=production; npm-run-all just-build",
