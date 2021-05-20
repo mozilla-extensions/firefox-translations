@@ -73,7 +73,7 @@ performance:
       Timing from "translation button pressed"
       to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/94
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -91,7 +91,7 @@ performance:
       Speed of the translation from "translation button
       pressed" to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -108,6 +108,7 @@ performance:
       Time spent on downloading a translation model for a language pair.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -124,6 +125,7 @@ performance:
       Time spent on loading a model into memory to start translation (ms).
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -140,6 +142,7 @@ performance:
       Time spent on translation by the translation engine.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -157,6 +160,7 @@ performance:
       Speed of translation as measured by the translation engine.
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
