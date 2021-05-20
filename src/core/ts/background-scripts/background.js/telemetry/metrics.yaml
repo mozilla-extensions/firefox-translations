@@ -62,6 +62,55 @@ metadata:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
+  extension_version:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Extension version
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  extension_build_id:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Extension build id, indicating which git revision
+      and build config was used to produce this build
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  bergamot_translator_version:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Bergamot translator engine version
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
 
 performance:
   full_page_translated_time:

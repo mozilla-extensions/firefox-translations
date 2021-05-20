@@ -13,7 +13,14 @@ import {
   translationEngineTime,
   translationEngineWps,
 } from "./generated/performance";
-import { fromLang, toLang, firefoxClientId } from "./generated/metadata";
+import {
+  fromLang,
+  toLang,
+  firefoxClientId,
+  extensionVersion,
+  extensionBuildId,
+  bergamotTranslatorVersion,
+} from "./generated/metadata";
 import {
   displayed,
   changeLang,
@@ -25,6 +32,8 @@ import {
 } from "./generated/infobar";
 import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
+import { browser as crossBrowser } from "webextension-polyfill-ts";
+import { BERGAMOT_VERSION_FULL } from "../../../web-worker-scripts/translation-worker.js/bergamot-translator-version";
 
 type TelemetryRecordingFunction = () => void;
 
@@ -54,6 +63,7 @@ export class Telemetry {
   private initialized: boolean;
   private firefoxClientId: string;
   private telemetryInactivityThresholdInSeconds: number;
+  private extensionVersion: string;
   private queuedRecordingsByTabId: {
     [tabId: string]: TelemetryRecordingFunction[];
   } = {};
@@ -67,6 +77,8 @@ export class Telemetry {
   ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
+    const manifest = crossBrowser.runtime.getManifest();
+    this.extensionVersion = manifest.version;
     try {
       Glean.initialize(appId, uploadEnabled, {
         debug: { logPings: config.telemetryDebugMode },
@@ -99,6 +111,9 @@ export class Telemetry {
     fromLang.set(from);
     toLang.set(to);
     firefoxClientId.set(this.firefoxClientId);
+    extensionVersion.set(this.extensionVersion);
+    extensionBuildId.set(config.extensionBuildId.substring(0, 100));
+    bergamotTranslatorVersion.set(BERGAMOT_VERSION_FULL);
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
