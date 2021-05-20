@@ -54,9 +54,20 @@ type StandardInfobarInteractionEvent = Event<
   (tabId: number, from: string, to: string) => void
 >;
 
+export interface TranslationRelevantFxTelemetryMetrics {
+  systemMemoryMb: number;
+  systemCpuCores: number;
+  systemCpuSpeedMhz: number;
+}
+
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {
   experiments: {
+    telemetryEnvironment: {
+      getTranslationRelevantFxTelemetryMetrics: () => Promise<
+        TranslationRelevantFxTelemetryMetrics
+      >;
+    };
     telemetryPreferences: {
       onUploadEnabledPrefChange: Event<() => void>;
       onCachedClientIDPrefChange: Event<() => void>;
@@ -142,10 +153,12 @@ export class NativeTranslateUiBroker {
 
     // Initialize telemetry
     const telemetryInactivityThresholdInSecondsOverride = await browserWithExperimentAPIs.experiments.extensionPreferences.getTelemetryInactivityThresholdInSecondsOverridePref();
+    const translationRelevantFxTelemetryMetrics = await browserWithExperimentAPIs.experiments.telemetryEnvironment.getTranslationRelevantFxTelemetryMetrics();
     telemetry.initialize(
       uploadEnabled,
       cachedClientID,
       telemetryInactivityThresholdInSecondsOverride,
+      translationRelevantFxTelemetryMetrics,
     );
 
     // Hook up experiment API events with listeners in this class

@@ -111,6 +111,57 @@ metadata:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
+  system_memory:
+    type: quantity
+    unit: mb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `memoryMB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_cores_count:
+    type: quantity
+    unit: cores
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `cpu.cores` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_speed:
+    type: quantity
+    unit: mhz
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `cpu.speedMHz` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
 
 performance:
   full_page_translated_time:

@@ -86,3 +86,42 @@ export const bergamotTranslatorVersion = new StringMetricType({
   lifetime: "ping",
   disabled: false,
 });
+
+/**
+ * Telemetry Environment `memoryMB` metric
+ *
+ * Generated from `metadata.system_memory`.
+ */
+export const systemMemory = new QuantityMetricType({
+  category: "metadata",
+  name: "system_memory",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.cores` metric
+ *
+ * Generated from `metadata.cpu_cores_count`.
+ */
+export const cpuCoresCount = new QuantityMetricType({
+  category: "metadata",
+  name: "cpu_cores_count",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.speedMHz` metric
+ *
+ * Generated from `metadata.cpu_speed`.
+ */
+export const cpuSpeed = new QuantityMetricType({
+  category: "metadata",
+  name: "cpu_speed",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});

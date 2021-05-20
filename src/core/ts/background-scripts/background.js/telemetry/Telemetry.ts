@@ -20,6 +20,9 @@ import {
   extensionVersion,
   extensionBuildId,
   bergamotTranslatorVersion,
+  systemMemory,
+  cpuCoresCount,
+  cpuSpeed,
 } from "./generated/metadata";
 import {
   displayed,
@@ -34,6 +37,7 @@ import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
 import { browser as crossBrowser } from "webextension-polyfill-ts";
 import { BERGAMOT_VERSION_FULL } from "../../../web-worker-scripts/translation-worker.js/bergamot-translator-version";
+import { TranslationRelevantFxTelemetryMetrics } from "../../../../../firefox-infobar-ui/ts/background-scripts/background.js/NativeTranslateUiBroker";
 
 type TelemetryRecordingFunction = () => void;
 
@@ -63,6 +67,7 @@ export class Telemetry {
   private initialized: boolean;
   private firefoxClientId: string;
   private telemetryInactivityThresholdInSeconds: number;
+  private translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics;
   private extensionVersion: string;
   private queuedRecordingsByTabId: {
     [tabId: string]: TelemetryRecordingFunction[];
@@ -74,6 +79,7 @@ export class Telemetry {
     uploadEnabled: boolean,
     $firefoxClientId: string,
     telemetryInactivityThresholdInSecondsOverride: number,
+    translationRelevantFxTelemetryMetrics: TranslationRelevantFxTelemetryMetrics,
   ) {
     const appId = config.telemetryAppId;
     this.setFirefoxClientId($firefoxClientId);
@@ -89,6 +95,7 @@ export class Telemetry {
       console.info(
         `Telemetry: initialization completed with application ID ${appId}. Inactivity threshold is set to ${this.telemetryInactivityThresholdInSeconds} seconds.`,
       );
+      this.translationRelevantFxTelemetryMetrics = translationRelevantFxTelemetryMetrics;
       this.initialized = true;
     } catch (err) {
       console.error(`Telemetry initialization error`, err);
@@ -114,6 +121,11 @@ export class Telemetry {
     extensionVersion.set(this.extensionVersion);
     extensionBuildId.set(config.extensionBuildId.substring(0, 100));
     bergamotTranslatorVersion.set(BERGAMOT_VERSION_FULL);
+    systemMemory.set(this.translationRelevantFxTelemetryMetrics.systemMemoryMb);
+    cpuCoresCount.set(
+      this.translationRelevantFxTelemetryMetrics.systemCpuCores,
+    );
+    cpuSpeed.set(this.translationRelevantFxTelemetryMetrics.systemCpuSpeedMhz);
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
