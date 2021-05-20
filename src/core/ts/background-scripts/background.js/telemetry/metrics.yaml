@@ -199,13 +199,15 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_download_time_int:
+  model_download_time_num:
     type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
       Time spent on downloading a translation model for a language pair.
+      (Renamed from model_download_time to model_download_time_num as part of
+      changing type from string to quantity)
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
@@ -216,13 +218,15 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
-  model_load_time_int:
+  model_load_time_num:
     type: timespan
     lifetime: ping
     send_in_pings:
       - custom
     description: |
-      Time spent on loading a model into memory to start translation (ms).
+      Time spent on loading a model into memory to start translation.
+      (Renamed from model_load_time to model_load_time_num as part of
+      changing type from string to quantity)
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
