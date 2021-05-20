@@ -17,7 +17,6 @@ import { connectRootStoreToDevTools } from "../../../../core/ts/background-scrip
 import { MobxKeystoneBackgroundContextHost } from "../../../../core/ts/background-scripts/background.js/state-management/MobxKeystoneBackgroundContextHost";
 import { NativeTranslateUiBroker } from "./NativeTranslateUiBroker";
 import { contentScriptBergamotApiClientPortListener } from "../../../../core/ts/background-scripts/background.js/contentScriptBergamotApiClientPortListener";
-import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { BERGAMOT_VERSION_FULL } from "../../../../core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker";
 const store = new Store(localStorageWrapper);
 /* eslint-disable no-unused-vars */
@@ -99,8 +98,6 @@ class ExtensionGlue {
   // TODO: Run this cleanup-method when relevant
   async cleanup() {
     await this.nativeTranslateUiBroker.stop();
-    // Make sure to send buffered telemetry events
-    telemetry.submit();
     // Tear down content script port listeners
     [
       this.extensionPreferencesPortListener,

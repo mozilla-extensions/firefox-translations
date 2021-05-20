@@ -63,6 +63,11 @@ interface BrowserWithExperimentAPIs extends browserInterface {
       getUploadEnabledPref: () => Promise<boolean>;
       getCachedClientIDPref: () => Promise<string>;
     };
+    extensionPreferences: {
+      getTelemetryInactivityThresholdInSecondsOverridePref: () => Promise<
+        number
+      >;
+    };
     translateUi: {
       start: () => Promise<void>;
       stop: () => Promise<void>;
@@ -136,7 +141,12 @@ export class NativeTranslateUiBroker {
     const cachedClientID = await browserWithExperimentAPIs.experiments.telemetryPreferences.getCachedClientIDPref();
 
     // Initialize telemetry
-    telemetry.initialize(uploadEnabled, cachedClientID);
+    const telemetryInactivityThresholdInSecondsOverride = await browserWithExperimentAPIs.experiments.extensionPreferences.getTelemetryInactivityThresholdInSecondsOverridePref();
+    telemetry.initialize(
+      uploadEnabled,
+      cachedClientID,
+      telemetryInactivityThresholdInSecondsOverride,
+    );
 
     // Hook up experiment API events with listeners in this class
     this.telemetryPreferencesEventsToObserve.map(
@@ -299,6 +309,7 @@ export class NativeTranslateUiBroker {
             if (hasChanged("translationStatus")) {
               if (tts.translationStatus === TranslationStatus.OFFER) {
                 telemetry.onTranslationStatusOffer(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
@@ -308,6 +319,7 @@ export class NativeTranslateUiBroker {
                 TranslationStatus.TRANSLATION_UNSUPPORTED
               ) {
                 telemetry.onTranslationStatusTranslationUnsupported(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
@@ -316,6 +328,7 @@ export class NativeTranslateUiBroker {
             if (hasChanged("modelLoadErrorOccurred")) {
               if (tts.modelLoadErrorOccurred) {
                 telemetry.onModelLoadErrorOccurred(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
@@ -324,6 +337,7 @@ export class NativeTranslateUiBroker {
             if (hasChanged("modelDownloadErrorOccurred")) {
               if (tts.modelDownloadErrorOccurred) {
                 telemetry.onModelDownloadErrorOccurred(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
@@ -332,6 +346,7 @@ export class NativeTranslateUiBroker {
             if (hasChanged("translationErrorOccurred")) {
               if (tts.translationErrorOccurred) {
                 telemetry.onTranslationErrorOccurred(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
@@ -340,9 +355,15 @@ export class NativeTranslateUiBroker {
             if (hasChanged("otherErrorOccurred")) {
               if (tts.otherErrorOccurred) {
                 telemetry.onOtherErrorOccurred(
+                  tabId,
                   tts.effectiveTranslateFrom,
                   tts.effectiveTranslateTo,
                 );
+              }
+            }
+            if (hasChanged("modelDownloadProgress")) {
+              if (tts.modelDownloadProgress) {
+                telemetry.updateInactivityTimerForAllTabs();
               }
             }
           },
@@ -429,5 +450,6 @@ export class NativeTranslateUiBroker {
         eventRef
       ].removeListener(this[eventRef] as any);
     });
+    await telemetry.cleanup();
   }
 }
