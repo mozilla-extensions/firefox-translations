@@ -101,6 +101,19 @@ export const systemMemory = new QuantityMetricType({
 });
 
 /**
+ * Telemetry Environment `cpu.count` metric
+ *
+ * Generated from `metadata.cpu_count`.
+ */
+export const cpuCount = new QuantityMetricType({
+  category: "metadata",
+  name: "cpu_count",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
  * Telemetry Environment `cpu.cores` metric
  *
  * Generated from `metadata.cpu_cores_count`.
@@ -114,6 +127,84 @@ export const cpuCoresCount = new QuantityMetricType({
 });
 
 /**
+ * Telemetry Environment `cpu.vendor` metric
+ *
+ * Generated from `metadata.cpu_vendor`.
+ */
+export const cpuVendor = new StringMetricType({
+  category: "metadata",
+  name: "cpu_vendor",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.family` metric
+ *
+ * Generated from `metadata.cpu_family`.
+ */
+export const cpuFamily = new StringMetricType({
+  category: "metadata",
+  name: "cpu_family",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.model` metric
+ *
+ * Generated from `metadata.cpu_model`.
+ */
+export const cpuModel = new StringMetricType({
+  category: "metadata",
+  name: "cpu_model",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.stepping` metric
+ *
+ * Generated from `metadata.cpu_stepping`.
+ */
+export const cpuStepping = new StringMetricType({
+  category: "metadata",
+  name: "cpu_stepping",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.l2cacheKB` metric
+ *
+ * Generated from `metadata.cpu_l2_cache`.
+ */
+export const cpuL2Cache = new QuantityMetricType({
+  category: "metadata",
+  name: "cpu_l2_cache",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.l3cacheKB` metric
+ *
+ * Generated from `metadata.cpu_l3_cache`.
+ */
+export const cpuL3Cache = new QuantityMetricType({
+  category: "metadata",
+  name: "cpu_l3_cache",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
  * Telemetry Environment `cpu.speedMHz` metric
  *
  * Generated from `metadata.cpu_speed`.
@@ -121,6 +212,19 @@ export const cpuCoresCount = new QuantityMetricType({
 export const cpuSpeed = new QuantityMetricType({
   category: "metadata",
   name: "cpu_speed",
+  sendInPings: ["custom"],
+  lifetime: "ping",
+  disabled: false,
+});
+
+/**
+ * Telemetry Environment `cpu.extensions` metric
+ *
+ * Generated from `metadata.cpu_extensions`.
+ */
+export const cpuExtensions = new StringMetricType({
+  category: "metadata",
+  name: "cpu_extensions",
   sendInPings: ["custom"],
   lifetime: "ping",
   disabled: false,

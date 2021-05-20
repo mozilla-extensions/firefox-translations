@@ -118,7 +118,24 @@ metadata:
     send_in_pings:
       - custom
     description: |
-      Telemetry Environment `memoryMB` metric
+      Telemetry Environment `system.memoryMB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_count:
+    type: quantity
+    unit: cpus
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.count` metric
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
     data_reviews:
@@ -135,7 +152,105 @@ metadata:
     send_in_pings:
       - custom
     description: |
-      Telemetry Environment `cpu.cores` metric
+      Telemetry Environment `system.cpu.cores` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_vendor:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.vendor` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_family:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.family` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_model:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.model` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_stepping:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.stepping` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_l2_cache:
+    type: quantity
+    unit: kb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.l2cacheKB` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_l3_cache:
+    type: quantity
+    unit: kb
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.l3cacheKB` metric
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
     data_reviews:
@@ -152,7 +267,23 @@ metadata:
     send_in_pings:
       - custom
     description: |
-      Telemetry Environment `cpu.speedMHz` metric
+      Telemetry Environment `system.cpu.speedMHz` metric
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  cpu_extensions:
+    type: string
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Telemetry Environment `system.cpu.extensions` metric
     bugs:
       - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
     data_reviews:

@@ -7,7 +7,10 @@ import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
-import { telemetry } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
+import {
+  telemetry,
+  TranslationRelevantFxTelemetryMetrics,
+} from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { TabTranslationState } from "../../../../core/ts/shared-resources/models/TabTranslationState";
 import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { reaction } from "mobx";
@@ -53,12 +56,6 @@ interface NativeTranslateUiState {
 type StandardInfobarInteractionEvent = Event<
   (tabId: number, from: string, to: string) => void
 >;
-
-export interface TranslationRelevantFxTelemetryMetrics {
-  systemMemoryMb: number;
-  systemCpuCores: number;
-  systemCpuSpeedMhz: number;
-}
 
 type browserInterface = typeof crossBrowser;
 interface BrowserWithExperimentAPIs extends browserInterface {

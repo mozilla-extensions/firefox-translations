@@ -23,12 +23,20 @@ this.telemetryEnvironment = class extends ExtensionAPI {
      */
     const collectTelemetryEnvironmentBasedAttributes = () => {
       const environment = TelemetryEnvironment.currentEnvironment;
-      console.log("TelemetryEnvironment.currentEnvironment", environment);
+      // console.debug("TelemetryEnvironment.currentEnvironment", environment);
 
       return {
         systemMemoryMb: environment.system.memoryMB,
+        systemCpuCount: environment.system.cpu.count,
         systemCpuCores: environment.system.cpu.cores,
+        systemCpuVendor: environment.system.cpu.vendor,
+        systemCpuFamily: environment.system.cpu.family,
+        systemCpuModel: environment.system.cpu.model,
+        systemCpuStepping: environment.system.cpu.stepping,
+        systemCpuL2cacheKB: environment.system.cpu.l2cacheKB,
+        systemCpuL3cacheKB: environment.system.cpu.l3cacheKB,
         systemCpuSpeedMhz: environment.system.cpu.speedMHz,
+        systemCpuExtensions: environment.system.cpu.extensions,
       };
     };
 
@@ -37,14 +45,8 @@ this.telemetryEnvironment = class extends ExtensionAPI {
         telemetryEnvironment: {
           async getTranslationRelevantFxTelemetryMetrics() {
             await TelemetryController.promiseInitialized();
-
             const telemetryEnvironmentBasedAttributes = collectTelemetryEnvironmentBasedAttributes();
-
-            console.log(
-              "telemetryEnvironmentBasedAttributes",
-              telemetryEnvironmentBasedAttributes,
-            );
-
+            // console.debug("telemetryEnvironmentBasedAttributes", telemetryEnvironmentBasedAttributes);
             return {
               ...telemetryEnvironmentBasedAttributes,
             };

@@ -21,8 +21,16 @@ import {
   extensionBuildId,
   bergamotTranslatorVersion,
   systemMemory,
+  cpuCount,
   cpuCoresCount,
+  cpuVendor,
+  cpuFamily,
+  cpuModel,
+  cpuStepping,
+  cpuL2Cache,
+  cpuL3Cache,
   cpuSpeed,
+  cpuExtensions,
 } from "./generated/metadata";
 import {
   displayed,
@@ -37,9 +45,22 @@ import { langMismatch, notSupported } from "./generated/service";
 import { modelDownload, translation } from "./generated/errors";
 import { browser as crossBrowser } from "webextension-polyfill-ts";
 import { BERGAMOT_VERSION_FULL } from "../../../web-worker-scripts/translation-worker.js/bergamot-translator-version";
-import { TranslationRelevantFxTelemetryMetrics } from "../../../../../firefox-infobar-ui/ts/background-scripts/background.js/NativeTranslateUiBroker";
 
 type TelemetryRecordingFunction = () => void;
+
+export interface TranslationRelevantFxTelemetryMetrics {
+  systemMemoryMb: number;
+  systemCpuCount: number;
+  systemCpuCores: number;
+  systemCpuVendor: string;
+  systemCpuFamily: string;
+  systemCpuModel: string;
+  systemCpuStepping: string;
+  systemCpuL2cacheKB: number;
+  systemCpuL3cacheKB: number;
+  systemCpuSpeedMhz: number;
+  systemCpuExtensions: string;
+}
 
 /**
  * This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.
@@ -122,10 +143,26 @@ export class Telemetry {
     extensionBuildId.set(config.extensionBuildId.substring(0, 100));
     bergamotTranslatorVersion.set(BERGAMOT_VERSION_FULL);
     systemMemory.set(this.translationRelevantFxTelemetryMetrics.systemMemoryMb);
+    cpuCount.set(this.translationRelevantFxTelemetryMetrics.systemCpuCount);
     cpuCoresCount.set(
       this.translationRelevantFxTelemetryMetrics.systemCpuCores,
     );
+    cpuVendor.set(this.translationRelevantFxTelemetryMetrics.systemCpuVendor);
+    cpuFamily.set(this.translationRelevantFxTelemetryMetrics.systemCpuFamily);
+    cpuModel.set(this.translationRelevantFxTelemetryMetrics.systemCpuModel);
+    cpuStepping.set(
+      this.translationRelevantFxTelemetryMetrics.systemCpuStepping,
+    );
+    cpuL2Cache.set(
+      this.translationRelevantFxTelemetryMetrics.systemCpuL2cacheKB,
+    );
+    cpuL3Cache.set(
+      this.translationRelevantFxTelemetryMetrics.systemCpuL3cacheKB,
+    );
     cpuSpeed.set(this.translationRelevantFxTelemetryMetrics.systemCpuSpeedMhz);
+    cpuExtensions.set(
+      this.translationRelevantFxTelemetryMetrics.systemCpuExtensions,
+    );
   }
 
   public onInfoBarDisplayed(tabId: number, from: string, to: string) {
