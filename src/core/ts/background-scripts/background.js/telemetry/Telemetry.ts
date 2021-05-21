@@ -59,7 +59,7 @@ export interface TranslationRelevantFxTelemetryMetrics {
   systemCpuL2cacheKB: number;
   systemCpuL3cacheKB: number;
   systemCpuSpeedMhz: number;
-  systemCpuExtensions: string;
+  systemCpuExtensions: string[];
 }
 
 /**
@@ -170,7 +170,7 @@ export class Telemetry {
       cpuL2Cache.set(systemCpuL2cacheKB);
       cpuL3Cache.set(systemCpuL3cacheKB);
       cpuSpeed.set(systemCpuSpeedMhz);
-      cpuExtensions.set(systemCpuExtensions);
+      cpuExtensions.set(systemCpuExtensions.join(","));
     }
   }
 
