@@ -187,7 +187,7 @@ Hint: To produce a clean log output for forwarding to developers / attaching to 
 
 ### Firefox - Infobar UI
 
-1. Go to `about:devtools-toolbox?type=extension&id=bergamot-browser-extension%40mozilla.org`
+1. Go to `about:devtools-toolbox?type=extension&id=firefox-translations%40mozilla.org`
 2. Click Console
 
 ### Firefox - Cross-browser UI

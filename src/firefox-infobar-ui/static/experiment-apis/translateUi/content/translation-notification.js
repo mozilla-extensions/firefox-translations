@@ -123,12 +123,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
     this.setAttribute("state", stateName);
 
-    // Workaround to show the animated icon also in the "loading" state. Extension-external
-    // code specifies that only the "translating" state shows an animated icon
-    if (stateName === "loading") {
-      this.setAttribute("state", "translating");
-    }
-
     if (val === this.translation.TranslationInfoBarStates.STATE_TRANSLATED) {
       this._handleButtonHiding();
     }
@@ -142,18 +136,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
   init(translationBrowserChromeUiNotificationManager) {
     this.translation = translationBrowserChromeUiNotificationManager;
-
-    // Localize some strings in this component using Fluent
-    // Temporary approach pending re-merge into gecko-dev and full migration to Fluent
-    /*
-    const { Localization } =
-      ChromeUtils.import("resource://gre/modules/Localization.jsm", {});
-    console.log({Localization})
-    this.tmpL10n = Localization.getLocalization([
-      "translations.ftl",
-    ]);
-    console.log("this.tmpL10n", this.tmpL10n)
-    */
 
     const sortByLocalizedName = function(list) {
       const names = Services.intl.getLanguageDisplayNames(undefined, list);

@@ -5,7 +5,7 @@ export const config = {
   sentryDsn: process.env.SENTRY_DSN,
   bergamotModelsBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/models"
-    : "https://storage.googleapis.com/bergamot-models-maml/0.2.0",
+    : "https://storage.googleapis.com/bergamot-models-sandbox/0.2.0",
   telemetryAppId: process.env.TELEMETRY_APP_ID,
   telemetryDebugMode: developmentBuild,
   extensionBuildId: `${process.env.VERSION}-${process.env.extensionBuildEnvironment}#${process.env.BRANCH}`,

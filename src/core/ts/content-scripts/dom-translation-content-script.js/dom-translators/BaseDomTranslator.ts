@@ -249,10 +249,12 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     await Promise.allSettled(chunksBeingProcessed);
 
     // Surface encountered errors
-    console.warn(
-      "Errors were encountered during translation",
-      this.errorsEncountered,
-    );
+    if (this.errorsEncountered.length) {
+      console.warn(
+        "Errors were encountered during translation",
+        this.errorsEncountered,
+      );
+    }
 
     // If at least one chunk was successful, the
     // translation should be displayed, albeit incomplete.

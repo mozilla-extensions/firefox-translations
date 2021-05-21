@@ -31,9 +31,6 @@ this.telemetryPreferences = class extends ExtensionAPI {
           async getUploadEnabledPref() {
             return Services.prefs.getBoolPref(uploadEnabledPrefName, undefined);
           },
-          async setUploadEnabledPref(value) {
-            Services.prefs.setBoolPref(uploadEnabledPrefName, value);
-          },
           onCachedClientIDPrefChange: new EventManager({
             context,
             name: "telemetryPreferences.onCachedClientIDPrefChange",
@@ -52,9 +49,6 @@ this.telemetryPreferences = class extends ExtensionAPI {
               cachedClientIDPrefName,
               undefined,
             );
-          },
-          async setCachedClientIDPref(value) {
-            Services.prefs.setStringPref(cachedClientIDPrefName, value);
           },
         },
       },
