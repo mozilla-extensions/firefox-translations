@@ -17,11 +17,13 @@ This document outlines how to get the v0.4.0 pre-release version of the extensio
 
 Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/tag/v0.4.0).
 
+<!--
 There are three flavors:
 
 - **Firefox - Infobar UI** - Firefox-only version which uses native browser UI elements
 - **Chrome - Cross-browser UI** - Chrome version of the extension - uses a cross-browser compatible UI (since we have no way of modifying native browser UI elements on Chrome)
 - **Firefox - Cross-browser UI** - Firefox version of the extension with the cross-browser compatible UI
+-->
 
 ## Firefox - Infobar UI
 
@@ -48,6 +50,7 @@ There are three flavors:
   - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
 - Press Translate in the translation infobar that pops up
 
+<!--
 ## Chrome - Cross-browser UI
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
@@ -84,3 +87,4 @@ There are three flavors:
   - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
 - Click the extension icon <img src="../src/core/static/icons/extension-icon.48x48.png"> next to the address bar
 - Press Translate in the popup
+-->
