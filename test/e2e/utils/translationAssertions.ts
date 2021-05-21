@@ -133,22 +133,25 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
   );
   // Check telemetry for translation performance metrics
   assert.isAbove(
-    telemetryPayload.metrics.timespan["performance.full_page_translated_time"],
+    telemetryPayload.metrics.timespan["performance.full_page_translated_time"]
+      .value,
     0,
     "The telemetry payload's timespan metric 'performance.full_page_translated_time' is more than 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.timespan["performance.model_download_time_num"],
+    telemetryPayload.metrics.timespan["performance.model_download_time_num"]
+      .value,
     0,
     "The telemetry payload's timespan metric 'performance.model_download_time_num' is at least 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.timespan["performance.model_load_time_num"],
+    telemetryPayload.metrics.timespan["performance.model_load_time_num"].value,
     0,
     "The telemetry payload's timespan metric 'performance.model_load_time_num' is at least 0",
   );
   assert.isAbove(
-    telemetryPayload.metrics.timespan["performance.translation_engine_time"],
+    telemetryPayload.metrics.timespan["performance.translation_engine_time"]
+      .value,
     0,
     "The telemetry payload's timespan metric 'performance.translation_engine_time' is more than 0",
   );
