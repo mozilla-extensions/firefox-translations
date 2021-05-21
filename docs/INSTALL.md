@@ -31,6 +31,7 @@ There are three flavors:
 
 - The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly (English or German edition) from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
 - Important! If you already use Nightly as your default browser, please [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles). Do not use your ordinary Nightly profile when testing pre-release versions of the extension.
+- If you have tried any previous version of the Firefox extension, please make sure to remove/uninstall it before installing the new version. You will find it named "Bergamot Translate" in `about:addons`. (The new version is now displayed as "Firefox Translations" in `about:addons`).
 
 ### Configuring Nightly and installing the extension
 
