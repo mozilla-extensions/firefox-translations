@@ -82,7 +82,7 @@
     "generate-wee:generateStubApi:translateUi": "cd src/firefox-infobar-ui/static/experiment-apis/translateUi && generateStubApi ./schema.json > stubApi.js",
     "generate-wee:verifyWeeSchema:translateUi": "cd src/firefox-infobar-ui/static/experiment-apis/translateUi && verifyWeeSchema schema.json",
     "init-dotenv-config": "./init-dotenv-config.sh",
-    "just-build": "npm-run-all init-dotenv-config clean generate-manifest && webpack --mode=${NODE_ENV} && web-ext build",
+    "just-build": "npm-run-all init-dotenv-config clean generate-manifest && webpack --config src/${UI}/webpack.config.js --mode=${NODE_ENV} && web-ext build",
     "just-web-ext-lint": "web-ext lint --ignore-files wasm/bergamot-translator-worker.data",
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint . --ext jsm,js,json,ts,tsx",
@@ -91,13 +91,12 @@
     "prebuild:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui NODE_ENV=production; npm-run-all init-dotenv-config clean generate-manifest",
     "prebuild:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=production; npm-run-all init-dotenv-config clean generate-manifest",
     "serve-fixtures": "http-serve test/fixtures/ --gzip",
-    "watch:cross-browser-ui:chrome": "export TARGET_BROWSER=chrome UI=cross-browser-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8182; npm-run-all just-build && concurrently 'webpack --watch' 'web-ext run -t chromium' 'remotedev --port=8182' 'yarn serve-fixtures -p 4000'",
-    "watch:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8181; npm-run-all just-build && concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8181' 'yarn serve-fixtures -p 4000'",
-    "watch:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8183; npm-run-all just-build && concurrently 'webpack --watch' 'web-ext run' 'remotedev --port=8183' 'yarn serve-fixtures -p 4000'",
+    "watch:cross-browser-ui:chrome": "export TARGET_BROWSER=chrome UI=cross-browser-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8182; npm-run-all just-build && concurrently 'webpack --config src/cross-browser-ui/webpack.config.js --watch' 'web-ext run -t chromium' 'remotedev --port=8182' 'yarn serve-fixtures -p 4000'",
+    "watch:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8181; npm-run-all just-build && concurrently 'webpack --config src/cross-browser-ui/webpack.config.js --watch' 'web-ext run' 'remotedev --port=8181' 'yarn serve-fixtures -p 4000'",
+    "watch:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui NODE_ENV=development REMOTE_DEV_SERVER_PORT=8183; npm-run-all just-build && concurrently 'webpack --config src/firefox-infobar-ui/webpack.config.js --watch' 'web-ext run' 'remotedev --port=8183' 'yarn serve-fixtures -p 4000'",
     "web-ext-lint:cross-browser-ui:chrome": "export TARGET_BROWSER=chrome UI=cross-browser-ui; npm-run-all just-web-ext-lint",
     "web-ext-lint:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui; npm-run-all just-web-ext-lint",
-    "web-ext-lint:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui; npm-run-all just-web-ext-lint",
-    "webpack:stats": "webpack --profile --json --mode=production > stats.json"
+    "web-ext-lint:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui; npm-run-all just-web-ext-lint"
   },
   "workspaces": [
     "src/core/ts",

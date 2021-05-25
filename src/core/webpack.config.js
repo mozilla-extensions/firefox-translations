@@ -17,7 +17,7 @@ const {
   buildPath,
   ui,
   extensionBuildEnvironment,
-} = require("./build-config.js");
+} = require("../../build-config.js");
 
 const dotEnvPath =
   targetEnvironment === "production"
@@ -154,9 +154,10 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          "postcss-loader",
+          // "postcss-loader",
         ],
       },
+      /*
       {
         test: /\.svg/,
         use: {
@@ -184,6 +185,7 @@ module.exports = {
           /node_modules\/diff2html/,
         ],
       },
+       */
     ],
   },
   resolve: {
