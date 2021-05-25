@@ -1,0 +1,10 @@
+{
+  "name": "bergamot-browser-extension-firefox-infobar-ui",
+  "description": "bergamot-browser-extension-firefox-infobar-ui",
+  "version": "0.0.0",
+  "dependencies": {
+    "bergamot-browser-extension-core": "0.0.0"
+  },
+  "devDependencies": {},
+  "private": true
+}
