@@ -69,7 +69,7 @@
     "format": "npm-run-all -s -n format:prettier format:docs format:eslint format:fixpack",
     "format:docs": "doctoc --title '**Contents**' docs/*.md && prettier '**/*.md' --ignore-path=.eslintignore --write",
     "format:eslint": "npm run lint:eslint -- --fix",
-    "format:fixpack": "fixpack && fixpack src/core/ts/package.json && fixpack src/cross-browser-ui/ts/package.json && fixpack src/firefox-infobar-ui/ts/package.json",
+    "format:fixpack": "fixpack && fixpack src/core/package.json && fixpack src/cross-browser-ui/package.json && fixpack src/firefox-infobar-ui/package.json",
     "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --ignore-path=.eslintignore --write",
     "generate-glean": "npm-run-all generate-glean:glinter generate-glean:metrics generate-glean:docs format",
     "generate-glean:docs": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean translate -o ./generated -f markdown metrics.yaml pings.yaml",
@@ -99,8 +99,8 @@
     "web-ext-lint:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui; npm-run-all just-web-ext-lint"
   },
   "workspaces": [
-    "src/core/ts",
-    "src/cross-browser-ui/ts",
-    "src/firefox-infobar-ui/ts"
+    "src/core",
+    "src/cross-browser-ui",
+    "src/firefox-infobar-ui"
   ]
 }
