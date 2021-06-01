@@ -103,16 +103,6 @@ this.translateUi = class extends ExtensionAPI {
           start: async function start() {
             try {
               console.log("Called start()");
-
-              console.log(
-                "Inactivating legacy built-in translation feature (by setting browser.translation.ui.show and browser.translation.detectLanguage to false)",
-              );
-              Services.prefs.setBoolPref(`browser.translation.ui.show`, false);
-              Services.prefs.setBoolPref(
-                `browser.translation.detectLanguage`,
-                false,
-              );
-
               return undefined;
             } catch (error) {
               // Surface otherwise silent or obscurely reported errors
