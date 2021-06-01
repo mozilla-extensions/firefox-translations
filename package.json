@@ -76,6 +76,7 @@
     "generate-glean:glinter": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean glinter metrics.yaml pings.yaml",
     "generate-glean:metrics": "cd ./src/core/ts/background-scripts/background.js/telemetry && glean translate -o ./generated -f typescript metrics.yaml pings.yaml",
     "generate-manifest": "node generate-manifest.js",
+    "generate-wee": "yarn workspace firefox-infobar-ui generate-wee && npm-run-all format",
     "init-dotenv-config": "./init-dotenv-config.sh",
     "lint": "npm-run-all lint:*",
     "lint:eslint": "eslint . --ext jsm,js,json,ts,tsx",

@@ -12,7 +12,7 @@
   "private": true,
   "scripts": {
     "webpack:build": "webpack --mode=${NODE_ENV}",
-    "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:* format",
+    "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:*",
     "generate-wee:documentSchema:translateUi": "cd static/experiment-apis/translateUi && documentSchema schema.json > api.md",
     "generate-wee:generateSchema:translateUi": "cd static/experiment-apis/translateUi && yaml2json schema.yaml -p > schema.json",
     "generate-wee:generateStubApi:translateUi": "cd static/experiment-apis/translateUi && generateStubApi ./schema.json > stubApi.js",
