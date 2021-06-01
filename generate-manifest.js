@@ -44,6 +44,7 @@ async function generateManifest({ dotEnvPath }) {
       },
     ],
     permissions: ["<all_urls>", "storage"],
+    // Make source maps available also when installed as non-temporary extension
     web_accessible_resources: [
       "commons.js.map",
       "background.js.map",
