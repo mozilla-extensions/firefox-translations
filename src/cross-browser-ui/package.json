@@ -38,9 +38,9 @@
   },
   "private": true,
   "scripts": {
-    "build:chrome": "export TARGET_BROWSER=chrome; webpack --mode=${NODE_ENV}",
-    "build:firefox": "export TARGET_BROWSER=firefox; webpack --mode=${NODE_ENV}",
-    "watch:chrome": "export TARGET_BROWSER=chrome; webpack --watch",
-    "watch:firefox": "export TARGET_BROWSER=firefox; webpack --watch"
+    "webpack:build:chrome": "export TARGET_BROWSER=chrome; webpack --mode=${NODE_ENV}",
+    "webpack:build:firefox": "export TARGET_BROWSER=firefox; webpack --mode=${NODE_ENV}",
+    "webpack:watch:chrome": "export TARGET_BROWSER=chrome; webpack --watch",
+    "webpack:watch:firefox": "export TARGET_BROWSER=firefox; webpack --watch"
   }
 }
