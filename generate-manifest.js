@@ -44,6 +44,12 @@ async function generateManifest({ dotEnvPath }) {
       },
     ],
     permissions: ["<all_urls>", "storage"],
+    web_accessible_resources: [
+      "commons.js.map",
+      "background.js.map",
+      "dom-translation-content-script.js.map",
+      "translation-worker.js.map",
+    ],
   };
   if (process.env.USE_BERGAMOT_REST_API === "1") {
     manifest.permissions.push(`${process.env.BERGAMOT_REST_API_INBOUND_URL}/*`);
