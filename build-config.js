@@ -40,7 +40,7 @@ const buildPath = path.join(
   ui,
 );
 
-module.exports = {
+const buildConfig = {
   targetEnvironment,
   targetBrowser,
   ui,
@@ -48,3 +48,7 @@ module.exports = {
   buildPath,
   extensionBuildEnvironment,
 };
+
+console.info(`Build config: `, buildConfig);
+
+module.exports = buildConfig;

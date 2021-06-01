@@ -36,5 +36,11 @@
     "svg-url-loader": "^5.0.0",
     "tailwindcss": "^1.1.3"
   },
-  "private": true
+  "private": true,
+  "scripts": {
+    "build:chrome": "export TARGET_BROWSER=chrome; webpack --mode=${NODE_ENV}",
+    "build:firefox": "export TARGET_BROWSER=firefox; webpack --mode=${NODE_ENV}",
+    "watch:chrome": "export TARGET_BROWSER=chrome; webpack --watch",
+    "watch:firefox": "export TARGET_BROWSER=firefox; webpack --watch"
+  }
 }
