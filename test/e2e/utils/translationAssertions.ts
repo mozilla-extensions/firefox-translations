@@ -165,4 +165,21 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     0,
     "The telemetry payload's quantity metric 'performance.translation_engine_wps' is more than 0",
   );
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.word_count"].value,
+    0,
+    "The telemetry payload's timespan metric 'performance.word_count' is at least 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.word_count_visible"].value,
+    0,
+    "The telemetry payload's timespan metric 'performance.word_count_visible' is at least 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan[
+      "performance.word_count_visible_in_viewport"
+    ].value,
+    0,
+    "The telemetry payload's timespan metric 'performance.word_count_visible_in_viewport' is at least 0",
+  );
 };
