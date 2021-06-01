@@ -166,20 +166,20 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     "The telemetry payload's quantity metric 'performance.translation_engine_wps' is more than 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.timespan["performance.word_count"].value,
+    telemetryPayload.metrics.quantity["performance.word_count"],
     0,
-    "The telemetry payload's timespan metric 'performance.word_count' is at least 0",
+    "The telemetry payload's quantity metric 'performance.word_count' is at least 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.timespan["performance.word_count_visible"].value,
+    telemetryPayload.metrics.quantity["performance.word_count_visible"],
     0,
-    "The telemetry payload's timespan metric 'performance.word_count_visible' is at least 0",
+    "The telemetry payload's quantity metric 'performance.word_count_visible' is at least 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.timespan[
+    telemetryPayload.metrics.quantity[
       "performance.word_count_visible_in_viewport"
-    ].value,
+    ],
     0,
-    "The telemetry payload's timespan metric 'performance.word_count_visible_in_viewport' is at least 0",
+    "The telemetry payload's quantity metric 'performance.word_count_visible_in_viewport' is at least 0",
   );
 };
