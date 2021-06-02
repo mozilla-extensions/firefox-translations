@@ -171,11 +171,6 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
     "The telemetry payload's quantity metric 'performance.word_count' is at least 0",
   );
   assert.isAtLeast(
-    telemetryPayload.metrics.quantity["performance.word_count_visible"],
-    0,
-    "The telemetry payload's quantity metric 'performance.word_count_visible' is at least 0",
-  );
-  assert.isAtLeast(
     telemetryPayload.metrics.quantity[
       "performance.word_count_visible_in_viewport"
     ],

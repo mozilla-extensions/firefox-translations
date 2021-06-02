@@ -83,7 +83,6 @@ export const translateAllFramesInTab = async (
       translationEngineTimeMs,
       translationEngineWordsPerSecond,
       wordCount,
-      wordCountVisible,
       wordCountVisibleInViewport,
     );
   } else {

@@ -119,19 +119,6 @@ export const wordCount = new QuantityMetricType({
 });
 
 /**
- * Total number of visible words on the original web page.
- *
- * Generated from `performance.word_count_visible`.
- */
-export const wordCountVisible = new QuantityMetricType({
-  category: "performance",
-  name: "word_count_visible",
-  sendInPings: ["custom"],
-  lifetime: "ping",
-  disabled: false,
-});
-
-/**
  * Total number of visible words on the original web page that
  * were visible in the viewport at the time of "translation button pressed".
  *
