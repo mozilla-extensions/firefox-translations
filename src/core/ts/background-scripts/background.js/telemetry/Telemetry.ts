@@ -304,7 +304,7 @@ export class Telemetry {
       notSupported.add(1);
       this.recordCommonMetadata(from, to);
     }, tabId);
-    this.updateInactivityTimerForAllTabs();
+    this.submitQueuedRecordings(tabId);
   }
 
   public onModelLoadErrorOccurred(tabId: number, from: string, to: string) {
