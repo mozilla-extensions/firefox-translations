@@ -206,9 +206,6 @@ export class DomTranslationManager {
       new TranslationDocument(this.document);
 
     console.info("Translating web page");
-    this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
-      TranslationStatus.TRANSLATING,
-    );
 
     const domTranslator = new BergamotDomTranslator(
       translationDocument,

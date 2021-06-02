@@ -342,6 +342,11 @@ export class ExtensionState extends Model({
             path: ["translationRequested"],
             value: true,
           },
+          {
+            op: "replace",
+            path: ["translationStatus"],
+            value: TranslationStatus.TRANSLATING,
+          },
         ]);
       },
     );
