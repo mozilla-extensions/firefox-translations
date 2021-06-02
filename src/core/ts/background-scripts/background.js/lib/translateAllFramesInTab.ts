@@ -39,7 +39,6 @@ export const translateAllFramesInTab = async (
     totalTranslationEngineRequestCount,
     totalTranslationWallTimeMs,
     wordCount,
-    wordCountVisible,
     wordCountVisibleInViewport,
     translationStatus,
     modelDownloadProgress,
