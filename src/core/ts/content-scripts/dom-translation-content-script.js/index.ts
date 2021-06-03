@@ -46,8 +46,15 @@ const init = async () => {
     window,
   );
 
+  const startDocumentTranslationStatistics = performance.now();
   const documentTranslationStatistics = await domTranslationManager.getDocumentTranslationStatistics();
   console.log({ documentTranslationStatistics });
+  const endDocumentTranslationStatistics = performance.now();
+  console.info(
+    `Gathering document translation statistics took ${(endDocumentTranslationStatistics -
+      startDocumentTranslationStatistics) /
+      1000} seconds`,
+  );
 
   // TODO: Prevent multiple translations from occurring simultaneously + enable cancellations of existing translation jobs
 

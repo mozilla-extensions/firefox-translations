@@ -53,6 +53,7 @@ export class DomTranslationManager {
     // and since it's hosted by emscripten, and therefore can't shrink
     // its heap after it's grown, it has a performance cost.
     // So we send plain text instead.)
+    const startGrabSample = performance.now();
     const translationNodes: TranslationNode[] = getTranslationNodes(
       document.body,
     );
@@ -69,6 +70,12 @@ export class DomTranslationManager {
     const string = domElementsToStringWithMaxLength(
       translationNodes.map(tn => tn.content),
       60 * 1024,
+    );
+    const endGrabSample = performance.now();
+    console.info(
+      `Grabbing a DOM sample for language detection took ${(endGrabSample -
+        startGrabSample) /
+        1000} seconds`,
     );
 
     // Language detection isn't reliable on very short strings.
