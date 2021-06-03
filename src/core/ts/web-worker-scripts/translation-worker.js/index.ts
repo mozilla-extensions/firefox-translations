@@ -13,21 +13,19 @@ import {
   TranslateRequestWorkerMessage,
   TranslationResultsWorkerMessage,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
-import {
-  DownloadedModelFile,
-  getBergamotModelsForLanguagePair,
-} from "./getBergamotModelsForLanguagePair";
+import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
 import { config, modelRegistry } from "../../config";
+import { DownloadedFile } from "./setupPersistRemoteFileWithProgressDuringDownload";
 
 type IncomingBergamotTranslatorAPIMessage =
   | LoadModelRequestWorkerMessage
   | TranslateRequestWorkerMessage;
 
-interface DownloadedModelFilesByType {
-  lex: DownloadedModelFile;
-  model: DownloadedModelFile;
-  vocab: DownloadedModelFile;
+interface DownloadedFilesByType {
+  lex: DownloadedFile;
+  model: DownloadedFile;
+  vocab: DownloadedFile;
 }
 
 const init = async () => {
@@ -89,13 +87,13 @@ const init = async () => {
       onModelDownloadProgress: (
         modelDownloadProgress: ModelDownloadProgress,
       ) => void,
-    ): Promise<DownloadedModelFilesByType> => {
+    ): Promise<DownloadedFilesByType> => {
       log(`downloadModel(${from}, ${to}, ${bergamotModelsBaseUrl})`);
 
       const languagePair = `${from}${to}`;
 
       const cache = await caches.open("bergamot-models");
-      const downloadedModelFiles: DownloadedModelFile[] = await getBergamotModelsForLanguagePair(
+      const downloadedFiles: DownloadedFile[] = await getBergamotModelsForLanguagePair(
         languagePair,
         bergamotModelsBaseUrl,
         modelRegistry,
@@ -104,19 +102,17 @@ const init = async () => {
         onModelDownloadProgress,
       );
 
-      const downloadedModelFilesByType: DownloadedModelFilesByType = {
+      const downloadedFilesByType: DownloadedFilesByType = {
         lex: undefined,
         model: undefined,
         vocab: undefined,
       };
 
-      downloadedModelFiles.forEach(downloadedModelFile => {
-        downloadedModelFilesByType[
-          downloadedModelFile.type
-        ] = downloadedModelFile;
+      downloadedFiles.forEach(downloadedFile => {
+        downloadedFilesByType[downloadedFile.type] = downloadedFile;
       });
 
-      return downloadedModelFilesByType;
+      return downloadedFilesByType;
     };
 
     const loadModel = async (
@@ -135,7 +131,7 @@ const init = async () => {
       }
 
       // Download or hydrate model files to/from persistent storage
-      const downloadedModelFilesByType: DownloadedModelFilesByType = await downloadModel(
+      const downloadedFilesByType: DownloadedFilesByType = await downloadModel(
         from,
         to,
         bergamotModelsBaseUrl,
@@ -180,9 +176,9 @@ gemm-precision: int8shift
       console.log("modelConfig: ", modelConfig);
 
       // Instantiate the TranslationModel
-      const modelBuffer = downloadedModelFilesByType.model.arrayBuffer;
-      const shortListBuffer = downloadedModelFilesByType.lex.arrayBuffer;
-      const vocabBuffers = [downloadedModelFilesByType.vocab.arrayBuffer];
+      const modelBuffer = downloadedFilesByType.model.arrayBuffer;
+      const shortListBuffer = downloadedFilesByType.lex.arrayBuffer;
+      const vocabBuffers = [downloadedFilesByType.vocab.arrayBuffer];
 
       // Construct AlignedMemory objects with downloaded buffers
       const alignedModelMemory = constructAlignedMemoryFromBuffer(
@@ -314,7 +310,9 @@ gemm-precision: int8shift
               postMessage(message);
             })
             .catch(error => {
-              if (error.name === "ModelDownloadError") {
+              if (error.name === "FileDownloadError") {
+                handleError(error, requestId, "downloadModel");
+              } else if (error.name === "LanguagePairUnsupportedError") {
                 handleError(error, requestId, "downloadModel");
               } else {
                 handleError(error, requestId, "loadModel");
