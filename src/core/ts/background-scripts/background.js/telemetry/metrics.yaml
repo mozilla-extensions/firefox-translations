@@ -403,6 +403,43 @@ performance:
     notification_emails:
       - anatal-all@mozilla.com
     expires: 2021-08-10
+  word_count:
+    type: quantity
+    unit: words
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Total number of words on the original web page.
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/166
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
+  word_count_visible_in_viewport:
+    type: quantity
+    unit: words
+    lifetime: ping
+    send_in_pings:
+      - custom
+    description: |
+      Total number of visible words on the original web page that
+      were visible in the viewport at the time of "translation button pressed".
+    bugs:
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/166
+    data_reviews:
+      - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
+    data_sensitivity:
+      - technical
+    notification_emails:
+      - anatal-all@mozilla.com
+    expires: 2021-08-10
   translation_quality:
     type: string
     lifetime: ping

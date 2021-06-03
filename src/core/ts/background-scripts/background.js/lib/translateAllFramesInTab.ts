@@ -39,6 +39,7 @@ export const translateAllFramesInTab = async (
     totalTranslationEngineRequestCount,
     totalTranslationWallTimeMs,
     wordCount,
+    wordCountVisibleInViewport,
     translationStatus,
     modelDownloadProgress,
   } = currentTabTranslationState;
@@ -80,6 +81,8 @@ export const translateAllFramesInTab = async (
       modelLoadTimeMs,
       translationEngineTimeMs,
       translationEngineWordsPerSecond,
+      wordCount,
+      wordCountVisibleInViewport,
     );
   } else {
     // TODO: Record error telemetry

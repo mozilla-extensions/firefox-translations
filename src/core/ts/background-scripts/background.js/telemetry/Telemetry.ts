@@ -12,6 +12,8 @@ import {
   modelLoadTimeNum,
   translationEngineTime,
   translationEngineWps,
+  wordCount,
+  wordCountVisibleInViewport,
 } from "./generated/performance";
 import {
   fromLang,
@@ -274,6 +276,8 @@ export class Telemetry {
     modelLoadTimeMs: number,
     translationEngineTimeMs: number,
     translationEngineWordsPerSecond: number,
+    $wordCount: number,
+    $wordCountVisibleInViewport: number,
   ) {
     this.queueRecording(() => {
       fullPageTranslatedTime.setRawNanos(timeToFullPageTranslatedMs * 1000000);
@@ -282,6 +286,8 @@ export class Telemetry {
       modelLoadTimeNum.setRawNanos(modelLoadTimeMs * 1000000);
       translationEngineTime.setRawNanos(translationEngineTimeMs * 1000000);
       translationEngineWps.set(translationEngineWordsPerSecond);
+      wordCount.set($wordCount);
+      wordCountVisibleInViewport.set($wordCountVisibleInViewport);
       this.recordCommonMetadata(from, to);
     }, tabId);
     this.submitQueuedRecordings(tabId);
