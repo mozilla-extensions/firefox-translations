@@ -37,10 +37,10 @@ echo "* Autoformatting imported TypeScript module"
 yarn prettier src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts --write
 
 echo "* Copying bergamot-translator wasm artifact (as is)"
+mkdir -p test/locally-hosted-files/wasm/
 cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
 
 echo "* Compressing bergamot-translator wasm artifact"
-mkdir -p test/locally-hosted-files/wasm/
 [ -f test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz ] && rm test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz
 gzip test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
 

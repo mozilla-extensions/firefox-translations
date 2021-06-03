@@ -28,7 +28,7 @@ this.languageDetector = class extends ExtensionAPI {
           /* Detect language */
           detectLanguage: async function detectLanguage(str) {
             try {
-              console.log("Called detectLanguage(str)", str);
+              // console.log("Called detectLanguage(str)", str);
               return LanguageDetector.detectLanguage(str);
             } catch (error) {
               // Surface otherwise silent or obscurely reported errors
