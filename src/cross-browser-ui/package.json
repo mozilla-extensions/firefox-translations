@@ -1,0 +1,46 @@
+{
+  "name": "cross-browser-ui",
+  "description": "bergamot-browser-extension/cross-browser-ui",
+  "version": "0.0.0",
+  "dependencies": {
+    "@ant-design/colors": "^4.0.5",
+    "@popperjs/core": "^2.4.4",
+    "@sentry/browser": "^5.15.5",
+    "classnames": "^2.2.6",
+    "core": "0.0.0",
+    "flat": "^5.0.0",
+    "photon-colors": "^3.3.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-icons": "^3.11.0",
+    "react-router-dom": "^5.2.0",
+    "react-transition-group": "^4.4.1",
+    "react-virtualized": "^9.21.2",
+    "typeface-inter": "^1.1.13"
+  },
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^2.1.2",
+    "@sentry/webpack-plugin": "^1.11.1",
+    "@types/classnames": "^2.2.10",
+    "@types/react": "^16.9.25",
+    "@types/react-dom": "^16.9.5",
+    "@types/react-router-dom": "^5.1.6",
+    "@types/react-transition-group": "^4.4.0",
+    "cssnano": "^4.1.10",
+    "postcss": "^8.1.4",
+    "postcss-loader": "^4.0.3",
+    "postcss-nested": "^5.0.1",
+    "postcss-preset-env": "^6.7.0",
+    "postcss-scss": "^3.0.2",
+    "style-loader": "^1.1.3",
+    "svg-url-loader": "^5.0.0",
+    "tailwindcss": "^1.1.3"
+  },
+  "private": true,
+  "scripts": {
+    "webpack:build:chrome": "export TARGET_BROWSER=chrome; webpack --mode=${NODE_ENV}",
+    "webpack:build:firefox": "export TARGET_BROWSER=firefox; webpack --mode=${NODE_ENV}",
+    "webpack:watch:chrome": "export TARGET_BROWSER=chrome; webpack --watch",
+    "webpack:watch:firefox": "export TARGET_BROWSER=firefox; webpack --watch"
+  }
+}

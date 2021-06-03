@@ -1,4 +1,4 @@
-/* global process, require, module, __dirname */
+/* eslint-env node */
 
 const webpack = require("webpack");
 const Dotenv = require("dotenv-webpack");
@@ -11,57 +11,63 @@ const gitRevisionPlugin = new GitRevisionPlugin({
   lightweightTags: true,
   branch: true,
 });
+const fs = require("fs");
 
 const {
   targetEnvironment,
   buildPath,
   ui,
   extensionBuildEnvironment,
-} = require("./build-config.js");
+} = require("../../build-config.js");
 
 const dotEnvPath =
   targetEnvironment === "production"
-    ? "./.env.production"
-    : "./.env.development";
+    ? "../../.env.production"
+    : "../../.env.development";
 
-const copyPluginPatterns = [{ from: "src/core/static", to: buildPath }];
+const copyPluginPatterns = [{ from: "../core/static", to: buildPath }];
 
 // Set entry points based on build variant
 const entry = {
-  background: `./src/${ui}/ts/background-scripts/background.js/index.ts`,
+  background: `../${ui}/ts/background-scripts/background.js/index.ts`,
   "dom-translation-content-script":
-    "./src/core/ts/content-scripts/dom-translation-content-script.js/index.ts",
+    "../core/ts/content-scripts/dom-translation-content-script.js/index.ts",
   "translation-worker":
-    "./src/core/ts/web-worker-scripts/translation-worker.js/index.ts",
+    "../core/ts/web-worker-scripts/translation-worker.js/index.ts",
 };
 if (ui === "cross-browser-ui") {
   entry["options-ui"] =
-    "./src/cross-browser-ui/ts/extension-pages/options-ui.js/index.tsx";
+    "../cross-browser-ui/ts/extension-pages/options-ui.js/index.tsx";
   entry["get-started"] =
-    "./src/cross-browser-ui/ts/extension-pages/get-started.js/index.tsx";
+    "../cross-browser-ui/ts/extension-pages/get-started.js/index.tsx";
   entry["main-interface"] =
-    "./src/cross-browser-ui/ts/extension-pages/main-interface.js/index.tsx";
+    "../cross-browser-ui/ts/extension-pages/main-interface.js/index.tsx";
   copyPluginPatterns.push({
-    from: "src/cross-browser-ui/static",
+    from: "../cross-browser-ui/static",
     to: buildPath,
   });
 } else {
   copyPluginPatterns.push({
-    from: "src/firefox-infobar-ui/static",
+    from: "../firefox-infobar-ui/static",
     to: buildPath,
   });
 }
 if (targetEnvironment !== "production") {
-  entry.tests = "./test/in-browser/ts/tests.js/index.ts";
-  copyPluginPatterns.push({ from: "test/in-browser/static", to: buildPath });
+  entry.tests = "../../test/in-browser/ts/tests.js/index.ts";
+  copyPluginPatterns.push({
+    from: "../../test/in-browser/static",
+    to: buildPath,
+  });
 }
 
 // Make env vars available in the current scope
+fs.createReadStream("../../.env.example").pipe(
+  fs.createWriteStream("./.env.example"),
+);
 require("dotenv").config({ path: dotEnvPath });
 
 // Workaround for https://github.com/getsentry/sentry-cli/issues/302
-const fs = require("fs");
-fs.createReadStream(dotEnvPath).pipe(fs.createWriteStream("./.env"));
+fs.createReadStream(dotEnvPath).pipe(fs.createWriteStream("../../.env"));
 
 const plugins = [
   // Make .env vars available in the scope of webpack plugins/loaders and the build itself
@@ -154,24 +160,7 @@ module.exports = {
               importLoaders: 1,
             },
           },
-          "postcss-loader",
         ],
-      },
-      {
-        test: /\.svg/,
-        use: {
-          loader: "svg-url-loader",
-          options: {},
-        },
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|png|jpeg|jpg)$/,
-        use: [{ loader: "file-loader" }],
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules[/\\](?!react-data-grid[/\\]lib)/,
-        use: "babel-loader",
       },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
       {

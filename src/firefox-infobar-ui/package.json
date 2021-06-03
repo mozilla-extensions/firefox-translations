@@ -1,0 +1,22 @@
+{
+  "name": "firefox-infobar-ui",
+  "description": "bergamot-browser-extension/firefox-infobar-ui",
+  "version": "0.0.0",
+  "dependencies": {
+    "core": "0.0.0"
+  },
+  "devDependencies": {
+    "webext-experiment-utils": "github:mozilla/webext-experiment-utils#v0.2.0",
+    "yamljs": "^0.3.0"
+  },
+  "private": true,
+  "scripts": {
+    "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:*",
+    "generate-wee:documentSchema:translateUi": "cd static/experiment-apis/translateUi && documentSchema schema.json > api.md",
+    "generate-wee:generateSchema:translateUi": "cd static/experiment-apis/translateUi && yaml2json schema.yaml -p > schema.json",
+    "generate-wee:generateStubApi:translateUi": "cd static/experiment-apis/translateUi && generateStubApi ./schema.json > stubApi.js",
+    "generate-wee:verifyWeeSchema:translateUi": "cd static/experiment-apis/translateUi && verifyWeeSchema schema.json",
+    "webpack:build": "webpack --mode=${NODE_ENV}",
+    "webpack:watch": "webpack --watch"
+  }
+}
