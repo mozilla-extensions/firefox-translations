@@ -25,7 +25,7 @@ const dotEnvPath =
     ? "../../.env.production"
     : "../../.env.development";
 
-const copyPluginPatterns = [{ from: "../core/static", to: buildPath }];
+const copyPluginPatterns = [];
 
 // Set entry points based on build variant
 const entry = {

@@ -70,6 +70,14 @@ async function generateManifest({ dotEnvPath }) {
           paths: [["experiments", "extensionPreferences"]],
         },
       },
+      languageDetector: {
+        schema: "./experiment-apis/languageDetector/schema.json",
+        parent: {
+          scopes: ["addon_parent"],
+          script: "./experiment-apis/languageDetector/api.js",
+          paths: [["experiments", "languageDetector"]],
+        },
+      },
       telemetryEnvironment: {
         schema: "./experiment-apis/telemetryEnvironment/schema.json",
         parent: {
