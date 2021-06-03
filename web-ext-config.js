@@ -2,13 +2,13 @@
 const path = require("path");
 
 const urlsToOpenOnRun = [
-  "http://0.0.0.0:4000/multiple-frames.html",
-  "http://0.0.0.0:4000/newstest2013.es.top10lines.html",
-  "http://0.0.0.0:4000/newstest2013.es.top300lines.html",
-  "http://0.0.0.0:4000/wmt18.et.top10lines.html",
-  "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21-full-page/original.html",
-  "http://0.0.0.0:4000/es.wikipedia.org-2021-01-20-welcome-box/original.html",
-  "http://0.0.0.0:4000/es.wikipedia.org-2020-11-21-events-on-nov-21-box/original.html",
+  "http://0.0.0.0:4000/fixtures/multiple-frames.html",
+  "http://0.0.0.0:4000/fixtures/newstest2013.es.top10lines.html",
+  "http://0.0.0.0:4000/fixtures/newstest2013.es.top300lines.html",
+  "http://0.0.0.0:4000/fixtures/wmt18.et.top10lines.html",
+  "http://0.0.0.0:4000/fixtures/es.wikipedia.org-2020-11-21-full-page/original.html",
+  "http://0.0.0.0:4000/fixtures/es.wikipedia.org-2021-01-20-welcome-box/original.html",
+  "http://0.0.0.0:4000/fixtures/es.wikipedia.org-2020-11-21-events-on-nov-21-box/original.html",
   "https://es.wikipedia.org",
   "https://www.mozilla.org/",
   "https://www.mozilla.org/es-ES/",
