@@ -1,64 +1,11 @@
 version: 2.1
 
 jobs:
-  build_bergamot_translator:
-    docker:
-      - image: emscripten/emsdk:2.0.9
-    resource_class: medium
-
-    working_directory: ~/checkout
-
-    steps:
-      - checkout
-
-      - run:
-          name: Checkout submodules recursively
-          command: git submodule update --init --recursive
-
-      - run:
-          name: Generate a file that changes when the bergamot-translator submodule changes
-          command:  git submodule status bergamot-translator > bergamot-translator-submodule-status.txt
-
-      - restore_cache:
-          keys:
-            - bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-3
-
-      - run:
-          name: Build WASM artifacts if they are not already built for this submodule reference
-          command: |
-            [ -d bergamot-translator/build-wasm ] || ./bergamot-translator/build-wasm.sh
-
-      - save_cache:
-          paths:
-            - bergamot-translator/build-wasm
-          key: bergamot-translator-submodule-{{ checksum "bergamot-translator-submodule-status.txt" }}-3
-
-      - run:
-          name: Move the built WASM artifacts to a separate directory
-          command: |
-            mkdir built-bergamot-translator-wasm-artifacts
-            cp bergamot-translator/build-wasm/bergamot*.wasm built-bergamot-translator-wasm-artifacts/
-            cp bergamot-translator/build-wasm/bergamot*.js built-bergamot-translator-wasm-artifacts/
-
-      - store_artifacts:
-          path: "built-bergamot-translator-wasm-artifacts"
-          destination: "built-bergamot-translator-wasm-artifacts"
-
-      - persist_to_workspace:
-          root: ~/checkout
-          # Must be relative path from root
-          paths:
-            - built-bergamot-translator-wasm-artifacts
-
   build_and_test_extension:
     docker:
       - image: circleci/node:latest-browsers
 
     parameters:
-      bergamot_translator_source:
-        type: string
-        default: 'downloaded'
-
       # Manually change/increase the following parameter to ensure that builds start without the Circle CI cache being populated
       # Useful eg to ensure that the latest Firefox Nightly is installed
       cache_buster:
@@ -93,19 +40,6 @@ jobs:
           command: yarn install --frozen-lockfile
 
       - when:
-          condition:
-            equal: [ << parameters.bergamot_translator_source >>, 'built' ]
-          steps:
-          - attach_workspace:
-              if: parameters.bergamot_translator_source == 'built'
-              at: /tmp/workspace
-          - run:
-              name: Import recently built Bergamot Translator build artifacts
-              command: ./import-bergamot-translator.sh /tmp/workspace/built-bergamot-translator-wasm-artifacts
-
-      - when:
-          condition:
-            equal: [ << parameters.bergamot_translator_source >>, 'downloaded' ]
           steps:
           - run:
               name: Download and import Bergamot Translator build artifacts
@@ -183,11 +117,3 @@ workflows:
   build-and-test:
     jobs:
       - build_and_test_extension
-
-  build-and-test-using-bergamot-translator-built-from-source:
-    jobs:
-      - build_bergamot_translator
-      - build_and_test_extension:
-          bergamot_translator_source: 'built'
-          requires:
-            - build_bergamot_translator
