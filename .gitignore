@@ -12,8 +12,8 @@ node_modules/
 .env*
 !/.env.example
 src/*/.env.example
-src/core/static/wasm/bergamot-translator-worker.wasm
 firefox-nightly-linux
 downloaded-bergamot-translator-wasm-artifacts*
+test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz
 test/locally-hosted-files/models/*
 !test/locally-hosted-files/models/dummy

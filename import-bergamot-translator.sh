@@ -22,8 +22,12 @@ echo "" >> $TS_FILE
 echo "// Note: The source code in this file is imported from bergamot-translator via" >> $TS_FILE
 echo "// the import-bergamot-translator.sh script in the root of this repo. " >> $TS_FILE
 echo "// Changes will be overwritten on each import!" >> $TS_FILE
+echo "" >> $TS_FILE
+echo "function loadEmscriptenGlueCode(Module) {" >> $TS_FILE
 cat "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.js" | sed 's/wasmBinaryFile = "/wasmBinaryFile = "wasm\//g' >> $TS_FILE
-echo "export { addOnPreMain, Module };" >> $TS_FILE
+echo "  return { addOnPreMain, Module };" >> $TS_FILE
+echo "}" >> $TS_FILE
+echo "export { loadEmscriptenGlueCode };" >> $TS_FILE
 
 echo "* Extracting the bergamot-translator version info to a separate file"
 VERSION_FILE=src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-version.ts
@@ -33,7 +37,11 @@ echo "* Autoformatting imported TypeScript module"
 yarn prettier src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts --write
 
 echo "* Copying bergamot-translator wasm artifact (as is)"
-cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" src/core/static/wasm/bergamot-translator-worker.wasm
+cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
+
+echo "* Compressing bergamot-translator wasm artifact"
+[ -f test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz ] && rm test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz
+gzip test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
 
 echo "* Done"
 
