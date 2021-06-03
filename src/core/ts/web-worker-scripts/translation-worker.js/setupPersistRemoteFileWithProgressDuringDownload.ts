@@ -3,11 +3,12 @@ import { persistResponse } from "./persistResponse";
 import { digestSha256 } from "./digestSha256";
 import { throttle } from "./throttle";
 
-export interface FileDownloadRequest {
+export interface RemoteFile {
   type: string;
   url: string;
   name: string;
   size: number;
+  estimatedCompressedSize: number;
   expectedSha256Hash: string;
 }
 
@@ -37,12 +38,7 @@ export const setupPersistRemoteFileWithProgressDuringDownload = (
     100,
   );
 
-  return async ({
-    type,
-    url,
-    name,
-    expectedSha256Hash,
-  }: FileDownloadRequest) => {
+  return async ({ type, url, name, expectedSha256Hash }: RemoteFile) => {
     let response = await cache.match(url);
     let downloaded = false;
     if (!response || response.status >= 400) {

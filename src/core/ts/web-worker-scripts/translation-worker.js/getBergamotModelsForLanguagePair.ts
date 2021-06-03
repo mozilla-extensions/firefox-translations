@@ -6,7 +6,7 @@ import { ModelRegistry } from "../../config";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 import {
   DownloadedFile,
-  FileDownloadRequest,
+  RemoteFile,
   setupPersistRemoteFileWithProgressDuringDownload,
 } from "./setupPersistRemoteFileWithProgressDuringDownload";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
@@ -35,11 +35,23 @@ export const getBergamotModelsForLanguagePair = async (
 
   const modelRegistryEntry = modelRegistry[languagePair];
 
-  const modelFiles: FileDownloadRequest[] = Object.keys(modelRegistryEntry).map(
+  const modelFiles: RemoteFile[] = Object.keys(modelRegistryEntry).map(
     (type: string) => {
-      const { name, size, expectedSha256Hash } = modelRegistryEntry[type];
+      const {
+        name,
+        size,
+        estimatedCompressedSize,
+        expectedSha256Hash,
+      } = modelRegistryEntry[type];
       const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
-      return { type, url, name, size, expectedSha256Hash };
+      return {
+        type,
+        url,
+        name,
+        size,
+        estimatedCompressedSize,
+        expectedSha256Hash,
+      };
     },
   );
 

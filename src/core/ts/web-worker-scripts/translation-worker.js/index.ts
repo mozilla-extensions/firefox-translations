@@ -16,7 +16,11 @@ import {
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
 import { config, modelRegistry } from "../../config";
-import { DownloadedFile } from "./setupPersistRemoteFileWithProgressDuringDownload";
+import {
+  DownloadedFile,
+  RemoteFile,
+  setupPersistRemoteFileWithProgressDuringDownload,
+} from "./setupPersistRemoteFileWithProgressDuringDownload";
 
 type IncomingBergamotTranslatorAPIMessage =
   | LoadModelRequestWorkerMessage
@@ -29,31 +33,54 @@ interface DownloadedFilesByType {
 }
 
 const init = async () => {
-  const wasmBinaryResponse = await fetch(
-    `${config.wasmBinariesBaseUrl}/bergamot-translator-worker.wasm`,
+  const log = message => {
+    postMessage({
+      type: "log",
+      message,
+    });
+  };
+
+  const name = "bergamot-translator-worker.wasm";
+  const remoteWasmBinary: RemoteFile = {
+    type: "wasm-binary",
+    url: `${config.wasmBinariesBaseUrl}/${name}`,
+    name,
+    size: 6732404,
+    estimatedCompressedSize: 1827872,
+    expectedSha256Hash:
+      "396d5e4df660f6746af00de961bfe257f7163e0f3aff413146072f93126e1c77",
+  };
+
+  const persistFiles = true;
+  const wasmBinaryCache = await caches.open("bergamot-wasm-binaries");
+  const filesToTransferByType = { "wasm-binary": undefined };
+  const bytesTransferredByType = { "wasm-binary": 0 };
+  const persistRemoteFileWithProgressDuringDownload = setupPersistRemoteFileWithProgressDuringDownload(
+    "bergamot-translator",
+    persistFiles,
+    wasmBinaryCache,
+    log,
+    filesToTransferByType,
+    bytesTransferredByType,
+    () => {
+      console.log("WASM binary download progress update", {
+        filesToTransferByType,
+        bytesTransferredByType,
+      });
+    },
+  );
+  const downloadedWasmBinary = await persistRemoteFileWithProgressDuringDownload(
+    remoteWasmBinary,
   );
 
-  if (wasmBinaryResponse.status >= 400) {
-    throw new Error("WASM binary download failed");
-  }
-
-  const wasmBinary = await wasmBinaryResponse.arrayBuffer();
-
   const initialModule = {
-    wasmBinary,
+    wasmBinary: downloadedWasmBinary.arrayBuffer,
   };
 
   const { addOnPreMain, Module } = loadEmscriptenGlueCode(initialModule);
 
   addOnPreMain(function() {
     let model;
-
-    const log = message => {
-      postMessage({
-        type: "log",
-        message,
-      });
-    };
 
     /**
      * If we end up in a situation where we want to make sure that an instance is deleted
