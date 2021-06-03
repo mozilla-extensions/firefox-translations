@@ -40,6 +40,7 @@ echo "* Copying bergamot-translator wasm artifact (as is)"
 cp "$ARTIFACTS_DIRECTORY/bergamot-translator-worker.wasm" test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
 
 echo "* Compressing bergamot-translator wasm artifact"
+mkdir -p test/locally-hosted-files/wasm/
 [ -f test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz ] && rm test/locally-hosted-files/wasm/bergamot-translator-worker.wasm.gz
 gzip test/locally-hosted-files/wasm/bergamot-translator-worker.wasm
 
