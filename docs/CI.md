@@ -7,16 +7,12 @@
   - [CircleCI](#circleci)
     - [Run Circle CI locally (requires Docker)](#run-circle-ci-locally-requires-docker)
     - [Installing artifacts created by CircleCI](#installing-artifacts-created-by-circleci)
-  - [Taskcluster](#taskcluster)
-    - [Test Taskcluster workflows locally](#test-taskcluster-workflows-locally)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Continuous Integration
 
-Both [Circle CI](https://circleci.com/) and Taskcluster is used for continuous integration. CircleCI is used as a general purpose CI, while the Taskcluster integration supports [the automated workflows common to all Mozilla extensions](https://github.com/mozilla-extensions/xpi-manifest/blob/master/docs/adding-a-new-xpi.md#adding-a-new-xpi).
-
-Extension artifacts built via the TaskCluster CI are signed using a development certificate, which enables some privileges in non-release versions of Firefox given that the pref `xpinstall.signatures.dev-root` is set to `true`. These artifacts are used in pre-releases.
+[Circle CI](https://circleci.com/) is used for continuous integration.
 
 ## CircleCI
 
@@ -70,18 +66,3 @@ Artifacts built via CircleCI are unsigned (just like developer-created local bui
   - `dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled`
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required`
-
-## Taskcluster
-
-Configured via `./.taskcluster.yml` and `./taskcluster/`.
-
-### Test Taskcluster workflows locally
-
-Taskcluster runs the following package scripts:
-
-```
-yarn build
-yarn lint
-```
-
-Run these locally to make sure that they work.

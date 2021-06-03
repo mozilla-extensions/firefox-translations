@@ -30,4 +30,3 @@ downloaded-bergamot-translator-wasm-artifacts*
 test/fixtures/models/
 # don't lint ci configuration
 .circleci/
-taskcluster/
