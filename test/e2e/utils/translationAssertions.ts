@@ -30,7 +30,8 @@ export const fixtures: { [k: string]: Fixture } = {
   },
 };
 
-export const fixtureUrl = "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html";
+export const fixtureUrl =
+  "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html";
 
 const expectedFirefoxTelemetryClientId = "12345678-90ab-cdef-1234-567890abcdef";
 

@@ -15,10 +15,10 @@ import {
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 import {
   DownloadedModelFile,
-  getBergamotModelsForLanguagePair, ModelDownloadError,
+  getBergamotModelsForLanguagePair,
 } from "./getBergamotModelsForLanguagePair";
 
-import {config, modelRegistry} from "../../config";
+import { config, modelRegistry } from "../../config";
 
 type IncomingBergamotTranslatorAPIMessage =
   | LoadModelRequestWorkerMessage
@@ -30,9 +30,10 @@ interface DownloadedModelFilesByType {
   vocab: DownloadedModelFile;
 }
 
-const init = async() => {
-
-  const wasmBinaryResponse = await fetch(`${config.wasmBinariesBaseUrl}/bergamot-translator-worker.wasm`);
+const init = async () => {
+  const wasmBinaryResponse = await fetch(
+    `${config.wasmBinariesBaseUrl}/bergamot-translator-worker.wasm`,
+  );
 
   if (wasmBinaryResponse.status >= 400) {
     throw new Error("WASM binary download failed");
@@ -41,7 +42,7 @@ const init = async() => {
   const wasmBinary = await wasmBinaryResponse.arrayBuffer();
 
   const initialModule = {
-    wasmBinary
+    wasmBinary,
   };
 
   const { addOnPreMain, Module } = loadEmscriptenGlueCode(initialModule);
@@ -112,7 +113,7 @@ const init = async() => {
       downloadedModelFiles.forEach(downloadedModelFile => {
         downloadedModelFilesByType[
           downloadedModelFile.type
-          ] = downloadedModelFile;
+        ] = downloadedModelFile;
       });
 
       return downloadedModelFilesByType;
@@ -348,7 +349,6 @@ gemm-precision: int8shift
     postMessage("ready");
     log("The worker is ready to receive translation-related messages");
   });
-
-}
+};
 
 init();
