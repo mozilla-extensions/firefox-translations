@@ -20,7 +20,6 @@ jobs:
       - run:
           name: Print out parameters used for this Circle CI job
           command: |
-            echo 'bergamot_translator_source: << parameters.bergamot_translator_source >>'
             echo 'cache_buster: << parameters.cache_buster >>'
 
       - run:
@@ -39,11 +38,9 @@ jobs:
           name: Install dependencies
           command: yarn install --frozen-lockfile
 
-      - when:
-          steps:
-          - run:
-              name: Download and import Bergamot Translator build artifacts
-              command: yarn bergamot-translator:download-and-import
+      - run:
+          name: Download and import Bergamot Translator build artifacts
+          command: yarn bergamot-translator:download-and-import
 
       - run:
           name: Check if the imported Bergamot Translator's glue code matches the versioned code contents
