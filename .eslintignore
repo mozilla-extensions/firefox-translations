@@ -7,16 +7,15 @@ yarn-error.log
 *.map
 package-lock.json
 src/core/ts/web-worker-scripts/translation-worker.js/bergamot-translator-worker.ts
-src/core/static/wasm/bergamot-translator-worker.wasm
-src/core/static/wasm/cld-worker.*
+src/cross-browser-ui/static/wasm/cld-worker.*
 # currently not maintaining these source files
 src/cross-browser-ui/ts/extension-pages/main-interface.js/components/
 # makes sure that eslintrc.js gets linted/formatted
 !.eslintrc.js
 # don't lint/format package.json since npm install formats it differently by default
 package.json
-# don't lint/format fixtures
-test/fixtures/
+# don't lint/format locally-hosted-files
+test/locally-hosted-files/
 # don't lint/format third party modules
 .venv
 venv
@@ -27,7 +26,6 @@ node_modules/
 test/in-browser/static/test-runner/inc/
 firefox-nightly-linux
 downloaded-bergamot-translator-wasm-artifacts*
-test/fixtures/models/
 # don't lint ci configuration
 .circleci/
 taskcluster/
