@@ -2,24 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { digestSha256 } from "./digestSha256";
 import { ModelRegistry } from "../../config";
-import { instrumentResponseWithProgressCallback } from "./instrumentResponseWithProgressCallback";
-import { persistResponse } from "./persistResponse";
-import { throttle } from "./throttle";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import {
+  DownloadedFile,
+  RemoteFile,
+  setupPersistRemoteFileWithProgressDuringDownload,
+} from "./setupPersistRemoteFileWithProgressDuringDownload";
 const mb = bytes => Math.round((bytes / 1024 / 1024) * 10) / 10;
 
-export interface DownloadedModelFile {
-  type: string;
-  name: string;
-  arrayBuffer: ArrayBuffer;
-  downloaded: boolean;
-  sha256Hash: string;
-}
-
-export class ModelDownloadError extends Error {
-  public name = "ModelDownloadError";
+export class LanguagePairUnsupportedError extends Error {
+  public name = "LanguagePairUnsupportedError";
 }
 
 export const getBergamotModelsForLanguagePair = async (
@@ -31,9 +24,9 @@ export const getBergamotModelsForLanguagePair = async (
   onModelDownloadProgress: (
     modelDownloadProgress: ModelDownloadProgress,
   ) => void,
-): Promise<DownloadedModelFile[]> => {
+): Promise<DownloadedFile[]> => {
   if (!modelRegistry[languagePair]) {
-    throw new ModelDownloadError(
+    throw new LanguagePairUnsupportedError(
       `Language pair '${languagePair}' not supported`,
     );
   }
@@ -42,11 +35,25 @@ export const getBergamotModelsForLanguagePair = async (
 
   const modelRegistryEntry = modelRegistry[languagePair];
 
-  const modelFiles = Object.keys(modelRegistryEntry).map((type: string) => {
-    const { name, size, expectedSha256Hash } = modelRegistryEntry[type];
-    const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
-    return { type, url, name, size, expectedSha256Hash };
-  });
+  const modelFiles: RemoteFile[] = Object.keys(modelRegistryEntry).map(
+    (type: string) => {
+      const {
+        name,
+        size,
+        estimatedCompressedSize,
+        expectedSha256Hash,
+      } = modelRegistryEntry[type];
+      const url = `${bergamotModelsBaseUrl}/${languagePair}/${name}`;
+      return {
+        type,
+        url,
+        name,
+        size,
+        estimatedCompressedSize,
+        expectedSha256Hash,
+      };
+    },
+  );
 
   // Check remaining storage quota
   const quota = await navigator.storage.estimate();
@@ -128,95 +135,28 @@ export const getBergamotModelsForLanguagePair = async (
     );
     */
   };
-  const throttledBroadcastDownloadProgressUpdate = throttle(
-    broadcastDownloadProgressUpdate,
-    100,
-  );
 
   // Download or restore model files from persistent cache
-  const downloadedModelFiles: DownloadedModelFile[] = await Promise.all(
-    modelFiles.map(async ({ type, url, name, expectedSha256Hash }) => {
-      let response = await cache.match(url);
-      let downloaded = false;
-      if (!response || response.status >= 400) {
-        log(`Downloading model file ${name} from ${url}`);
-        downloaded = true;
-        filesToTransferByType[type] = true;
-
-        try {
-          const downloadResponsePromise = fetch(url);
-
-          // Await initial response headers before continuing
-          const downloadResponseRaw = await downloadResponsePromise;
-
-          // Hook up progress callbacks to track actual download of the model files
-          const onProgress = (bytesTransferred: number) => {
-            // console.debug(`${name}: onProgress - ${mb(bytesTransferred)} mb out of ${mb(size)} mb transferred`);
-            bytesTransferredByType[type] = bytesTransferred;
-            throttledBroadcastDownloadProgressUpdate();
-          };
-          response = instrumentResponseWithProgressCallback(
-            downloadResponseRaw,
-            onProgress,
-          );
-
-          log(`Response for ${url} from network is: ${response.status}`);
-
-          if (persistFiles) {
-            // This avoids caching responses that we know are errors (i.e. HTTP status code of 4xx or 5xx).
-            if (response.status < 400) {
-              await persistResponse(cache, url, response, log);
-            } else {
-              log(
-                `${name}: Not caching the response to ${url} since the status was >= 400`,
-              );
-            }
-          }
-        } catch ($$err) {
-          console.warn(
-            `${name}: An error occurred while downloading/persisting the file`,
-            { $$err },
-          );
-          const errorToThrow = new ModelDownloadError($$err.message);
-          errorToThrow.stack = $$err.stack;
-          throw errorToThrow;
-        }
-      } else {
-        log(`${name}: Model file from ${url} previously downloaded already`);
-      }
-
-      if (response.status >= 400) {
-        throw new ModelDownloadError("Model file download failed");
-      }
-
-      const arrayBuffer = await response.arrayBuffer();
-
-      // Verify the hash of downloaded model files
-      const sha256Hash = await digestSha256(arrayBuffer);
-      if (sha256Hash !== expectedSha256Hash) {
-        console.warn(
-          `Model file download integrity check failed for ${languagePair}'s ${type} file`,
-          {
-            sha256Hash,
-            expectedSha256Hash,
-          },
-        );
-        throw new ModelDownloadError(
-          `Model file download integrity check failed for ${languagePair}'s ${type} file`,
-        );
-      }
-
-      return { type, name, arrayBuffer, downloaded, sha256Hash };
-    }),
+  const persistRemoteFileWithProgressDuringDownload = setupPersistRemoteFileWithProgressDuringDownload(
+    languagePair,
+    persistFiles,
+    cache,
+    log,
+    filesToTransferByType,
+    bytesTransferredByType,
+    broadcastDownloadProgressUpdate,
+  );
+  const downloadedFiles: DownloadedFile[] = await Promise.all(
+    modelFiles.map(persistRemoteFileWithProgressDuringDownload),
   );
 
   // Measure the time it took to acquire model files
   const downloadEnd = Date.now();
   const downloadDurationMs = downloadEnd - downloadStart;
-  const totalBytes = downloadedModelFiles
+  const totalBytes = downloadedFiles
     .map(({ arrayBuffer }) => arrayBuffer.byteLength)
     .reduce((a, b) => a + b, 0);
-  const totalBytesDownloaded = downloadedModelFiles
+  const totalBytesDownloaded = downloadedFiles
     .filter(({ downloaded }) => downloaded)
     .map(({ arrayBuffer }) => arrayBuffer.byteLength)
     .reduce((a, b) => a + b, 0);
@@ -252,5 +192,5 @@ export const getBergamotModelsForLanguagePair = async (
     )}% was downloaded)`,
   );
 
-  return downloadedModelFiles;
+  return downloadedFiles;
 };

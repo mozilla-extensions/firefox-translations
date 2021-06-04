@@ -12,9 +12,13 @@
   "private": true,
   "scripts": {
     "generate-wee": "npm-run-all -s -n generate-wee:generateSchema:* generate-wee:verifyWeeSchema:* generate-wee:documentSchema:* generate-wee:generateStubApi:*",
+    "generate-wee:documentSchema:languageDetector": "cd static/experiment-apis/languageDetector && documentSchema schema.json > api.md",
     "generate-wee:documentSchema:translateUi": "cd static/experiment-apis/translateUi && documentSchema schema.json > api.md",
+    "generate-wee:generateSchema:languageDetector": "cd static/experiment-apis/languageDetector && yaml2json schema.yaml -p > schema.json",
     "generate-wee:generateSchema:translateUi": "cd static/experiment-apis/translateUi && yaml2json schema.yaml -p > schema.json",
+    "generate-wee:generateStubApi:languageDetector": "cd static/experiment-apis/languageDetector && generateStubApi ./schema.json > stubApi.js",
     "generate-wee:generateStubApi:translateUi": "cd static/experiment-apis/translateUi && generateStubApi ./schema.json > stubApi.js",
+    "generate-wee:verifyWeeSchema:languageDetector": "cd static/experiment-apis/languageDetector && verifyWeeSchema schema.json",
     "generate-wee:verifyWeeSchema:translateUi": "cd static/experiment-apis/translateUi && verifyWeeSchema schema.json",
     "webpack:build": "webpack --mode=${NODE_ENV}",
     "webpack:watch": "webpack --watch"

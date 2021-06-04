@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
-import Event = Events.Event;
 import { LanguageSupport } from "../../../../core/ts/shared-resources/LanguageSupport";
 import { TranslationStatus } from "../../../../core/ts/shared-resources/models/BaseTranslationState";
 import { ExtensionState } from "../../../../core/ts/shared-resources/models/ExtensionState";
@@ -16,10 +14,27 @@ import { getSnapshot, SnapshotOutOf } from "mobx-keystone";
 import { reaction } from "mobx";
 import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
 import { translateAllFramesInTab } from "../../../../core/ts/background-scripts/background.js/lib/translateAllFramesInTab";
+import { browserWithExperimentAPIs } from "./browserWithExperimentAPIs";
+
+type TelemetryPreferencesEventRef =
+  | "onUploadEnabledPrefChange"
+  | "onCachedClientIDPrefChange";
+
+type NativeTranslateUiEventRef =
+  | "onInfoBarDisplayed"
+  | "onSelectTranslateTo"
+  | "onSelectTranslateFrom"
+  | "onInfoBarClosed"
+  | "onNeverTranslateSelectedLanguage"
+  | "onNeverTranslateThisSite"
+  | "onShowOriginalButtonPressed"
+  | "onShowTranslatedButtonPressed"
+  | "onTranslateButtonPressed"
+  | "onNotNowButtonPressed";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
-enum NativeTranslateUiStateInfobarState {
+export enum NativeTranslateUiStateInfobarState {
   STATE_OFFER = 0,
   STATE_TRANSLATING = 1,
   STATE_TRANSLATED = 2,
@@ -37,7 +52,7 @@ enum NativeTranslateUiStateInfobarState {
  * - originalShown, boolean indicating if the original or translated
  *   version of the page is shown.
  */
-interface NativeTranslateUiState {
+export interface NativeTranslateUiState {
   acceptedTargetLanguages: string[];
   detectedLanguageResults: DetectedLanguageResults;
   defaultTargetLanguage: string;
@@ -53,71 +68,6 @@ interface NativeTranslateUiState {
   translationDurationMs: number;
   localizedTranslationProgressText: string;
 }
-
-type StandardInfobarInteractionEvent = Event<
-  (tabId: number, from: string, to: string) => void
->;
-
-type browserInterface = typeof crossBrowser;
-interface BrowserWithExperimentAPIs extends browserInterface {
-  experiments: {
-    telemetryEnvironment: {
-      getTranslationRelevantFxTelemetryMetrics: () => Promise<
-        TranslationRelevantFxTelemetryMetrics
-      >;
-    };
-    telemetryPreferences: {
-      onUploadEnabledPrefChange: Event<() => void>;
-      onCachedClientIDPrefChange: Event<() => void>;
-      getUploadEnabledPref: () => Promise<boolean>;
-      getCachedClientIDPref: () => Promise<string>;
-    };
-    extensionPreferences: {
-      getTelemetryInactivityThresholdInSecondsOverridePref: () => Promise<
-        number
-      >;
-    };
-    translateUi: {
-      start: () => Promise<void>;
-      stop: () => Promise<void>;
-      setUiState: (
-        tabId: number,
-        uiState: NativeTranslateUiState,
-      ) => Promise<void>;
-      onInfoBarDisplayed: StandardInfobarInteractionEvent;
-      onSelectTranslateTo: Event<
-        (tabId: number, from: string, newTo: string) => void
-      >;
-      onSelectTranslateFrom: Event<
-        (tabId: number, newFrom: string, to: string) => void
-      >;
-      onInfoBarClosed: StandardInfobarInteractionEvent;
-      onNeverTranslateSelectedLanguage: StandardInfobarInteractionEvent;
-      onNeverTranslateThisSite: StandardInfobarInteractionEvent;
-      onShowOriginalButtonPressed: StandardInfobarInteractionEvent;
-      onShowTranslatedButtonPressed: StandardInfobarInteractionEvent;
-      onTranslateButtonPressed: StandardInfobarInteractionEvent;
-      onNotNowButtonPressed: StandardInfobarInteractionEvent;
-    };
-  };
-}
-const browserWithExperimentAPIs = (browser as any) as BrowserWithExperimentAPIs;
-
-type TelemetryPreferencesEventRef =
-  | "onUploadEnabledPrefChange"
-  | "onCachedClientIDPrefChange";
-
-type NativeTranslateUiEventRef =
-  | "onInfoBarDisplayed"
-  | "onSelectTranslateTo"
-  | "onSelectTranslateFrom"
-  | "onInfoBarClosed"
-  | "onNeverTranslateSelectedLanguage"
-  | "onNeverTranslateThisSite"
-  | "onShowOriginalButtonPressed"
-  | "onShowTranslatedButtonPressed"
-  | "onTranslateButtonPressed"
-  | "onNotNowButtonPressed";
 
 export class NativeTranslateUiBroker {
   private extensionState: ExtensionState;

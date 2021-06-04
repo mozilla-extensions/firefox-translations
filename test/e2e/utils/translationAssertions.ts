@@ -16,13 +16,13 @@ interface Fixture {
 
 export const fixtures: { [k: string]: Fixture } = {
   es: {
-    url: "http://0.0.0.0:4001/newstest2013.es.top10lines.html",
-    multipleFramesUrl: "http://0.0.0.0:4001/multiple-frames.html",
+    url: "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html",
+    multipleFramesUrl: "http://0.0.0.0:4001/fixtures/multiple-frames.html",
     originalTextToLookFor: "Una estrategia republicana para obstaculizar",
     translatedTextToLookFor: "A Republican strategy to hinder",
   },
   et: {
-    url: "http://0.0.0.0:4001/wmt18.et.top10lines.html",
+    url: "http://0.0.0.0:4001/fixtures/wmt18.et.top10lines.html",
     originalTextToLookFor:
       "Eestis ja Hispaanias peeti kinni neli Kemerovo grupeeringu liiget",
     translatedTextToLookFor:
@@ -30,7 +30,8 @@ export const fixtures: { [k: string]: Fixture } = {
   },
 };
 
-export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
+export const fixtureUrl =
+  "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html";
 
 const expectedFirefoxTelemetryClientId = "12345678-90ab-cdef-1234-567890abcdef";
 
