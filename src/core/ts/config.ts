@@ -20,13 +20,13 @@ export const config = {
     // ["fr","en"],
     ["es", "en"],
     // ["pl","en"],
-    // ["cs", "en"],
+    ["cs", "en"],
     ["et", "en"],
     ["en", "de"],
     // ["en","fr"],
     ["en", "es"],
     // ["en","pl"],
-    // ["en", "cs"],
+    ["en", "cs"],
     ["en", "et"],
   ],
   privacyNoticeUrl: "https://example.com/privacy-notice",
@@ -67,6 +67,29 @@ export const modelRegistry: ModelRegistry = {
       estimatedCompressedSize: 414566,
       expectedSha256Hash:
         "909b1eea1face0d7f90a474fe29a8c0fef8d104b6e41e65616f864c964ba8845",
+    },
+  },
+  csen: {
+    lex: {
+      name: "lex.50.50.csen.s2t.bin",
+      size: 4535788,
+      estimatedCompressedSize: 2418488,
+      expectedSha256Hash:
+        "8228a3c3f7887759a62b7d7c674a7bef9b70161913f9b0939ab58f71186835c2",
+    },
+    model: {
+      name: "model.csen.intgemm.alphas.bin",
+      size: 17140756,
+      estimatedCompressedSize: 13045032,
+      expectedSha256Hash:
+        "5b16661e2864dc50b2f4091a16bdd4ec8d8283e04271e602159ba348df5d6e2d",
+    },
+    vocab: {
+      name: "vocab.csen.spm",
+      size: 769763,
+      estimatedCompressedSize: 366392,
+      expectedSha256Hash:
+        "f71cc5d045e479607078e079884f44032f5a0b82547fb96eefa29cd1eb47c6f3",
     },
   },
   eten: {
@@ -136,6 +159,29 @@ export const modelRegistry: ModelRegistry = {
       estimatedCompressedSize: 414566,
       expectedSha256Hash:
         "909b1eea1face0d7f90a474fe29a8c0fef8d104b6e41e65616f864c964ba8845",
+    },
+  },
+  encs: {
+    lex: {
+      name: "lex.50.50.encs.s2t.bin",
+      size: 12996877,
+      estimatedCompressedSize: 12976833,
+      expectedSha256Hash:
+        "9fcb2c558f39a2f276540a564f364d46a0943c85d44b0637ff1a6ee7d566b0ff",
+    },
+    model: {
+      name: "model.encs.intgemm.alphas.bin",
+      size: 17140755,
+      estimatedCompressedSize: 12630325,
+      expectedSha256Hash:
+        "9a2fe0588bd972accfc801e2f31c945de0557804a91666ae5ab43b94fb74ac4b",
+    },
+    vocab: {
+      name: "vocab.csen.spm",
+      size: 825463,
+      estimatedCompressedSize: 366392,
+      expectedSha256Hash:
+        "f71cc5d045e479607078e079884f44032f5a0b82547fb96eefa29cd1eb47c6f3",
     },
   },
   enet: {
