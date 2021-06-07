@@ -66,20 +66,22 @@ export class DomTranslationManager {
     // its heap after it's grown, it has a performance cost.
     // So we send plain text instead.)
     const startGrabSample = performance.now();
-    const domElementsToStringWithMaxLength = (
-      elements: Node[],
+    const grabTranslationNodesSample = (
+      $translationNodes: TranslationNode[],
       maxLength,
       // skipInvisibleContent = false,
     ) => {
-      return elements
-        .map(el => el.textContent)
-        .join("\n")
-        .substr(0, maxLength);
+      let totalLength = 0;
+      const textContents = [];
+      $translationNodes.some(translationNode => {
+        const textContent = translationNode.content.textContent;
+        textContents.push(textContent);
+        totalLength += textContent.length;
+        return totalLength >= maxLength;
+      });
+      return textContents.join("\n").substr(0, maxLength);
     };
-    const string = domElementsToStringWithMaxLength(
-      translationNodes.map(tn => tn.content),
-      60 * 1024,
-    );
+    const string = grabTranslationNodesSample(translationNodes, 60 * 1024);
     const endGrabSample = performance.now();
     console.info(
       `Grabbing a DOM sample for language detection took ${(endGrabSample -
