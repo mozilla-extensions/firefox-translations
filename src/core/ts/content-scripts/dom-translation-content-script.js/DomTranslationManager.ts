@@ -47,6 +47,18 @@ export class DomTranslationManager {
       TranslationStatus.DETECTING_LANGUAGE,
     );
 
+    // Extract translation nodes from the document - necessary for grabbing a sample for language detection
+    const startGetTranslationNodes = performance.now();
+    const translationNodes: TranslationNode[] = getTranslationNodes(
+      document.body,
+    );
+    const endGetTranslationNodes = performance.now();
+    console.info(
+      `Extracting translation nodes from the document took ${(endGetTranslationNodes -
+        startGetTranslationNodes) /
+        1000} seconds`,
+    );
+
     // Grab a 60k sample of text from the page.
     // (The CLD2 library used by the language detector is capable of
     // analyzing raw HTML. Unfortunately, that takes much more memory,
@@ -54,9 +66,6 @@ export class DomTranslationManager {
     // its heap after it's grown, it has a performance cost.
     // So we send plain text instead.)
     const startGrabSample = performance.now();
-    const translationNodes: TranslationNode[] = getTranslationNodes(
-      document.body,
-    );
     const domElementsToStringWithMaxLength = (
       elements: Node[],
       maxLength,
