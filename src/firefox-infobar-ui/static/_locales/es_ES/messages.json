@@ -7,6 +7,10 @@
     "message": "Traducción de la Máquina Neural para el navegador.",
     "description": "Description of the extension."
   },
+  "currentlyDownloadingTranslationEngine": {
+    "message": "Motor de traducción de descarga",
+    "description": "Informs the user that the translations feature is currently downloading the translation engine."
+  },
   "currentlyDownloadingLanguageModel": {
     "message": "Actualmente descargando el modelo de idioma",
     "description": "Informs the user that the translations feature is currently downloading the language model files."
