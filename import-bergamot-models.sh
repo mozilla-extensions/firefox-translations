@@ -21,12 +21,12 @@ fi
 cd -
 if [ "$MODELS_UPDATED" == "1" ]; then
   echo "* Importing model files from bergamot-models repo"
-  mkdir -p test/fixtures/models
-  mv test/fixtures/models/dummy tmp
-  rm -rf test/fixtures/models/*
-  cp -rf bergamot-models/prod/* test/fixtures/models
-  ls -l test/fixtures/models/*
-  mv tmp test/fixtures/models/dummy
+  mkdir -p test/locally-hosted-files/models
+  mv test/locally-hosted-files/models/dummy tmp
+  rm -rf test/locally-hosted-files/models/*
+  cp -rf bergamot-models/prod/* test/locally-hosted-files/models
+  ls -l test/locally-hosted-files/models/*
+  mv tmp test/locally-hosted-files/models/dummy
 fi
 
 echo "* Done"
