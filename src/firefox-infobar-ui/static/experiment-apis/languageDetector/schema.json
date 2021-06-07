@@ -10,8 +10,8 @@
         "description": "Detect language",
         "parameters": [
           {
-            "name": "str",
-            "type": "string"
+            "name": "params",
+            "type": "any"
           }
         ]
       }
