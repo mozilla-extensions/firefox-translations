@@ -3,7 +3,7 @@
   "description": "bergamot-browser-extension/core",
   "version": "0.0.0",
   "dependencies": {
-    "@mozilla/glean": "^0.14.1",
+    "@mozilla/glean": "^0.15.0",
     "mobx": "^6.0.3",
     "mobx-keystone": "^0.48.0",
     "mobx-react": "^7.0.4",
