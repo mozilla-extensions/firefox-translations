@@ -6,7 +6,7 @@
 - [Installation instructions](#installation-instructions)
   - [Firefox - Infobar UI](#firefox---infobar-ui)
     - [Preparations](#preparations)
-    - [Configuring Nightly and installing the extension](#configuring-nightly-and-installing-the-extension)
+    - [Configuring Nightly to enable the extension](#configuring-nightly-to-enable-the-extension)
     - [Demo](#demo)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -30,19 +30,13 @@ There are three flavors:
 ### Preparations
 
 - The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly (English or German edition) from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
-- Important! If you already use Nightly as your default browser, please [create a new profile](https://developer.mozilla.org/Firefox/Multiple_profiles). Do not use your ordinary Nightly profile when testing pre-release versions of the extension.
-- If you have tried any previous version of the Firefox extension, please make sure to remove/uninstall it before installing the new version. You will find it named "Bergamot Translate" in `about:addons`. (The new version is now displayed as "Firefox Translations" in `about:addons`).
+- If you have tried any previous version of the Firefox extension, please make sure to remove/uninstall it before installing the new version. You will find it named "Firefox Translations" or "Bergamot Translate" in `about:addons`.
 
-### Configuring Nightly and installing the extension
+### Configuring Nightly to enable the extension
 
-- Make sure that the following preferences are set to `true` in `about:config`:
-  - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to install pre-release versions of the extension)
-- Make sure that the following preferences are set to `false` in `about:config`:
-  - `xpinstall.signatures.required` (This enables the use of ordinary extensions in the same profile)
-- Click [here](https://github.com/mozilla-extensions/bergamot-browser-extension/releases/download/v0.4.1/firefox-translations-0.4.1.dev-root-signed.xpi) to start the download and installation of the extension
-- Wait for the extension to be downloaded
-- Click `Add` in the popup that comes up
-- The extension is now installed
+- Change the following preferences `false` in `about:config`:
+  - `extensions.translations.disabled`
+- The extension is now enabled
 
 ### Demo
 
@@ -50,6 +44,7 @@ There are three flavors:
   - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ or https://www.mozilla.org/et/
   - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
 - Press Translate in the translation infobar that pops up
+  - Note: For non-english editions of Nightly, one must eliminate EN and EN-US from the accepted languages (from the Language section of about:preferences, more precisely from the Webpage Language Settings) for the infobar to show
 
 <!--
 ## Chrome - Cross-browser UI
