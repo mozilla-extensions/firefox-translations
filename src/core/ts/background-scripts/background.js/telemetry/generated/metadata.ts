@@ -142,7 +142,7 @@ export const cpuVendor = new StringMetricType({
  *
  * Generated from `metadata.cpu_family`.
  */
-export const cpuFamily = new StringMetricType({
+export const cpuFamily = new QuantityMetricType({
   category: "metadata",
   name: "cpu_family",
   sendInPings: ["custom"],
@@ -155,7 +155,7 @@ export const cpuFamily = new StringMetricType({
  *
  * Generated from `metadata.cpu_model`.
  */
-export const cpuModel = new StringMetricType({
+export const cpuModel = new QuantityMetricType({
   category: "metadata",
   name: "cpu_model",
   sendInPings: ["custom"],
@@ -168,7 +168,7 @@ export const cpuModel = new StringMetricType({
  *
  * Generated from `metadata.cpu_stepping`.
  */
-export const cpuStepping = new StringMetricType({
+export const cpuStepping = new QuantityMetricType({
   category: "metadata",
   name: "cpu_stepping",
   sendInPings: ["custom"],
