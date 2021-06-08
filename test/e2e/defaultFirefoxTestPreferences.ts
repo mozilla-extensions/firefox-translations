@@ -19,7 +19,6 @@ export const defaultFirefoxTestPreferences = {
 
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
-  "browser.proton.enabled": true,
   "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled": true,
   "javascript.options.wasm_simd": true,
   "javascript.options.wasm_simd_wormhole": true,
