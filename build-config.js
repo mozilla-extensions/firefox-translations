@@ -18,6 +18,8 @@ if (process.env.CIRCLECI === "true") {
   extensionBuildEnvironment = "circleci";
 } else if (process.env.CI === "true") {
   extensionBuildEnvironment = "ci";
+} else if (process.env.MC === "1") {
+  extensionBuildEnvironment = "mozilla";
 } else {
   extensionBuildEnvironment = "local";
 }
@@ -27,7 +29,11 @@ if (targetEnvironment !== "production") {
 
 const extensionId =
   ui === "firefox-infobar-ui"
-    ? "firefox-translations@mozilla.org"
+    ? `${
+        process.env.MC === "1"
+          ? "firefox-translations@mozilla.org"
+          : "firefox-infobar-ui-bergamot-browser-extension@browser.mt"
+      }`
     : "bergamot-browser-extension@browser.mt";
 
 const buildPath = path.join(
