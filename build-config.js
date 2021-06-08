@@ -14,12 +14,12 @@ const targetBrowser = process.env.TARGET_BROWSER;
 const ui = process.env.UI;
 
 let extensionBuildEnvironment;
-if (process.env.CIRCLECI === "true") {
+if (process.env.MC === "1") {
+  extensionBuildEnvironment = "mozilla";
+} else if (process.env.CIRCLECI === "true") {
   extensionBuildEnvironment = "circleci";
 } else if (process.env.CI === "true") {
   extensionBuildEnvironment = "ci";
-} else if (process.env.MC === "1") {
-  extensionBuildEnvironment = "mozilla";
 } else {
   extensionBuildEnvironment = "local";
 }
