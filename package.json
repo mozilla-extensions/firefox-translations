@@ -6,7 +6,7 @@
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">=1.21.1",
-    "node": ">=12.20.0"
+    "node": ">=12.21.0"
   },
   "husky": {
     "hooks": {
