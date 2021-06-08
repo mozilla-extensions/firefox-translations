@@ -46,16 +46,6 @@ const init = async () => {
     window,
   );
 
-  const startDocumentTranslationStatistics = performance.now();
-  const documentTranslationStatistics = await domTranslationManager.getDocumentTranslationStatistics();
-  console.log({ documentTranslationStatistics });
-  const endDocumentTranslationStatistics = performance.now();
-  console.info(
-    `Gathering document translation statistics took ${(endDocumentTranslationStatistics -
-      startDocumentTranslationStatistics) /
-      1000} seconds`,
-  );
-
   // TODO: Prevent multiple translations from occurring simultaneously + enable cancellations of existing translation jobs
 
   // Any subsequent actions are determined by document translation state changes
@@ -169,10 +159,6 @@ const init = async () => {
         ...frameInfo,
         translationStatus: TranslationStatus.UNKNOWN,
         url: window.location.href,
-        wordCount: documentTranslationStatistics.wordCount,
-        wordCountVisible: documentTranslationStatistics.wordCountVisible,
-        wordCountVisibleInViewport:
-          documentTranslationStatistics.wordCountVisibleInViewport,
       }),
     );
     // Schedule removal of this document translation state when the document is closed

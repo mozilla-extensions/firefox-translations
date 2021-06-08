@@ -4,19 +4,18 @@
 
 import { TranslationDocument } from "./TranslationDocument";
 import { BergamotDomTranslator } from "./dom-translators/BergamotDomTranslator";
-import { getTranslationNodes, TranslationNode } from "./getTranslationNodes";
 import { ContentScriptLanguageDetectorProxy } from "../../shared-resources/ContentScriptLanguageDetectorProxy";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { TranslationStatus } from "../../shared-resources/models/BaseTranslationState";
 import { LanguageSupport } from "../../shared-resources/LanguageSupport";
 import { DocumentTranslationStateCommunicator } from "../../shared-resources/state-management/DocumentTranslationStateCommunicator";
-import { detag } from "./dom-translators/detagAndProject";
 import { FrameTranslationProgress } from "./dom-translators/BaseDomTranslator";
 import {
   BergamotTranslatorAPIModelDownloadError,
   BergamotTranslatorAPIModelLoadError,
   BergamotTranslatorAPITranslationError,
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { TranslationItem } from "./TranslationItem";
 
 export class DomTranslationManager {
   private documentTranslationStateCommunicator: DocumentTranslationStateCommunicator;
@@ -28,6 +27,17 @@ export class DomTranslationManager {
     this.document = document;
     this.contentWindow = contentWindow;
     this.languageDetector = new ContentScriptLanguageDetectorProxy();
+  }
+
+  getTranslationDocument(): TranslationDocument {
+    // If a TranslationDocument already exists for this document, it should
+    // be used instead of creating a new one so that we can use the original
+    // content of the page for the new translation instead of the newly
+    // translated text.
+    return (
+      this.contentWindow.translationDocument ||
+      new TranslationDocument(this.document)
+    );
   }
 
   async attemptToDetectLanguage() {
@@ -47,11 +57,10 @@ export class DomTranslationManager {
       TranslationStatus.DETECTING_LANGUAGE,
     );
 
-    // Extract translation nodes from the document - necessary for grabbing a sample for language detection
+    // Extract translation roots from the document - necessary for grabbing a sample for language detection
     const startGetTranslationNodes = performance.now();
-    const translationNodes: TranslationNode[] = getTranslationNodes(
-      document.body,
-    );
+    const translationRoots: TranslationItem[] = this.getTranslationDocument()
+      .translationRoots;
     const endGetTranslationNodes = performance.now();
     console.info(
       `Extracting translation nodes from the document took ${(endGetTranslationNodes -
@@ -67,27 +76,28 @@ export class DomTranslationManager {
     // So we send plain text instead.)
     const startGrabSample = performance.now();
     const grabTranslationNodesSample = (
-      $translationNodes: TranslationNode[],
+      $translationRoots: TranslationItem[],
       maxLength,
       // skipInvisibleContent = false,
     ) => {
       let totalLength = 0;
       const textContents = [];
-      $translationNodes.some(translationNode => {
-        const textContent = translationNode.content.textContent;
+      $translationRoots.some(translationItem => {
+        const textContent = translationItem.nodeRef.textContent;
         textContents.push(textContent);
         totalLength += textContent.length;
         return totalLength >= maxLength;
       });
       return textContents.join("\n").substr(0, maxLength);
     };
-    const string = grabTranslationNodesSample(translationNodes, 60 * 1024);
+    const string = grabTranslationNodesSample(translationRoots, 60 * 1024);
     const endGrabSample = performance.now();
     console.info(
       `Grabbing a DOM sample for language detection took ${(endGrabSample -
         startGrabSample) /
         1000} seconds`,
     );
+    console.debug("DOM sample for language detection:", { string });
 
     // Language detection isn't reliable on very short strings.
     if (string.length < 100) {
@@ -125,6 +135,7 @@ export class DomTranslationManager {
     if (!detectedLanguageResults.confident) {
       console.debug(
         "Language detection results not confident enough, bailing.",
+        { string },
       );
       this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
         TranslationStatus.LANGUAGE_NOT_DETECTED,
@@ -215,13 +226,7 @@ export class DomTranslationManager {
   }
 
   async doTranslation(from, to) {
-    // If a TranslationDocument already exists for this document, it should
-    // be used instead of creating a new one so that we can use the original
-    // content of the page for the new translation instead of the newly
-    // translated text.
-    const translationDocument =
-      this.contentWindow.translationDocument ||
-      new TranslationDocument(this.document);
+    const translationDocument = this.getTranslationDocument();
 
     console.info("Translating web page");
 
@@ -273,6 +278,11 @@ export class DomTranslationManager {
         TranslationStatus.ERROR,
       );
     } finally {
+      this.documentTranslationStateCommunicator.broadcastTranslationAttemptConcluded(
+        translationDocument.translationError,
+        domTranslator.derivedTranslationDocumentData,
+      );
+
       // Communicate that errors occurred
       // Positioned in finally-clause so that it gets communicated whether the
       // translation attempt resulted in some translated content or not
@@ -308,57 +318,5 @@ export class DomTranslationManager {
         },
       );
     }
-  }
-
-  async getDocumentTranslationStatistics() {
-    const translationDocument: TranslationDocument =
-      this.contentWindow.translationDocument ||
-      new TranslationDocument(this.document);
-
-    const { translationRoots } = translationDocument;
-
-    const {
-      translationRootsVisible,
-      translationRootsVisibleInViewport,
-    } = await translationDocument.determineVisibilityOfTranslationRoots();
-
-    const generateOriginalMarkupToTranslate = translationRoot =>
-      translationDocument.generateMarkupToTranslate(translationRoot);
-    const removeTags = originalString => {
-      const detaggedString = detag(originalString);
-      return detaggedString.plainString;
-    };
-
-    const texts = translationRoots
-      .map(generateOriginalMarkupToTranslate)
-      .map(removeTags);
-    const textsVisible = translationRootsVisible
-      .map(generateOriginalMarkupToTranslate)
-      .map(removeTags);
-    const textsVisibleInViewport = translationRootsVisibleInViewport
-      .map(generateOriginalMarkupToTranslate)
-      .map(removeTags);
-
-    const wordCount = texts.join(" ").split(" ").length;
-    const wordCountVisible = textsVisible.join(" ").split(" ").length;
-    const wordCountVisibleInViewport = textsVisibleInViewport
-      .join(" ")
-      .split(" ").length;
-
-    const translationRootsCount = translationRoots.length;
-    const simpleTranslationRootsCount = translationRoots.filter(
-      translationRoot => translationRoot.isSimleTranslationRoot,
-    ).length;
-
-    return {
-      translationRootsCount,
-      simpleTranslationRootsCount,
-      texts,
-      textsVisible,
-      textsVisibleInViewport,
-      wordCount,
-      wordCountVisible,
-      wordCountVisibleInViewport,
-    };
   }
 }
