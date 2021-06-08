@@ -268,24 +268,18 @@ export class DomTranslationManager {
         { from, to },
       );
       console.info("Translated web page");
-      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
-        TranslationStatus.TRANSLATED,
-      );
     } catch (err) {
       console.warn("Translation error occurred: ", err);
       translationDocument.translationError = true;
-      this.documentTranslationStateCommunicator.broadcastUpdatedTranslationStatus(
-        TranslationStatus.ERROR,
-      );
     } finally {
+      // Positioned in finally-clause so that it gets communicated whether the
+      // translation attempt resulted in some translated content or not
       this.documentTranslationStateCommunicator.broadcastTranslationAttemptConcluded(
         translationDocument.translationError,
         domTranslator.derivedTranslationDocumentData,
       );
 
       // Communicate that errors occurred
-      // Positioned in finally-clause so that it gets communicated whether the
-      // translation attempt resulted in some translated content or not
       domTranslator.errorsEncountered.forEach(
         (
           error:
