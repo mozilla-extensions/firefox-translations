@@ -97,7 +97,7 @@ export class DomTranslationManager {
         startGrabSample) /
         1000} seconds`,
     );
-    console.debug("DOM sample for language detection:", { string });
+    // console.debug("DOM sample for language detection:", { string });
 
     // Language detection isn't reliable on very short strings.
     if (string.length < 100) {
