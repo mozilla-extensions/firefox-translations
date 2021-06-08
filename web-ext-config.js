@@ -58,6 +58,7 @@ if (targetBrowser === "firefox") {
     "about:debugging#/runtime/this-firefox",
   ];
   defaultConfig.run.pref = [
+    `extensions.translations.disabled=true`,
     "extensions.experiments.enabled=true",
     "browser.proton.enabled=true",
     "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled=true",
