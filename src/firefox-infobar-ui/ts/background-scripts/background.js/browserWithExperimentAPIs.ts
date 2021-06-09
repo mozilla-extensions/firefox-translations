@@ -2,7 +2,10 @@ import { browser as crossBrowser, Events } from "webextension-polyfill-ts";
 import Event = Events.Event;
 import { TranslationRelevantFxTelemetryMetrics } from "../../../../core/ts/background-scripts/background.js/telemetry/Telemetry";
 import { NativeTranslateUiState } from "./NativeTranslateUiBroker";
-import { DetectedLanguageResults } from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
+import {
+  DetectedLanguageResults,
+  DetectLanguageParams,
+} from "../../../../core/ts/background-scripts/background.js/lib/LanguageDetector";
 
 type StandardInfobarInteractionEvent = Event<
   (tabId: number, from: string, to: string) => void
@@ -28,7 +31,9 @@ interface BrowserWithExperimentAPIs extends browserInterface {
       >;
     };
     languageDetector: {
-      detectLanguage: (str: string) => Promise<DetectedLanguageResults>;
+      detectLanguage: (
+        params: DetectLanguageParams,
+      ) => Promise<DetectedLanguageResults>;
     };
     translateUi: {
       start: () => Promise<void>;
