@@ -1,22 +1,22 @@
 {
   "extensionName": {
-    "message": "Firefox Translations",
+    "message": "Firefox Tõlged",
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Neural Machine Translation for the browser.",
+    "message": "Neural Machine Translation brauseri jaoks.",
     "description": "Description of the extension."
   },
   "currentlyDownloadingTranslationEngine": {
-    "message": "Currently downloading translation engine",
+    "message": "Praegu laaditakse tõlkemootor",
     "description": "Informs the user that the translations feature is currently downloading the translation engine."
   },
   "currentlyDownloadingLanguageModel": {
-    "message": "Currently downloading language model",
+    "message": "Praegu allalaadimine keelemudel",
     "description": "Informs the user that the translations feature is currently downloading the language model files."
   },
   "detailedDownloadProgress": {
-    "message": "$PERCENTAGE$% out of $MB$ mb downloaded",
+    "message": "$PERCENTAGE$% $MB$ mb allalaaditud",
     "description": "Informs the user how the language model file downloading is progressing.",
     "placeholders": {
       "percentage": {
@@ -30,15 +30,15 @@
     }
   },
   "currentlyLoadingLanguageModel": {
-    "message": "Currently loading language model",
+    "message": "Praegu laadiv keelemudel",
     "description": "Informs the user that the translations feature is currently loading the language model files into memory."
   },
   "loadedLanguageModel": {
-    "message": "Language model loaded",
+    "message": "Keelemudel koormatud",
     "description": "Informs the user that the translations feature is has loaded the language model files into memory."
   },
   "partsLeftToTranslate": {
-    "message": "Parts left to translate: $NUM$",
+    "message": "Osad jätta tõlkida: $NUM$",
     "description": "Informs the user that the translations feature has $NUM$ parts left to translate.",
     "placeholders": {
       "num": {
