@@ -107,6 +107,24 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.equal(downloadedModelFiles.length, 3);
   });
 
+  it("csen", async function() {
+    const languagePair = "csen";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      modelRegistry,
+      cache,
+      log,
+      _modelDownloadProgress => {},
+    );
+
+    assert.equal(downloadedModelFiles.length, 3);
+  });
+
   it("ende", async function() {
     const languagePair = "ende";
 
@@ -127,6 +145,24 @@ describe("getBergamotModelsForLanguagePair", function() {
 
   it("enes", async function() {
     const languagePair = "enes";
+
+    const cache = await caches.open(
+      `tests:bergamot-models:${testSuiteExecutionUuid}`,
+    );
+    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
+      languagePair,
+      config.bergamotModelsBaseUrl,
+      modelRegistry,
+      cache,
+      log,
+      _modelDownloadProgress => {},
+    );
+
+    assert.equal(downloadedModelFiles.length, 3);
+  });
+
+  it("encs", async function() {
+    const languagePair = "encs";
 
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
