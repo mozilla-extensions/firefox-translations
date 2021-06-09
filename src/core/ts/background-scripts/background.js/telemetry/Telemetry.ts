@@ -55,9 +55,9 @@ export interface TranslationRelevantFxTelemetryMetrics {
   systemCpuCount: number;
   systemCpuCores: number;
   systemCpuVendor: string;
-  systemCpuFamily: string;
-  systemCpuModel: string;
-  systemCpuStepping: string;
+  systemCpuFamily: number;
+  systemCpuModel: number;
+  systemCpuStepping: number;
   systemCpuL2cacheKB: number;
   systemCpuL3cacheKB: number;
   systemCpuSpeedMhz: number;
