@@ -179,7 +179,8 @@ metadata:
       - anatal-all@mozilla.com
     expires: 2021-08-10
   cpu_family:
-    type: string
+    type: quantity
+    unit: enum
     lifetime: ping
     send_in_pings:
       - custom
@@ -195,7 +196,8 @@ metadata:
       - anatal-all@mozilla.com
     expires: 2021-08-10
   cpu_model:
-    type: string
+    type: quantity
+    unit: enum
     lifetime: ping
     send_in_pings:
       - custom
@@ -211,7 +213,8 @@ metadata:
       - anatal-all@mozilla.com
     expires: 2021-08-10
   cpu_stepping:
-    type: string
+    type: quantity
+    unit: enum
     lifetime: ping
     send_in_pings:
       - custom
