@@ -36,7 +36,7 @@ export const modelRegistry: ModelRegistry = {
   encs: {
     vocab: {
       name: "vocab.csen.spm",
-      size: 825463,
+      size: 769763,
       estimatedCompressedSize: 366392,
       expectedSha256Hash:
         "f71cc5d045e479607078e079884f44032f5a0b82547fb96eefa29cd1eb47c6f3",
@@ -50,7 +50,7 @@ export const modelRegistry: ModelRegistry = {
     },
     model: {
       name: "model.encs.intgemm.alphas.bin",
-      size: 17140755,
+      size: 17140756,
       estimatedCompressedSize: 12630325,
       expectedSha256Hash:
         "9a2fe0588bd972accfc801e2f31c945de0557804a91666ae5ab43b94fb74ac4b",
