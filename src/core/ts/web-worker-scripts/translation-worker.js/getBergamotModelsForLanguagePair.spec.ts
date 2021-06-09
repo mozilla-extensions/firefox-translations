@@ -40,9 +40,16 @@ const dummyModelRegistryEntry = {
   },
 };
 
+/* eslint-disable mocha/no-setup-in-describe */
 describe("getBergamotModelsForLanguagePair", function() {
-  it("esen", async function() {
-    const languagePair = "esen";
+  const languagePairsLeftToTest = config.supportedLanguagePairs;
+  const [
+    firstLanguagePairFrom,
+    firstLanguagePairTo,
+  ] = languagePairsLeftToTest.shift();
+  const firstLanguagePair = `${firstLanguagePairFrom}${firstLanguagePairTo}`;
+  it(`Download language pair: ${firstLanguagePair}`, async function() {
+    const languagePair = firstLanguagePair;
 
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
@@ -67,8 +74,8 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.isAtLeast(latestModelDownloadProgressSeen.bytesDownloaded, 1);
   });
 
-  it("esen again", async function() {
-    const languagePair = "esen";
+  it(`Download language pair again: ${firstLanguagePair}`, async function() {
+    const languagePair = firstLanguagePair;
 
     const cache = await caches.open(
       `tests:bergamot-models:${testSuiteExecutionUuid}`,
@@ -89,115 +96,28 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.equal(latestModelDownloadProgressSeen.bytesDownloaded, 0);
   });
 
-  it("eten", async function() {
-    const languagePair = "eten";
+  // Download all remaining supported language pairs
+  languagePairsLeftToTest.forEach(([from, to]) => {
+    const languagePair = `${from}${to}`;
+    const testName = `Download language pair: ${languagePair}`;
+    it(testName, async function() {
+      const cache = await caches.open(
+        `tests:bergamot-models:${testSuiteExecutionUuid}`,
+      );
+      const downloadedModelFiles = await getBergamotModelsForLanguagePair(
+        languagePair,
+        config.bergamotModelsBaseUrl,
+        modelRegistry,
+        cache,
+        log,
+        _modelDownloadProgress => {},
+      );
 
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
+      assert.equal(downloadedModelFiles.length, 3);
+    });
   });
 
-  it("csen", async function() {
-    const languagePair = "csen";
-
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
-  });
-
-  it("ende", async function() {
-    const languagePair = "ende";
-
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
-  });
-
-  it("enes", async function() {
-    const languagePair = "enes";
-
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
-  });
-
-  it("encs", async function() {
-    const languagePair = "encs";
-
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
-  });
-
-  it("enet", async function() {
-    const languagePair = "enet";
-
-    const cache = await caches.open(
-      `tests:bergamot-models:${testSuiteExecutionUuid}`,
-    );
-    const downloadedModelFiles = await getBergamotModelsForLanguagePair(
-      languagePair,
-      config.bergamotModelsBaseUrl,
-      modelRegistry,
-      cache,
-      log,
-      _modelDownloadProgress => {},
-    );
-
-    assert.equal(downloadedModelFiles.length, 3);
-  });
-
-  it("download still works (albeit not persisted) when files to download exceeds available storage quota", async function() {
+  it("Download still works (albeit not persisted) when files to download exceeds available storage quota", async function() {
     const languagePair = "dummy";
 
     const cache = await caches.open(
@@ -237,7 +157,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     assert.isAtLeast(latestModelDownloadProgressSeen.bytesDownloaded, 1);
   });
 
-  it("failing download integrity checks", async function() {
+  it("Failing download integrity checks", async function() {
     const languagePair = "dummy";
 
     const cache = await caches.open(
@@ -270,7 +190,7 @@ describe("getBergamotModelsForLanguagePair", function() {
     ).to.be.rejectedWith(Error);
   });
 
-  it("a language pair that is missing on the remote server", async function() {
+  it("A language pair that is missing on the remote server results in an error", async function() {
     const languagePair = "xyz";
 
     const cache = await caches.open(
