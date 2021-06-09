@@ -15,7 +15,8 @@ import {
 } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
-import { config, modelRegistry } from "../../config";
+import { config } from "../../config";
+import { modelRegistry } from "../../modelRegistry";
 import {
   DownloadedFile,
   RemoteFile,

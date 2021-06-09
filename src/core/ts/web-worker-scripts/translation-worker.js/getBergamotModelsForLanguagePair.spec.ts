@@ -9,7 +9,8 @@ const { assert, expect } = chai;
 
 import { getBergamotModelsForLanguagePair } from "./getBergamotModelsForLanguagePair";
 
-import { config, modelRegistry } from "../../config";
+import { config } from "../../config";
+import { modelRegistry } from "../../modelRegistry";
 import { nanoid } from "nanoid";
 import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
