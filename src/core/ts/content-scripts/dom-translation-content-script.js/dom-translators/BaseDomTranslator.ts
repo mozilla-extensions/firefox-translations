@@ -9,6 +9,21 @@ import {
   ModelDownloadProgress,
   TranslationResults,
 } from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { detag } from "./detagAndProject";
+
+export interface DerivedTranslationDocumentData {
+  translationRoots: TranslationItem[];
+  translationRootsVisible: TranslationItem[];
+  translationRootsVisibleInViewport: TranslationItem[];
+  translationRootsCount: number;
+  simpleTranslationRootsCount: number;
+  texts: string[];
+  textsVisible: string[];
+  textsVisibleInViewport: string[];
+  wordCount: number;
+  wordCountVisible: number;
+  wordCountVisibleInViewport: number;
+}
 
 export interface TranslationRequestData {
   markupsToTranslate: string[];
@@ -103,6 +118,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   public translatedCharacterCount: number;
   public errorsEncountered: Error[];
   public partialSuccess: boolean;
+  public derivedTranslationDocumentData: DerivedTranslationDocumentData;
   private translationApiClient: TranslationApiClient;
   private parseChunkResult: TranslationParseChunkResultFunction;
   private translationApiLimits: TranslationApiLimits;
@@ -153,11 +169,24 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     const chunksBeingProcessed: Promise<TranslationResponseData>[] = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
-    const { translationRoots } = this.translationDocument;
+    // Derive document translation data upfront
+    const startDeriveDocumentTranslationData = performance.now();
+    this.derivedTranslationDocumentData = await this.deriveDocumentTranslationData();
+    console.log({
+      derivedTranslationDocumentData: this.derivedTranslationDocumentData,
+    });
+    const endDeriveDocumentTranslationData = performance.now();
+    console.info(
+      `Deriving document translation data took ${(endDeriveDocumentTranslationData -
+        startDeriveDocumentTranslationData) /
+        1000} seconds`,
+    );
+
     const {
+      translationRoots,
       translationRootsVisible,
       translationRootsVisibleInViewport,
-    } = await this.translationDocument.determineVisibilityOfTranslationRoots();
+    } = this.derivedTranslationDocumentData;
     this.translationRootsPickedUpForTranslation = [];
 
     const progressOfIndividualTranslationRequests: Map<
@@ -264,6 +293,58 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     }
     return {
       characterCount: this.translatedCharacterCount,
+    };
+  }
+
+  async deriveDocumentTranslationData(): Promise<
+    DerivedTranslationDocumentData
+  > {
+    const {
+      translationRoots,
+      translationRootsVisible,
+      translationRootsVisibleInViewport,
+    } = await this.translationDocument.determineVisibilityOfTranslationRoots();
+
+    const generateOriginalMarkupToTranslate = translationRoot =>
+      this.translationDocument.generateMarkupToTranslate(translationRoot);
+    const removeTags = originalString => {
+      const detaggedString = detag(originalString);
+      return detaggedString.plainString;
+    };
+
+    const texts = translationRoots
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsVisible = translationRootsVisible
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsVisibleInViewport = translationRootsVisibleInViewport
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+
+    const wordCount = texts.join(" ").split(" ").length;
+    const wordCountVisible = textsVisible.join(" ").split(" ").length;
+    const wordCountVisibleInViewport = textsVisibleInViewport
+      .join(" ")
+      .split(" ").length;
+
+    const translationRootsCount = translationRoots.length;
+    const simpleTranslationRootsCount = translationRoots.filter(
+      translationRoot => translationRoot.isSimleTranslationRoot,
+    ).length;
+
+    return {
+      translationRoots,
+      translationRootsVisible,
+      translationRootsVisibleInViewport,
+      translationRootsCount,
+      simpleTranslationRootsCount,
+      texts,
+      textsVisible,
+      textsVisibleInViewport,
+      wordCount,
+      wordCountVisible,
+      wordCountVisibleInViewport,
     };
   }
 

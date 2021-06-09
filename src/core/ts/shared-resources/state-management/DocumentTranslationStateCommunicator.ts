@@ -6,6 +6,7 @@ import { FrameInfo } from "../types/bergamot.types";
 import { TranslationStatus } from "../models/BaseTranslationState";
 import { ExtensionState } from "../models/ExtensionState";
 import {
+  DerivedTranslationDocumentData,
   FrameTranslationProgress,
   TranslationRequestProgress,
 } from "../../content-scripts/dom-translation-content-script.js/dom-translators/BaseDomTranslator";
@@ -50,6 +51,41 @@ export class DocumentTranslationStateCommunicator {
 
   broadcastUpdatedTranslationStatus(translationStatus: TranslationStatus) {
     this.broadcastUpdatedAttributeValue("translationStatus", translationStatus);
+  }
+
+  broadcastTranslationAttemptConcluded(
+    translationError: boolean,
+    derivedTranslationDocumentData: DerivedTranslationDocumentData,
+  ) {
+    const {
+      wordCount,
+      wordCountVisible,
+      wordCountVisibleInViewport,
+    } = derivedTranslationDocumentData;
+    this.patchDocumentTranslationState([
+      {
+        op: "replace",
+        path: ["translationStatus"],
+        value: translationError
+          ? TranslationStatus.ERROR
+          : TranslationStatus.TRANSLATED,
+      },
+      {
+        op: "replace",
+        path: ["wordCount"],
+        value: wordCount,
+      },
+      {
+        op: "replace",
+        path: ["wordCountVisible"],
+        value: wordCountVisible,
+      },
+      {
+        op: "replace",
+        path: ["wordCountVisibleInViewport"],
+        value: wordCountVisibleInViewport,
+      },
+    ]);
   }
 
   /**

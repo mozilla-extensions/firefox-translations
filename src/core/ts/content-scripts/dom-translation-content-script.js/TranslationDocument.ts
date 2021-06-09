@@ -318,6 +318,7 @@ export class TranslationDocument {
     }
 
     return {
+      translationRoots,
       translationRootsVisible,
       translationRootsVisibleInViewport,
     };
