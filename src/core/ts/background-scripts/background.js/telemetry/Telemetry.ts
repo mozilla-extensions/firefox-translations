@@ -69,7 +69,7 @@ export interface TranslationRelevantFxTelemetryMetrics {
  *
  * Synchronous methods here is important, since it is the only way to guarantee that multiple Glean API calls are
  * executed sequentially and not interleaved with other asynchronous Telemetry recording.
- * For more information, see: https://github.com/mozilla-extensions/bergamot-browser-extension/pull/76#discussion_r602128568
+ * For more information, see: https://github.com/mozilla-extensions/firefox-translations/pull/76#discussion_r602128568
  *
  * Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
  * For this reason we surround all code invoking Glean.js in try/catch blocks.
