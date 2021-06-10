@@ -65,8 +65,7 @@
     "e2e-tests:cross-browser-ui:firefox": "export TARGET_BROWSER=firefox UI=cross-browser-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/production/firefox/cross-browser-ui/bergamot-browser-extension-$npm_package_version-firefox-cross-browser-ui.xpi GECKODRIVER_URL=http://127.0.0.1:4444; ts-mocha -p test/e2e/tsconfig.json test/e2e/tests/cross-browser-ui/*.spec.ts --bail --full-trace --timeout 10000",
     "e2e-tests:firefox-infobar-ui": "export TARGET_BROWSER=firefox UI=firefox-infobar-ui FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} EXTENSION_ARTIFACT=./dist/production/firefox/firefox-infobar-ui/firefox-translations-$npm_package_version.xpi GECKODRIVER_URL=http://127.0.0.1:4444; ts-mocha -p test/e2e/tsconfig.json test/e2e/tests/firefox-infobar-ui/*.spec.ts --bail --full-trace --timeout 10000",
     "e2e-tests:test-infra": "export FIREFOX_BINARY=${FIREFOX_BINARY:-nightly} GECKODRIVER_URL=http://127.0.0.1:4444; ts-mocha -p test/e2e/tsconfig.json test/e2e/tests/test-infra/*.spec.ts --bail --full-trace --timeout 10000",
-    "format": "npm-run-all -s -n format:prettier format:docs format:eslint format:fixpack",
-    "format:docs": "doctoc --title '**Contents**' docs/*.md && prettier '**/*.md' --ignore-path=.eslintignore --write",
+    "format": "npm-run-all -s -n format:prettier format:eslint format:fixpack",
     "format:eslint": "npm run lint:eslint -- --fix",
     "format:fixpack": "fixpack && fixpack src/core/package.json && fixpack src/cross-browser-ui/package.json && fixpack src/firefox-infobar-ui/package.json",
     "format:prettier": "prettier '**/*.{css,scss,js,ts,tsx,json,jsm,html}' --ignore-path=.eslintignore --write",
@@ -94,6 +93,7 @@
   "workspaces": [
     "src/core",
     "src/cross-browser-ui",
-    "src/firefox-infobar-ui"
+    "src/firefox-infobar-ui",
+    "docs"
   ]
 }

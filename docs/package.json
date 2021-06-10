@@ -1,0 +1,27 @@
+{
+  "name": "docs",
+  "description": "docs",
+  "version": "0.0.0",
+  "dependencies": {
+    "core": "0.0.0",
+    "cross-browser-ui": "0.0.0",
+    "firefox-infobar-ui": "0.0.0",
+    "mermaid": "^8.10.2"
+  },
+  "devDependencies": {
+    "light-server": "^2.9.1",
+    "link-checker": "^1.4.2",
+    "typedoc": "^0.20.36",
+    "typedoc-plugin-markdown": "^3.9.0"
+  },
+  "private": true,
+  "scripts": {
+    "build": "bin/build-docs.sh",
+    "api-docs": "typedoc --options typedoc.json",
+    "format": "prettier '**/*.{md,css,js,json,html}' --ignore-path=.eslintignore --write",
+    "serve": "http-serve ../build/docs -p 3000",
+    "spellcheck:list": "bin/spellcheck.sh list",
+    "spellcheck:check": "bin/spellcheck.sh check",
+    "watch": "yarn build && light-server -s ../build/docs -p 3000 -w \"** # yarn build\""
+  }
+}

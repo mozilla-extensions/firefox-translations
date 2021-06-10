@@ -1,7 +1,9 @@
 version: 2.1
 
 jobs:
-  build_and_test_extension:
+  ###########################################################################
+  # Ordinary "build and test" CI flow
+  build-and-test-extension:
     docker:
       - image: circleci/node:latest-browsers
 
@@ -109,8 +111,103 @@ jobs:
           path: "test/e2e/results"
           destination: "test/e2e/results"
 
-workflows:
+  ###########################################################################
+  # Docs
+  generate-docs:
+    docker:
+      - image: circleci/rust:latest
+    steps:
+      - checkout
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - run:
+          name: Install mdbook-dtmo
+          command: |
+            MDBOOK_VERSION=0.8.1
+            MDBOOK="mdbook-dtmo-${MDBOOK_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            MDBOOK_SHA256=5b8fc7444816c685ae6a3018e6168844a2fcde73e681a9bfbe4775f361dec64c
+            curl -sfSL --retry 5 -O "https://github.com/badboy/mdbook-dtmo/releases/download/${MDBOOK_VERSION}/${MDBOOK}"
+            echo "${MDBOOK_SHA256} *${MDBOOK}" | shasum -a 256 -c -
+            tar -xvf "${MDBOOK}"
+            # We rename it to mdbook here, so other tools keep working as expected
+            mv mdbook-dtmo /usr/local/cargo/bin/mdbook
+            mdbook --version
+      - run:
+          name: Install npm deps
+          command: cd docs && yarn install
+      - run:
+          name: Build documentation
+          command: cd docs && yarn build
+      - persist_to_workspace:
+          root: generated-docs/
+          paths:
+            - docs/book
+            - docs/dev
+            - docs/shared
+            - docs/index.html
 
-  build-and-test:
+  docs-spellcheck:
+    docker:
+      # Use Ubuntu Focal (20.04) so we get aspell 0.60.8 or later (which contains markdown support)
+      - image: circleci/buildpack-deps:focal
+    steps:
+      - checkout
+      - run:
+          name: Upgrade packages
+          command: sudo apt update
+      - run:
+          name: Install aspell
+          command: sudo apt install aspell aspell-en
+      - run:
+          name: Check documentation spelling
+          command: bin/spellcheck.sh list
+
+  # via https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: generated-docs/
+      - run:
+          name: Disable jekyll builds
+          command: touch generated-docs/docs/.nojekyll
+      - run:
+          name: Show contents
+          command: ls -R
+      # Needed for write access to the GitHub repository;
+      # see https://circleci.com/docs/2.0/gh-bb-integration/#deployment-keys-and-user-keys
+      - add_ssh_keys:
+          fingerprints:
+            - "74:8f:b2:1e:d9:ac:2b:d3:d5:62:b3:55:4a:5e:fd:ed"
+      # The gh-pages npm package can be used to push a directory to a git branch;
+      # see https://www.npmjs.com/package/gh-pages
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: |
+            git config user.email "ci-build@bergamot-browser-extension"
+            git config user.name "CircleCI docs-deploy job"
+            npm install -g --silent gh-pages@2.0.1
+            gh-pages --dotfiles --message "[skip ci] Updates" --dist generated-docs/docs
+
+
+###########################################################################
+# Workflows
+
+workflows:
+  version: 2
+  ci:
     jobs:
-      - build_and_test_extension
+      - build-and-test-extension
+      - docs-spellcheck
+      - generate-docs:
+          requires:
+            - docs-spellcheck
+      - docs-deploy:
+          requires:
+            - generate-docs
+          filters:
+            branches:
+              only: main
