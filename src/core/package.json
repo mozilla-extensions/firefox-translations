@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "description": "bergamot-browser-extension/core",
+  "description": "core",
   "version": "0.0.0",
   "dependencies": {
     "@mozilla/glean": "^0.15.0",

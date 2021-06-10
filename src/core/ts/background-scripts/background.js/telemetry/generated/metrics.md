@@ -22,7 +22,7 @@ This ping includes the [client id](https://mozilla.github.io/glean/book/user/pin
 
 **Bugs related to this ping:**
 
-- <https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42>
+- <https://github.com/mozilla-extensions/firefox-translations/issues/42>
 
 All Glean pings contain built-in metrics in the [`ping_info`](https://mozilla.github.io/glean/book/user/pings/index.html#the-ping_info-section) and [`client_info`](https://mozilla.github.io/glean/book/user/pings/index.html#the-client_info-section) sections.
 

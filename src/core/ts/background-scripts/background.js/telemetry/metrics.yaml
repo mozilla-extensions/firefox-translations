@@ -22,7 +22,7 @@ metadata:
     description: |
       Translation source language.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -38,7 +38,7 @@ metadata:
     description: |
       Translation target language.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -54,7 +54,7 @@ metadata:
     description: |
       Firefox Telemetry client id.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/92
+      - https://github.com/mozilla-extensions/firefox-translations/issues/92
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -70,7 +70,7 @@ metadata:
     description: |
       Extension version
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+      - https://github.com/mozilla-extensions/firefox-translations/issues/137
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -87,7 +87,7 @@ metadata:
       Extension build id, indicating which git revision
       and build config was used to produce this build
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+      - https://github.com/mozilla-extensions/firefox-translations/issues/137
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -103,7 +103,7 @@ metadata:
     description: |
       Bergamot translator engine version
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/137
+      - https://github.com/mozilla-extensions/firefox-translations/issues/137
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -120,7 +120,7 @@ metadata:
     description: |
       Telemetry Environment `system.memoryMB` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -137,7 +137,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.count` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -154,7 +154,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.cores` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -170,7 +170,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.vendor` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -187,7 +187,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.family` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -204,7 +204,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.model` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -221,7 +221,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.stepping` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -238,7 +238,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.l2cacheKB` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -255,7 +255,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.l3cacheKB` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -272,7 +272,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.speedMHz` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -288,7 +288,7 @@ metadata:
     description: |
       Telemetry Environment `system.cpu.extensions` metric
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/147
+      - https://github.com/mozilla-extensions/firefox-translations/issues/147
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -307,7 +307,7 @@ performance:
       Timing from "translation button pressed"
       to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
+      - https://github.com/mozilla-extensions/firefox-translations/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -325,7 +325,7 @@ performance:
       Speed of the translation from "translation button
       pressed" to "full page is translated".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
+      - https://github.com/mozilla-extensions/firefox-translations/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -343,8 +343,8 @@ performance:
       (Renamed from model_download_time to model_download_time_num as part of
       changing type from string to quantity)
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/138
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -362,8 +362,8 @@ performance:
       (Renamed from model_load_time to model_load_time_num as part of
       changing type from string to quantity)
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/138
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/138
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -379,8 +379,8 @@ performance:
     description: |
       Time spent on translation by the translation engine.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -397,8 +397,8 @@ performance:
     description: |
       Speed of translation as measured by the translation engine.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/155
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/155
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -415,8 +415,8 @@ performance:
     description: |
       Total number of words on the original web page.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/166
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/166
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -434,8 +434,8 @@ performance:
       Total number of visible words on the original web page that
       were visible in the viewport at the time of "translation button pressed".
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/166
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/166
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -451,7 +451,7 @@ performance:
     description: |
       Quality estimation of translation.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -469,7 +469,7 @@ infobar:
     description: |
       The translation infobar was automatically displayed in a browser.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -485,7 +485,7 @@ infobar:
     description: |
       The translation infobar was closed.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -501,7 +501,7 @@ infobar:
     description: |
       The "Translate" button was pressed on translation infobar.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -517,7 +517,7 @@ infobar:
     description: |
       "Never translate language" button in the infobar options was pressed.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -533,7 +533,7 @@ infobar:
     description: |
       "Never translate site" button in the infobar options was pressed.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -549,7 +549,7 @@ infobar:
     description: |
       "Not now" button on the infobar was pressed.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -565,7 +565,7 @@ infobar:
     description: |
       "This page is in" language was changed manually.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -583,7 +583,7 @@ service:
     description: |
       Language pair of user and website languages is not supported.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -599,7 +599,7 @@ service:
     description: |
       The user and website languages do not match.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -617,7 +617,7 @@ errors:
     description: |
       The translation procedure has failed.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -633,7 +633,7 @@ errors:
     description: |
       Marian code related error.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -649,7 +649,7 @@ errors:
     description: |
       Memory allocation error.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -665,7 +665,7 @@ errors:
     description: |
       Failed to download a model for a supported language pair.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -683,7 +683,7 @@ test:
     description: |
       Test counter.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -699,7 +699,7 @@ test:
     description: |
       Test event.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
@@ -715,7 +715,7 @@ test:
     description: |
       Test string.
     bugs:
-      - https://github.com/mozilla-extensions/bergamot-browser-extension/issues/42
+      - https://github.com/mozilla-extensions/firefox-translations/issues/42
     data_reviews:
       - https://bugzilla.mozilla.org/show_bug.cgi?id=1694813
     data_sensitivity:
