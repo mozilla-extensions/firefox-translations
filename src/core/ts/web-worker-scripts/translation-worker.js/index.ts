@@ -33,9 +33,12 @@ interface DownloadedFilesByType {
   vocab: DownloadedFile;
 }
 
+// https://stackoverflow.com/a/54382037
+const ctx: Worker = self as any;
+
 const init = async () => {
   const log = message => {
-    postMessage({
+    ctx.postMessage({
       type: "log",
       message,
     });
@@ -305,7 +308,7 @@ gemm-precision: int8shift
         requestId,
         errorSource,
       };
-      postMessage(message);
+      ctx.postMessage(message);
     };
 
     onmessage = function(msg: { data: IncomingBergamotTranslatorAPIMessage }) {
@@ -326,7 +329,7 @@ gemm-precision: int8shift
                 requestId,
                 modelDownloadProgress,
               };
-              postMessage(message);
+              ctx.postMessage(message);
             },
           )
             .then(loadModelResults => {
@@ -335,7 +338,7 @@ gemm-precision: int8shift
                 requestId,
                 loadModelResults,
               };
-              postMessage(message);
+              ctx.postMessage(message);
             })
             .catch(error => {
               if (error.name === "FileDownloadError") {
@@ -358,7 +361,7 @@ gemm-precision: int8shift
             requestId,
             translationResults,
           };
-          postMessage(message);
+          ctx.postMessage(message);
         } catch (error) {
           handleError(error, requestId, "translate");
         }
@@ -372,7 +375,7 @@ gemm-precision: int8shift
     };
 
     // Send a message indicating that the worker is ready to receive WASM-related messages
-    postMessage("ready");
+    ctx.postMessage("ready");
     log("The worker is ready to receive translation-related messages");
   });
 };

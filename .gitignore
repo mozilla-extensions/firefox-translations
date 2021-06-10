@@ -5,6 +5,7 @@ dist/
 build/
 test/build/
 test/results/coverage/
+debug/
 stats.json
 yarn-error.log
 *.map

@@ -1,6 +1,7 @@
 # do not lint/format generated artifacts
 dist/
 build/
+debug/
 test/e2e/results/
 stats.json
 yarn-error.log
