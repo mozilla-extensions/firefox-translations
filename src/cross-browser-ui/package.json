@@ -1,6 +1,6 @@
 {
   "name": "cross-browser-ui",
-  "description": "bergamot-browser-extension/cross-browser-ui",
+  "description": "cross-browser-ui",
   "version": "0.0.0",
   "dependencies": {
     "@ant-design/colors": "^4.0.5",
