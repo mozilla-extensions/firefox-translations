@@ -137,6 +137,9 @@ jobs:
           name: Install npm deps
           command: cd docs && yarn install
       - run:
+          name: Generate API docs
+          command: cd docs && yarn generate-api-docs
+      - run:
           name: Build documentation
           command: cd docs && yarn build
       - persist_to_workspace:

@@ -5,9 +5,9 @@
     "../src/firefox-infobar-ui/ts"
   ],
   "theme": "markdown",
-  "exclude": "**/*.tsx",
+  "exclude": ["**/*.tsx", "**/*+(index|.spec).ts"],
   "excludeExternals": true,
   "readme": "none",
-  "externalPattern": "**/node_modules/**",
-  "out": "api-docs"
+  "externalPattern": ["**/node_modules/**"],
+  "out": "dev/api-docs"
 }

@@ -1,3 +1,7 @@
+# don't lint/format generated files
+dev/api-docs/
+dev/api-docs-summary.md
+dev/SUMMARY.md
 # don't lint/format package.json since npm install formats it differently by default
 package.json
 # don't lint/format third party modules

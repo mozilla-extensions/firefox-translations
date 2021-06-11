@@ -31,6 +31,7 @@ if echo "$output" | grep -q "\[ERROR\]" ; then
 fi
 
 # Build the dev book
+cat dev/SUMMARY.tpl.md dev/api-docs-summary.md > dev/SUMMARY.md
 output=$(mdbook build dev/ 2>&1)
 if echo "$output" | grep -q "\[ERROR\]" ; then
     exit 1

@@ -17,7 +17,7 @@
   "private": true,
   "scripts": {
     "build": "bin/build-docs.sh",
-    "api-docs": "typedoc --options typedoc.json",
+    "generate-api-docs": "bin/generate-api-docs.sh",
     "format": "prettier '**/*.{md,css,js,json,html}' --ignore-path=.eslintignore --write",
     "serve": "http-serve ../build/docs -p 3000",
     "spellcheck:list": "bin/spellcheck.sh list",
