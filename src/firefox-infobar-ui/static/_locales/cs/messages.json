@@ -1,22 +1,22 @@
 {
   "extensionName": {
-    "message": "Firefoxace",
+    "message": "Překladač pro Firefox",
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Neural Machine Překlad pro prohlížeč.",
+    "message": "Strojový překladač cizích jazyků založený na neuronové síti.",
     "description": "Description of the extension."
   },
   "currentlyDownloadingTranslationEngine": {
-    "message": "V současné době stahování jazykového modelu",
+    "message": "Stahování překladače",
     "description": "Informs the user that the translations feature is currently downloading the translation engine."
   },
   "currentlyDownloadingLanguageModel": {
-    "message": "Aktuálně stahování překladatelského stroje",
+    "message": "Stahování jazykového modelu",
     "description": "Informs the user that the translations feature is currently downloading the language model files."
   },
   "detailedDownloadProgress": {
-    "message": "$PERCENTAGE$% z $MB$ mb staženo",
+    "message": "Staženo $PERCENTAGE$ % z $MB$ MB",
     "description": "Informs the user how the language model file downloading is progressing.",
     "placeholders": {
       "percentage": {
@@ -25,20 +25,20 @@
       },
       "mb": {
         "content": "$2",
-        "example": "22.2"
+        "example": "22,2"
       }
     }
   },
   "currentlyLoadingLanguageModel": {
-    "message": "V současnosti načítání jazykového modelu",
+    "message": "Načítání jazykového modelu",
     "description": "Informs the user that the translations feature is currently loading the language model files into memory."
   },
   "loadedLanguageModel": {
-    "message": "Jazykový model načtený",
+    "message": "Jazykový model načten",
     "description": "Informs the user that the translations feature is has loaded the language model files into memory."
   },
   "partsLeftToTranslate": {
-    "message": "Z dílků zbývá přeložit: $NUM$",
+    "message": "Zbývající části k přeložení: $NUM$",
     "description": "Informs the user that the translations feature has $NUM$ parts left to translate.",
     "placeholders": {
       "num": {
