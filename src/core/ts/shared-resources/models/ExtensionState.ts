@@ -142,33 +142,45 @@ export class ExtensionState extends Model({
           url,
         } = getSnapshot(tabTopFrameState);
 
+        const isNotUndefined = val => val !== undefined;
+
         // Sum some state attributes
         const wordCount = documentTranslationStates
           .map(dts => dts.wordCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const wordCountVisible = documentTranslationStates
           .map(dts => dts.wordCountVisible)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const wordCountVisibleInViewport = documentTranslationStates
           .map(dts => dts.wordCountVisibleInViewport)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const totalModelLoadWallTimeMs = documentTranslationStates
           .map(dts => dts.totalModelLoadWallTimeMs)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const totalTranslationWallTimeMs = documentTranslationStates
           .map(dts => dts.totalTranslationWallTimeMs)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const totalTranslationEngineRequestCount = documentTranslationStates
           .map(dts => dts.totalTranslationEngineRequestCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
         const queuedTranslationEngineRequestCount = documentTranslationStates
           .map(dts => dts.queuedTranslationEngineRequestCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
 
         // Merge translation-progress-related booleans as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
-        const translationInitiationTimestamps = documentTranslationStates.map(
-          (dts: DocumentTranslationState) => dts.translationInitiationTimestamp,
-        );
+        const translationInitiationTimestamps = documentTranslationStates
+          .map(
+            (dts: DocumentTranslationState) =>
+              dts.translationInitiationTimestamp,
+          )
+          .filter(isNotUndefined);
         const translationInitiationTimestamp = Math.min(
           ...translationInitiationTimestamps,
         );
