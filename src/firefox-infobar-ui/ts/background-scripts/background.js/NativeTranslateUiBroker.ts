@@ -242,7 +242,6 @@ export class NativeTranslateUiBroker {
           return NativeTranslateUiStateInfobarState.STATE_UNAVAILABLE;
         case TranslationStatus.OFFER:
           return NativeTranslateUiStateInfobarState.STATE_OFFER;
-        case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
         case TranslationStatus.TRANSLATING:
           return NativeTranslateUiStateInfobarState.STATE_TRANSLATING;
         case TranslationStatus.TRANSLATED:
