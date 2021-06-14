@@ -17,14 +17,18 @@ import {
 import { BergamotDomTranslatorRequest } from "./BergamotDomTranslatorRequest";
 
 // The maximum amount of net data allowed per request on Bergamot's API.
-export const MAX_REQUEST_DATA = 500000;
+export const MAX_REQUEST_DATA = 10 * 500; // About 500-1000 words per request
 
 // The maximum number of texts allowed to be translated in a single request.
-export const MAX_REQUEST_TEXTS = 100;
+// Currently set to 5000 sentences per request, which should cover
+// any ordinary request with max 500-1000 words per request
+export const MAX_REQUEST_TEXTS = 5000;
 
 // Self-imposed limit of requests. This means that a page that would need
 // to be broken in more than this amount of requests won't be fully translated.
-export const MAX_REQUESTS = 15;
+// Currently set to 1000, which implies that any document with less
+// than 0.5-1 million words will be translated - eventually.
+export const MAX_REQUESTS = 1000;
 
 /**
  * Translates a webpage using Bergamot's Translation backend.
