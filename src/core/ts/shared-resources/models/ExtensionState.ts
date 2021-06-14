@@ -184,8 +184,6 @@ export class ExtensionState extends Model({
           .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
 
-        console.log({ queuedTranslationEngineRequestCount });
-
         // Merge translation-progress-related booleans as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
         const translationInitiationTimestamps = translationRelevantDocumentTranslationStates
           .map(
@@ -196,10 +194,6 @@ export class ExtensionState extends Model({
         const translationInitiationTimestamp = Math.min(
           ...translationInitiationTimestamps,
         );
-        console.log({
-          translationInitiationTimestamp,
-          translationInitiationTimestamps,
-        });
         const modelLoadNecessary = !!translationRelevantDocumentTranslationStates.filter(
           (dts: DocumentTranslationState) => dts.modelLoadNecessary,
         ).length;
