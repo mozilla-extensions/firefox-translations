@@ -2,7 +2,6 @@
 
 import { installExtension, launchFirefox } from "../../utils/setupWebdriver";
 import { navigateToURL } from "../../utils/navigateToURL";
-import { By } from "selenium-webdriver";
 import { assertElementExists } from "../../utils/assertElement";
 import { takeScreenshot } from "../../utils/takeScreenshot";
 import {
@@ -73,18 +72,15 @@ describe("Translation: Multiple frames (with empty child frame)", function() {
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
-  it("Translation of all frames", async function() {
+  it("Translation of all non-empty frames", async function() {
     // ... this test continues the session from the previous test
     await assertOriginalPageElementExists(driver, fixtures.es);
     await translateViaInfobar(driver, tabsCurrentlyOpened);
     await assertTranslationSucceeded(driver, fixtures.es);
-    const iframe = driver.findElement(By.css("iframe"));
-    await driver.switchTo().frame(iframe);
-    await assertTranslationSucceeded(driver, fixtures.es);
     await takeScreenshot(driver, this.test.fullTitle());
   });
 
-  it("Telemetry checks after: Translation of all frames", async function() {
+  it("Telemetry checks after: Translation of all non-empty frames", async function() {
     // ... this test continues the session from the previous test
     const seenTelemetry = await readSeenTelemetry(0, 0, proxyInstanceId);
     assertOnTranslateButtonPressedTelemetry(seenTelemetry[0], "es", "en");
