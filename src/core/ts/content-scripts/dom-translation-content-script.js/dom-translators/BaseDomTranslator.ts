@@ -262,6 +262,16 @@ export class BaseDomTranslator extends MinimalDomTranslator {
       if (domTranslationChunk.isLastChunk) {
         break;
       }
+
+      // Warn if we still have content left to translate but have reached the MAX_REQUESTS limit
+      if (
+        !domTranslationChunk.isLastChunk &&
+        currentRequestOrdinal === MAX_REQUESTS - 1
+      ) {
+        console.warn(
+          `We have reached the MAX_REQUESTS limit of ${MAX_REQUESTS} requests. Remaining parts of the page will be left untranslated`,
+        );
+      }
     }
 
     // Return early with a noop if there is nothing to translate
