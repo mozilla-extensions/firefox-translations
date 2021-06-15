@@ -103,7 +103,9 @@ const init = async () => {
       if (hasChanged("translationStatus")) {
         if (
           currentTabFrameDocumentTranslationState.translationStatus ===
-          TranslationStatus.UNKNOWN
+            TranslationStatus.UNKNOWN &&
+          // Only attempt to detect language in top frames
+          frameInfo.frameId === 0
         ) {
           await domTranslationManager.attemptToDetectLanguage();
         }
