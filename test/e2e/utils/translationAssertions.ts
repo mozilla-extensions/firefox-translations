@@ -10,6 +10,7 @@ export const maxToleratedTranslationDurationInSeconds = 100;
 interface Fixture {
   url: string;
   multipleFramesUrl?: string;
+  multipleFramesWithEmptyChildFrameUrl?: string;
   originalTextToLookFor: string;
   translatedTextToLookFor: string;
 }
@@ -18,6 +19,8 @@ export const fixtures: { [k: string]: Fixture } = {
   es: {
     url: "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html",
     multipleFramesUrl: "http://0.0.0.0:4001/fixtures/multiple-frames.html",
+    multipleFramesWithEmptyChildFrameUrl:
+      "http://0.0.0.0:4001/fixtures/multiple-frames.with-empty-child-frame.html",
     originalTextToLookFor: "Una estrategia republicana para obstaculizar",
     translatedTextToLookFor: "A Republican strategy to hinder",
   },
