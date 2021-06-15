@@ -147,15 +147,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
           break;
         case TranslationStatus.TRANSLATION_UNSUPPORTED:
           break;
-        case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
-          action = (
-            <Button
-              type={"secondary"}
-              label={"Cancel"}
-              onClick={requestCancellation}
-            />
-          );
-          break;
         case TranslationStatus.TRANSLATING:
           action = (
             <Button
@@ -307,7 +298,6 @@ export class Home extends React.Component<HomeProps, HomeState> {
             TranslationStatus.SOURCE_LANGUAGE_UNDERSTOOD,
             TranslationStatus.TRANSLATION_UNSUPPORTED,
             TranslationStatus.OFFER,
-            TranslationStatus.DOWNLOADING_TRANSLATION_MODEL,
             TranslationStatus.TRANSLATING,
             TranslationStatus.TRANSLATED,
           ].includes(translationStatus) && (
