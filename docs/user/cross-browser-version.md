@@ -1,53 +1,11 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+# Cross-browser version
 
-**Contents**
+Firefox Translations is currently a Firefox-only feature since it uses native browser UI elements and takes advantage of Firefox-specific optimizations.
 
-- [Installation instructions](#installation-instructions)
-  - [Firefox - Infobar UI](#firefox---infobar-ui)
-    - [Preparations](#preparations)
-    - [Configuring Nightly to enable the extension](#configuring-nightly-to-enable-the-extension)
-    - [Demo](#demo)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# Installation instructions
-
-This document outlines how to get the v0.4.2 pre-release version of the extension running locally.
-
-Before installing, please take a minute to read [the release notes](https://github.com/mozilla-extensions/firefox-translations/releases/tag/v0.4.2).
+In the past, and possibly sometime in the future, there was/will be releases of cross-browser versions of the feature. The cross-browser version uses no Firefox-specific UI or optimizations.
 
 <!--
-There are three flavors:
-
-- **Firefox - Infobar UI** - Firefox-only version which uses native browser UI elements
-- **Chrome - Cross-browser UI** - Chrome version of the extension - uses a cross-browser compatible UI (since we have no way of modifying native browser UI elements on Chrome)
-- **Firefox - Cross-browser UI** - Firefox version of the extension with the cross-browser compatible UI
--->
-
-## Firefox - Infobar UI
-
-### Preparations
-
-- The current release requires bleeding edge browser capabilities. If you haven't already, download and install Firefox Nightly (English or German edition) from [https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly](https://www.mozilla.org/en-US/firefox/all/#product-desktop-nightly).
-- If you have tried any previous version of the Firefox extension, please make sure to remove/uninstall it before installing the new version. You will find it named "Firefox Translations" or "Bergamot Translate" in `about:addons`.
-
-### Configuring Nightly to enable the extension
-
-- Change the following preferences `false` in `about:config`:
-  - `extensions.translations.disabled`
-- The extension is now enabled
-
-### Demo
-
-- To try it out, visit a page in a language combination that is supported for translation, eg one of:
-  - With Firefox Nightly English edition, visit a page in either Spanish or Estonian, eg https://www.mozilla.org/es-ES/ or https://www.mozilla.org/et/
-  - With Firefox Nightly German edition, visit a page in English, eg https://www.mozilla.org/en-US/
-- Press Translate in the translation infobar that pops up
-  - Note: For non-english editions of Nightly, one must eliminate EN and EN-US from the accepted languages (from the Language section of about:preferences, more precisely from the Webpage Language Settings) for the infobar to show
-
-<!--
-## Chrome - Cross-browser UI
+## Installation on Chrome
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
 - Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/firefox-translations/releases/download/v0.4.2/bergamot-browser-extension-0.4.2-chrome-cross-browser-ui.zip)
@@ -59,7 +17,7 @@ There are three flavors:
 - Choose the directory that you unpacked from the zip file
 - Note that the extension icon may not be visible directly. Click the puzzle icon far to the right of the address bar and click the pin symbol next to the Bergamot Translate icon so that the pin becomes blue. This will make the Bergamot Translate extension icon show at all times.
 
-## Firefox - Cross-browser UI
+## Installation on Firefox
 
 ### Preparations
 

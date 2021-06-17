@@ -1,17 +1,5 @@
 [Introduction](README.md)
 
-# Overview
-
-TODO
-
-# User Guides
-
-TODO
-
-# Developer Guides
-
-TODO
-
-# Other
-
-- [Release History](release-history.md)
+- [Installation instructions](install.md)
+- [Usage instructions](usage.md)
+- [Cross-browser version](cross-browser-version.md)
