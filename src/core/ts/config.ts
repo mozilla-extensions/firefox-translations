@@ -28,6 +28,7 @@ export const config = {
     // ["en","pl"],
     ["en", "cs"],
     ["en", "et"],
+    ["ru", "en"],
   ],
   privacyNoticeUrl: "https://example.com/privacy-notice",
   feedbackSurveyUrl:

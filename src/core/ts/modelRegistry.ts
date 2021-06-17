@@ -10,6 +10,29 @@ export interface ModelRegistry {
 }
 
 export const modelRegistry: ModelRegistry = {
+  ruen: {
+    vocab: {
+      name: "vocab.ruen.spm",
+      size: 911389,
+      estimatedCompressedSize: 433000,
+      expectedSha256Hash:
+        "d52b077fd1a2633f8a833b5f50ec0a1d1775d1d82edf5f92fcae9be50cbee1a5",
+    },
+    lex: {
+      name: "lex.50.50.ruen.s2t.bin",
+      size: 4020736,
+      estimatedCompressedSize: 2131338,
+      expectedSha256Hash:
+        "f34d96729e9c7ccd060109d9add03705b4f012ea5783ba3ad9c24ba57fe1813d",
+    },
+    model: {
+      name: "model.ruen.intgemm.alphas.bin",
+      size: 17140836,
+      estimatedCompressedSize: 13170690,
+      expectedSha256Hash:
+        "5dd27f1c7c0872f1d544aa285828b5bcf71bfd923d07d1e493e354fb1d743655",
+    },
+  },
   csen: {
     vocab: {
       name: "vocab.csen.spm",
@@ -43,10 +66,10 @@ export const modelRegistry: ModelRegistry = {
     },
     lex: {
       name: "lex.50.50.encs.s2t.bin",
-      size: 12996877,
-      estimatedCompressedSize: 12976833,
+      size: 3556124,
+      estimatedCompressedSize: 1913246,
       expectedSha256Hash:
-        "9fcb2c558f39a2f276540a564f364d46a0943c85d44b0637ff1a6ee7d566b0ff",
+        "e19c77231bf977988e31ff8db15fe79966b5170564bd3e10613f239e7f461d97",
     },
     model: {
       name: "model.encs.intgemm.alphas.bin",

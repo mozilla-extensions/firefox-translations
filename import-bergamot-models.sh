@@ -24,7 +24,7 @@ if [ "$MODELS_UPDATED" == "1" ]; then
   mkdir -p test/locally-hosted-files/models
   mv test/locally-hosted-files/models/dummy tmp
   rm -rf test/locally-hosted-files/models/*
-  cp -rf bergamot-models/prod/* test/locally-hosted-files/models
+  cp -rf bergamot-models/*/* test/locally-hosted-files/models
   ls -l test/locally-hosted-files/models/*
   mv tmp test/locally-hosted-files/models/dummy
 fi
