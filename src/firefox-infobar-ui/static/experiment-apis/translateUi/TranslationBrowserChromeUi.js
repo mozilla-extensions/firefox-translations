@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* global TranslationBrowserChromeUiNotificationManager */
 /* eslint no-unused-vars: ["error", { "varsIgnorePattern": "(TranslationBrowserChromeUi)" }]*/
 
@@ -20,6 +24,7 @@ class TranslationBrowserChromeUi {
     this.uiState = null;
     this.browser = browser;
     this.context = context;
+    this.translationInfoBarShown = false;
     this.shouldShowTranslationProgressTimer = undefined;
     this.importTranslationNotification();
 
@@ -71,11 +76,14 @@ class TranslationBrowserChromeUi {
     this.translationBrowserChromeUiNotificationManager.uiState = uiState;
     this.setInfobarState(uiState.infobarState);
     this.updateTranslationProgress(uiState);
-    if (this.shouldShowInfoBar(this.browser.contentPrincipal)) {
+    const showInfoBar = this.shouldShowInfoBar(this.browser.contentPrincipal);
+    if (showInfoBar) {
       this.showTranslationInfoBarIfNotAlreadyShown();
     } else {
       this.hideTranslationInfoBarIfShown();
     }
+    // Always show the url bar icon
+    this.showURLBarIcon(showInfoBar);
   }
 
   /**
@@ -103,9 +111,9 @@ class TranslationBrowserChromeUi {
     const notif = this.notificationBox.getNotificationWithValue("translation");
     if (notif) {
       const {
+        modelDownloading,
         translationDurationMs,
-        modelLoading,
-        queuedTranslationEngineRequestCount,
+        localizedTranslationProgressText,
       } = uiState;
 
       // Always cancel ongoing timers so that we start from a clean state
@@ -114,11 +122,13 @@ class TranslationBrowserChromeUi {
       }
 
       // Only show progress if translation has been going on for at least 3 seconds
+      // or we are currently downloading a model
       let shouldShowTranslationProgress;
       const thresholdMsAfterWhichToShouldTranslationProgress = 3000;
       if (
         translationDurationMs >=
-        thresholdMsAfterWhichToShouldTranslationProgress
+          thresholdMsAfterWhichToShouldTranslationProgress ||
+        modelDownloading
       ) {
         shouldShowTranslationProgress = true;
       } else {
@@ -126,8 +136,7 @@ class TranslationBrowserChromeUi {
         this.shouldShowTranslationProgressTimer = setTimeout(() => {
           notif.updateTranslationProgress(
             true,
-            modelLoading,
-            queuedTranslationEngineRequestCount,
+            localizedTranslationProgressText,
           );
           clearTimeout(this.shouldShowTranslationProgressTimer);
         }, thresholdMsAfterWhichToShouldTranslationProgress - translationDurationMs);
@@ -136,8 +145,7 @@ class TranslationBrowserChromeUi {
       }
       notif.updateTranslationProgress(
         shouldShowTranslationProgress,
-        modelLoading,
-        queuedTranslationEngineRequestCount,
+        localizedTranslationProgressText,
       );
     }
   }
@@ -217,22 +225,22 @@ class TranslationBrowserChromeUi {
     }
   }
 
-  showURLBarIcon() {
+  showURLBarIcon(showInfoBar) {
     const chromeWin = this.browser.ownerGlobal;
     const PopupNotifications = chromeWin.PopupNotifications;
-    const removeId = this.translationBrowserChromeUiNotificationManager.uiState
-      .originalShown
-      ? "translated"
-      : "translate";
-    const notification = PopupNotifications.getNotification(
-      removeId,
-      this.browser,
-    );
-    if (notification) {
-      PopupNotifications.remove(notification);
-    }
+    const inactive =
+      !showInfoBar ||
+      this.translationBrowserChromeUiNotificationManager.uiState.originalShown;
 
-    const callback = (topic /* , aNewBrowser */) => {
+    // Remove existing url bar icon
+    ["translated", "translate"].forEach(id => {
+      const notification = PopupNotifications.getNotification(id, this.browser);
+      if (notification) {
+        PopupNotifications.remove(notification);
+      }
+    });
+
+    const onClickCallback = (topic /* , aNewBrowser */) => {
       if (topic === "swapping") {
         const infoBarVisible = this.notificationBox.getNotificationWithValue(
           "translation",
@@ -257,10 +265,8 @@ class TranslationBrowserChromeUi {
       return true;
     };
 
-    const addId = this.translationBrowserChromeUiNotificationManager.uiState
-      .originalShown
-      ? "translate"
-      : "translated";
+    const addId = inactive ? "translate" : "translated";
+
     PopupNotifications.show(
       this.browser,
       addId,
@@ -268,7 +274,7 @@ class TranslationBrowserChromeUi {
       addId + "-notification-icon",
       null,
       null,
-      { dismissed: true, eventCallback: callback },
+      { dismissed: true, eventCallback: onClickCallback },
     );
   }
 
@@ -276,10 +282,9 @@ class TranslationBrowserChromeUi {
     const translationNotification = this.notificationBox.getNotificationWithValue(
       "translation",
     );
-    if (!translationNotification) {
+    if (!translationNotification && !this.translationInfoBarShown) {
       this.showTranslationInfoBar();
     }
-    this.showURLBarIcon();
   }
 
   hideTranslationInfoBarIfShown() {
@@ -289,11 +294,12 @@ class TranslationBrowserChromeUi {
     if (translationNotification) {
       translationNotification.close();
     }
-    this.hideURLBarIcon();
+    this.translationInfoBarShown = false;
   }
 
   showTranslationInfoBar() {
     console.debug("showTranslationInfoBar");
+    this.translationInfoBarShown = true;
     const notificationBox = this.notificationBox;
     const chromeWin = this.browser.ownerGlobal;
     const notif = notificationBox.appendNotification(

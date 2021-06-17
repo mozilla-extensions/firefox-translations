@@ -5,7 +5,25 @@
 import { TranslationDocument } from "../TranslationDocument";
 import { TranslationItem } from "../TranslationItem";
 import { MinimalDomTranslator } from "./MinimalDomTranslator";
-import { TranslationResults } from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import {
+  ModelDownloadProgress,
+  TranslationResults,
+} from "../../../background-scripts/background.js/lib/BergamotTranslatorAPI";
+import { detag } from "./detagAndProject";
+
+export interface DerivedTranslationDocumentData {
+  translationRoots: TranslationItem[];
+  translationRootsVisible: TranslationItem[];
+  translationRootsVisibleInViewport: TranslationItem[];
+  translationRootsCount: number;
+  simpleTranslationRootsCount: number;
+  texts: string[];
+  textsVisible: string[];
+  textsVisibleInViewport: string[];
+  wordCount: number;
+  wordCountVisible: number;
+  wordCountVisibleInViewport: number;
+}
 
 export interface TranslationRequestData {
   markupsToTranslate: string[];
@@ -32,6 +50,9 @@ export interface TranslationRequestProgress {
   initiationTimestamp: number;
   queued: boolean;
   modelLoadNecessary: boolean;
+  modelDownloadNecessary: boolean;
+  modelDownloading: boolean;
+  modelDownloadProgress: ModelDownloadProgress;
   modelLoading: boolean;
   modelLoaded: boolean;
   modelLoadWallTimeMs: number;
@@ -85,13 +106,19 @@ interface TranslationApiLimits {
   MAX_REQUESTS: number;
 }
 
+export class DomTranslatorError extends Error {
+  public name = "DomTranslatorError";
+}
+
 /**
  * Base class for DOM translators that splits the document into several chunks
  * respecting the data limits of the backing API.
  */
 export class BaseDomTranslator extends MinimalDomTranslator {
   public translatedCharacterCount: number;
+  public errorsEncountered: Error[];
   public partialSuccess: boolean;
+  public derivedTranslationDocumentData: DerivedTranslationDocumentData;
   private translationApiClient: TranslationApiClient;
   private parseChunkResult: TranslationParseChunkResultFunction;
   private translationApiLimits: TranslationApiLimits;
@@ -119,6 +146,7 @@ export class BaseDomTranslator extends MinimalDomTranslator {
   ) {
     super(translationDocument, sourceLanguage, targetLanguage);
     this.translatedCharacterCount = 0;
+    this.errorsEncountered = [];
     this.partialSuccess = false;
     this.translationApiClient = translationApiClient;
     this.parseChunkResult = parseChunkResult;
@@ -141,19 +169,30 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     const chunksBeingProcessed: Promise<TranslationResponseData>[] = [];
     const { MAX_REQUESTS } = this.translationApiLimits;
 
-    const { translationRoots } = this.translationDocument;
+    // Derive document translation data upfront
+    const startDeriveDocumentTranslationData = performance.now();
+    this.derivedTranslationDocumentData = await this.deriveDocumentTranslationData();
+    console.log({
+      derivedTranslationDocumentData: this.derivedTranslationDocumentData,
+    });
+    const endDeriveDocumentTranslationData = performance.now();
+    console.info(
+      `Deriving document translation data took ${(endDeriveDocumentTranslationData -
+        startDeriveDocumentTranslationData) /
+        1000} seconds`,
+    );
+
     const {
+      translationRoots,
       translationRootsVisible,
       translationRootsVisibleInViewport,
-    } = await this.translationDocument.determineVisibilityOfTranslationRoots();
+    } = this.derivedTranslationDocumentData;
     this.translationRootsPickedUpForTranslation = [];
 
     const progressOfIndividualTranslationRequests: Map<
       string,
       TranslationRequestProgress
     > = new Map();
-
-    const errorsEncountered = [];
 
     // Split the document into various requests to be sent to the translation API
     for (
@@ -207,12 +246,12 @@ export class BaseDomTranslator extends MinimalDomTranslator {
             );
           } else {
             throw new Error(
-              "The returned translationResonseData was false/empty",
+              "The returned translationResponseData was false/empty",
             );
           }
         })
         .catch(err => {
-          errorsEncountered.push(err);
+          this.errorsEncountered.push(err);
         });
 
       console.info(
@@ -222,6 +261,16 @@ export class BaseDomTranslator extends MinimalDomTranslator {
 
       if (domTranslationChunk.isLastChunk) {
         break;
+      }
+
+      // Warn if we still have content left to translate but have reached the MAX_REQUESTS limit
+      if (
+        !domTranslationChunk.isLastChunk &&
+        currentRequestOrdinal === MAX_REQUESTS - 1
+      ) {
+        console.warn(
+          `We have reached the MAX_REQUESTS limit of ${MAX_REQUESTS} requests. Remaining parts of the page will be left untranslated`,
+        );
       }
     }
 
@@ -238,14 +287,74 @@ export class BaseDomTranslator extends MinimalDomTranslator {
     // Wait for all requests to settle
     await Promise.allSettled(chunksBeingProcessed);
 
+    // Surface encountered errors
+    if (this.errorsEncountered.length) {
+      console.warn(
+        "Errors were encountered during translation",
+        this.errorsEncountered,
+      );
+    }
+
     // If at least one chunk was successful, the
     // translation should be displayed, albeit incomplete.
     // Otherwise, the "Error" state will appear.
     if (!this.partialSuccess) {
-      throw new Error("No content was translated");
+      throw new DomTranslatorError("No content was translated");
     }
     return {
       characterCount: this.translatedCharacterCount,
+    };
+  }
+
+  async deriveDocumentTranslationData(): Promise<
+    DerivedTranslationDocumentData
+  > {
+    const {
+      translationRoots,
+      translationRootsVisible,
+      translationRootsVisibleInViewport,
+    } = await this.translationDocument.determineVisibilityOfTranslationRoots();
+
+    const generateOriginalMarkupToTranslate = translationRoot =>
+      this.translationDocument.generateMarkupToTranslate(translationRoot);
+    const removeTags = originalString => {
+      const detaggedString = detag(originalString);
+      return detaggedString.plainString;
+    };
+
+    const texts = translationRoots
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsVisible = translationRootsVisible
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+    const textsVisibleInViewport = translationRootsVisibleInViewport
+      .map(generateOriginalMarkupToTranslate)
+      .map(removeTags);
+
+    const wordCount = texts.join(" ").split(" ").length;
+    const wordCountVisible = textsVisible.join(" ").split(" ").length;
+    const wordCountVisibleInViewport = textsVisibleInViewport
+      .join(" ")
+      .split(" ").length;
+
+    const translationRootsCount = translationRoots.length;
+    const simpleTranslationRootsCount = translationRoots.filter(
+      translationRoot => translationRoot.isSimleTranslationRoot,
+    ).length;
+
+    return {
+      translationRoots,
+      translationRootsVisible,
+      translationRootsVisibleInViewport,
+      translationRootsCount,
+      simpleTranslationRootsCount,
+      texts,
+      textsVisible,
+      textsVisibleInViewport,
+      wordCount,
+      wordCountVisible,
+      wordCountVisibleInViewport,
     };
   }
 

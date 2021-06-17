@@ -136,17 +136,6 @@ export class ExtensionIconTranslationState {
                 tabId,
               );
               break;
-            case TranslationStatus.DOWNLOADING_TRANSLATION_MODEL:
-              dynamicActionIcon.setBadge(
-                {
-                  text: dts.detectedLanguageResults.language,
-                  textColor: "#000000",
-                  backgroundColor: "#ffffffAA",
-                },
-                tabId,
-              );
-              dynamicActionIcon.startLoadingIndication(tabId);
-              break;
             case TranslationStatus.TRANSLATING:
               dynamicActionIcon.setBadge(
                 {

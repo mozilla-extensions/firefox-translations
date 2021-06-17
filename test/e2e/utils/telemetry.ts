@@ -2,7 +2,7 @@ import { join } from "path";
 import * as waitOn from "wait-on";
 import * as fs from "fs";
 
-export const maxToleratedTelemetryUploadingDurationInSeconds = 10;
+export const maxToleratedTelemetryUploadingDurationInSeconds = 20 + 15;
 
 const range = (start, end) => Array.from(Array(end + 1).keys()).slice(start);
 

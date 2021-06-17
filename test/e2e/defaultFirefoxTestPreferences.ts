@@ -8,9 +8,17 @@ export const defaultFirefoxTestPreferences = {
   // Removing warning for `about:config`
   "general.warnOnAboutConfig": false,
 
+  // Make the Firefox telemetry client id assertable in tests
+  "toolkit.telemetry.cachedClientID": "12345678-90ab-cdef-1234-567890abcdef",
+
+  // Set the preference that signals that the user has Firefox telemetry enabled
+  "datareporting.healthreport.uploadEnabled": true,
+
+  // Override the telemetry inactivity threshold to 20 seconds instead of 1 minute so that we can verify submitted telemetry faster
+  "extensions.translations.telemetryInactivityThresholdInSecondsOverride": "20",
+
   // Additional preferences necessary for the extension to function properly
   "extensions.experiments.enabled": true,
-  "browser.proton.enabled": true,
   "dom.postMessage.sharedArrayBuffer.bypassCOOP_COEP.insecure.enabled": true,
   "javascript.options.wasm_simd": true,
   "javascript.options.wasm_simd_wormhole": true,

@@ -284,6 +284,16 @@ export class TranslationDocument {
   async determineVisibilityOfTranslationRoots() {
     const { translationRoots } = this;
 
+    // Short-circuit this process in case the document is empty, or else
+    // it will hang, waiting for any visible elements
+    if (translationRoots.length === 0) {
+      return {
+        translationRoots: [],
+        translationRootsVisible: [],
+        translationRootsVisibleInViewport: [],
+      };
+    }
+
     const elements = translationRoots.map(
       translationRoot => translationRoot.nodeRef,
     );
@@ -318,6 +328,7 @@ export class TranslationDocument {
     }
 
     return {
+      translationRoots,
       translationRootsVisible,
       translationRootsVisibleInViewport,
     };

@@ -13,6 +13,29 @@ const targetEnvironment =
 const targetBrowser = process.env.TARGET_BROWSER;
 const ui = process.env.UI;
 
+let extensionBuildEnvironment;
+if (process.env.MC === "1") {
+  extensionBuildEnvironment = "mozilla";
+} else if (process.env.CIRCLECI === "true") {
+  extensionBuildEnvironment = "circleci";
+} else if (process.env.CI === "true") {
+  extensionBuildEnvironment = "ci";
+} else {
+  extensionBuildEnvironment = "local";
+}
+if (targetEnvironment !== "production") {
+  extensionBuildEnvironment += `:${targetEnvironment}`;
+}
+
+const extensionId =
+  ui === "firefox-infobar-ui"
+    ? `${
+        process.env.MC === "1"
+          ? "firefox-translations@mozilla.org"
+          : "firefox-infobar-ui-bergamot-browser-extension@browser.mt"
+      }`
+    : "bergamot-browser-extension@browser.mt";
+
 const buildPath = path.join(
   __dirname,
   "build",
@@ -21,9 +44,15 @@ const buildPath = path.join(
   ui,
 );
 
-module.exports = {
+const buildConfig = {
   targetEnvironment,
   targetBrowser,
   ui,
+  extensionId,
   buildPath,
+  extensionBuildEnvironment,
 };
+
+console.info(`Build config: `, buildConfig);
+
+module.exports = buildConfig;

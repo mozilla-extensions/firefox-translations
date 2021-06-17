@@ -1,6 +1,6 @@
-# Bergamot Translate Browser Extension
+# Firefox Translations Web Extension
 
-[![CircleCI badge](https://img.shields.io/circleci/project/github/mozilla-extensions/bergamot-browser-extension/main.svg?label=CircleCI)](https://circleci.com/gh/mozilla-extensions/bergamot-browser-extension/)
+[![CircleCI badge](https://img.shields.io/circleci/project/github/mozilla-extensions/firefox-translations/main.svg?label=CircleCI)](https://circleci.com/gh/mozilla-extensions/firefox-translations/)
 
 For more information see [The Bergamot Project website](https://browser.mt/).
 

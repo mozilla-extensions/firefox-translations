@@ -37,14 +37,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             <hbox><label value="&translation.translatingContent.label;"/><label anonid="progress-label" value=""/></hbox>
           </vbox>
           <hbox class="translated-box" align="center">
-            <label value="&translation.translatedFrom.label;"/>
-            <menulist class="notification-button" anonid="fromLanguage" oncommand="this.closest('notification').fromLanguageChanged();">
-              <menupopup/>
-            </menulist>
-            <label value="&translation.translatedTo.label;"/>
-            <menulist class="notification-button" anonid="toLanguage" oncommand="this.closest('notification').toLanguageChanged();">
-              <menupopup/>
-            </menulist>
+            <label value="&translation.translatedFrom.label;" style="margin-right: 4px;"/>
+            <label anonid="fromLanguage" style="margin-inline:0px;font-weight: bold;"/>
+            <label value="&translation.translatedTo.label;" style="margin-inline:3px;"/>
+            <label anonid="toLanguage" style="margin-inline:0px;font-weight: bold;"/>
             <label value="&translation.translatedToSuffix.label;"/>
             <button anonid="showOriginal" class="notification-button" label="&translation.showOriginal.button;" oncommand="this.closest('notification').showOriginal();"/>
             <button anonid="showTranslation" class="notification-button" label="&translation.showTranslation.button;" oncommand="this.closest('notification').showTranslation();"/>
@@ -93,23 +89,13 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
   }
 
-  updateTranslationProgress(
+  async updateTranslationProgress(
     shouldShowTranslationProgress,
-    modelLoading,
-    queuedTranslationEngineRequestCount,
+    localizedTranslationProgressText,
   ) {
-    let progressLabelValue;
-    if (!shouldShowTranslationProgress) {
-      progressLabelValue = "";
-    } else if (modelLoading) {
-      progressLabelValue = "(Currently loading language model...)";
-    } else if (queuedTranslationEngineRequestCount > 0) {
-      progressLabelValue = `(Language model loaded. ${queuedTranslationEngineRequestCount} part${
-        queuedTranslationEngineRequestCount > 1 ? "s" : ""
-      } left to translate)`;
-    } else {
-      progressLabelValue = "";
-    }
+    const progressLabelValue = shouldShowTranslationProgress
+      ? localizedTranslationProgressText
+      : "";
     this._getAnonElt("progress-label").setAttribute(
       "value",
       progressLabelValue,
@@ -133,12 +119,6 @@ window.MozTranslationNotification = class extends MozElements.Notification {
     }
     this.setAttribute("state", stateName);
 
-    // Workaround to show the animated icon also in the "loading" state. Extension-external
-    // code specifies that only the "translating" state shows an animated icon
-    if (stateName === "loading") {
-      this.setAttribute("state", "translating");
-    }
-
     if (val === this.translation.TranslationInfoBarStates.STATE_TRANSLATED) {
       this._handleButtonHiding();
     }
@@ -153,6 +133,8 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   init(translationBrowserChromeUiNotificationManager) {
     this.translation = translationBrowserChromeUiNotificationManager;
 
+    this.localizedLanguagesByCode = {};
+
     const sortByLocalizedName = function(list) {
       const names = Services.intl.getLanguageDisplayNames(undefined, list);
       return list
@@ -162,20 +144,27 @@ window.MozTranslationNotification = class extends MozElements.Notification {
 
     // Fill the lists of supported source languages.
     const detectedLanguage = this._getAnonElt("detectedLanguage");
-    const fromLanguage = this._getAnonElt("fromLanguage");
     const sourceLanguages = sortByLocalizedName(
       this.translation.uiState.supportedSourceLanguages,
     );
     for (const [code, name] of sourceLanguages) {
       detectedLanguage.appendItem(name, code);
-      fromLanguage.appendItem(name, code);
+      this.localizedLanguagesByCode[code] = name;
     }
     detectedLanguage.value = this.translation.uiState.detectedLanguageResults.language;
 
     // translatedFrom is only set if we have already translated this page.
+    const fromLanguage = this._getAnonElt("fromLanguage");
     if (translationBrowserChromeUiNotificationManager.uiState.translatedFrom) {
-      fromLanguage.value =
-        translationBrowserChromeUiNotificationManager.uiState.translatedFrom;
+      for (const [code, name] of sourceLanguages) {
+        detectedLanguage.appendItem(name, code);
+      }
+      fromLanguage.setAttribute(
+        "value",
+        this.localizedLanguagesByCode[
+          translationBrowserChromeUiNotificationManager.uiState.translatedFrom
+        ],
+      );
     }
 
     // Fill the list of supported target languages.
@@ -184,12 +173,16 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       this.translation.uiState.supportedTargetLanguages,
     );
     for (const [code, name] of targetLanguages) {
-      toLanguage.appendItem(name, code);
+      this.localizedLanguagesByCode[code] = name;
     }
 
     if (translationBrowserChromeUiNotificationManager.uiState.translatedTo) {
-      toLanguage.value =
-        translationBrowserChromeUiNotificationManager.uiState.translatedTo;
+      toLanguage.setAttribute(
+        "value",
+        this.localizedLanguagesByCode[
+          translationBrowserChromeUiNotificationManager.uiState.translatedTo
+        ],
+      );
     }
 
     if (translationBrowserChromeUiNotificationManager.uiState.infobarState) {
@@ -308,8 +301,14 @@ window.MozTranslationNotification = class extends MozElements.Notification {
       this.translation.uiState.infobarState ===
       this.translation.TranslationInfoBarStates.STATE_OFFER
     ) {
-      this._getAnonElt("fromLanguage").value = from;
-      this._getAnonElt("toLanguage").value = to;
+      this._getAnonElt("fromLanguage").setAttribute(
+        "value",
+        this.localizedLanguagesByCode[from],
+      );
+      this._getAnonElt("toLanguage").setAttribute(
+        "value",
+        this.localizedLanguagesByCode[to],
+      );
     }
   }
 
@@ -356,25 +355,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   _getSourceLang() {
-    let lang;
-    if (
-      this.translation.uiState.infobarState ===
-      this.translation.TranslationInfoBarStates.STATE_OFFER
-    ) {
-      lang = this._getAnonElt("detectedLanguage").value;
-    } else {
-      lang = this._getAnonElt("fromLanguage").value;
-
-      // If we have never attempted to translate the page before the
-      // service became unavailable, "fromLanguage" isn't set.
-      if (
-        !lang &&
-        this.translation.uiState.infobarState ===
-          this.translation.TranslationInfoBarStates.STATE_UNAVAILABLE
-      ) {
-        lang = this.translation.uiState.defaultTargetLanguage;
-      }
-    }
+    const lang = this._getAnonElt("detectedLanguage").value;
     if (!lang) {
       throw new Error("Source language is not defined");
     }
@@ -382,10 +363,7 @@ window.MozTranslationNotification = class extends MozElements.Notification {
   }
 
   _getTargetLang() {
-    return (
-      this._getAnonElt("toLanguage").value ||
-      this.translation.uiState.defaultTargetLanguage
-    );
+    return this.translation.uiState.defaultTargetLanguage;
   }
 
   optionsShowing() {

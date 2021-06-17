@@ -12,9 +12,12 @@ const prettier = require("prettier/standalone");
 const plugins = [require("prettier/parser-html")];
 
 export const fetchFixtureHtml = async fixture => {
-  const fixtureBaseUrl = "http://0.0.0.0:4000";
+  const fixtureBaseUrl = "http://0.0.0.0:4000/fixtures";
   const url = `${fixtureBaseUrl}/${fixture}`;
   const response = await fetch(url);
+  if (response.status > 400) {
+    throw new Error(`Download of fixture ${fixture} failed`);
+  }
   return response.text();
 };
 

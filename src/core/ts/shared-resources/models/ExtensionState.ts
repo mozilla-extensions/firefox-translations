@@ -19,6 +19,7 @@ import { FrameInfo } from "../types/bergamot.types";
 import { computed } from "mobx";
 import { TabTranslationState } from "./TabTranslationState";
 import { TranslationStatus } from "./BaseTranslationState";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 export const documentTranslationStateMapKey = (frameInfo: FrameInfo) =>
   `${frameInfo.tabId}-${frameInfo.frameId}`;
@@ -141,80 +142,162 @@ export class ExtensionState extends Model({
           url,
         } = getSnapshot(tabTopFrameState);
 
+        // For most translation-related attributes, we are only interested in the frames that existed when
+        // the translation was requested, or else we will not get attributes that represent the state of the
+        // web page at that time
+        const translationRelevantDocumentTranslationStates = documentTranslationStates.filter(
+          dts =>
+            dts.translationRequested ||
+            dts.translationStatus === TranslationStatus.TRANSLATING ||
+            dts.translationFinished,
+        );
+
+        const isNotUndefined = val => val !== undefined;
+
         // Sum some state attributes
-        const wordCount = documentTranslationStates
+        const wordCount = translationRelevantDocumentTranslationStates
           .map(dts => dts.wordCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const wordCountVisible = documentTranslationStates
+        const wordCountVisible = translationRelevantDocumentTranslationStates
           .map(dts => dts.wordCountVisible)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const wordCountVisibleInViewport = documentTranslationStates
+        const wordCountVisibleInViewport = translationRelevantDocumentTranslationStates
           .map(dts => dts.wordCountVisibleInViewport)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const totalModelLoadWallTimeMs = documentTranslationStates
+        const totalModelLoadWallTimeMs = translationRelevantDocumentTranslationStates
           .map(dts => dts.totalModelLoadWallTimeMs)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const totalTranslationWallTimeMs = documentTranslationStates
+        const totalTranslationWallTimeMs = translationRelevantDocumentTranslationStates
           .map(dts => dts.totalTranslationWallTimeMs)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const totalTranslationEngineRequestCount = documentTranslationStates
+        const totalTranslationEngineRequestCount = translationRelevantDocumentTranslationStates
           .map(dts => dts.totalTranslationEngineRequestCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
-        const queuedTranslationEngineRequestCount = documentTranslationStates
+        const queuedTranslationEngineRequestCount = translationRelevantDocumentTranslationStates
           .map(dts => dts.queuedTranslationEngineRequestCount)
+          .filter(isNotUndefined)
           .reduce((a, b) => a + b, 0);
 
         // Merge translation-progress-related booleans as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
-        const translationInitiationTimestamps = documentTranslationStates.map(
-          (dts: DocumentTranslationState) => dts.translationInitiationTimestamp,
-        );
+        const translationInitiationTimestamps = translationRelevantDocumentTranslationStates
+          .map(
+            (dts: DocumentTranslationState) =>
+              dts.translationInitiationTimestamp,
+          )
+          .filter(isNotUndefined);
         const translationInitiationTimestamp = Math.min(
           ...translationInitiationTimestamps,
         );
-        const modelLoadNecessary = !!documentTranslationStates.filter(
+        const modelLoadNecessary = !!translationRelevantDocumentTranslationStates.filter(
           (dts: DocumentTranslationState) => dts.modelLoadNecessary,
         ).length;
+        const modelDownloadNecessary = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloadNecessary,
+        ).length;
+        const modelDownloading = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloading,
+        ).length;
         const modelLoading = modelLoadNecessary
-          ? !!documentTranslationStates.find(
+          ? !!translationRelevantDocumentTranslationStates.find(
               (dts: DocumentTranslationState) => dts.modelLoading,
             )
           : undefined;
         const modelLoaded = modelLoadNecessary
-          ? !!documentTranslationStates.find(
+          ? !!translationRelevantDocumentTranslationStates.find(
               (dts: DocumentTranslationState) => !dts.modelLoaded,
             )
           : undefined;
         const translationFinished =
-          documentTranslationStates.filter(
+          translationRelevantDocumentTranslationStates.filter(
             (dts: DocumentTranslationState) => !dts.translationFinished,
           ).length === 0;
 
+        // Merge model download progress as per src/core/ts/shared-resources/state-management/DocumentTranslationStateCommunicator.ts
+        const emptyDownloadProgress: ModelDownloadProgress = {
+          bytesDownloaded: 0,
+          bytesToDownload: 0,
+          startTs: undefined,
+          durationMs: 0,
+          endTs: undefined,
+        };
+        const modelDownloadProgress = translationRelevantDocumentTranslationStates
+          .map((dts: DocumentTranslationState) =>
+            getSnapshot(dts.modelDownloadProgress),
+          )
+          .filter((mdp: ModelDownloadProgress | undefined) => mdp)
+          .reduce((a: ModelDownloadProgress, b: ModelDownloadProgress) => {
+            const startTs =
+              a.startTs && a.startTs <= b.startTs ? a.startTs : b.startTs;
+            const endTs = a.endTs && a.endTs >= b.endTs ? a.endTs : b.endTs;
+            return {
+              bytesDownloaded: a.bytesDownloaded + b.bytesDownloaded,
+              bytesToDownload: a.bytesToDownload + b.bytesToDownload,
+              startTs,
+              durationMs: endTs ? endTs - startTs : Date.now() - startTs,
+              endTs,
+            };
+          }, emptyDownloadProgress);
+
+        // Merge errorOccurred attributes
+        const modelLoadErrorOccurred = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelLoadErrorOccurred,
+        ).length;
+        const modelDownloadErrorOccurred = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.modelDownloadErrorOccurred,
+        ).length;
+        const translationErrorOccurred = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.translationErrorOccurred,
+        ).length;
+        const otherErrorOccurred = !!translationRelevantDocumentTranslationStates.filter(
+          (dts: DocumentTranslationState) => dts.otherErrorOccurred,
+        ).length;
+
         // Special merging of translation status
-        const anyTabHasTranslationStatus = (
+        const anyFrameHasTranslationStatus = (
           translationStatus: TranslationStatus,
         ) =>
           documentTranslationStates.find(
             dts => dts.translationStatus === translationStatus,
           );
+        const anyFrameThatExistedWhenTranslationWasRequestedHasTranslationStatus = (
+          translationStatus: TranslationStatus,
+        ) =>
+          translationRelevantDocumentTranslationStates.find(
+            dts => dts.translationStatus === translationStatus,
+          );
+
         const tabTranslationStatus = (): TranslationStatus => {
+          // Since we only use some attributes from the top frame, we should only consider
+          // top frame when considering the related statuses
           if (
-            anyTabHasTranslationStatus(TranslationStatus.DETECTING_LANGUAGE)
+            [
+              TranslationStatus.DETECTING_LANGUAGE,
+              TranslationStatus.OFFER,
+            ].includes(tabTopFrameState.translationStatus)
           ) {
-            return TranslationStatus.DETECTING_LANGUAGE;
+            return tabTopFrameState.translationStatus;
           }
+          // Translation is ongoing - only consider frames that were available when
+          // the translation was requested, or else new frames injected in the document
+          // will cause unexpected status changes
           if (
-            anyTabHasTranslationStatus(
-              TranslationStatus.DOWNLOADING_TRANSLATION_MODEL,
+            anyFrameThatExistedWhenTranslationWasRequestedHasTranslationStatus(
+              TranslationStatus.TRANSLATING,
             )
           ) {
-            return TranslationStatus.DOWNLOADING_TRANSLATION_MODEL;
-          }
-          if (anyTabHasTranslationStatus(TranslationStatus.TRANSLATING)) {
             return TranslationStatus.TRANSLATING;
           }
-          if (anyTabHasTranslationStatus(TranslationStatus.ERROR)) {
+          // An error in any frame makes gets promoted to tab-level
+          if (anyFrameHasTranslationStatus(TranslationStatus.ERROR)) {
             return TranslationStatus.ERROR;
           }
+          // Fallback on top frame status as the canonical status
           return tabTopFrameState.translationStatus;
         };
         const translationStatus = tabTranslationStatus();
@@ -241,9 +324,16 @@ export class ExtensionState extends Model({
           totalTranslationEngineRequestCount,
           queuedTranslationEngineRequestCount,
           modelLoadNecessary,
+          modelDownloadNecessary,
+          modelDownloading,
+          modelDownloadProgress,
           modelLoading,
           modelLoaded,
           translationFinished,
+          modelLoadErrorOccurred,
+          modelDownloadErrorOccurred,
+          translationErrorOccurred,
+          otherErrorOccurred,
         };
 
         const tabTranslationState = new TabTranslationState(
@@ -287,6 +377,11 @@ export class ExtensionState extends Model({
             op: "replace",
             path: ["translationRequested"],
             value: true,
+          },
+          {
+            op: "replace",
+            path: ["translationStatus"],
+            value: TranslationStatus.TRANSLATING,
           },
         ]);
       },

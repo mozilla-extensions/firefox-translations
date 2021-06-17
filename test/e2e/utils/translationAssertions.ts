@@ -10,19 +10,22 @@ export const maxToleratedTranslationDurationInSeconds = 100;
 interface Fixture {
   url: string;
   multipleFramesUrl?: string;
+  multipleFramesWithEmptyChildFrameUrl?: string;
   originalTextToLookFor: string;
   translatedTextToLookFor: string;
 }
 
 export const fixtures: { [k: string]: Fixture } = {
   es: {
-    url: "http://0.0.0.0:4001/newstest2013.es.top10lines.html",
-    multipleFramesUrl: "http://0.0.0.0:4001/multiple-frames.html",
+    url: "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html",
+    multipleFramesUrl: "http://0.0.0.0:4001/fixtures/multiple-frames.html",
+    multipleFramesWithEmptyChildFrameUrl:
+      "http://0.0.0.0:4001/fixtures/multiple-frames.with-empty-child-frame.html",
     originalTextToLookFor: "Una estrategia republicana para obstaculizar",
     translatedTextToLookFor: "A Republican strategy to hinder",
   },
   et: {
-    url: "http://0.0.0.0:4001/wmt18.et.top10lines.html",
+    url: "http://0.0.0.0:4001/fixtures/wmt18.et.top10lines.html",
     originalTextToLookFor:
       "Eestis ja Hispaanias peeti kinni neli Kemerovo grupeeringu liiget",
     translatedTextToLookFor:
@@ -30,7 +33,10 @@ export const fixtures: { [k: string]: Fixture } = {
   },
 };
 
-export const fixtureUrl = "http://0.0.0.0:4001/newstest2013.es.top10lines.html";
+export const fixtureUrl =
+  "http://0.0.0.0:4001/fixtures/newstest2013.es.top10lines.html";
+
+const expectedFirefoxTelemetryClientId = "12345678-90ab-cdef-1234-567890abcdef";
 
 async function lookForFixturePageOriginalContent(
   driver: WebDriver,
@@ -81,7 +87,7 @@ export const assertTranslationSucceeded = async (
   assertElementExists(translatedPageElement, "translatedPageElement");
 };
 
-export const assertOnTranslationAttemptConcludedTelemetry = (
+export const assertTranslationTelemetryMetadata = (
   telemetryPayload,
   expectedFromLang: string,
   expectedToLang: string,
@@ -89,33 +95,90 @@ export const assertOnTranslationAttemptConcludedTelemetry = (
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.from_lang"],
     expectedFromLang,
-    "The telemetry payload's string metrics 'metadata.from_lang' is correct",
+    "The telemetry payload's string metric 'metadata.from_lang' is correct",
   );
   assert.strictEqual(
     telemetryPayload.metrics.string["metadata.to_lang"],
     expectedToLang,
-    "The telemetry payload's string metrics 'metadata.to_lang' is correct",
+    "The telemetry payload's string metric 'metadata.to_lang' is correct",
   );
-  // Check telemetry for: Translated words per second, Model load time, Translation time
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.model_load_time"],
-      10,
-    ) >= 0,
-    "The telemetry payload's string metrics 'performance.model_load_time' is a string that when parsed evaluates to 0 or greater",
+  assert.strictEqual(
+    telemetryPayload.metrics.string["metadata.firefox_client_id"],
+    expectedFirefoxTelemetryClientId,
+    "The telemetry payload's string metric 'metadata.firefox_client_id' is correct",
   );
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.translation_time"],
-      10,
-    ) > 0,
-    "The telemetry payload's string metrics 'performance.translation_time' is a string that when parsed evaluates to more than 0",
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.extension_version"].length,
+    1,
+    "The telemetry payload's string metric 'metadata.extension_version' is non-empty",
   );
-  assert(
-    parseInt(
-      telemetryPayload.metrics.string["performance.words_per_second"],
-      10,
-    ) > 0,
-    "The telemetry payload's string metrics 'performance.words_per_second' is a string that when parsed evaluates to more than 0",
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.extension_build_id"].length,
+    1,
+    "The telemetry payload's string metric 'metadata.extension_build_id' is non-empty",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.string["metadata.bergamot_translator_version"]
+      .length,
+    1,
+    "The telemetry payload's string metric 'metadata.bergamot_translator_version' is non-empty",
+  );
+};
+
+export const assertOnTranslationAttemptConcludedTelemetry = (
+  telemetryPayload,
+  expectedFromLang: string,
+  expectedToLang: string,
+) => {
+  assertTranslationTelemetryMetadata(
+    telemetryPayload,
+    expectedFromLang,
+    expectedToLang,
+  );
+  // Check telemetry for translation performance metrics
+  assert.isAbove(
+    telemetryPayload.metrics.timespan["performance.full_page_translated_time"]
+      .value,
+    0,
+    "The telemetry payload's timespan metric 'performance.full_page_translated_time' is more than 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.model_download_time_num"]
+      .value,
+    0,
+    "The telemetry payload's timespan metric 'performance.model_download_time_num' is at least 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.timespan["performance.model_load_time_num"].value,
+    0,
+    "The telemetry payload's timespan metric 'performance.model_load_time_num' is at least 0",
+  );
+  assert.isAbove(
+    telemetryPayload.metrics.timespan["performance.translation_engine_time"]
+      .value,
+    0,
+    "The telemetry payload's timespan metric 'performance.translation_engine_time' is more than 0",
+  );
+  assert.isAbove(
+    telemetryPayload.metrics.quantity["performance.full_page_translated_wps"],
+    0,
+    "The telemetry payload's quantity metric 'performance.full_page_translated_wps' is more than 0",
+  );
+  assert.isAbove(
+    telemetryPayload.metrics.quantity["performance.translation_engine_wps"],
+    0,
+    "The telemetry payload's quantity metric 'performance.translation_engine_wps' is more than 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.quantity["performance.word_count"],
+    0,
+    "The telemetry payload's quantity metric 'performance.word_count' is at least 0",
+  );
+  assert.isAtLeast(
+    telemetryPayload.metrics.quantity[
+      "performance.word_count_visible_in_viewport"
+    ],
+    0,
+    "The telemetry payload's quantity metric 'performance.word_count_visible_in_viewport' is at least 0",
   );
 };

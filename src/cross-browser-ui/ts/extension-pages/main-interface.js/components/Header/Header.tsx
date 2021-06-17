@@ -2,7 +2,7 @@ import * as React from "react";
 import Icon from "../Icon/Icon";
 import { useHistory } from "react-router-dom";
 import { BiChevronLeft } from "react-icons/bi";
-import logo from "../../../../../../core/static/icons/extension-icon.38x38.png";
+import logo from "../../../../../../cross-browser-ui/static/icons/extension-icon.38x38.png";
 
 interface Props {
   text?: string;

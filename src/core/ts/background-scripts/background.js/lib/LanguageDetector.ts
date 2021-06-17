@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { browser } from "webextension-polyfill-ts";
+import { browserWithExperimentAPIs } from "firefox-infobar-ui/ts/background-scripts/background.js/browserWithExperimentAPIs";
 
 // Since Emscripten can handle heap growth, but not heap shrinkage, we
 // need to refresh the worker after we've processed a particularly large
@@ -21,13 +22,13 @@ const IDLE_TIMEOUT = 10 * 1000;
 
 const WORKER_URL = browser.runtime.getURL(`wasm/cld-worker.js`);
 
-export interface DetectLanguageParams {
+export type DetectLanguageParams = {
   text: string;
   isHTML?: boolean;
-  language?: boolean;
-  tld?: boolean;
-  encoding?: boolean;
-}
+  language?: string;
+  tld?: string;
+  encoding?: string;
+};
 
 export interface DetectedLanguageResults {
   confident: boolean;
@@ -165,6 +166,12 @@ export const LanguageDetector = {
   ): Promise<DetectedLanguageResults> {
     if (typeof params === "string") {
       params = { text: params };
+    }
+    // Either use the Firefox experimental web extension API or the bundled WASM-based language detection
+    if (process.env.UI === "firefox-infobar-ui") {
+      return browserWithExperimentAPIs.experiments.languageDetector.detectLanguage(
+        params,
+      );
     }
     return workerManager.detectLanguage(params);
   },

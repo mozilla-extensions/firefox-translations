@@ -6,6 +6,7 @@ import { Model, model, prop } from "mobx-keystone";
 import { DetectedLanguageResults } from "../../background-scripts/background.js/lib/LanguageDetector";
 import { computed } from "mobx";
 import { browser } from "webextension-polyfill-ts";
+import { ModelDownloadProgress } from "../../background-scripts/background.js/lib/BergamotTranslatorAPI";
 
 /* eslint-disable no-unused-vars, no-shadow */
 // TODO: update typescript-eslint when support for this kind of declaration is supported
@@ -17,7 +18,6 @@ export enum TranslationStatus {
   SOURCE_LANGUAGE_UNDERSTOOD = "SOURCE_LANGUAGE_UNDERSTOOD",
   TRANSLATION_UNSUPPORTED = "TRANSLATION_UNSUPPORTED",
   OFFER = "OFFER",
-  DOWNLOADING_TRANSLATION_MODEL = "DOWNLOADING_TRANSLATION_MODEL",
   TRANSLATING = "TRANSLATING",
   TRANSLATED = "TRANSLATED",
   ERROR = "ERROR",
@@ -48,9 +48,16 @@ export class BaseTranslationState extends Model({
   totalTranslationEngineRequestCount: prop<number>(),
   queuedTranslationEngineRequestCount: prop<number>(),
   modelLoadNecessary: prop<boolean>(),
+  modelDownloadNecessary: prop<boolean>(),
+  modelDownloading: prop<boolean>(),
+  modelDownloadProgress: prop<ModelDownloadProgress>(),
   modelLoading: prop<boolean>(),
   modelLoaded: prop<boolean>(),
   translationFinished: prop<boolean>(),
+  modelLoadErrorOccurred: prop<boolean>(),
+  modelDownloadErrorOccurred: prop<boolean>(),
+  translationErrorOccurred: prop<boolean>(),
+  otherErrorOccurred: prop<boolean>(),
 }) {
   @computed
   get effectiveTranslateFrom() {
