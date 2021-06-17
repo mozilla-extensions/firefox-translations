@@ -202,13 +202,13 @@ jobs:
       # see https://circleci.com/docs/2.0/gh-bb-integration/#deployment-keys-and-user-keys
       - add_ssh_keys:
           fingerprints:
-            - "74:8f:b2:1e:d9:ac:2b:d3:d5:62:b3:55:4a:5e:fd:ed"
+            - "ea:bc:e4:c3:89:d4:2d:79:4f:70:d7:d8:3a:b9:ba:98"
       # The gh-pages npm package can be used to push a directory to a git branch;
       # see https://www.npmjs.com/package/gh-pages
       - run:
           name: Deploy docs to gh-pages branch
           command: |
-            git config user.email "ci-build@bergamot-browser-extension"
+            git config user.email "ci-docs-deploy@firefox-translations"
             git config user.name "CircleCI docs-deploy job"
             npm install -g --silent gh-pages@2.0.1
             gh-pages --dotfiles --message "[skip ci] Updates" --dist build/docs
