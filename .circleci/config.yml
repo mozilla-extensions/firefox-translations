@@ -142,6 +142,9 @@ jobs:
       - run:
           name: Build documentation
           command: cd docs && yarn build
+      - run:
+          name: Check documentation links
+          command: cd docs && yarn linkcheck
       - persist_to_workspace:
           root: generated-docs/
           paths:
