@@ -22,7 +22,7 @@ This is the user documentation for the **Firefox Translations** feature.
 
 For developer documentation on the **Firefox Translations Web Extension**, refer to [Firefox Translations Developer's Guide](../dev/index.html).
 
-## Acknowledgements
+## Acknowledgments
 
 ### The Bergamot project
 
@@ -40,5 +40,3 @@ The Bergamot project has received funding from the European Union’s Horizon 20
 
 Firefox Translations and Firefox Translations Source Code is subject to the terms of the Mozilla Public License v2.0.
 You can obtain a copy of the MPL at <https://mozilla.org/MPL/2.0/>.
-
-[gleanjs-bugs]: https://bugzilla.mozilla.org/enter_bug.cgi?product=Data+Platform+and+Tools&component=Firefox Translations&priority=P4&status_whiteboard=%5Btelemetry%3Aglean-js%3Am%3F%5D

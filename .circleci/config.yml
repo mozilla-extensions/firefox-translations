@@ -166,8 +166,8 @@ jobs:
           name: Install aspell
           command: sudo apt install aspell aspell-en
       - run:
-          name: Check documentation spelling
-          command: bin/spellcheck.sh list
+          name: Check spelling
+          command: cd docs && bin/spellcheck.sh list
 
   # via https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
   docs-deploy:

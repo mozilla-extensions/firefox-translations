@@ -20,8 +20,7 @@
     "generate-api-docs": "bin/generate-api-docs.sh",
     "format": "prettier '**/*.{md,css,js,json,html}' --ignore-path=.eslintignore --write",
     "linkcheck": "link-checker ../build/docs --disable-external true --allow-hash-href true",
-    "spellcheck:list": "bin/spellcheck.sh list",
-    "spellcheck:check": "bin/spellcheck.sh check",
+    "spellcheck": "bin/spellcheck.sh check",
     "serve": "light-server -s ../build/docs -p 3000",
     "watch": "yarn build && yarn serve -w \"** # yarn build\""
   }
