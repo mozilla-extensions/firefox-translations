@@ -4,7 +4,7 @@ authors = ["Bergamot Team @ Mozilla"]
 src = "."
 
 [build]
-build-dir = "../../build/docs/user"
+build-dir = "../../docs/user"
 create-missing = true
 
 [output.html]

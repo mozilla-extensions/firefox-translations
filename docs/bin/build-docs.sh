@@ -11,31 +11,40 @@ set -xe
 
 DEST_PATH=../build/docs
 
+# To cleanly apply some preprocessing, we copy all src files to an
+# intermediate path before running mdbook
+INTERMEDIATE_SRC_PATH=../build/tmp-docs
+
 # Clean
+rm -rf $INTERMEDIATE_SRC_PATH
+mkdir -p $INTERMEDIATE_SRC_PATH
 rm -rf $DEST_PATH
 mkdir -p $DEST_PATH
 
-# Add redirect from the root page to the user docs
-echo '<meta http-equiv=refresh content=0;url=user/index.html>' > $DEST_PATH/index.html
+# Copy src files to the intermediate source dir
+cp -r dev shared user $INTERMEDIATE_SRC_PATH/
 
 # Add npm assets necessary at build time
-cp ../node_modules/mermaid/dist/mermaid.min.js shared/
+cp ../node_modules/mermaid/dist/mermaid.min.js $INTERMEDIATE_SRC_PATH/shared/
 
 # TODO: Add telemetry docs
 # TODO: Add data-review docs?
 
-# Build the user book
+# Build the docs
+cat dev/SUMMARY.tpl.md dev/api-docs-summary.md > $INTERMEDIATE_SRC_PATH/dev/SUMMARY.md
+cd $INTERMEDIATE_SRC_PATH
 output=$(mdbook build user/ 2>&1)
 if echo "$output" | grep -q "\[ERROR\]" ; then
     exit 1
 fi
-
-# Build the dev book
-cat dev/SUMMARY.tpl.md dev/api-docs-summary.md > dev/SUMMARY.md
 output=$(mdbook build dev/ 2>&1)
 if echo "$output" | grep -q "\[ERROR\]" ; then
     exit 1
 fi
+cd -
 
-# Check links
-link-checker $DEST_PATH --disable-external true --allow-hash-href true
+# Clean up intermediate src files
+rm -rf $INTERMEDIATE_SRC_PATH
+
+# Add redirect from the root page to the user docs
+echo '<meta http-equiv=refresh content=0;url=user/index.html>' > $DEST_PATH/index.html

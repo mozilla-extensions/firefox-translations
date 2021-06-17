@@ -19,7 +19,8 @@ cd dev
 # Create links to all the individual pages in a file that eventually
 # ends up in SUMMARY.md (an mdBook requirement is that all files
 # are linked in SUMMARY.md)
-echo "- [API Docs](./api-docs/README.md)" > api-docs-summary.md
+rm api-docs-summary.md || true
+touch api-docs-summary.md
 for f in api-docs/**/*.md; do
   b=$(basename $f)
   echo "  - [$b](./$f)" >> api-docs-summary.md

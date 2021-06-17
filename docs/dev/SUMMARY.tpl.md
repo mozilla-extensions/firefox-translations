@@ -2,3 +2,4 @@
 
 # Appendix
 
+- [Generated API Docs](./api-docs/README.md)
