@@ -1,18 +1,18 @@
-# Getting started
+# Local development
 
 The commands in these instructions are meant to be run in the root folder in this repo.
 
 ## First time setup
 
-Install dependencies using [yarn v1](https://classic.yarnpkg.com/en/docs/install/):
+1. Follow the [Getting started](./getting-started.md) instructions
+
+2. Import bergamot models locally, since the extension downloads the models from a local endpoint when running in development mode:
 
 ```bash
-yarn install
+yarn bergamot-models:import
 ```
 
-## Import Bergamot Translator
-
-There are two ways
+3. Import Bergamot translator using one of the two methods below.
 
 ### Using known-to-work Bergamot Translator WASM artifacts and importing them to the extension
 
@@ -43,18 +43,12 @@ When all is properly set-up, you should be able to run the following to build an
 
 Re-run this command any time there has been an update in the bergamot-translator submodule.
 
-## Start development mode
+## Start development/watch mode
 
-First, import bergamot models locally, since the extension downloads the models from a local endpoint when running in development mode:
-
-```bash
-yarn bergamot-models:import
-```
-
-If you haven't already, download and install Firefox Nightly from [here](https://www.mozilla.org/en-US/firefox/channel/desktop/) before running the below commands.
-
-Finally, use the commands below to build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed.
+When the above commands have finished, run:
 
 ```bash
 yarn watch:firefox-infobar-ui
 ```
+
+This will build the extension, launch the browser, install the extension and start Webpack in watch mode, which repeats the build process and reloads the extension when source files are changed:

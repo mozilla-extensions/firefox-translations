@@ -11,6 +11,8 @@
   - [Continuous integration](./engineering/ci.md)
   - [Contributing](./engineering/contributing.md)
 
+- [Architecture](./architecture/overview.md)
+
 - [Maintenance](./maintenance/overview.md)
   - [Upgrading Glean.js](./maintenance/upgrading-glean-js.md)
 

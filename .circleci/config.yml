@@ -115,12 +115,28 @@ jobs:
   # Docs
   generate-docs:
     docker:
-      - image: circleci/rust:latest
+      - image: circleci/node:latest-browsers
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "docs/package.json" }}
+      - run:
+          name: Install npm deps
+          command: cd docs && yarn install --immutable
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies-{{ checksum "docs/package.json" }}
+      - run:
+          name: Upgrade packages
+          command: sudo apt update
+      - run:
+          name: Install Aspell and Rust
+          command: sudo apt install aspell aspell-en rustc
       - run:
           name: Version information
-          command: rustc --version; cargo --version; rustup --version
+          command: rustc --version; cargo --version; aspell --version; yarn --version
       - run:
           name: Install mdbook-dtmo
           command: |
@@ -131,11 +147,9 @@ jobs:
             echo "${MDBOOK_SHA256} *${MDBOOK}" | shasum -a 256 -c -
             tar -xvf "${MDBOOK}"
             # We rename it to mdbook here, so other tools keep working as expected
-            mv mdbook-dtmo /usr/local/cargo/bin/mdbook
+            mkdir -p ~/.local/bin/
+            mv mdbook-dtmo ~/.local/bin/mdbook
             mdbook --version
-      - run:
-          name: Install npm deps
-          command: cd docs && yarn install
       - run:
           name: Generate API docs
           command: cd docs && yarn generate-api-docs
@@ -146,16 +160,17 @@ jobs:
           name: Check documentation links
           command: cd docs && yarn linkcheck
       - persist_to_workspace:
-          root: generated-docs/
+          root: build/
           paths:
-            - docs/book
+            - docs/user
             - docs/dev
             - docs/shared
             - docs/index.html
 
   docs-spellcheck:
     docker:
-      # Use Ubuntu Focal (20.04) so we get aspell 0.60.8 or later (which contains markdown support)
+      # This is a separate job so that we can use Ubuntu Focal (20.04) and that
+      # way get aspell 0.60.8 or later (which contains markdown support)
       - image: circleci/buildpack-deps:focal
     steps:
       - checkout
@@ -166,7 +181,7 @@ jobs:
           name: Install aspell
           command: sudo apt install aspell aspell-en
       - run:
-          name: Check spelling
+          name: Check documentation spelling
           command: cd docs && bin/spellcheck.sh list
 
   # via https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
@@ -176,10 +191,10 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: generated-docs/
+          at: build/
       - run:
           name: Disable jekyll builds
-          command: touch generated-docs/docs/.nojekyll
+          command: touch build/docs/.nojekyll
       - run:
           name: Show contents
           command: ls -R
@@ -196,7 +211,7 @@ jobs:
             git config user.email "ci-build@bergamot-browser-extension"
             git config user.name "CircleCI docs-deploy job"
             npm install -g --silent gh-pages@2.0.1
-            gh-pages --dotfiles --message "[skip ci] Updates" --dist generated-docs/docs
+            gh-pages --dotfiles --message "[skip ci] Updates" --dist build/docs
 
 
 ###########################################################################
@@ -207,13 +222,13 @@ workflows:
   ci:
     jobs:
       - build-and-test-extension
-      - docs-spellcheck
-      - generate-docs:
-          requires:
-            - docs-spellcheck
-      - docs-deploy:
+      - generate-docs
+      - docs-spellcheck:
           requires:
             - generate-docs
+      - docs-deploy:
+          requires:
+            - docs-spellcheck
           #filters:
           #  branches:
           #    only: main
