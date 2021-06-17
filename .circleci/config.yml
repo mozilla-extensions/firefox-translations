@@ -214,6 +214,6 @@ workflows:
       - docs-deploy:
           requires:
             - generate-docs
-          filters:
-            branches:
-              only: main
+          #filters:
+          #  branches:
+          #    only: main
