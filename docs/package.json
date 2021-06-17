@@ -19,10 +19,10 @@
     "build": "bin/build-docs.sh",
     "generate-api-docs": "bin/generate-api-docs.sh",
     "format": "prettier '**/*.{md,css,js,json,html}' --ignore-path=.eslintignore --write",
-    "serve": "http-serve ../build/docs -p 3000",
     "linkcheck": "link-checker ../build/docs --disable-external true --allow-hash-href true",
     "spellcheck:list": "bin/spellcheck.sh list",
     "spellcheck:check": "bin/spellcheck.sh check",
-    "watch": "yarn build && light-server -s ../build/docs -p 3000 -w \"** # yarn build\""
+    "serve": "light-server -s ../build/docs -p 3000",
+    "watch": "yarn build && yarn serve -w \"** # yarn build\""
   }
 }
