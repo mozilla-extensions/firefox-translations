@@ -1,0 +1,74 @@
+{
+  "extensionName": {
+    "message": "Bergamot",
+    "description": "Name of the extension"
+  },
+  "extensionDescription": {
+    "message": "Neuronový strojový překlad v prohlížeči",
+    "description": "Description of the extension."
+  },
+  "browserActionButtonTitle": {
+    "message": "Bergamot",
+    "description": "The browser action button title."
+  },
+  "translationStatus_UNAVAILABLE_mainInterfaceMessage": {
+    "message": "Tuto stránku nelze přeložit.",
+    "description": "Main interface dropdown message for: When no translation is relevant (about-pages and the like)"
+  },
+  "translationStatus_DETECTING_LANGUAGE_mainInterfaceMessage": {
+    "message": "Zjišťování jazyka stránky…",
+    "description": "Main interface dropdown message for: While language detection is being performed"
+  },
+  "translationStatus_LANGUAGE_NOT_DETECTED_mainInterfaceMessage": {
+    "message": "Vyberte prosím jazyk, ve kterém je obsah této stránky.",
+    "description": "Main interface dropdown message for: When web page language detection does not succeed"
+  },
+  "translationStatus_SOURCE_LANGUAGE_UNDERSTOOD_mainInterfaceMessage": {
+    "message": "Tato stránka je v jazyce [SOURCE_LANG], kterému rozumíte.",
+    "description": "Main interface dropdown message for: When web page is in the user's language(s)"
+  },
+  "translationStatus_DETECTED_LANGUAGE_UNSUPPORTED_mainInterfaceMessage": {
+    "message": "Jazyk [SOURCE_LANG] bohužel není podporován.",
+    "description": "Main interface dropdown message for: When web page is in an unsupported language"
+  },
+  "translationStatus_OFFER_mainInterfaceMessage": {
+    "message": "Tato stránka je v jazyce [SOURCE_LANG]. Chcete tuto stránku přeložit?",
+    "description": "Main interface dropdown message for: When language detection is ready and web page is in a language different than the user language(s)"
+  },
+  "translationStatus_DOWNLOADING_TRANSLATION_MODEL_mainInterfaceMessage": {
+    "message": "Stahování jazykových souborů…",
+    "description": "Main interface dropdown message for: When language files are downloaded"
+  },
+  "translationStatus_TRANSLATING_mainInterfaceMessage": {
+    "message": "Probíhá překlad stránky…",
+    "description": "Main interface dropdown message for: When translation is in progress"
+  },
+  "translationStatus_TRANSLATED_mainInterfaceMessage": {
+    "message": "Tato stránka byla přeložena z jazyka [SOURCE_LANG] do jazyka [TARGET_LANG].",
+    "description": "Main interface dropdown message for: Page Successfully Translated"
+  },
+  "translationStatus_ERROR_mainInterfaceMessage": {
+    "message": "Během překladu této stránky došlo k chybě.",
+    "description": "Main interface dropdown message for: Page Translation Error"
+  },
+  "language_iso6391_en": {
+    "message": "angličtina",
+    "description": "Language name of 'en' (ISO 639-1)"
+  },
+  "language_iso6391_de": {
+    "message": "němčina",
+    "description": "Language name of 'de' (ISO 639-1)"
+  },
+  "language_iso6391_es": {
+    "message": "španělština",
+    "description": "Language name of 'es' (ISO 639-1)"
+  },
+  "language_iso6391_et": {
+    "message": "estonština",
+    "description": "Language name of 'et' (ISO 639-1)"
+  },
+  "language_iso6391_cs": {
+    "message": "čeština",
+    "description": "Language name of 'cs' (ISO 639-1)"
+  }
+}
