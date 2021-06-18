@@ -4,7 +4,7 @@
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Strojový překladač cizích jazyků založený na neuronové síti.",
+    "message": "Neuronový strojový překlad v prohlížeči",
     "description": "Description of the extension."
   },
   "browserActionButtonTitle": {
