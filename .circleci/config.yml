@@ -203,7 +203,6 @@ jobs:
       - add_ssh_keys:
           fingerprints:
             - "ea:bc:e4:c3:89:d4:2d:79:4f:70:d7:d8:3a:b9:ba:98"
-            - "86:9c:17:73:b1:92:e2:02:eb:05:29:88:ca:c5:30:fd"
       # The gh-pages npm package can be used to push a directory to a git branch;
       # see https://www.npmjs.com/package/gh-pages
       - run:
@@ -230,6 +229,6 @@ workflows:
       - docs-deploy:
           requires:
             - docs-spellcheck
-          #filters:
-          #  branches:
-          #    only: main
+          filters:
+            branches:
+              only: main
