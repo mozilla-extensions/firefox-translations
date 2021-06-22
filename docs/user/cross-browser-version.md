@@ -8,7 +8,7 @@ In the past, and possibly sometime in the future, there was/will be releases of 
 ## Installation on Chrome
 
 - If you haven't already, download and install [Chrome Canary](https://www.google.com/chrome/canary/) since the current release requires bleeding edge browser capabilities.
-- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/firefox-translations/releases/download/v0.4.2/bergamot-browser-extension-0.4.2-chrome-cross-browser-ui.zip)
+- Download the latest Chrome zip file, linked [here](https://github.com/mozilla-extensions/firefox-translations/releases/download/v0.4.3/bergamot-browser-extension-0.4.3-chrome-cross-browser-ui.zip)
 - Unpack the zip file locally
 - Start Chrome Canary with the following extra argument: `--js-flags="--experimental-wasm-simd"`, eg `/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --js-flags="--experimental-wasm-simd"`
 - Enter `chrome://extensions` in Chrome's address bar and press enter
@@ -30,7 +30,7 @@ In the past, and possibly sometime in the future, there was/will be releases of 
   - `xpinstall.signatures.dev-root` (Create this pref if it doesn't exist. This is required to be able to test these unreleased candidate builds)
 - Make sure that the following preferences are set to `false` in `about:config`:
   - `xpinstall.signatures.required` (This enables the use of ordinary extensions in the same profile)
-- Click [here](https://github.com/mozilla-extensions/firefox-translations/releases/download/v0.4.2/bergamot-browser-extension-0.4.2-firefox-cross-browser-ui.xpi) to start the download and installation of the extension
+- Click [here](https://github.com/mozilla-extensions/firefox-translations/releases/download/v0.4.3/bergamot-browser-extension-0.4.3-firefox-cross-browser-ui.xpi) to start the download and installation of the extension
 - Wait for the extension to be downloaded
 - Click `Add` in the popup that comes up
 - The extension is now installed
