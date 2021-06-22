@@ -15,7 +15,6 @@ For user documentation on the **Firefox Translations** feature, refer to [Firefo
 ## The main sections of this guide
 
 - **[Engineering](./engineering/overview.md)** - Details how to get your hands dirty and contribute to the codebase
-- **[Architecture](./architecture/overview.md)** - A description of the main components and how they interact with each other
 - **[Maintenance](./maintenance/overview.md)** - Shorter tutorials on how to achieve specific maintenance tasks
 
 ## Reporting bugs/issues
