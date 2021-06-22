@@ -8,6 +8,7 @@
   - [Local development](./engineering/local-development.md)
   - [Building and installing the extension](./engineering/building-and-installing-the-extension.md)
   - [Debugging](./engineering/debugging.md)
+  - [Improving the documentation](./engineering/improving-the-documentation.md)
   - [Continuous integration](./engineering/ci.md)
   - [Contributing](./engineering/contributing.md)
 

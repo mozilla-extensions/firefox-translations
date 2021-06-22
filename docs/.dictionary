@@ -1,4 +1,4 @@
-personal_ws-1.1 en 32 utf-8
+personal_ws-1.1 en 36 utf-8
 BERGAMOT
 Bergamot
 CircleCI
@@ -7,10 +7,12 @@ Github
 MPL
 PRs
 README
+TypeDoc
 UI
 WASM
 Webpage
 XQuartz
+aspell
 bergamot
 cli
 codebase
@@ -22,6 +24,7 @@ erDiagram
 geckodriver
 infobar
 js
+mdBook
 mitmproxy
 monolingually
 pre
@@ -29,5 +32,6 @@ programme
 repo
 submodule
 submodules
+typedoc
 ui
 webpack
