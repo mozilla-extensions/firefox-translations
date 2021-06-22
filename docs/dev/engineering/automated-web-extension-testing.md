@@ -1,10 +1,12 @@
-in-browser tests
+# Automated web extension testing
 
-these tests run inside an extension page to be able to have access to the same privileges that web extension background script has
+## In-browser tests
 
-e2e tests
+These tests run inside an extension page to be able to have access to the same privileges that web extension background script has.
 
-selenium because of only that allows access to the privileged parts of the ui
+## End-to-end (e2e) tests
+
+These are based on Selenium because of only that allows access to the privileged parts of the UI.
 
 ## Run end-to-end tests
 
@@ -50,7 +52,6 @@ To troubleshoot issues with failing tests when only cryptic error messages are a
 
 Maintenance and development of this component requires experience in:
 
-- ...
-
-- Web extension regression tests (CI, e2e tests)
-  Senior/Staff Test Engineer with great experience in configuring CI and writing Selenium-based e2e tests for web extensions
+- Web extension regression tests
+- Selenium
+- CircleCI

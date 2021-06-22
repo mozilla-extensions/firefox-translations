@@ -9,6 +9,7 @@
   - [Building and installing the extension](./engineering/building-and-installing-the-extension.md)
   - [Debugging](./engineering/debugging.md)
   - [Improving the documentation](./engineering/improving-the-documentation.md)
+  - [Automated tests](./engineering/automated-web-extension-testing.md)
   - [Continuous integration](./engineering/ci.md)
   - [Contributing](./engineering/contributing.md)
 
