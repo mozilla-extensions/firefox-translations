@@ -1,22 +1,22 @@
 {
   "extensionName": {
-    "message": "Firefox Übersetzungen",
+    "message": "Firefox Переводчик",
     "description": "Name of the extension"
   },
   "extensionDescription": {
-    "message": "Neurale Maschine Übersetzung für den Browser.",
+    "message": "Нейронный машинный перевод для браузера.",
     "description": "Description of the extension."
   },
   "currentlyDownloadingTranslationEngine": {
-    "message": "Derzeit Download Übersetzungs-Engine",
+    "message": "Скачивание движка перевода",
     "description": "Informs the user that the translations feature is currently downloading the translation engine."
   },
   "currentlyDownloadingLanguageModel": {
-    "message": "Derzeit das Sprachmodell herunterladen",
+    "message": "Скачивание языковой модели",
     "description": "Informs the user that the translations feature is currently downloading the language model files."
   },
   "detailedDownloadProgress": {
-    "message": "$PERCENTAGE$% von $MB$ mb heruntergeladen",
+    "message": "$PERCENTAGE$% из $MB$ МБ загружено",
     "description": "Informs the user how the language model file downloading is progressing.",
     "placeholders": {
       "percentage": {
@@ -30,15 +30,15 @@
     }
   },
   "currentlyLoadingLanguageModel": {
-    "message": "Derzeit ladende Sprachmodell",
+    "message": "Загрузка языковой модели",
     "description": "Informs the user that the translations feature is currently loading the language model files into memory."
   },
   "loadedLanguageModel": {
-    "message": "Sprachmodell geladen",
+    "message": "Языковая модель загружена",
     "description": "Informs the user that the translations feature has loaded the language model files into memory."
   },
   "partsLeftToTranslate": {
-    "message": "Noch zu übersetzende Teile: $NUM$",
+    "message": "Осталось частей для перевода: $NUM$",
     "description": "Informs the user that the translations feature has $NUM$ parts left to translate.",
     "placeholders": {
       "num": {

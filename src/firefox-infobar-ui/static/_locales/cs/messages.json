@@ -35,7 +35,7 @@
   },
   "loadedLanguageModel": {
     "message": "Jazykový model načten",
-    "description": "Informs the user that the translations feature is has loaded the language model files into memory."
+    "description": "Informs the user that the translations feature has loaded the language model files into memory."
   },
   "partsLeftToTranslate": {
     "message": "Zbývající části k přeložení: $NUM$",
