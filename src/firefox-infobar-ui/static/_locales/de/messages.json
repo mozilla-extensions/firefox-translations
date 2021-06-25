@@ -38,7 +38,7 @@
     "description": "Informs the user that the translations feature is has loaded the language model files into memory."
   },
   "partsLeftToTranslate": {
-    "message": "Teile links zu übersetzen: $NUM$",
+    "message": "Noch zu übersetzende Teile: $NUM$",
     "description": "Informs the user that the translations feature has $NUM$ parts left to translate.",
     "placeholders": {
       "num": {
