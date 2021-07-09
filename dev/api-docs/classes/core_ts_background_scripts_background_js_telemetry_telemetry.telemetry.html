@@ -1,0 +1,705 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.md - Firefox Translations Web Extension - Developer&#x27;s Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../../favicon.png">
+        
+        <link rel="stylesheet" href="../../css/variables.css">
+        <link rel="stylesheet" href="../../css/general.css">
+        <link rel="stylesheet" href="../../css/chrome.css">
+        
+        <link rel="stylesheet" href="../../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../highlight.css">
+        <link rel="stylesheet" href="../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+        <link rel="stylesheet" href="../../../shared/custom.css">
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item affix "><a href="../../index.html">Introduction</a></li><li class="chapter-item affix "><li class="part-title">Developer's Guide</li><li class="chapter-item "><a href="../../engineering/overview.html"><strong aria-hidden="true">1.</strong> Engineering</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../engineering/getting-started.html"><strong aria-hidden="true">1.1.</strong> Getting started</a></li><li class="chapter-item "><a href="../../engineering/local-development.html"><strong aria-hidden="true">1.2.</strong> Local development</a></li><li class="chapter-item "><a href="../../engineering/building-and-installing-the-extension.html"><strong aria-hidden="true">1.3.</strong> Building and installing the extension</a></li><li class="chapter-item "><a href="../../engineering/debugging.html"><strong aria-hidden="true">1.4.</strong> Debugging</a></li><li class="chapter-item "><a href="../../engineering/improving-the-documentation.html"><strong aria-hidden="true">1.5.</strong> Improving the documentation</a></li><li class="chapter-item "><a href="../../engineering/automated-web-extension-testing.html"><strong aria-hidden="true">1.6.</strong> Automated tests</a></li><li class="chapter-item "><a href="../../engineering/ci.html"><strong aria-hidden="true">1.7.</strong> Continuous integration</a></li><li class="chapter-item "><a href="../../engineering/contributing.html"><strong aria-hidden="true">1.8.</strong> Contributing</a></li></ol></li><li class="chapter-item "><a href="../../maintenance/overview.html"><strong aria-hidden="true">2.</strong> Maintenance</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../maintenance/upgrading-glean-js.html"><strong aria-hidden="true">2.1.</strong> Upgrading Glean.js</a></li></ol></li><li class="chapter-item "><li class="part-title">Appendix</li><li class="chapter-item expanded "><a href="../../api-docs/index.html"><strong aria-hidden="true">3.</strong> Generated API Docs</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapimodeldownloaderror.html"><strong aria-hidden="true">3.1.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapimodeldownloaderror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapimodelloaderror.html"><strong aria-hidden="true">3.2.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapimodelloaderror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapitranslationerror.html"><strong aria-hidden="true">3.3.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.bergamottranslatorapitranslationerror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_state_management_mobxkeystonebackgroundcontexthost.mobxkeystonebackgroundcontexthost.html"><strong aria-hidden="true">3.4.</strong> core_ts_background_scripts_background_js_state_management_mobxkeystonebackgroundcontexthost.mobxkeystonebackgroundcontexthost.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_state_management_store.store.html"><strong aria-hidden="true">3.5.</strong> core_ts_background_scripts_background_js_state_management_store.store.md</a></li><li class="chapter-item expanded "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html" class="active"><strong aria-hidden="true">3.6.</strong> core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.bergamotrestapiclient.html"><strong aria-hidden="true">3.7.</strong> core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.bergamotrestapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_background_scripts_background_js_translation_api_clients_bergamotwasmapiclient.bergamotwasmapiclient.html"><strong aria-hidden="true">3.8.</strong> core_ts_background_scripts_background_js_translation_api_clients_bergamotwasmapiclient.bergamotwasmapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.basedomtranslator.html"><strong aria-hidden="true">3.9.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.basedomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslatorerror.html"><strong aria-hidden="true">3.10.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslatorerror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslator.bergamotdomtranslator.html"><strong aria-hidden="true">3.11.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslator.bergamotdomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslatorrequest.bergamotdomtranslatorrequest.html"><strong aria-hidden="true">3.12.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslatorrequest.bergamotdomtranslatorrequest.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_minimaldomtranslator.minimaldomtranslator.html"><strong aria-hidden="true">3.13.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_minimaldomtranslator.minimaldomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_testdomtranslator.testdomtranslator.html"><strong aria-hidden="true">3.14.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_testdomtranslator.testdomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_domtranslationmanager.domtranslationmanager.html"><strong aria-hidden="true">3.15.</strong> core_ts_content_scripts_dom_translation_content_script_js_domtranslationmanager.domtranslationmanager.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_translationdocument.translationdocument.html"><strong aria-hidden="true">3.16.</strong> core_ts_content_scripts_dom_translation_content_script_js_translationdocument.translationdocument.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_translationitem.translationitem.html"><strong aria-hidden="true">3.17.</strong> core_ts_content_scripts_dom_translation_content_script_js_translationitem.translationitem.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_content_scripts_dom_translation_content_script_js_translationitem.translationitem_nodeplaceholder.html"><strong aria-hidden="true">3.18.</strong> core_ts_content_scripts_dom_translation_content_script_js_translationitem.translationitem_nodeplaceholder.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_contentscriptbergamotapiclient.contentscriptbergamotapiclient.html"><strong aria-hidden="true">3.19.</strong> core_ts_shared_resources_contentscriptbergamotapiclient.contentscriptbergamotapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_contentscriptframeinfo.contentscriptframeinfo.html"><strong aria-hidden="true">3.20.</strong> core_ts_shared_resources_contentscriptframeinfo.contentscriptframeinfo.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_contentscriptlanguagedetectorproxy.contentscriptlanguagedetectorproxy.html"><strong aria-hidden="true">3.21.</strong> core_ts_shared_resources_contentscriptlanguagedetectorproxy.contentscriptlanguagedetectorproxy.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_languagesupport.languagesupport.html"><strong aria-hidden="true">3.22.</strong> core_ts_shared_resources_languagesupport.languagesupport.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_basetranslationstate.basetranslationstate.html"><strong aria-hidden="true">3.23.</strong> core_ts_shared_resources_models_basetranslationstate.basetranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_documenttranslationstate.documenttranslationstate.html"><strong aria-hidden="true">3.24.</strong> core_ts_shared_resources_models_documenttranslationstate.documenttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_extensionstate.extensionstate.html"><strong aria-hidden="true">3.25.</strong> core_ts_shared_resources_models_extensionstate.extensionstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_fragmenttranslationstate.fragmenttranslationstate.html"><strong aria-hidden="true">3.26.</strong> core_ts_shared_resources_models_fragmenttranslationstate.fragmenttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_tabtranslationstate.tabtranslationstate.html"><strong aria-hidden="true">3.27.</strong> core_ts_shared_resources_models_tabtranslationstate.tabtranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_models_translateowntexttranslationstate.translateowntexttranslationstate.html"><strong aria-hidden="true">3.28.</strong> core_ts_shared_resources_models_translateowntexttranslationstate.translateowntexttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_shared_resources_state_management_documenttranslationstatecommunicator.documenttranslationstatecommunicator.html"><strong aria-hidden="true">3.29.</strong> core_ts_shared_resources_state_management_documenttranslationstatecommunicator.documenttranslationstatecommunicator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_web_worker_scripts_translation_worker_js_getbergamotmodelsforlanguagepair.languagepairunsupportederror.html"><strong aria-hidden="true">3.30.</strong> core_ts_web_worker_scripts_translation_worker_js_getbergamotmodelsforlanguagepair.languagepairunsupportederror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.filedownloaderror.html"><strong aria-hidden="true">3.31.</strong> core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.filedownloaderror.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/cross_browser_ui_ts_background_scripts_background_js_dynamicactionicon.dynamicactionicon.html"><strong aria-hidden="true">3.32.</strong> cross_browser_ui_ts_background_scripts_background_js_dynamicactionicon.dynamicactionicon.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/cross_browser_ui_ts_background_scripts_background_js_extensionicontranslationstate.extensionicontranslationstate.html"><strong aria-hidden="true">3.33.</strong> cross_browser_ui_ts_background_scripts_background_js_extensionicontranslationstate.extensionicontranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/cross_browser_ui_ts_extension_pages_main_interface_js_lib_translator.translator.html"><strong aria-hidden="true">3.34.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_lib_translator.translator.md</a></li><li class="chapter-item "><a href="../../api-docs/classes/firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuibroker.html"><strong aria-hidden="true">3.35.</strong> firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuibroker.md</a></li><li class="chapter-item "><a href="../../api-docs/enums/core_ts_shared_resources_models_basetranslationstate.translationstatus.html"><strong aria-hidden="true">3.36.</strong> core_ts_shared_resources_models_basetranslationstate.translationstatus.md</a></li><li class="chapter-item "><a href="../../api-docs/enums/firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuistateinfobarstate.html"><strong aria-hidden="true">3.37.</strong> firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuistateinfobarstate.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_contentscriptbergamotapiclientportlistener.translationrequestupdate.html"><strong aria-hidden="true">3.38.</strong> core_ts_background_scripts_background_js_contentscriptbergamotapiclientportlistener.translationrequestupdate.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.errorworkermessage.html"><strong aria-hidden="true">3.39.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.errorworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelparams.html"><strong aria-hidden="true">3.40.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelparams.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelrequestworkermessage.html"><strong aria-hidden="true">3.41.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelrequestworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelresults.html"><strong aria-hidden="true">3.42.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelresults.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelresultsworkermessage.html"><strong aria-hidden="true">3.43.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.loadmodelresultsworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogress.html"><strong aria-hidden="true">3.44.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogress.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogresseventdata.html"><strong aria-hidden="true">3.45.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogresseventdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogressworkermessage.html"><strong aria-hidden="true">3.46.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modeldownloadprogressworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modelloadedeventdata.html"><strong aria-hidden="true">3.47.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modelloadedeventdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modelwillloadeventdata.html"><strong aria-hidden="true">3.48.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.modelwillloadeventdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translateparams.html"><strong aria-hidden="true">3.49.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translateparams.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translaterequestworkermessage.html"><strong aria-hidden="true">3.50.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translaterequestworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationfinishedeventdata.html"><strong aria-hidden="true">3.51.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationfinishedeventdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationrequestqueuedeventdata.html"><strong aria-hidden="true">3.52.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationrequestqueuedeventdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationresults.html"><strong aria-hidden="true">3.53.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationresults.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationresultsworkermessage.html"><strong aria-hidden="true">3.54.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.translationresultsworkermessage.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_lib_languagedetector.detectedlanguageresults.html"><strong aria-hidden="true">3.55.</strong> core_ts_background_scripts_background_js_lib_languagedetector.detectedlanguageresults.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_state_management_store.extensionpreferences.html"><strong aria-hidden="true">3.56.</strong> core_ts_background_scripts_background_js_state_management_store.extensionpreferences.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_state_management_store.localstoragewrapper.html"><strong aria-hidden="true">3.57.</strong> core_ts_background_scripts_background_js_state_management_store.localstoragewrapper.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_background_scripts_background_js_telemetry_telemetry.translationrelevantfxtelemetrymetrics.html"><strong aria-hidden="true">3.58.</strong> core_ts_background_scripts_background_js_telemetry_telemetry.translationrelevantfxtelemetrymetrics.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.derivedtranslationdocumentdata.html"><strong aria-hidden="true">3.59.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.derivedtranslationdocumentdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslationchunk.html"><strong aria-hidden="true">3.60.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslationchunk.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslatorrequest.html"><strong aria-hidden="true">3.61.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.domtranslatorrequest.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.frametranslationprogress.html"><strong aria-hidden="true">3.62.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.frametranslationprogress.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationapiclient.html"><strong aria-hidden="true">3.63.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationrequestdata.html"><strong aria-hidden="true">3.64.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationrequestdata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationrequestprogress.html"><strong aria-hidden="true">3.65.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationrequestprogress.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationresponsedata.html"><strong aria-hidden="true">3.66.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.translationresponsedata.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_detagandproject.detaggedstring.html"><strong aria-hidden="true">3.67.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_detagandproject.detaggedstring.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_content_scripts_dom_translation_content_script_js_gettranslationnodes.translationnode.html"><strong aria-hidden="true">3.68.</strong> core_ts_content_scripts_dom_translation_content_script_js_gettranslationnodes.translationnode.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_modelregistry.modelregistry.html"><strong aria-hidden="true">3.69.</strong> core_ts_modelregistry.modelregistry.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_shared_resources_types_bergamot_types.frameinfo.html"><strong aria-hidden="true">3.70.</strong> core_ts_shared_resources_types_bergamot_types.frameinfo.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.downloadedfile.html"><strong aria-hidden="true">3.71.</strong> core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.downloadedfile.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.remotefile.html"><strong aria-hidden="true">3.72.</strong> core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.remotefile.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/cross_browser_ui_ts_extension_pages_main_interface_js_components_list_iitem.props.html"><strong aria-hidden="true">3.73.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_list_iitem.props.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/cross_browser_ui_ts_extension_pages_main_interface_js_components_progress_interface.default.html"><strong aria-hidden="true">3.74.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_progress_interface.default.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/cross_browser_ui_ts_extension_pages_main_interface_js_components_table_interface.default.html"><strong aria-hidden="true">3.75.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_table_interface.default.md</a></li><li class="chapter-item "><a href="../../api-docs/interfaces/firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuistate.html"><strong aria-hidden="true">3.76.</strong> firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.nativetranslateuistate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_contentscriptbergamotapiclientportlistener.html"><strong aria-hidden="true">3.77.</strong> core_ts_background_scripts_background_js_contentscriptbergamotapiclientportlistener.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_contentscriptframeinfoportlistener.html"><strong aria-hidden="true">3.78.</strong> core_ts_background_scripts_background_js_contentscriptframeinfoportlistener.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_contentscriptlanguagedetectorproxyportlistener.html"><strong aria-hidden="true">3.79.</strong> core_ts_background_scripts_background_js_contentscriptlanguagedetectorproxyportlistener.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_lib_bergamottranslatorapi.html"><strong aria-hidden="true">3.80.</strong> core_ts_background_scripts_background_js_lib_bergamottranslatorapi.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_lib_languagedetector.html"><strong aria-hidden="true">3.81.</strong> core_ts_background_scripts_background_js_lib_languagedetector.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_lib_translateallframesintab.html"><strong aria-hidden="true">3.82.</strong> core_ts_background_scripts_background_js_lib_translateallframesintab.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_connectrootstoretodevtools.html"><strong aria-hidden="true">3.83.</strong> core_ts_background_scripts_background_js_state_management_connectrootstoretodevtools.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_createbackgroundcontextrootstore.html"><strong aria-hidden="true">3.84.</strong> core_ts_background_scripts_background_js_state_management_createbackgroundcontextrootstore.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_localstoragewrapper.html"><strong aria-hidden="true">3.85.</strong> core_ts_background_scripts_background_js_state_management_localstoragewrapper.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_mobxkeystonebackgroundcontexthost.html"><strong aria-hidden="true">3.86.</strong> core_ts_background_scripts_background_js_state_management_mobxkeystonebackgroundcontexthost.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_mocklocalstorage.html"><strong aria-hidden="true">3.87.</strong> core_ts_background_scripts_background_js_state_management_mocklocalstorage.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_state_management_store.html"><strong aria-hidden="true">3.88.</strong> core_ts_background_scripts_background_js_state_management_store.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_errors.html"><strong aria-hidden="true">3.89.</strong> core_ts_background_scripts_background_js_telemetry_generated_errors.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_infobar.html"><strong aria-hidden="true">3.90.</strong> core_ts_background_scripts_background_js_telemetry_generated_infobar.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_metadata.html"><strong aria-hidden="true">3.91.</strong> core_ts_background_scripts_background_js_telemetry_generated_metadata.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_performance.html"><strong aria-hidden="true">3.92.</strong> core_ts_background_scripts_background_js_telemetry_generated_performance.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_pings.html"><strong aria-hidden="true">3.93.</strong> core_ts_background_scripts_background_js_telemetry_generated_pings.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_service.html"><strong aria-hidden="true">3.94.</strong> core_ts_background_scripts_background_js_telemetry_generated_service.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_generated_test.html"><strong aria-hidden="true">3.95.</strong> core_ts_background_scripts_background_js_telemetry_generated_test.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_telemetry_telemetry.html"><strong aria-hidden="true">3.96.</strong> core_ts_background_scripts_background_js_telemetry_telemetry.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.html"><strong aria-hidden="true">3.97.</strong> core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_background_scripts_background_js_translation_api_clients_bergamotwasmapiclient.html"><strong aria-hidden="true">3.98.</strong> core_ts_background_scripts_background_js_translation_api_clients_bergamotwasmapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_config.html"><strong aria-hidden="true">3.99.</strong> core_ts_config.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.html"><strong aria-hidden="true">3.100.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_basedomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslator.html"><strong aria-hidden="true">3.101.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslatorrequest.html"><strong aria-hidden="true">3.102.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_bergamotdomtranslatorrequest.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_detagandproject.html"><strong aria-hidden="true">3.103.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_detagandproject.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_minimaldomtranslator.html"><strong aria-hidden="true">3.104.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_minimaldomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_dom_translators_testdomtranslator.html"><strong aria-hidden="true">3.105.</strong> core_ts_content_scripts_dom_translation_content_script_js_dom_translators_testdomtranslator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_domtranslationmanager.html"><strong aria-hidden="true">3.106.</strong> core_ts_content_scripts_dom_translation_content_script_js_domtranslationmanager.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_gettranslationnodes.html"><strong aria-hidden="true">3.107.</strong> core_ts_content_scripts_dom_translation_content_script_js_gettranslationnodes.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_hastextfortranslation.html"><strong aria-hidden="true">3.108.</strong> core_ts_content_scripts_dom_translation_content_script_js_hastextfortranslation.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_translationdocument.html"><strong aria-hidden="true">3.109.</strong> core_ts_content_scripts_dom_translation_content_script_js_translationdocument.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_content_scripts_dom_translation_content_script_js_translationitem.html"><strong aria-hidden="true">3.110.</strong> core_ts_content_scripts_dom_translation_content_script_js_translationitem.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_modelregistry.html"><strong aria-hidden="true">3.111.</strong> core_ts_modelregistry.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_contentscriptbergamotapiclient.html"><strong aria-hidden="true">3.112.</strong> core_ts_shared_resources_contentscriptbergamotapiclient.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_contentscriptframeinfo.html"><strong aria-hidden="true">3.113.</strong> core_ts_shared_resources_contentscriptframeinfo.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_contentscriptlanguagedetectorproxy.html"><strong aria-hidden="true">3.114.</strong> core_ts_shared_resources_contentscriptlanguagedetectorproxy.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_errorreporting.html"><strong aria-hidden="true">3.115.</strong> core_ts_shared_resources_errorreporting.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_languagesupport.html"><strong aria-hidden="true">3.116.</strong> core_ts_shared_resources_languagesupport.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_basetranslationstate.html"><strong aria-hidden="true">3.117.</strong> core_ts_shared_resources_models_basetranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_documenttranslationstate.html"><strong aria-hidden="true">3.118.</strong> core_ts_shared_resources_models_documenttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_extensionstate.html"><strong aria-hidden="true">3.119.</strong> core_ts_shared_resources_models_extensionstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_fragmenttranslationstate.html"><strong aria-hidden="true">3.120.</strong> core_ts_shared_resources_models_fragmenttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_tabtranslationstate.html"><strong aria-hidden="true">3.121.</strong> core_ts_shared_resources_models_tabtranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_models_translateowntexttranslationstate.html"><strong aria-hidden="true">3.122.</strong> core_ts_shared_resources_models_translateowntexttranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_state_management_documenttranslationstatecommunicator.html"><strong aria-hidden="true">3.123.</strong> core_ts_shared_resources_state_management_documenttranslationstatecommunicator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_state_management_subscribetoextensionpreferencechanges.html"><strong aria-hidden="true">3.124.</strong> core_ts_shared_resources_state_management_subscribetoextensionpreferencechanges.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_state_management_subscribetoextensionstate.html"><strong aria-hidden="true">3.125.</strong> core_ts_shared_resources_state_management_subscribetoextensionstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_types_bergamot_types.html"><strong aria-hidden="true">3.126.</strong> core_ts_shared_resources_types_bergamot_types.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_shared_resources_types_import_png.html"><strong aria-hidden="true">3.127.</strong> core_ts_shared_resources_types_import_png.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_bergamot_translator_version.html"><strong aria-hidden="true">3.128.</strong> core_ts_web_worker_scripts_translation_worker_js_bergamot_translator_version.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_bergamot_translator_worker.html"><strong aria-hidden="true">3.129.</strong> core_ts_web_worker_scripts_translation_worker_js_bergamot_translator_worker.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_digestsha256.html"><strong aria-hidden="true">3.130.</strong> core_ts_web_worker_scripts_translation_worker_js_digestsha256.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_getbergamotmodelsforlanguagepair.html"><strong aria-hidden="true">3.131.</strong> core_ts_web_worker_scripts_translation_worker_js_getbergamotmodelsforlanguagepair.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_instrumentresponsewithprogresscallback.html"><strong aria-hidden="true">3.132.</strong> core_ts_web_worker_scripts_translation_worker_js_instrumentresponsewithprogresscallback.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_persistresponse.html"><strong aria-hidden="true">3.133.</strong> core_ts_web_worker_scripts_translation_worker_js_persistresponse.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.html"><strong aria-hidden="true">3.134.</strong> core_ts_web_worker_scripts_translation_worker_js_setuppersistremotefilewithprogressduringdownload.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/core_ts_web_worker_scripts_translation_worker_js_throttle.html"><strong aria-hidden="true">3.135.</strong> core_ts_web_worker_scripts_translation_worker_js_throttle.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_background_scripts_background_js_dynamicactionicon.html"><strong aria-hidden="true">3.136.</strong> cross_browser_ui_ts_background_scripts_background_js_dynamicactionicon.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_background_scripts_background_js_extensionicontranslationstate.html"><strong aria-hidden="true">3.137.</strong> cross_browser_ui_ts_background_scripts_background_js_extensionicontranslationstate.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_background_scripts_background_js_ischrome.html"><strong aria-hidden="true">3.138.</strong> cross_browser_ui_ts_background_scripts_background_js_ischrome.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_extension_pages_main_interface_js_components_list_iitem.html"><strong aria-hidden="true">3.139.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_list_iitem.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_extension_pages_main_interface_js_components_progress_interface.html"><strong aria-hidden="true">3.140.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_progress_interface.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_extension_pages_main_interface_js_components_table_interface.html"><strong aria-hidden="true">3.141.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_components_table_interface.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_extension_pages_main_interface_js_lib_translator.html"><strong aria-hidden="true">3.142.</strong> cross_browser_ui_ts_extension_pages_main_interface_js_lib_translator.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/cross_browser_ui_ts_shared_resources_getcurrenttab.html"><strong aria-hidden="true">3.143.</strong> cross_browser_ui_ts_shared_resources_getcurrenttab.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/firefox_infobar_ui_ts_background_scripts_background_js_browserwithexperimentapis.html"><strong aria-hidden="true">3.144.</strong> firefox_infobar_ui_ts_background_scripts_background_js_browserwithexperimentapis.md</a></li><li class="chapter-item "><a href="../../api-docs/modules/firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.html"><strong aria-hidden="true">3.145.</strong> firefox_infobar_ui_ts_background_scripts_background_js_nativetranslateuibroker.md</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Firefox Translations Web Extension - Developer&#x27;s Guide</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/mozilla-extensions/firefox-translations" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#class-telemetry" id="class-telemetry">Class: Telemetry</a></h1>
+<p><a href="../modules/core_ts_background_scripts_background_js_telemetry_telemetry.html">core/ts/background-scripts/background.js/telemetry/Telemetry</a>.Telemetry</p>
+<p>This class contains general telemetry initialization and helper code and synchronous telemetry-recording functions.</p>
+<p>Synchronous methods here is important, since it is the only way to guarantee that multiple Glean API calls are
+executed sequentially and not interleaved with other asynchronous Telemetry recording.
+For more information, see: https://github.com/mozilla-extensions/firefox-translations/pull/76#discussion_r602128568</p>
+<p>Glean.js guarantees zero exceptions, but our glue code or specific way of invoking Glean.js may result in exceptions.
+For this reason we surround all code invoking Glean.js in try/catch blocks.</p>
+<p>Pings are grouped by tab id and submitted on specific triggers (see below), or after 1 minute of inactivity.</p>
+<p>The &quot;1 minute&quot; period can be overridden to facilitate testing by setting
+the telemetryInactivityThresholdInSecondsOverride string argument at initialization.</p>
+<p>Submit triggers:</p>
+<ol>
+<li>Regular translation: infobar displayed -&gt; translated pressed -&gt; translation finished or error -&gt; submit</li>
+<li>Switch language: infobar displayed -&gt; switch source or target lang -&gt; submit (further actions will be submitted in translation scenario)</li>
+<li>Reject: infobar displayed -&gt; press never, not now or close -&gt; submit</li>
+<li>No action: infobar displayed -&gt; no action -&gt; submit on timer after a period of inactivity.</li>
+<li>Language pair unsupported -&gt; submit</li>
+</ol>
+<h2><a class="header" href="#table-of-contents" id="table-of-contents">Table of contents</a></h2>
+<h3><a class="header" href="#constructors" id="constructors">Constructors</a></h3>
+<ul>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#constructor">constructor</a></li>
+</ul>
+<h3><a class="header" href="#properties" id="properties">Properties</a></h3>
+<ul>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#extensionversion">extensionVersion</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#firefoxclientid">firefoxClientId</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#inactivitydispatchtimersbytabid">inactivityDispatchTimersByTabId</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#initialized">initialized</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#queuedrecordingsbytabid">queuedRecordingsByTabId</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#telemetryinactivitythresholdinseconds">telemetryInactivityThresholdInSeconds</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#translationrelevantfxtelemetrymetrics">translationRelevantFxTelemetryMetrics</a></li>
+</ul>
+<h3><a class="header" href="#methods" id="methods">Methods</a></h3>
+<ul>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#cleanup">cleanup</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#clearinactivitytimerfortab">clearInactivityTimerForTab</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#initialize">initialize</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#oninfobarclosed">onInfoBarClosed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#oninfobardisplayed">onInfoBarDisplayed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onmodeldownloaderroroccurred">onModelDownloadErrorOccurred</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onmodelloaderroroccurred">onModelLoadErrorOccurred</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onnevertranslateselectedlanguage">onNeverTranslateSelectedLanguage</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onnevertranslatethissite">onNeverTranslateThisSite</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onnotnowbuttonpressed">onNotNowButtonPressed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onothererroroccurred">onOtherErrorOccurred</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onselecttranslatefrom">onSelectTranslateFrom</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onselecttranslateto">onSelectTranslateTo</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onshoworiginalbuttonpressed">onShowOriginalButtonPressed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#onshowtranslatedbuttonpressed">onShowTranslatedButtonPressed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#ontranslatebuttonpressed">onTranslateButtonPressed</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#ontranslationerroroccurred">onTranslationErrorOccurred</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#ontranslationfinished">onTranslationFinished</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#ontranslationstatusoffer">onTranslationStatusOffer</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#ontranslationstatustranslationunsupported">onTranslationStatusTranslationUnsupported</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#queuerecording">queueRecording</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#recordcommonmetadata">recordCommonMetadata</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#setfirefoxclientid">setFirefoxClientId</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#settranslationrelevantfxtelemetrymetrics">setTranslationRelevantFxTelemetryMetrics</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#submitqueuedrecordings">submitQueuedRecordings</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#updateinactivitytimerforalltabs">updateInactivityTimerForAllTabs</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#updateinactivitytimerfortab">updateInactivityTimerForTab</a></li>
+<li><a href="core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.html#uploadenabledpreferenceupdated">uploadEnabledPreferenceUpdated</a></li>
+</ul>
+<h2><a class="header" href="#constructors-1" id="constructors-1">Constructors</a></h2>
+<h3><a class="header" href="#constructor" id="constructor">constructor</a></h3>
+<p>• <strong>new Telemetry</strong>()</p>
+<h2><a class="header" href="#properties-1" id="properties-1">Properties</a></h2>
+<h3><a class="header" href="#extensionversion" id="extensionversion">extensionVersion</a></h3>
+<p>• <code>Private</code> <strong>extensionVersion</strong>: <code>string</code></p>
+<h4><a class="header" href="#defined-in" id="defined-in">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L94">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:94</a></p>
+<hr />
+<h3><a class="header" href="#firefoxclientid" id="firefoxclientid">firefoxClientId</a></h3>
+<p>• <code>Private</code> <strong>firefoxClientId</strong>: <code>string</code></p>
+<h4><a class="header" href="#defined-in-1" id="defined-in-1">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L91">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:91</a></p>
+<hr />
+<h3><a class="header" href="#inactivitydispatchtimersbytabid" id="inactivitydispatchtimersbytabid">inactivityDispatchTimersByTabId</a></h3>
+<p>• <code>Private</code> <strong>inactivityDispatchTimersByTabId</strong>: <code>Object</code> = {}</p>
+<h4><a class="header" href="#index-signature" id="index-signature">Index signature</a></h4>
+<p>▪ [tabId: <code>string</code>]: <code>number</code></p>
+<h4><a class="header" href="#defined-in-2" id="defined-in-2">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L98">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:98</a></p>
+<hr />
+<h3><a class="header" href="#initialized" id="initialized">initialized</a></h3>
+<p>• <code>Private</code> <strong>initialized</strong>: <code>boolean</code></p>
+<h4><a class="header" href="#defined-in-3" id="defined-in-3">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L90">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:90</a></p>
+<hr />
+<h3><a class="header" href="#queuedrecordingsbytabid" id="queuedrecordingsbytabid">queuedRecordingsByTabId</a></h3>
+<p>• <code>Private</code> <strong>queuedRecordingsByTabId</strong>: <code>Object</code> = {}</p>
+<h4><a class="header" href="#index-signature-1" id="index-signature-1">Index signature</a></h4>
+<p>▪ [tabId: <code>string</code>]: <code>TelemetryRecordingFunction</code>[]</p>
+<h4><a class="header" href="#defined-in-4" id="defined-in-4">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L95">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:95</a></p>
+<hr />
+<h3><a class="header" href="#telemetryinactivitythresholdinseconds" id="telemetryinactivitythresholdinseconds">telemetryInactivityThresholdInSeconds</a></h3>
+<p>• <code>Private</code> <strong>telemetryInactivityThresholdInSeconds</strong>: <code>number</code></p>
+<h4><a class="header" href="#defined-in-5" id="defined-in-5">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L92">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:92</a></p>
+<hr />
+<h3><a class="header" href="#translationrelevantfxtelemetrymetrics" id="translationrelevantfxtelemetrymetrics">translationRelevantFxTelemetryMetrics</a></h3>
+<p>• <code>Private</code> <strong>translationRelevantFxTelemetryMetrics</strong>: <a href="../interfaces/core_ts_background_scripts_background_js_telemetry_telemetry.translationrelevantfxtelemetrymetrics.html">TranslationRelevantFxTelemetryMetrics</a></p>
+<h4><a class="header" href="#defined-in-6" id="defined-in-6">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L93">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:93</a></p>
+<h2><a class="header" href="#methods-1" id="methods-1">Methods</a></h2>
+<h3><a class="header" href="#cleanup" id="cleanup">cleanup</a></h3>
+<p>▸ <strong>cleanup</strong>(): <code>Promise</code>&lt;void&gt;</p>
+<h4><a class="header" href="#returns" id="returns">Returns</a></h4>
+<p><code>Promise</code>&lt;void&gt;</p>
+<h4><a class="header" href="#defined-in-7" id="defined-in-7">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L414">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:414</a></p>
+<hr />
+<h3><a class="header" href="#clearinactivitytimerfortab" id="clearinactivitytimerfortab">clearInactivityTimerForTab</a></h3>
+<p>▸ <strong>clearInactivityTimerForTab</strong>(<code>tabId</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters" id="parameters">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>string</code> | <code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-1" id="returns-1">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-8" id="defined-in-8">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L381">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:381</a></p>
+<hr />
+<h3><a class="header" href="#initialize" id="initialize">initialize</a></h3>
+<p>▸ <strong>initialize</strong>(<code>uploadEnabled</code>, <code>$firefoxClientId</code>, <code>telemetryInactivityThresholdInSecondsOverride</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-1" id="parameters-1">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>uploadEnabled</code></td><td align="left"><code>boolean</code></td></tr>
+<tr><td align="left"><code>$firefoxClientId</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>telemetryInactivityThresholdInSecondsOverride</code></td><td align="left"><code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-2" id="returns-2">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-9" id="defined-in-9">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L101">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:101</a></p>
+<hr />
+<h3><a class="header" href="#oninfobarclosed" id="oninfobarclosed">onInfoBarClosed</a></h3>
+<p>▸ <strong>onInfoBarClosed</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-2" id="parameters-2">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-3" id="returns-3">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-10" id="defined-in-10">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L203">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:203</a></p>
+<hr />
+<h3><a class="header" href="#oninfobardisplayed" id="oninfobardisplayed">onInfoBarDisplayed</a></h3>
+<p>▸ <strong>onInfoBarDisplayed</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-3" id="parameters-3">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-4" id="returns-4">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-11" id="defined-in-11">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L179">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:179</a></p>
+<hr />
+<h3><a class="header" href="#onmodeldownloaderroroccurred" id="onmodeldownloaderroroccurred">onModelDownloadErrorOccurred</a></h3>
+<p>▸ <strong>onModelDownloadErrorOccurred</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-4" id="parameters-4">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-5" id="returns-5">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-12" id="defined-in-12">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L321">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:321</a></p>
+<hr />
+<h3><a class="header" href="#onmodelloaderroroccurred" id="onmodelloaderroroccurred">onModelLoadErrorOccurred</a></h3>
+<p>▸ <strong>onModelLoadErrorOccurred</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-5" id="parameters-5">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-6" id="returns-6">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-13" id="defined-in-13">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L316">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:316</a></p>
+<hr />
+<h3><a class="header" href="#onnevertranslateselectedlanguage" id="onnevertranslateselectedlanguage">onNeverTranslateSelectedLanguage</a></h3>
+<p>▸ <strong>onNeverTranslateSelectedLanguage</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-6" id="parameters-6">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-7" id="returns-7">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-14" id="defined-in-14">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L211">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:211</a></p>
+<hr />
+<h3><a class="header" href="#onnevertranslatethissite" id="onnevertranslatethissite">onNeverTranslateThisSite</a></h3>
+<p>▸ <strong>onNeverTranslateThisSite</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-7" id="parameters-7">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-8" id="returns-8">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-15" id="defined-in-15">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L223">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:223</a></p>
+<hr />
+<h3><a class="header" href="#onnotnowbuttonpressed" id="onnotnowbuttonpressed">onNotNowButtonPressed</a></h3>
+<p>▸ <strong>onNotNowButtonPressed</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-8" id="parameters-8">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-9" id="returns-9">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-16" id="defined-in-16">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L257">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:257</a></p>
+<hr />
+<h3><a class="header" href="#onothererroroccurred" id="onothererroroccurred">onOtherErrorOccurred</a></h3>
+<p>▸ <strong>onOtherErrorOccurred</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-9" id="parameters-9">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-10" id="returns-10">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-17" id="defined-in-17">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L337">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:337</a></p>
+<hr />
+<h3><a class="header" href="#onselecttranslatefrom" id="onselecttranslatefrom">onSelectTranslateFrom</a></h3>
+<p>▸ <strong>onSelectTranslateFrom</strong>(<code>tabId</code>, <code>newFrom</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-10" id="parameters-10">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>newFrom</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-11" id="returns-11">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-18" id="defined-in-18">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L187">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:187</a></p>
+<hr />
+<h3><a class="header" href="#onselecttranslateto" id="onselecttranslateto">onSelectTranslateTo</a></h3>
+<p>▸ <strong>onSelectTranslateTo</strong>(<code>tabId</code>, <code>from</code>, <code>newTo</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-11" id="parameters-11">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>newTo</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-12" id="returns-12">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-19" id="defined-in-19">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L195">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:195</a></p>
+<hr />
+<h3><a class="header" href="#onshoworiginalbuttonpressed" id="onshoworiginalbuttonpressed">onShowOriginalButtonPressed</a></h3>
+<p>▸ <strong>onShowOriginalButtonPressed</strong>(<code>tabId</code>, <code>_from</code>, <code>_to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-12" id="parameters-12">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>_from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>_to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-13" id="returns-13">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-20" id="defined-in-20">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L231">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:231</a></p>
+<hr />
+<h3><a class="header" href="#onshowtranslatedbuttonpressed" id="onshowtranslatedbuttonpressed">onShowTranslatedButtonPressed</a></h3>
+<p>▸ <strong>onShowTranslatedButtonPressed</strong>(<code>tabId</code>, <code>_from</code>, <code>_to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-13" id="parameters-13">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>_from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>_to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-14" id="returns-14">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-21" id="defined-in-21">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L240">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:240</a></p>
+<hr />
+<h3><a class="header" href="#ontranslatebuttonpressed" id="ontranslatebuttonpressed">onTranslateButtonPressed</a></h3>
+<p>▸ <strong>onTranslateButtonPressed</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-14" id="parameters-14">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-15" id="returns-15">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-22" id="defined-in-22">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L249">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:249</a></p>
+<hr />
+<h3><a class="header" href="#ontranslationerroroccurred" id="ontranslationerroroccurred">onTranslationErrorOccurred</a></h3>
+<p>▸ <strong>onTranslationErrorOccurred</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-15" id="parameters-15">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-16" id="returns-16">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-23" id="defined-in-23">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L329">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:329</a></p>
+<hr />
+<h3><a class="header" href="#ontranslationfinished" id="ontranslationfinished">onTranslationFinished</a></h3>
+<p>▸ <strong>onTranslationFinished</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>, <code>timeToFullPageTranslatedMs</code>, <code>timeToFullPageTranslatedWordsPerSecond</code>, <code>modelDownloadTimeMs</code>, <code>modelLoadTimeMs</code>, <code>translationEngineTimeMs</code>, <code>translationEngineWordsPerSecond</code>, <code>$wordCount</code>, <code>$wordCountVisibleInViewport</code>): <code>void</code></p>
+<p>A translation attempt starts when a translation is requested in a
+specific tab and ends when all translations in that tab has completed</p>
+<h4><a class="header" href="#parameters-16" id="parameters-16">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>timeToFullPageTranslatedMs</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>timeToFullPageTranslatedWordsPerSecond</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>modelDownloadTimeMs</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>modelLoadTimeMs</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>translationEngineTimeMs</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>translationEngineWordsPerSecond</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>$wordCount</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>$wordCountVisibleInViewport</code></td><td align="left"><code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-17" id="returns-17">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-24" id="defined-in-24">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L269">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:269</a></p>
+<hr />
+<h3><a class="header" href="#ontranslationstatusoffer" id="ontranslationstatusoffer">onTranslationStatusOffer</a></h3>
+<p>▸ <strong>onTranslationStatusOffer</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-17" id="parameters-17">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-18" id="returns-18">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-25" id="defined-in-25">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L296">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:296</a></p>
+<hr />
+<h3><a class="header" href="#ontranslationstatustranslationunsupported" id="ontranslationstatustranslationunsupported">onTranslationStatusTranslationUnsupported</a></h3>
+<p>▸ <strong>onTranslationStatusTranslationUnsupported</strong>(<code>tabId</code>, <code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-18" id="parameters-18">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-19" id="returns-19">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-26" id="defined-in-26">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L304">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:304</a></p>
+<hr />
+<h3><a class="header" href="#queuerecording" id="queuerecording">queueRecording</a></h3>
+<p>▸ <strong>queueRecording</strong>(<code>telemetryRecordingFunction</code>, <code>tabId</code>): <code>void</code></p>
+<p>Submits all collected metrics in a custom ping.</p>
+<h4><a class="header" href="#parameters-19" id="parameters-19">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>telemetryRecordingFunction</code></td><td align="left">() =&gt; <code>void</code></td></tr>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-20" id="returns-20">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-27" id="defined-in-27">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L345">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:345</a></p>
+<hr />
+<h3><a class="header" href="#recordcommonmetadata" id="recordcommonmetadata">recordCommonMetadata</a></h3>
+<p>▸ <strong>recordCommonMetadata</strong>(<code>from</code>, <code>to</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-20" id="parameters-20">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>from</code></td><td align="left"><code>string</code></td></tr>
+<tr><td align="left"><code>to</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-21" id="returns-21">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-28" id="defined-in-28">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L144">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:144</a></p>
+<hr />
+<h3><a class="header" href="#setfirefoxclientid" id="setfirefoxclientid">setFirefoxClientId</a></h3>
+<p>▸ <strong>setFirefoxClientId</strong>(<code>$firefoxClientId</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-21" id="parameters-21">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>$firefoxClientId</code></td><td align="left"><code>string</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-22" id="returns-22">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-29" id="defined-in-29">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L134">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:134</a></p>
+<hr />
+<h3><a class="header" href="#settranslationrelevantfxtelemetrymetrics" id="settranslationrelevantfxtelemetrymetrics">setTranslationRelevantFxTelemetryMetrics</a></h3>
+<p>▸ <strong>setTranslationRelevantFxTelemetryMetrics</strong>(<code>translationRelevantFxTelemetryMetrics</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-22" id="parameters-22">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>translationRelevantFxTelemetryMetrics</code></td><td align="left"><a href="../interfaces/core_ts_background_scripts_background_js_telemetry_telemetry.translationrelevantfxtelemetrymetrics.html">TranslationRelevantFxTelemetryMetrics</a></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-23" id="returns-23">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-30" id="defined-in-30">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L138">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:138</a></p>
+<hr />
+<h3><a class="header" href="#submitqueuedrecordings" id="submitqueuedrecordings">submitQueuedRecordings</a></h3>
+<p>▸ <strong>submitQueuedRecordings</strong>(<code>tabId</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-23" id="parameters-23">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>string</code> | <code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-24" id="returns-24">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-31" id="defined-in-31">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L390">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:390</a></p>
+<hr />
+<h3><a class="header" href="#updateinactivitytimerforalltabs" id="updateinactivitytimerforalltabs">updateInactivityTimerForAllTabs</a></h3>
+<p>▸ <strong>updateInactivityTimerForAllTabs</strong>(): <code>void</code></p>
+<h4><a class="header" href="#returns-25" id="returns-25">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-32" id="defined-in-32">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L375">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:375</a></p>
+<hr />
+<h3><a class="header" href="#updateinactivitytimerfortab" id="updateinactivitytimerfortab">updateInactivityTimerForTab</a></h3>
+<p>▸ <strong>updateInactivityTimerForTab</strong>(<code>tabId</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-24" id="parameters-24">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>tabId</code></td><td align="left"><code>string</code> | <code>number</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-26" id="returns-26">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-33" id="defined-in-33">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L363">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:363</a></p>
+<hr />
+<h3><a class="header" href="#uploadenabledpreferenceupdated" id="uploadenabledpreferenceupdated">uploadEnabledPreferenceUpdated</a></h3>
+<p>▸ <strong>uploadEnabledPreferenceUpdated</strong>(<code>uploadEnabled</code>): <code>void</code></p>
+<h4><a class="header" href="#parameters-25" id="parameters-25">Parameters</a></h4>
+<table><thead><tr><th align="left">Name</th><th align="left">Type</th></tr></thead><tbody>
+<tr><td align="left"><code>uploadEnabled</code></td><td align="left"><code>boolean</code></td></tr>
+</tbody></table>
+<h4><a class="header" href="#returns-27" id="returns-27">Returns</a></h4>
+<p><code>void</code></p>
+<h4><a class="header" href="#defined-in-34" id="defined-in-34">Defined in</a></h4>
+<p><a href="https://github.com/mozilla-extensions/firefox-translations/blob/v0.4.3/src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts#L126">src/core/ts/background-scripts/background.js/telemetry/Telemetry.ts:126</a></p>
+<footer id="open-on-gh">Found a bug? <a href="https://github.com/mozilla-extensions/firefox-translations/edit/main/build/tmp-docs/dev/api-docs/classes/core_ts_background_scripts_background_js_telemetry_telemetry.telemetry.md">Edit this file on GitHub.</a></footer>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../../api-docs/classes/core_ts_background_scripts_background_js_state_management_store.store.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../../api-docs/classes/core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.bergamotrestapiclient.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../../api-docs/classes/core_ts_background_scripts_background_js_state_management_store.store.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../../api-docs/classes/core_ts_background_scripts_background_js_translation_api_clients_bergamotrestapiclient.bergamotrestapiclient.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+        <script type="text/javascript" src="../../../shared/tabs.js"></script>
+        
+        <script type="text/javascript" src="../../../shared/mermaid.min.js"></script>
+        
+        <script type="text/javascript" src="../../../shared/mermaid-init.js"></script>
+        
+
+        
+
+    </body>
+</html>
