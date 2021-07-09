@@ -1,6 +1,7 @@
 # do not lint/format generated artifacts
 dist/
 build/
+debug/
 test/e2e/results/
 stats.json
 yarn-error.log
@@ -28,3 +29,5 @@ firefox-nightly-linux
 downloaded-bergamot-translator-wasm-artifacts*
 # don't lint ci configuration
 .circleci/
+# formatted/linted separately
+docs

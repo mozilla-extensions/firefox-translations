@@ -1,0 +1,25 @@
+[book]
+title = "Firefox Translations Web Extension - Developer's Guide"
+authors = ["Bergamot Team @ Mozilla"]
+src = "."
+
+[build]
+build-dir = "../../docs/dev"
+create-missing = true
+
+[output.html]
+additional-css = ["../shared/custom.css"]
+additional-js = ["../shared/tabs.js", "../shared/mermaid.min.js", "../shared/mermaid-init.js"]
+git-repository-url = "https://github.com/mozilla-extensions/firefox-translations"
+git-branch = "main"
+mathjax-support = true
+
+[output.html.fold]
+enable = true
+level = 0
+
+[preprocessor.open-on-gh]
+command = "mdbook-open-on-gh"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"

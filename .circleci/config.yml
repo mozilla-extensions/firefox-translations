@@ -1,7 +1,9 @@
 version: 2.1
 
 jobs:
-  build_and_test_extension:
+  ###########################################################################
+  # Ordinary "build and test" CI flow
+  build-and-test-extension:
     docker:
       - image: circleci/node:latest-browsers
 
@@ -109,8 +111,124 @@ jobs:
           path: "test/e2e/results"
           destination: "test/e2e/results"
 
-workflows:
+  ###########################################################################
+  # Docs
+  generate-docs:
+    docker:
+      - image: circleci/node:latest-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "docs/package.json" }}
+      - run:
+          name: Install npm deps
+          command: cd docs && yarn install --immutable
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies-{{ checksum "docs/package.json" }}
+      - run:
+          name: Upgrade packages
+          command: sudo apt update
+      - run:
+          name: Install Aspell and Rust
+          command: sudo apt install aspell aspell-en rustc
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; aspell --version; yarn --version
+      - run:
+          name: Install mdbook-dtmo
+          command: |
+            MDBOOK_VERSION=0.8.1
+            MDBOOK="mdbook-dtmo-${MDBOOK_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            MDBOOK_SHA256=5b8fc7444816c685ae6a3018e6168844a2fcde73e681a9bfbe4775f361dec64c
+            curl -sfSL --retry 5 -O "https://github.com/badboy/mdbook-dtmo/releases/download/${MDBOOK_VERSION}/${MDBOOK}"
+            echo "${MDBOOK_SHA256} *${MDBOOK}" | shasum -a 256 -c -
+            tar -xvf "${MDBOOK}"
+            # We rename it to mdbook here, so other tools keep working as expected
+            mkdir -p ~/.local/bin/
+            mv mdbook-dtmo ~/.local/bin/mdbook
+            mdbook --version
+      - run:
+          name: Generate API docs
+          command: cd docs && yarn generate-api-docs
+      - run:
+          name: Build documentation
+          command: cd docs && yarn build
+      - run:
+          name: Check documentation links
+          command: cd docs && yarn linkcheck
+      - persist_to_workspace:
+          root: build/
+          paths:
+            - docs/user
+            - docs/dev
+            - docs/shared
+            - docs/index.html
 
-  build-and-test:
+  docs-spellcheck:
+    docker:
+      # This is a separate job so that we can use Ubuntu Focal (20.04) and that
+      # way get aspell 0.60.8 or later (which contains markdown support)
+      - image: circleci/buildpack-deps:focal
+    steps:
+      - checkout
+      - run:
+          name: Upgrade packages
+          command: sudo apt update
+      - run:
+          name: Install aspell
+          command: sudo apt install aspell aspell-en
+      - run:
+          name: Check documentation spelling
+          command: cd docs && bin/spellcheck.sh list
+
+  # via https://circleci.com/blog/deploying-documentation-to-github-pages-with-continuous-integration/
+  docs-deploy:
+    docker:
+      - image: node:8.10.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: build/
+      - run:
+          name: Disable jekyll builds
+          command: touch build/docs/.nojekyll
+      - run:
+          name: Show contents
+          command: ls -R
+      # Needed for write access to the GitHub repository;
+      # see https://circleci.com/docs/2.0/gh-bb-integration/#deployment-keys-and-user-keys
+      - add_ssh_keys:
+          fingerprints:
+            - "ea:bc:e4:c3:89:d4:2d:79:4f:70:d7:d8:3a:b9:ba:98"
+      # The gh-pages npm package can be used to push a directory to a git branch;
+      # see https://www.npmjs.com/package/gh-pages
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: |
+            git config user.email "ci-docs-deploy@firefox-translations"
+            git config user.name "CircleCI docs-deploy job"
+            npm install -g --silent gh-pages@2.0.1
+            gh-pages --dotfiles --message "[skip ci] Updates" --dist build/docs
+
+
+###########################################################################
+# Workflows
+
+workflows:
+  version: 2
+  ci:
     jobs:
-      - build_and_test_extension
+      - build-and-test-extension
+      - generate-docs
+      - docs-spellcheck:
+          requires:
+            - generate-docs
+      - docs-deploy:
+          requires:
+            - docs-spellcheck
+          filters:
+            branches:
+              only: main

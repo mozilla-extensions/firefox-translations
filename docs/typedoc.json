@@ -1,0 +1,13 @@
+{
+  "entryPoints": [
+    "../src/core/ts",
+    "../src/cross-browser-ui/ts",
+    "../src/firefox-infobar-ui/ts"
+  ],
+  "theme": "markdown",
+  "exclude": ["**/*.tsx", "**/*+(index|.spec).ts"],
+  "excludeExternals": true,
+  "readme": "none",
+  "externalPattern": ["**/node_modules/**"],
+  "out": "dev/api-docs"
+}

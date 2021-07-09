@@ -3,8 +3,8 @@
 *.pyc
 dist/
 build/
-test/build/
-test/results/coverage/
+debug/
+test/e2e/results/
 stats.json
 yarn-error.log
 *.map

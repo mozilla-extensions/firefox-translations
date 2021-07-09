@@ -10,7 +10,7 @@
     "module": "commonjs",
     "target": "es6",
     "jsx": "react",
-    "lib": ["es2020", "dom", "webworker"],
+    "lib": ["es2020", "dom"],
     "esModuleInterop": true,
     "allowJs": true
   },

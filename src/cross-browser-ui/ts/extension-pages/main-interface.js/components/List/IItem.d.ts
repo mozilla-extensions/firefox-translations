@@ -6,5 +6,5 @@ export interface Props {
   actions?: ReactNode[];
   style?: CSSProperties;
   action?: ReactNode;
-  onClick?: (event: MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
