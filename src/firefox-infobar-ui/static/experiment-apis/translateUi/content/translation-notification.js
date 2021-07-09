@@ -37,10 +37,10 @@ window.MozTranslationNotification = class extends MozElements.Notification {
             <hbox><label value="&translation.translatingContent.label;"/><label anonid="progress-label" value=""/></hbox>
           </vbox>
           <hbox class="translated-box" align="center">
-            <label value="&translation.translatedFrom.label;" style="margin-right: 4px;"/>
-            <label anonid="fromLanguage" style="margin-inline:0px;font-weight: bold;"/>
+            <label value="&translation.translatedFrom.label;" style="margin-inline-end: 4px;"/>
+            <label anonid="fromLanguage" style="margin-inline:0;font-weight: bold;"/>
             <label value="&translation.translatedTo.label;" style="margin-inline:3px;"/>
-            <label anonid="toLanguage" style="margin-inline:0px;font-weight: bold;"/>
+            <label anonid="toLanguage" style="margin-inline:0;font-weight: bold;"/>
             <label value="&translation.translatedToSuffix.label;"/>
             <button anonid="showOriginal" class="notification-button" label="&translation.showOriginal.button;" oncommand="this.closest('notification').showOriginal();"/>
             <button anonid="showTranslation" class="notification-button" label="&translation.showTranslation.button;" oncommand="this.closest('notification').showTranslation();"/>
