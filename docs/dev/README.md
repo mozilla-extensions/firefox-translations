@@ -26,7 +26,8 @@ To report engineering-related issues or request changes specific to the **Firefo
 The other repositories that together build up the **Firefox Translations** feature are:
 
 - **Bergamot Translator** - The translation engine ([Source code](https://github.com/mozilla/bergamot-translator))
-- **Language Models** - The files that the translation engine uses to translate between languages ([Source code](https://github.com/mozilla-applied-ml/bergamot-models))
+- **Language Models** - The files that the translation engine uses to translate between languages ([Source code](https://github.com/mozilla/firefox-translations-models))
+- **Training pipeline** - The scripts to train language models  ([Source code](https://github.com/mozilla/firefox-translations-training))
 - **Firefox** - Contains UI elements and optimizations specific to the translations feature ([Firefox source code documentation](https://firefox-source-docs.mozilla.org/))
 
 ### The relationship between the repositories
@@ -37,6 +38,7 @@ The other repositories that together build up the **Firefox Translations** featu
     THIS-WEB-EXTENSION ||..|| BERGAMOT-TRANSLATOR : downloads
     THIS-WEB-EXTENSION ||--|| BERGAMOT-TRANSLATOR : consumes
     BERGAMOT-TRANSLATOR ||--|{ LANGUAGE-MODELS : loads
+    TRAINING-PIPELINE ||--|{ LANGUAGE-MODELS : produces
 </pre>
 
 ## License
