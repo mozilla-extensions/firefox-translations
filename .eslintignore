@@ -21,7 +21,7 @@ test/locally-hosted-files/
 .venv
 venv
 bergamot-translator/
-bergamot-models/
+firefox-translations-models/
 emsdk/
 node_modules/
 test/in-browser/static/test-runner/inc/
