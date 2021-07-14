@@ -190,7 +190,8 @@
 <p>The other repositories that together build up the <strong>Firefox Translations</strong> feature are:</p>
 <ul>
 <li><strong>Bergamot Translator</strong> - The translation engine (<a href="https://github.com/mozilla/bergamot-translator">Source code</a>)</li>
-<li><strong>Language Models</strong> - The files that the translation engine uses to translate between languages (<a href="https://github.com/mozilla-applied-ml/bergamot-models">Source code</a>)</li>
+<li><strong>Language Models</strong> - The files that the translation engine uses to translate between languages (<a href="https://github.com/mozilla/firefox-translations-models">Source code</a>)</li>
+<li><strong>Training pipeline</strong> - The scripts to train language models  (<a href="https://github.com/mozilla/firefox-translations-training">Source code</a>)</li>
 <li><strong>Firefox</strong> - Contains UI elements and optimizations specific to the translations feature (<a href="https://firefox-source-docs.mozilla.org/">Firefox source code documentation</a>)</li>
 </ul>
 <h3><a class="header" href="#the-relationship-between-the-repositories" id="the-relationship-between-the-repositories">The relationship between the repositories</a></h3>
@@ -200,6 +201,7 @@
     THIS-WEB-EXTENSION ||..|| BERGAMOT-TRANSLATOR : downloads
     THIS-WEB-EXTENSION ||--|| BERGAMOT-TRANSLATOR : consumes
     BERGAMOT-TRANSLATOR ||--|{ LANGUAGE-MODELS : loads
+    TRAINING-PIPELINE ||--|{ LANGUAGE-MODELS : produces
 </pre>
 <h2><a class="header" href="#license" id="license">License</a></h2>
 <p>Firefox Translations Source Code is subject to the terms of the Mozilla Public License v2.0.
