@@ -9,7 +9,7 @@ The commands in these instructions are meant to be run in the root folder in thi
 2. Import bergamot models locally, since the extension downloads the models from a local endpoint when running in development mode:
 
 ```bash
-yarn bergamot-models:import
+yarn models:import
 ```
 
 3. Import Bergamot translator using one of the two methods below.
