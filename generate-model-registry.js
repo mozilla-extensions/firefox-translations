@@ -40,7 +40,7 @@ async function generateModelRegistry() {
   const modelRegistry = {};
 
   await Promise.all(
-    glob.sync("firefox-translations-models/*/*").map(async directory => {
+    glob.sync("firefox-translations-models/models/*/*").map(async directory => {
       const languagePair = path.basename(directory);
       modelRegistry[languagePair] = {};
       return Promise.all(
