@@ -7,7 +7,7 @@ set -e
 
 echo "* Checkout out the relevant revision of the firefox-translations-models repo"
 MODELS_UPDATED=0
-MODELS_GIT_REV="5f860ebfe5ed7c01a747567923cbdde97a47d808" # v0.2.2
+MODELS_GIT_REV="71b77fc986d60e901cf9a8b35b0ef1f6e795bc5c" # v0.2.4
 if [ ! -d "firefox-translations-models" ]; then
   git clone --branch main --single-branch https://github.com/mozilla/firefox-translations-models
   MODELS_UPDATED=1
@@ -24,7 +24,7 @@ if [ "$MODELS_UPDATED" == "1" ]; then
   mkdir -p test/locally-hosted-files/models
   mv test/locally-hosted-files/models/dummy tmp
   rm -rf test/locally-hosted-files/models/*
-  cp -rf firefox-translations-models/*/* test/locally-hosted-files/models
+  cp -rf firefox-translations-models/models/*/* test/locally-hosted-files/models
   ls -l test/locally-hosted-files/models/*
   mv tmp test/locally-hosted-files/models/dummy
 fi
