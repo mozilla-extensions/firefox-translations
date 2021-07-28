@@ -7,7 +7,7 @@ set -e
 
 echo "* Checkout out the relevant revision of the firefox-translations-models repo"
 MODELS_UPDATED=0
-MODELS_GIT_REV="71b77fc986d60e901cf9a8b35b0ef1f6e795bc5c" # v0.2.4
+MODELS_GIT_REV="a8158d24c78fc9b8bea6b3e94c99ee370210bd84" # v0.2.5
 if [ ! -d "firefox-translations-models" ]; then
   git clone --branch main --single-branch https://github.com/mozilla/firefox-translations-models
   MODELS_UPDATED=1
