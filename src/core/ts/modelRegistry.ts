@@ -10,27 +10,73 @@ export interface ModelRegistry {
 }
 
 export const modelRegistry: ModelRegistry = {
+  enru: {
+    vocab: {
+      name: "vocab.enru.spm",
+      size: 954844,
+      estimatedCompressedSize: 439863,
+      expectedSha256Hash:
+        "4bd81da3657acbdf12d22a04d0076bec7ca2db70b978791723113b595b6a831e",
+    },
+    lex: {
+      name: "lex.50.50.enru.s2t.bin",
+      size: 2981280,
+      estimatedCompressedSize: 1532704,
+      expectedSha256Hash:
+        "2e28a40f9146db615acfe4e836b6fc61d6933417a1ea9640cc015fd7b4546798",
+    },
+    model: {
+      name: "model.enru.intgemm.alphas.bin",
+      size: 17140836,
+      estimatedCompressedSize: 12868710,
+      expectedSha256Hash:
+        "b88c646db5af7cf2b8be78450a47e78e55f4f4d2fb14611eada5dcd3e324c212",
+    },
+  },
+  pten: {
+    vocab: {
+      name: "vocab.pten.spm",
+      size: 812889,
+      estimatedCompressedSize: 406730,
+      expectedSha256Hash:
+        "8389979e3c965688b07aeb712a7e44406e5dcdb2b84087229d26fcc71448c4ed",
+    },
+    lex: {
+      name: "lex.50.50.pten.s2t.bin",
+      size: 5001420,
+      estimatedCompressedSize: 2733800,
+      expectedSha256Hash:
+        "212ed0ae44a6f920cd6d17ca02f0a523ba6c4b0ef5078ae310c20bc4c51484c5",
+    },
+    model: {
+      name: "model.pten.intgemm.alphas.bin",
+      size: 17140836,
+      estimatedCompressedSize: 13584764,
+      expectedSha256Hash:
+        "6c3b7af01772022a19712410c63342ba581468c2f1aac34d7488409c4043e697",
+    },
+  },
   ruen: {
     vocab: {
       name: "vocab.ruen.spm",
-      size: 911389,
-      estimatedCompressedSize: 433000,
+      size: 952700,
+      estimatedCompressedSize: 439416,
       expectedSha256Hash:
-        "d52b077fd1a2633f8a833b5f50ec0a1d1775d1d82edf5f92fcae9be50cbee1a5",
+        "52166910903332384a723561dc5a5913d3c2348e6f4b9c8846869f24a7cadce5",
     },
     lex: {
       name: "lex.50.50.ruen.s2t.bin",
-      size: 4020736,
-      estimatedCompressedSize: 2131338,
+      size: 4370648,
+      estimatedCompressedSize: 2284561,
       expectedSha256Hash:
-        "f34d96729e9c7ccd060109d9add03705b4f012ea5783ba3ad9c24ba57fe1813d",
+        "5bbea0f3bd641f675eaa3ef325f623e3427b29eb291805f37e3efd2e5abc928b",
     },
     model: {
       name: "model.ruen.intgemm.alphas.bin",
       size: 17140836,
-      estimatedCompressedSize: 13170690,
+      estimatedCompressedSize: 13189875,
       expectedSha256Hash:
-        "5dd27f1c7c0872f1d544aa285828b5bcf71bfd923d07d1e493e354fb1d743655",
+        "a045a53520d5792aa1761198e3508c3c698870d47510e2c08fa77a1a4a2b83c9",
     },
   },
   csen: {
