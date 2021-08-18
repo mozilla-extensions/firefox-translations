@@ -33,6 +33,29 @@ export const modelRegistry: ModelRegistry = {
         "b88c646db5af7cf2b8be78450a47e78e55f4f4d2fb14611eada5dcd3e324c212",
     },
   },
+  iten: {
+    vocab: {
+      name: "vocab.iten.spm",
+      size: 814151,
+      estimatedCompressedSize: 405416,
+      expectedSha256Hash:
+        "22d5ce6973be5360a921103acbe984a9bfca952a1f6c55c9cb5ef7de4fd58266",
+    },
+    lex: {
+      name: "lex.50.50.iten.s2t.bin",
+      size: 5238420,
+      estimatedCompressedSize: 2860178,
+      expectedSha256Hash:
+        "357d362373022b029ee9965975a133e6f36fdb0fed749202ff578365cf0111f8",
+    },
+    model: {
+      name: "model.iten.intgemm.alphas.bin",
+      size: 17140836,
+      estimatedCompressedSize: 13423308,
+      expectedSha256Hash:
+        "1fae546faeb9046f80b1b7e940b37b660974ce72902778181d6cd1c30b717f35",
+    },
+  },
   pten: {
     vocab: {
       name: "vocab.pten.spm",
@@ -59,24 +82,24 @@ export const modelRegistry: ModelRegistry = {
   ruen: {
     vocab: {
       name: "vocab.ruen.spm",
-      size: 952700,
-      estimatedCompressedSize: 439416,
+      size: 936576,
+      estimatedCompressedSize: 435801,
       expectedSha256Hash:
-        "52166910903332384a723561dc5a5913d3c2348e6f4b9c8846869f24a7cadce5",
+        "aaf9a325c0a988c507d0312cb6ba1a02bac7a370bcd879aedee626a40bfbda78",
     },
     lex: {
       name: "lex.50.50.ruen.s2t.bin",
-      size: 4370648,
-      estimatedCompressedSize: 2284561,
+      size: 5090836,
+      estimatedCompressedSize: 2684919,
       expectedSha256Hash:
-        "5bbea0f3bd641f675eaa3ef325f623e3427b29eb291805f37e3efd2e5abc928b",
+        "e6667e22f5f86be4872e3768b7184727f5dd8c9f2ccfb0639baabcb1176f5d11",
     },
     model: {
       name: "model.ruen.intgemm.alphas.bin",
       size: 17140836,
-      estimatedCompressedSize: 13189875,
+      estimatedCompressedSize: 13108893,
       expectedSha256Hash:
-        "a045a53520d5792aa1761198e3508c3c698870d47510e2c08fa77a1a4a2b83c9",
+        "3b6a0305e3d232fadd54f5a765365b7b96ad6d8f2e818cba594b02fbd8fadb3d",
     },
   },
   csen: {
