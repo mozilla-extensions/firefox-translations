@@ -5,7 +5,7 @@ export const config = {
   sentryDsn: process.env.SENTRY_DSN,
   bergamotModelsBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/models"
-    : "https://storage.googleapis.com/bergamot-models-sandbox/0.2.6",
+    : "https://storage.googleapis.com/bergamot-models-sandbox/0.2.7",
   wasmBinariesBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/wasm"
     : "https://storage.googleapis.com/bergamot-models-sandbox/wasm/1",
@@ -31,6 +31,7 @@ export const config = {
     ["ru", "en"],
     ["en", "ru"],
     ["pt", "en"],
+    ["en", "pt"],
     ["it", "en"],
   ],
   privacyNoticeUrl: "https://example.com/privacy-notice",
