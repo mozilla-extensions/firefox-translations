@@ -10,6 +10,29 @@ export interface ModelRegistry {
 }
 
 export const modelRegistry: ModelRegistry = {
+  enit: {
+    vocab: {
+      name: "vocab.enit.spm",
+      size: 814128,
+      estimatedCompressedSize: 405338,
+      expectedSha256Hash:
+        "de8cbeb79e0139304bfa47e8559f2447016bf9906225a97d3df1baed4de8f3a3",
+    },
+    lex: {
+      name: "lex.50.50.enit.s2t.bin",
+      size: 4489920,
+      estimatedCompressedSize: 2409986,
+      expectedSha256Hash:
+        "bb1fad3b3f6a13ebce1698cf7f39ca736c4dea4525f3dab5e1a78436f07445e6",
+    },
+    model: {
+      name: "model.enit.intgemm.alphas.bin",
+      size: 17140836,
+      estimatedCompressedSize: 13283223,
+      expectedSha256Hash:
+        "a5ce3723f62ead92a0e0373b6df0ad8e3e6d22963adb1333984206e33b8b6c61",
+    },
+  },
   enpt: {
     vocab: {
       name: "vocab.enpt.spm",
