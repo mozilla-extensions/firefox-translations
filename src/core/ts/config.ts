@@ -5,7 +5,7 @@ export const config = {
   sentryDsn: process.env.SENTRY_DSN,
   bergamotModelsBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/models"
-    : "https://storage.googleapis.com/bergamot-models-sandbox/0.2.8",
+    : "https://storage.googleapis.com/bergamot-models-sandbox/0.2.9",
   wasmBinariesBaseUrl: developmentBuild
     ? "http://0.0.0.0:4000/wasm"
     : "https://storage.googleapis.com/bergamot-models-sandbox/wasm/1",
@@ -16,7 +16,7 @@ export const config = {
     // "German, French, Spanish, Polish, Czech, and Estonian in and out of English"
     // ISO 639-1 codes
     // Language pairs that are not available are commented out
-    // ["de","en"],
+    ["de", "en"],
     // ["fr","en"],
     ["es", "en"],
     // ["pl","en"],
