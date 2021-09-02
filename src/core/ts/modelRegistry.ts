@@ -171,6 +171,29 @@ export const modelRegistry: ModelRegistry = {
         "5b16661e2864dc50b2f4091a16bdd4ec8d8283e04271e602159ba348df5d6e2d",
     },
   },
+  deen: {
+    vocab: {
+      name: "vocab.deen.spm",
+      size: 784269,
+      estimatedCompressedSize: 410738,
+      expectedSha256Hash:
+        "417668f2ed297970febafb5b079a9d5ebc4ed0b3550ac8386d67a90473a09bd7",
+    },
+    lex: {
+      name: "lex.50.50.deen.s2t.bin",
+      size: 5047568,
+      estimatedCompressedSize: 2657472,
+      expectedSha256Hash:
+        "2f7c0f7bbce97ae5b52454074a892ba7b7610fb98e3c5d341e4ca79f0850c4de",
+    },
+    model: {
+      name: "model.deen.intgemm.alphas.bin",
+      size: 17140837,
+      estimatedCompressedSize: 13091214,
+      expectedSha256Hash:
+        "dda44d87ab0d8ad3b3871122fd3ee385f37878183a8b4ec139cd909531ec5009",
+    },
+  },
   encs: {
     vocab: {
       name: "vocab.csen.spm",
