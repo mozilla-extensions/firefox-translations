@@ -1,5 +1,6 @@
 ```
-This repo has been archived and the work on Firefox Translations will continue here: https://github.com/mozilla/firefox-translations
+This repo has been archived and the work on Firefox Translations will continue here: 
+https://github.com/mozilla/firefox-translations
 ```
 # Firefox Translations Web Extension
 
