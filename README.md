@@ -1,3 +1,6 @@
+```
+This repo has been archived and the work on Firefox Translations will continue here: https://github.com/mozilla/firefox-translations
+```
 # Firefox Translations Web Extension
 
 [![CircleCI badge](https://img.shields.io/circleci/project/github/mozilla-extensions/firefox-translations/main.svg?label=CircleCI)](https://circleci.com/gh/mozilla-extensions/firefox-translations/)
