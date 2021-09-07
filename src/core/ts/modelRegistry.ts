@@ -59,24 +59,24 @@ export const modelRegistry: ModelRegistry = {
   enru: {
     vocab: {
       name: "vocab.enru.spm",
-      size: 954844,
-      estimatedCompressedSize: 439863,
+      size: 937157,
+      estimatedCompressedSize: 435776,
       expectedSha256Hash:
-        "4bd81da3657acbdf12d22a04d0076bec7ca2db70b978791723113b595b6a831e",
+        "feca2d44f01b946c85faba3b15b5eb53344bec84cd14a1a4d4a82ddd774c5edd",
     },
     lex: {
       name: "lex.50.50.enru.s2t.bin",
-      size: 2981280,
-      estimatedCompressedSize: 1532704,
+      size: 3049096,
+      estimatedCompressedSize: 1579779,
       expectedSha256Hash:
-        "2e28a40f9146db615acfe4e836b6fc61d6933417a1ea9640cc015fd7b4546798",
+        "7bd3e2c0a72286fe1f3da65c56c49a7cd77efa5f1d1a444e2a9e769480b96ff3",
     },
     model: {
       name: "model.enru.intgemm.alphas.bin",
       size: 17140836,
-      estimatedCompressedSize: 12868710,
+      estimatedCompressedSize: 12853987,
       expectedSha256Hash:
-        "b88c646db5af7cf2b8be78450a47e78e55f4f4d2fb14611eada5dcd3e324c212",
+        "4a45186a93b8a2dd9301c66a3b3dad580b1bcfa74aadda583ca383f9fe0dea93",
     },
   },
   iten: {
